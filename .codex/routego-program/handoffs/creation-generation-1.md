@@ -6,9 +6,11 @@
 - OpenSpec change：`add-routego-image-creation`
 - 来源任务：`019f7084-17c4-7442-94e5-458f59b20086`
 - 来源代次：`0`
-- 继任任务：`pending`
+- 继任任务：`019f71e2-aabc-77f2-84a2-59ba87936c27`
 - 继任代次：`1`
 - 计划分支：`codex/routego-creation-g1`
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\da45\生图插件`
+- 交接治理起始提交：`18490fd01258cab55939f829673ba67f96963bef`
 - 可观察上下文压缩：`2`
 - 原因：连续性治理到达时大型原子任务 `3.2` 已在执行；来源任务完成、验证并提交该任务后发送 `[LANE_CHECKPOINT]`，不得继续启动大型任务 `4.1`。
 
