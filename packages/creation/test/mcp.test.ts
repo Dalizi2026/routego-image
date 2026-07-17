@@ -138,7 +138,15 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(value.tools).toHaveLength(7);
     for (const tool of value.tools) {
       expect(tool.inputSchema).toMatchObject({ type: "object" });
-      expect(tool.inputSchema["additionalProperties"]).toBe(false);
+      const variants = tool.inputSchema["oneOf"];
+      if (Array.isArray(variants)) {
+        expect(variants.length).toBeGreaterThan(0);
+        for (const variant of variants) {
+          expect(variant).toMatchObject({ type: "object", additionalProperties: false });
+        }
+      } else {
+        expect(tool.inputSchema["additionalProperties"]).toBe(false);
+      }
     }
   });
 

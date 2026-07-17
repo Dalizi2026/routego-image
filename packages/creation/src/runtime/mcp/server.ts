@@ -60,17 +60,25 @@ const TOOL_TO_OPERATION = new Map<string, RoutegoOperation>(
   routegoOperationNames.map((operation) => [routegoOperationDefinitions[operation].toolName, operation])
 );
 
+function inputJsonSchema(operation: RoutegoOperation): Record<string, unknown> {
+  const generated = routegoOperationDefinitions[operation].inputSchema.toJSONSchema({
+    target: "draft-07",
+    io: "input",
+    unrepresentable: "any"
+  }) as Record<string, unknown>;
+  if (generated["type"] === undefined && Array.isArray(generated["oneOf"])) {
+    return { ...generated, type: "object" };
+  }
+  return generated;
+}
+
 function toolDefinitions() {
   return routegoOperationNames.map((operation) => {
     const definition = routegoOperationDefinitions[operation];
     return {
       name: definition.toolName,
       description: TOOL_DESCRIPTIONS[operation],
-      inputSchema: definition.inputSchema.toJSONSchema({
-        target: "draft-07",
-        io: "input",
-        unrepresentable: "any"
-      })
+      inputSchema: inputJsonSchema(operation)
     };
   });
 }
