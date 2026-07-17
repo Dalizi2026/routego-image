@@ -29,7 +29,7 @@
 
 ## 6. Contract freeze and delivery
 
-- [ ] 6.1 `[lane=foundation owner=main deps=1.3,5.4 files=all Foundation-owned delivery files]` Run a clean-install regression from the committed lockfile, verify package exports contain no Node imports in the contracts browser surface and no native runtime dependency, and reconcile implementation against every requirement/scenario and audit recommendation. Verification: no planned item, hidden TODO, placeholder, fake data path, or uncommitted generated artifact remains.
+- [x] 6.1 `[lane=foundation owner=main deps=1.3,5.4 files=all Foundation-owned delivery files]` Run a clean-install regression from the committed lockfile, verify package exports contain no Node imports in the contracts browser surface and no native runtime dependency, and reconcile implementation against every requirement/scenario and audit recommendation. Verification: no planned item, hidden TODO, placeholder, fake data path, or uncommitted generated artifact remains.
 - [ ] 6.2 `[lane=foundation owner=main deps=6.1 files=OpenSpec tasks/status only]` Run `openspec validate --all --strict --no-interactive`, `pnpm safety`, `pnpm typecheck`, `pnpm build`, `pnpm test`, and Git cleanliness checks; record final commits, tests, blockers, and residual risks for Program Controller integration. Verification: every command passes and the change reports all tasks complete before integration handoff.
 
 > Checkbox ownership: only the Foundation apply-owner updates this file. A checkbox is marked complete only after its implementation is committed to the Foundation integration branch and its listed verification passes. Subagents must not edit OpenSpec artifacts, `tasks.md`, root dependency/lock files, or shared schemas.
