@@ -3,13 +3,13 @@
   "lane": "foundation-extension",
   "change": "extend-routego-image-foundation-contracts",
   "role": "openspec-apply-owner",
-  "status": "planning",
+  "status": "archived",
   "threadId": "019f708d-92bb-78b0-a23d-3a8d68255006",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\c358\\生图插件",
   "branch": "codex/routego-foundation-extension",
   "startingCommit": "c3b885221e154ee96e96eb00224893c483545c04",
   "registrationCommit": "8fac9f29825db0f06c1459a421aaea7fa36ef8c6",
-  "headCommit": null,
+  "headCommit": "c64c727f6dd449d41dd38cfb60a4bf849e719672",
   "generation": 0,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "context-summary-2026-07-17-c600405-task-3.1-staged-pd003-resolved",
@@ -33,6 +33,12 @@
       "plugin manifest, installation, and release workflow",
       "real API keys, user images, legacy config, and legacy library mutation"
     ]
+  },
+  "integration": {
+    "mergeCommit": "710eb61",
+    "specsSynced": true,
+    "archivePath": "openspec/changes/archive/2026-07-17-extend-routego-image-foundation-contracts",
+    "archivedAt": "2026-07-18T00:08:00+08:00"
   },
   "completion": {
     "tasks": "5/5",

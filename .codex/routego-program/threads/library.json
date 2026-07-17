@@ -3,7 +3,7 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "blocked-on-foundation-extension",
+  "status": "resume-pending",
   "threadId": "019f7084-17ce-75d0-932b-12878f95f48f",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f5a6\\生图插件",
   "branch": "codex/routego-library",
@@ -18,6 +18,11 @@
     "establish-routego-image-foundation",
     "extend-routego-image-foundation-contracts"
   ],
+  "foundationExtension": {
+    "branch": "codex/routego-foundation-extension",
+    "commit": "c64c727f6dd449d41dd38cfb60a4bf849e719672",
+    "mergeCommit": "710eb61"
+  },
   "ownership": {
     "owned": [
       "local provider configuration persistence",
