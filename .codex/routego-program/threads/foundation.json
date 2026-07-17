@@ -42,5 +42,13 @@
     "lastCompletedTask": "2.3",
     "lastHealthAuditAt": "2026-07-17T20:40:30.9797218+08:00",
     "newCompactionMarkerObserved": false
+  },
+  "subagents": {
+    "runtime": {
+      "task": "/root/foundation_runtime",
+      "status": "active",
+      "startedAt": "2026-07-17T20:42:10.7543416+08:00",
+      "ownsTasks": ["3.1", "3.2", "4.1", "4.2"]
+    }
   }
 }
