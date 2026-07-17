@@ -3,12 +3,12 @@
   "lane": "creation",
   "change": "add-routego-image-creation",
   "role": "openspec-apply-owner",
-  "status": "handoff-awaiting-acceptance",
+  "status": "applying",
   "threadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\da45\\生图插件",
   "branch": "codex/routego-creation-g1",
   "startingCommit": "18490fd01258cab55939f829673ba67f96963bef",
-  "headCommit": "18490fd01258cab55939f829673ba67f96963bef",
+  "headCommit": "ca173854e51c221b751c2761164599245244f04f",
   "generation": 1,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -23,8 +23,8 @@
   "openspecProgress": "6/8",
   "nextTask": "4.1",
   "applyOwnership": {
-    "state": "awaiting-successor-acceptance",
-    "activeOwnerThreadId": null,
+    "state": "active-single-owner",
+    "activeOwnerThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
     "predecessorThreadId": "019f7084-17c4-7442-94e5-458f59b20086",
     "successorThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27"
   },
@@ -35,7 +35,7 @@
     "headCommit": "ca173854e51c221b751c2761164599245244f04f",
     "productCheckpointCommit": "2efb2465fa92fc51b4f6bf5f744a29a320b62a63",
     "observableCompactions": 2,
-    "status": "handoff-suspended"
+    "status": "archived"
   },
   "continuityGovernance": {
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
