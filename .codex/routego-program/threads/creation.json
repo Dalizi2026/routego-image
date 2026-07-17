@@ -3,12 +3,12 @@
   "lane": "creation",
   "change": "add-routego-image-creation",
   "role": "openspec-apply-owner",
-  "status": "applying",
+  "status": "delivered-pending-archive",
   "threadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\da45\\生图插件",
   "branch": "codex/routego-creation-g1",
   "startingCommit": "18490fd01258cab55939f829673ba67f96963bef",
-  "headCommit": "0cf3af53c56f17e18228bccb705054a7c2fb8933",
+  "headCommit": "624e7390b902814620d3eeb583ed43a57fd8243a",
   "generation": 1,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -20,11 +20,14 @@
   "handoffCommit": "18490fd01258cab55939f829673ba67f96963bef",
   "registrationCommit": "ca173854e51c221b751c2761164599245244f04f",
   "activationCommit": "0cf3af53c56f17e18228bccb705054a7c2fb8933",
+  "planningCommit": "c517b823cb4724367553f039769bd43643e78fe1",
+  "finalImplementationCommit": "be67086dcb9caf9a1cd86c4e214b6f55bdcc6143",
+  "deliveryCommit": "624e7390b902814620d3eeb583ed43a57fd8243a",
   "handoffFile": ".codex/routego-program/handoffs/creation-generation-1.md",
-  "openspecProgress": "6/8",
-  "nextTask": "4.1",
+  "openspecProgress": "8/8",
+  "nextTask": null,
   "applyOwnership": {
-    "state": "active-single-owner",
+    "state": "delivery-complete-awaiting-controller-archive",
     "activeOwnerThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
     "predecessorThreadId": "019f7084-17c4-7442-94e5-458f59b20086",
     "successorThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27"
@@ -42,7 +45,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "delivered-and-checkpointed"
+    "status": "lane-complete-received"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
