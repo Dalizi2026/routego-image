@@ -10,9 +10,9 @@
   "startingCommit": "e0177a29431e237859e001473fcba29c23fdd1cc",
   "headCommit": null,
   "generation": 0,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "pending",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "handoff-summary@c517b823cb4724367553f039769bd43643e78fe1:task-1.1-before-write",
+  "lastHealthAudit": "2026-07-18:healthy; branch/head/change/task/ownership confirmed before task 1.1",
   "successorThreadId": null,
   "dependsOn": [
     "establish-routego-image-foundation",
