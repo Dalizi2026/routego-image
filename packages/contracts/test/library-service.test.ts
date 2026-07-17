@@ -363,7 +363,10 @@ describe("Library Studio operation definitions", () => {
       "reserveUploadResource",
       "finalizeUploadResource",
       "getUploadResourceStatus",
-      "discardUploadResource"
+      "discardUploadResource",
+      "studioGenerate",
+      "studioEdit",
+      "studioBatch"
     ]);
     for (const operation of [
       "listFolders",

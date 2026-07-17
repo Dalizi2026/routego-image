@@ -276,7 +276,10 @@ describe("separate Studio operation registry", () => {
       "reserveUploadResource",
       "finalizeUploadResource",
       "getUploadResourceStatus",
-      "discardUploadResource"
+      "discardUploadResource",
+      "studioGenerate",
+      "studioEdit",
+      "studioBatch"
     ]);
     expect(studioOperationNames.some((name) => routegoOperationNames.includes(name as never))).toBe(
       false

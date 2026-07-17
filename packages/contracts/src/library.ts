@@ -354,7 +354,8 @@ export const relativeBrowserResourceUrlSchema = z
   .max(2_048)
   .superRefine((value, context) => {
     if (
-      !value.startsWith("/api/v1/library/resources/") ||
+      (!value.startsWith("/api/v1/library/resources/") &&
+        !value.startsWith("/api/v1/resources/")) ||
       value.startsWith("//") ||
       value.includes("\\") ||
       value.includes("..") ||
@@ -364,7 +365,7 @@ export const relativeBrowserResourceUrlSchema = z
     ) {
       context.addIssue({
         code: "custom",
-        message: "Browser resources require a protected relative Library URL"
+        message: "Browser resources require a protected relative resource URL"
       });
     }
   });

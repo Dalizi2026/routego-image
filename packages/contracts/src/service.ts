@@ -53,6 +53,18 @@ import {
   type UpsertProviderProfileResult
 } from "./settings";
 import {
+  studioBatchInputSchema,
+  studioBatchResultSchema,
+  studioEditInputSchema,
+  studioGenerateInputSchema,
+  studioImageOperationResultSchema,
+  type StudioBatchInput,
+  type StudioBatchResult,
+  type StudioEditInput,
+  type StudioGenerateInput,
+  type StudioImageOperationResult
+} from "./studio-creation";
+import {
   imageOperationResultSchema,
   routegoBatchInputSchema,
   routegoBatchResultSchema,
@@ -127,7 +139,10 @@ export const studioOperationNames = [
   "reserveUploadResource",
   "finalizeUploadResource",
   "getUploadResourceStatus",
-  "discardUploadResource"
+  "discardUploadResource",
+  "studioGenerate",
+  "studioEdit",
+  "studioBatch"
 ] as const;
 
 export type StudioOperation = (typeof studioOperationNames)[number];
@@ -265,6 +280,21 @@ export const studioOperationDefinitions = {
     http: { method: "POST", path: "/api/v1/uploads/discard" },
     inputSchema: discardUploadResourceInputSchema,
     outputSchema: discardUploadResourceResultSchema
+  },
+  studioGenerate: {
+    http: { method: "POST", path: "/api/v1/studio/creation/generate" },
+    inputSchema: studioGenerateInputSchema,
+    outputSchema: studioImageOperationResultSchema
+  },
+  studioEdit: {
+    http: { method: "POST", path: "/api/v1/studio/creation/edit" },
+    inputSchema: studioEditInputSchema,
+    outputSchema: studioImageOperationResultSchema
+  },
+  studioBatch: {
+    http: { method: "POST", path: "/api/v1/studio/creation/batch" },
+    inputSchema: studioBatchInputSchema,
+    outputSchema: studioBatchResultSchema
   }
 } as const satisfies Record<
   StudioOperation,
@@ -322,11 +352,18 @@ export interface StudioUploadService {
   ): Promise<DiscardUploadResourceResult>;
 }
 
+export interface StudioCreationService {
+  studioGenerate(input: StudioGenerateInput): Promise<StudioImageOperationResult>;
+  studioEdit(input: StudioEditInput): Promise<StudioImageOperationResult>;
+  studioBatch(input: StudioBatchInput): Promise<StudioBatchResult>;
+}
+
 export interface LocalRoutegoService
   extends RoutegoService,
     StudioSettingsService,
     StudioLibraryService,
-    StudioUploadService {}
+    StudioUploadService,
+    StudioCreationService {}
 
 export function parseRoutegoOperationInput(operation: RoutegoOperation, input: unknown): unknown {
   return routegoOperationDefinitions[operation].inputSchema.parse(input);

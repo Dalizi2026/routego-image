@@ -7,5 +7,6 @@ export * from "./library";
 export * from "./provider";
 export * from "./service";
 export * from "./settings";
+export * from "./studio-creation";
 export * from "./tools";
 export * from "./upload";
