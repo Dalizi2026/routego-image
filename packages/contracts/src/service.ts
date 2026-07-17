@@ -1,6 +1,32 @@
 import type { z } from "zod";
 
 import {
+  executeLibraryMutationInputSchema,
+  executeLibraryMutationResultSchema,
+  getAssetDetailInputSchema,
+  getAssetDetailResultSchema,
+  getBrowserResourceInputSchema,
+  getBrowserResourceResultSchema,
+  listFoldersInputSchema,
+  listFoldersResultSchema,
+  preflightLibraryMutationInputSchema,
+  preflightLibraryMutationResultSchema,
+  reorderFoldersInputSchema,
+  reorderFoldersResultSchema,
+  type ExecuteLibraryMutationInput,
+  type ExecuteLibraryMutationResult,
+  type GetAssetDetailInput,
+  type GetAssetDetailResult,
+  type GetBrowserResourceInput,
+  type GetBrowserResourceResult,
+  type ListFoldersInput,
+  type ListFoldersResult,
+  type PreflightLibraryMutationInput,
+  type PreflightLibraryMutationResult,
+  type ReorderFoldersInput,
+  type ReorderFoldersResult
+} from "./library";
+import {
   capabilityProbeInputSchema,
   capabilityProbeResultSchema,
   readSettingsInputSchema,
@@ -73,7 +99,13 @@ export const studioOperationNames = [
   "removeProviderProfile",
   "setActiveProviderProfile",
   "refreshModels",
-  "probeCapabilities"
+  "probeCapabilities",
+  "listFolders",
+  "reorderFolders",
+  "getAssetDetail",
+  "getBrowserResource",
+  "preflightLibraryMutation",
+  "executeLibraryMutation"
 ] as const;
 
 export type StudioOperation = (typeof studioOperationNames)[number];
@@ -161,6 +193,36 @@ export const studioOperationDefinitions = {
     http: { method: "POST", path: "/api/v1/settings/providers/capability-probe" },
     inputSchema: capabilityProbeInputSchema,
     outputSchema: capabilityProbeResultSchema
+  },
+  listFolders: {
+    http: { method: "GET", path: "/api/v1/library/folders" },
+    inputSchema: listFoldersInputSchema,
+    outputSchema: listFoldersResultSchema
+  },
+  reorderFolders: {
+    http: { method: "POST", path: "/api/v1/library/folders/reorder" },
+    inputSchema: reorderFoldersInputSchema,
+    outputSchema: reorderFoldersResultSchema
+  },
+  getAssetDetail: {
+    http: { method: "POST", path: "/api/v1/library/assets/detail" },
+    inputSchema: getAssetDetailInputSchema,
+    outputSchema: getAssetDetailResultSchema
+  },
+  getBrowserResource: {
+    http: { method: "POST", path: "/api/v1/library/resources/resolve" },
+    inputSchema: getBrowserResourceInputSchema,
+    outputSchema: getBrowserResourceResultSchema
+  },
+  preflightLibraryMutation: {
+    http: { method: "POST", path: "/api/v1/library/mutations/preflight" },
+    inputSchema: preflightLibraryMutationInputSchema,
+    outputSchema: preflightLibraryMutationResultSchema
+  },
+  executeLibraryMutation: {
+    http: { method: "POST", path: "/api/v1/library/mutations/execute" },
+    inputSchema: executeLibraryMutationInputSchema,
+    outputSchema: executeLibraryMutationResultSchema
   }
 } as const satisfies Record<
   StudioOperation,
@@ -192,7 +254,23 @@ export interface StudioSettingsService {
   probeCapabilities(input: CapabilityProbeInput): Promise<CapabilityProbeResult>;
 }
 
-export interface LocalRoutegoService extends RoutegoService, StudioSettingsService {}
+export interface StudioLibraryService {
+  listFolders(input: ListFoldersInput): Promise<ListFoldersResult>;
+  reorderFolders(input: ReorderFoldersInput): Promise<ReorderFoldersResult>;
+  getAssetDetail(input: GetAssetDetailInput): Promise<GetAssetDetailResult>;
+  getBrowserResource(input: GetBrowserResourceInput): Promise<GetBrowserResourceResult>;
+  preflightLibraryMutation(
+    input: PreflightLibraryMutationInput
+  ): Promise<PreflightLibraryMutationResult>;
+  executeLibraryMutation(
+    input: ExecuteLibraryMutationInput
+  ): Promise<ExecuteLibraryMutationResult>;
+}
+
+export interface LocalRoutegoService
+  extends RoutegoService,
+    StudioSettingsService,
+    StudioLibraryService {}
 
 export function parseRoutegoOperationInput(operation: RoutegoOperation, input: unknown): unknown {
   return routegoOperationDefinitions[operation].inputSchema.parse(input);

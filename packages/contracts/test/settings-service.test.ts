@@ -266,7 +266,13 @@ describe("separate Studio operation registry", () => {
       "removeProviderProfile",
       "setActiveProviderProfile",
       "refreshModels",
-      "probeCapabilities"
+      "probeCapabilities",
+      "listFolders",
+      "reorderFolders",
+      "getAssetDetail",
+      "getBrowserResource",
+      "preflightLibraryMutation",
+      "executeLibraryMutation"
     ]);
     expect(studioOperationNames.some((name) => routegoOperationNames.includes(name as never))).toBe(
       false
