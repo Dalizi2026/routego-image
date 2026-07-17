@@ -2,8 +2,10 @@
 
 - 泳道/change：`studio` / `add-routego-studio`
 - 来源任务：`019f71d8-03f8-7c20-a816-8bed99e07881`，generation 1
-- 继任任务：`pending`，generation 2
+- 继任任务：`019f7245-f614-7911-9ea1-c974cd82fa35`，generation 2
 - 计划分支：`codex/routego-studio-g2`
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\ec66\生图插件`
+- 交接治理起始提交：`649e4fe1da0bacdeb0eca9c3d20378a209303fdd`
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\8b8b\生图插件`
 - 产品/OpenSpec 安全提交：`313fafba3a1d49d6b65db30fb679fd77d8760d18`
 - OpenSpec：`7/11`
