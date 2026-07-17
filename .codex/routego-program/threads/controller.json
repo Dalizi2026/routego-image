@@ -2,16 +2,18 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active",
+  "status": "handoff-pending-successor",
   "threadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
   "worktree": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "branch": "main",
-  "headCommit": "b356425f07eb514544a9665d9a095e28d2035bff",
+  "headCommit": "93300173a7f658a16c5dc0a10c115cd72f1ec0c7",
   "generation": 0,
-  "observableCompactions": 2,
-  "lastCompactionFingerprint": "2026-07-17-foundation-14-of-16-context-summary",
-  "lastHealthAudit": "passed",
-  "successorThreadId": null,
+  "observableCompactions": 3,
+  "lastCompactionFingerprint": "2026-07-18-browser-boundary-complete-controller-handoff-summary",
+  "lastHealthAudit": "passed-handoff-required",
+  "successorThreadId": "pending",
+  "successorGeneration": 1,
+  "handoffFile": ".codex/routego-program/handoffs/controller-generation-1.md",
   "notes": [
     "The first observable context compaction occurred before execution started.",
     "The repository default branch was normalized to main during bootstrap.",
@@ -31,6 +33,8 @@
     "The post-extension main baseline passed frozen install, strict OpenSpec, safety, typecheck, build, 129 tests, and all seven package export checks.",
     "Creation, Library, and Studio each checkpointed their non-frozen artifacts, merged the exact frozen baseline, resolved only governance-state conflicts, and resumed OpenSpec planning.",
     "Studio and Creation independently confirmed that browser upload and path-free image-operation boundaries remain absent; a dedicated Foundation Browser Boundary gate was authorized before any affected artifact freeze.",
-    "Library independently confirmed the same gap and clarified resource-registry ownership; a fresh pinned Browser Boundary task and isolated worktree were created."
+    "Library independently confirmed the same gap and clarified resource-registry ownership; a fresh pinned Browser Boundary task and isolated worktree were created.",
+    "Browser Boundary completed 5/5 at e1a6d84169ce6a0fb6d000f407ef03d0f6a77a01 with no reported blocker, but has not been merged into main.",
+    "The third observable context compaction triggered the mandatory new-thread/new-worktree Controller handoff before Browser Boundary verification or merge."
   ]
 }
