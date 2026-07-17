@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "../../.typecheck/mock-relay",
+    "rootDir": ".",
+    "tsBuildInfoFile": "../../.typecheck/mock-relay.tsbuildinfo",
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "../contracts" },
+    { "path": "../foundation" }
+  ],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}
