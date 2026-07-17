@@ -99,7 +99,18 @@ for (const file of trackedFiles) {
         normalized === "library" &&
         index === 1 &&
         segments[0]?.toLowerCase() === "packages";
-      return forbiddenPathSegments.has(normalized) && !exactLibraryPackageSegment;
+      const exactStudioLibraryFeatureSegment =
+        normalized === "library" &&
+        index === 4 &&
+        segments[0]?.toLowerCase() === "packages" &&
+        segments[1]?.toLowerCase() === "studio" &&
+        segments[2]?.toLowerCase() === "src" &&
+        segments[3]?.toLowerCase() === "features";
+      return (
+        forbiddenPathSegments.has(normalized) &&
+        !exactLibraryPackageSegment &&
+        !exactStudioLibraryFeatureSegment
+      );
     })
   ) {
     report(file, "generated output, local library, cache, or report path");
