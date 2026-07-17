@@ -6,7 +6,7 @@
   "threadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
   "worktree": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "branch": "main",
-  "headCommit": "23dd083e1b9cad43aafc6564f247a6025913c749",
+  "headCommit": "ff0d2a88524c768c15b5c7a67dc8ead3aa8989c9",
   "generation": 0,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "2026-07-17-foundation-14-of-16-context-summary",
@@ -29,6 +29,7 @@
     "Foundation Extension completed 5/5 at c64c727f6dd449d41dd38cfb60a4bf849e719672, independently revalidated, and merged into main at 710eb61.",
     "Six corrective delta specs were synced into the frozen main specifications and the change was archived before downstream wakeup.",
     "The post-extension main baseline passed frozen install, strict OpenSpec, safety, typecheck, build, 129 tests, and all seven package export checks.",
-    "Creation, Library, and Studio each checkpointed their non-frozen artifacts, merged the exact frozen baseline, resolved only governance-state conflicts, and resumed OpenSpec planning."
+    "Creation, Library, and Studio each checkpointed their non-frozen artifacts, merged the exact frozen baseline, resolved only governance-state conflicts, and resumed OpenSpec planning.",
+    "Studio and Creation independently confirmed that browser upload and path-free image-operation boundaries remain absent; a dedicated Foundation Browser Boundary gate was authorized before any affected artifact freeze."
   ]
 }

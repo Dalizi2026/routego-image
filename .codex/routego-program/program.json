@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "parallel-lanes-active",
+  "status": "browser-boundary-dispatching",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -31,11 +31,17 @@
       "dependsOn": ["establish-routego-image-foundation"]
     },
     {
+      "id": "complete-routego-browser-boundaries",
+      "lane": "foundation-browser-boundary",
+      "dependsOn": ["extend-routego-image-foundation-contracts"]
+    },
+    {
       "id": "add-routego-image-creation",
       "lane": "creation",
       "dependsOn": [
         "establish-routego-image-foundation",
-        "extend-routego-image-foundation-contracts"
+        "extend-routego-image-foundation-contracts",
+        "complete-routego-browser-boundaries"
       ]
     },
     {
@@ -43,7 +49,8 @@
       "lane": "library",
       "dependsOn": [
         "establish-routego-image-foundation",
-        "extend-routego-image-foundation-contracts"
+        "extend-routego-image-foundation-contracts",
+        "complete-routego-browser-boundaries"
       ]
     },
     {
@@ -51,7 +58,8 @@
       "lane": "studio",
       "dependsOn": [
         "establish-routego-image-foundation",
-        "extend-routego-image-foundation-contracts"
+        "extend-routego-image-foundation-contracts",
+        "complete-routego-browser-boundaries"
       ]
     },
     {
@@ -67,6 +75,7 @@
   "dispatch": {
     "foundationThreadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
     "foundationExtensionThreadId": "019f708d-92bb-78b0-a23d-3a8d68255006",
+    "browserBoundaryThreadId": "pending",
     "legacyAuditThreadId": "019f6fe8-6fad-7dc1-8057-eeb45e80211e",
     "upstreamAuditThreadId": "019f6fe8-6fd4-73f0-b83b-1805925c5301",
     "creationThreadId": "019f7084-17c4-7442-94e5-458f59b20086",

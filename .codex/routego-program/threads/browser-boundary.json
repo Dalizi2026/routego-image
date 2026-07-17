@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "lane": "foundation-browser-boundary",
+  "change": "complete-routego-browser-boundaries",
+  "role": "openspec-apply-owner",
+  "status": "dispatch-pending",
+  "threadId": "pending",
+  "worktree": "pending",
+  "branch": "codex/routego-browser-boundary",
+  "startingCommit": "ff0d2a88524c768c15b5c7a67dc8ead3aa8989c9",
+  "headCommit": null,
+  "generation": 0,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "lastHealthAudit": "pending",
+  "successorThreadId": null,
+  "dependsOn": [
+    "extend-routego-image-foundation-contracts"
+  ],
+  "ownership": {
+    "owned": [
+      "packages/contracts/** browser upload and path-free Studio boundary contracts",
+      "packages/mock-relay/** deterministic upload, gallery, path-free operation and settings fixtures",
+      "openspec/changes/complete-routego-browser-boundaries/**"
+    ],
+    "readOnly": [
+      "packages/creation/**",
+      "packages/library/**",
+      "packages/studio/**",
+      "root dependency and lock files"
+    ],
+    "forbidden": [
+      "real binary upload storage or filesystem persistence",
+      "real provider transport or billable requests",
+      "Studio UI and browser journeys",
+      "plugin manifest, installation, and release workflow",
+      "new public MCP tools",
+      "real API keys, user images, legacy config, and legacy library mutation"
+    ]
+  }
+}

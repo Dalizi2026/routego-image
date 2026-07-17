@@ -3,7 +3,7 @@
   "lane": "creation",
   "change": "add-routego-image-creation",
   "role": "openspec-apply-owner",
-  "status": "planning",
+  "status": "blocked-on-browser-boundary",
   "threadId": "019f7084-17c4-7442-94e5-458f59b20086",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\76ae\\生图插件",
   "branch": "codex/routego-creation",
@@ -16,7 +16,8 @@
   "successorThreadId": null,
   "dependsOn": [
     "establish-routego-image-foundation",
-    "extend-routego-image-foundation-contracts"
+    "extend-routego-image-foundation-contracts",
+    "complete-routego-browser-boundaries"
   ],
   "foundationExtension": {
     "branch": "codex/routego-foundation-extension",
