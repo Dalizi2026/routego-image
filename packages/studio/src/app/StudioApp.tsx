@@ -1,11 +1,18 @@
-import { useEffect, useReducer, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState, type ReactNode } from "react";
 
 import type { ReadSettingsResult, RoutegoStatusResult } from "@routego-image/contracts";
 
 import { StudioGatewayError, type StudioGateway } from "../api";
 import { AppNavigation, AsyncStatePanel, NoticeStack } from "../components";
 import { CapabilityProvider } from "../features/capabilities";
-import { CreationWorkbench } from "../features/creation";
+import {
+  CreationWorkbench,
+  type CreationExternalHandoff
+} from "../features/creation";
+import {
+  LibraryWorkspace,
+  type LibraryCreationHandoff
+} from "../features/library";
 import { I18nProvider, useI18n, type MessageKey } from "../i18n";
 import "../styles/index.css";
 import {
@@ -205,6 +212,27 @@ function StatusLedger({
   );
 }
 
+export interface StudioLibraryHandoffTransition {
+  readonly route: "workbench";
+  readonly handoff: CreationExternalHandoff;
+}
+
+export function createStudioLibraryHandoffTransition(
+  handoff: LibraryCreationHandoff,
+  sequence: number
+): StudioLibraryHandoffTransition {
+  if (!Number.isSafeInteger(sequence) || sequence < 1) {
+    throw new Error("Library handoff sequence must be a positive integer.");
+  }
+  return {
+    route: "workbench",
+    handoff: {
+      id: `library:${sequence}:${handoff.action}`,
+      draft: handoff.draft
+    }
+  };
+}
+
 function StudioWorkspace({
   gateway,
   service,
@@ -221,19 +249,49 @@ function StudioWorkspace({
     ...initialStudioAppState,
     notices: noticesFor(service, settings)
   });
-  const content = {
-    workbench: (
+  const [creationHandoff, setCreationHandoff] = useState<CreationExternalHandoff>();
+  const handoffSequenceRef = useRef(0);
+  const handleCreationHandoff = useCallback((handoff: LibraryCreationHandoff) => {
+    handoffSequenceRef.current += 1;
+    const transition = createStudioLibraryHandoffTransition(
+      handoff,
+      handoffSequenceRef.current
+    );
+    setCreationHandoff(transition.handoff);
+    dispatch({ type: "navigate", route: transition.route });
+  }, []);
+  const workbenchContent = routeContent?.workbench ?? (
       <CreationWorkbench
         gateway={gateway}
         defaults={settings.defaults}
+        externalHandoff={creationHandoff}
       />
-    ),
-    ...routeContent
-  } satisfies Partial<Record<StudioRoute, ReactNode>>;
+    );
+  const content = {
+    library:
+      routeContent?.library ?? (
+        <LibraryWorkspace
+          gateway={gateway}
+          view="library"
+          onCreationHandoff={handleCreationHandoff}
+        />
+      ),
+    trash:
+      routeContent?.trash ?? (
+        <LibraryWorkspace
+          gateway={gateway}
+          view="trash"
+          onCreationHandoff={handleCreationHandoff}
+        />
+      ),
+    ...(routeContent?.settings === undefined ? {} : { settings: routeContent.settings })
+  } satisfies Partial<Record<Exclude<StudioRoute, "workbench">, ReactNode>>;
   const headingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    headingRef.current?.querySelector<HTMLElement>("h1")?.focus();
+    headingRef.current
+      ?.querySelector<HTMLElement>(`[data-studio-route="${state.route}"] h1`)
+      ?.focus();
   }, [state.route]);
 
   return (
@@ -269,7 +327,14 @@ function StudioWorkspace({
       />
       <main id="studio-workspace" className="studio-workspace" ref={headingRef}>
         <section className="studio-workspace__primary" aria-live="polite">
-          {content[state.route] ?? <RouteOverview route={state.route} />}
+          <div data-studio-route="workbench" hidden={state.route !== "workbench"}>
+            {workbenchContent}
+          </div>
+          {state.route === "workbench" ? null : (
+            <div data-studio-route={state.route}>
+              {content[state.route] ?? <RouteOverview route={state.route} />}
+            </div>
+          )}
         </section>
         <StatusLedger service={service} settings={settings} />
       </main>

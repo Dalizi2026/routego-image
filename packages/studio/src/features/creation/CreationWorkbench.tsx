@@ -132,7 +132,8 @@ const copy = {
     previousResponse: "上一响应标识",
     retryAcknowledge: "我确认要创建一次新的明确请求",
     capabilityTitle: "能力证据",
-    capabilityTransient: "最近探测失败，保留此前能力状态"
+    capabilityTransient: "最近探测失败，保留此前能力状态",
+    handoffInvalid: "图库接力未提供稳定的受保护标识符，当前草稿未被替换。"
   },
   en: {
     eyebrow: "CREATE / 01",
@@ -189,11 +190,104 @@ const copy = {
     previousResponse: "Previous response ID",
     retryAcknowledge: "I understand this creates a new explicit request",
     capabilityTitle: "Capability evidence",
-    capabilityTransient: "The latest probe failed; the previous capability state was preserved"
+    capabilityTransient: "The latest probe failed; the previous capability state was preserved",
+    handoffInvalid: "The Library handoff did not contain stable protected identifiers; the current draft was preserved."
   }
 } as const;
 
 type CreationLabels = { readonly [Key in keyof (typeof copy)["zh"]]: string };
+
+export interface CreationExternalHandoff {
+  readonly id: string;
+  readonly draft: CreationDraft;
+}
+
+function isStableIdentifier(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$/u.test(value)
+  );
+}
+
+function hasExactKeys(value: object, expected: readonly string[]): boolean {
+  const keys = Object.keys(value).sort();
+  return keys.length === expected.length && keys.every((key, index) => key === expected[index]);
+}
+
+function isStableLibraryLocator(value: unknown): boolean {
+  if (typeof value !== "object" || value === null || !("source" in value)) return false;
+  if (value.source === "asset") {
+    return (
+      "assetId" in value &&
+      isStableIdentifier(value.assetId) &&
+      hasExactKeys(value, ["assetId", "source"])
+    );
+  }
+  if (value.source === "artifact") {
+    return (
+      "artifactId" in value &&
+      isStableIdentifier(value.artifactId) &&
+      hasExactKeys(value, ["artifactId", "source"])
+    );
+  }
+  return false;
+}
+
+function isIdentifierOnlyDraftImage(value: DraftImageInput): boolean {
+  return (
+    isStableIdentifier(value.id) &&
+    value.upload === undefined &&
+    value.resource === undefined &&
+    isStableLibraryLocator(value.locator)
+  );
+}
+
+export function isIdentifierOnlyCreationExternalHandoff(
+  handoff: CreationExternalHandoff | undefined
+): handoff is CreationExternalHandoff {
+  if (handoff === undefined || !isStableIdentifier(handoff.id)) return false;
+  const draft = handoff.draft;
+  const images = [
+    ...draft.references,
+    ...(draft.target === undefined ? [] : [draft.target]),
+    ...draft.supportingImages
+  ];
+  return (
+    images.every(isIdentifierOnlyDraftImage) &&
+    draft.maskUpload === undefined &&
+    (draft.mask === undefined ||
+      (draft.mask.targetSlot === 0 && isStableLibraryLocator(draft.mask.image)))
+  );
+}
+
+export function shouldConsumeCreationExternalHandoff(
+  handoff: CreationExternalHandoff | undefined,
+  consumedId: string | undefined
+): boolean {
+  return (
+    handoff !== undefined &&
+    handoff.id !== consumedId &&
+    isIdentifierOnlyCreationExternalHandoff(handoff)
+  );
+}
+
+export function collectCreationDraftUploads(
+  drafts: readonly CreationDraft[]
+): readonly UploadLifecycleItem[] {
+  const uploads = new Map<string, UploadLifecycleItem>();
+  for (const draft of drafts) {
+    const images = [
+      ...draft.references,
+      ...(draft.target === undefined ? [] : [draft.target]),
+      ...draft.supportingImages
+    ];
+    for (const image of images) {
+      if (image.upload !== undefined) uploads.set(image.upload.id, image.upload);
+    }
+    if (draft.maskUpload !== undefined) uploads.set(draft.maskUpload.id, draft.maskUpload);
+  }
+  return [...uploads.values()];
+}
 
 type MaskTargetState =
   | { readonly status: "idle" }
@@ -471,10 +565,12 @@ function ResultPanel({
 
 export function CreationWorkbench({
   gateway,
-  defaults
+  defaults,
+  externalHandoff
 }: {
   readonly gateway: StudioGateway;
   readonly defaults: ReadSettingsResult["defaults"];
+  readonly externalHandoff?: CreationExternalHandoff | undefined;
 }) {
   const { language } = useI18n();
   const labels = copy[language];
@@ -516,6 +612,7 @@ export function CreationWorkbench({
   const [maskEditorOpen, setMaskEditorOpen] = useState(false);
   const [maskTarget, setMaskTarget] = useState<MaskTargetState>({ status: "idle" });
   const draftRef = useRef(draft);
+  const consumedExternalHandoffRef = useRef<string | undefined>(undefined);
   const maskSetupRef = useRef<HTMLDivElement>(null);
   const pendingMaskUploadRef = useRef<UploadLifecycleItem | undefined>(undefined);
 
@@ -571,10 +668,60 @@ export function CreationWorkbench({
     [discardDetachedMaskUpload]
   );
 
+  const discardReplacedDraftResources = useCallback(
+    (drafts: readonly CreationDraft[]) => {
+      const uploads = new Map(
+        collectCreationDraftUploads(drafts).map((item) => [item.id, item] as const)
+      );
+      const pending = pendingMaskUploadRef.current;
+      if (pending !== undefined) uploads.set(pending.id, pending);
+      uploads.forEach(discardDetachedMaskUpload);
+      pendingMaskUploadRef.current = undefined;
+    },
+    [discardDetachedMaskUpload]
+  );
+
   const resetMaskEditor = useCallback(() => {
     setMaskEditorOpen(false);
     setMaskTarget({ status: "idle" });
   }, []);
+
+  useEffect(() => {
+    if (externalHandoff === undefined || externalHandoff.id === consumedExternalHandoffRef.current) {
+      return;
+    }
+    consumedExternalHandoffRef.current = externalHandoff.id;
+    if (!shouldConsumeCreationExternalHandoff(externalHandoff, undefined)) {
+      setSubmission({
+        status: "failure",
+        safeMessage: labels.handoffInvalid
+      });
+      return;
+    }
+    discardReplacedDraftResources(
+      workflow === "single" ? [draftRef.current] : [singleDraft]
+    );
+    resetMaskEditor();
+    const next = normalizeCreationDraftForCapabilities(
+      cloneCreationDraft(externalHandoff.draft),
+      resolve
+    );
+    draftRef.current = next;
+    setDraft(next);
+    setSingleDraft(cloneCreationDraft(next));
+    setWorkflow("single");
+    setSubmission({ status: "idle" });
+    setRetryAcknowledged(false);
+    setFieldErrors({});
+  }, [
+    discardReplacedDraftResources,
+    externalHandoff,
+    labels.handoffInvalid,
+    resetMaskEditor,
+    resolve,
+    singleDraft,
+    workflow
+  ]);
 
   const clearMaskForTargetChange = useCallback(() => {
     const current = draftRef.current;
