@@ -6,7 +6,7 @@
   "threadId": "019f715f-c042-7590-a38b-ffb406315903",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d46b\\生图插件",
   "branch": "codex/routego-controller-g1",
-  "headCommit": "daee4625cca6c14834e162c61da7b57f56c391f2",
+  "headCommit": "c18115146d383822ab70bdc82ddd95265eb0e46f",
   "generation": 1,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "2026-07-18-studio-successor-and-lane-monitor-checkpoint",
@@ -46,6 +46,7 @@
     "Studio generation 1 accepted the handoff at registered HEAD 2475cdc6b4fe9b397074ff3c240a22ab044b22e0 after fresh OpenSpec status/apply checks confirmed 4/11 and next task 2.2; generation 0 was then archived before sole-owner activation.",
     "The Studio successor recorded sole apply-owner activation at cac0330c673bb59441cf5c871065c8e243dc6818 and resumed with a fresh apply read for task 2.2.",
     "Creation obeyed the continuity policy by completing in-progress task 3.2 at 6/8, sending LANE_CHECKPOINT at 2efb2465fa92fc51b4f6bf5f744a29a320b62a63, and entering a generation-1 successor handoff before task 4.1.",
-    "Creation generation 1 accepted at ca173854e51c221b751c2761164599245244f04f after fresh OpenSpec checks; generation 0 was archived before sole-owner activation for task 4.1."
+    "Creation generation 1 accepted at ca173854e51c221b751c2761164599245244f04f after fresh OpenSpec checks; generation 0 was archived before sole-owner activation for task 4.1.",
+    "The Creation successor recorded local sole-owner activation at 0cf3af53c56f17e18228bccb705054a7c2fb8933 before starting task 4.1."
   ]
 }
