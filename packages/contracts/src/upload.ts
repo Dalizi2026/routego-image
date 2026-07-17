@@ -1,26 +1,40 @@
 import { z } from "zod";
 
 import { identifierSchema, routegoSchemaVersionSchema, timestampSchema } from "./common";
-import { routegoServiceErrorSchema } from "./errors";
+import {
+  retryDispositionSchema,
+  routegoErrorCategorySchema,
+  routegoErrorStageSchema
+} from "./errors";
 
-export const uploadServiceErrorSchema = routegoServiceErrorSchema.superRefine(
-  (value, context) => {
-    if (value.partialArtifacts.length > 0) {
-      context.addIssue({
-        code: "custom",
-        path: ["partialArtifacts"],
-        message: "Upload errors cannot include image artifacts"
-      });
-    }
-    if (value.details !== undefined) {
-      context.addIssue({
-        code: "custom",
-        path: ["details"],
-        message: "Upload errors cannot include arbitrary diagnostic details"
-      });
-    }
-  }
-);
+export const uploadErrorCodeSchema = z.enum([
+  "upload_expired",
+  "upload_invalid_type",
+  "upload_oversize",
+  "upload_checksum_failed",
+  "upload_consumed",
+  "upload_discarded"
+]);
+
+export const uploadServiceErrorCodeSchema = z.union([
+  z.literal("not_found"),
+  uploadErrorCodeSchema
+]);
+
+export const uploadServiceErrorSchema = z
+  .object({
+    id: identifierSchema.optional(),
+    code: uploadServiceErrorCodeSchema,
+    category: routegoErrorCategorySchema,
+    stage: routegoErrorStageSchema,
+    safeMessage: z.string().trim().min(1).max(1_000),
+    retryDisposition: retryDispositionSchema,
+    httpStatus: z.number().int().min(100).max(599).optional(),
+    partialArtifacts: z.tuple([]).default([]),
+    receivedAnyOutput: z.literal(false),
+    mayHaveBilled: z.literal(false)
+  })
+  .strict();
 
 export const uploadResourcePurposeSchema = z.enum([
   "image",
@@ -377,6 +391,7 @@ export type UploadResourcePurpose = z.infer<typeof uploadResourcePurposeSchema>;
 export type UploadMimeType = z.infer<typeof uploadMimeTypeSchema>;
 export type UploadResourceStatus = z.infer<typeof uploadResourceStatusSchema>;
 export type UploadReusePolicy = z.infer<typeof uploadReusePolicySchema>;
+export type UploadServiceError = z.infer<typeof uploadServiceErrorSchema>;
 export type UploadResourceDescriptor = z.infer<typeof uploadResourceDescriptorSchema>;
 export type ReserveUploadResourceInput = z.input<typeof reserveUploadResourceInputSchema>;
 export type ReserveUploadResourceResult = z.output<typeof reserveUploadResourceResultSchema>;

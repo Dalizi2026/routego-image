@@ -300,6 +300,22 @@ export class MockRoutegoService implements LocalRoutegoService {
     });
   }
 
+  #libraryUploadError(
+    code:
+      | "not_found"
+      | "upload_expired"
+      | "upload_invalid_type"
+      | "upload_oversize"
+      | "upload_checksum_failed"
+      | "upload_consumed"
+      | "upload_discarded",
+    safeMessage: string
+  ): RoutegoServiceError {
+    return code === "not_found"
+      ? this.#error("not_found", safeMessage)
+      : this.#error("conflict", safeMessage);
+  }
+
   #profile(overrides: Partial<ProviderProfileDescriptor> = {}): ProviderProfileDescriptor {
     const { hasApiKey = true, apiKeyPreview, ...rest } = overrides;
     return {
@@ -1871,18 +1887,24 @@ export class MockRoutegoService implements LocalRoutegoService {
         parsed.mutation.action !== "import-zip"
           ? undefined
           : !upload
-            ? this.#uploadError("not_found", "The synthetic ZIP upload was not found.")
+            ? this.#libraryUploadError("not_found", "The synthetic ZIP upload was not found.")
             : upload.purpose !== "zip-import"
-              ? this.#uploadError(
+              ? this.#libraryUploadError(
                   "upload_invalid_type",
                   "The synthetic upload is not a ZIP import resource."
                 )
               : upload.status === "consumed"
-                ? this.#uploadError("upload_consumed", "The synthetic ZIP upload was consumed.")
+                ? this.#libraryUploadError(
+                    "upload_consumed",
+                    "The synthetic ZIP upload was consumed."
+                  )
                 : upload.status === "expired"
-                  ? this.#uploadError("upload_expired", "The synthetic ZIP upload expired.")
+                  ? this.#libraryUploadError(
+                      "upload_expired",
+                      "The synthetic ZIP upload expired."
+                    )
                   : upload.status === "discarded"
-                    ? this.#uploadError(
+                    ? this.#libraryUploadError(
                         "upload_discarded",
                         "The synthetic ZIP upload was discarded."
                       )
@@ -1965,28 +1987,34 @@ export class MockRoutegoService implements LocalRoutegoService {
         parsed.action !== "import-zip"
           ? undefined
           : fixture === "not-found"
-            ? this.#uploadError("not_found", "The synthetic ZIP upload was not found.")
+            ? this.#libraryUploadError("not_found", "The synthetic ZIP upload was not found.")
             : fixture === "expired"
-              ? this.#uploadError("upload_expired", "The synthetic ZIP upload expired.")
+              ? this.#libraryUploadError(
+                  "upload_expired",
+                  "The synthetic ZIP upload expired."
+                )
               : fixture === "invalid-type"
-                ? this.#uploadError(
+                ? this.#libraryUploadError(
                     "upload_invalid_type",
                     "The synthetic upload is not an importable ZIP."
                   )
                 : fixture === "oversize"
-                  ? this.#uploadError("upload_oversize", "The synthetic ZIP upload is oversized.")
+                  ? this.#libraryUploadError(
+                      "upload_oversize",
+                      "The synthetic ZIP upload is oversized."
+                    )
                   : fixture === "checksum-failed"
-                    ? this.#uploadError(
+                    ? this.#libraryUploadError(
                         "upload_checksum_failed",
                         "The synthetic ZIP checksum failed."
                       )
                     : fixture === "consumed"
-                      ? this.#uploadError(
+                      ? this.#libraryUploadError(
                           "upload_consumed",
                           "The synthetic ZIP upload was consumed."
                         )
                       : fixture === "discarded"
-                        ? this.#uploadError(
+                        ? this.#libraryUploadError(
                             "upload_discarded",
                             "The synthetic ZIP upload was discarded."
                           )
@@ -1995,13 +2023,19 @@ export class MockRoutegoService implements LocalRoutegoService {
         parsed.action !== "import-zip" || fixtureUploadError
           ? undefined
           : !upload
-            ? this.#uploadError("not_found", "The synthetic ZIP upload was not found.")
+            ? this.#libraryUploadError("not_found", "The synthetic ZIP upload was not found.")
             : upload.status === "consumed"
-              ? this.#uploadError("upload_consumed", "The synthetic ZIP upload was consumed.")
+              ? this.#libraryUploadError(
+                  "upload_consumed",
+                  "The synthetic ZIP upload was consumed."
+                )
               : upload.status === "expired"
-                ? this.#uploadError("upload_expired", "The synthetic ZIP upload expired.")
+                ? this.#libraryUploadError(
+                    "upload_expired",
+                    "The synthetic ZIP upload expired."
+                  )
                 : upload.status === "discarded"
-                  ? this.#uploadError(
+                  ? this.#libraryUploadError(
                       "upload_discarded",
                       "The synthetic ZIP upload was discarded."
                     )

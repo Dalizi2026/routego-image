@@ -26,12 +26,6 @@ export const routegoErrorCodeSchema = z.enum([
   "path_unsafe",
   "not_found",
   "conflict",
-  "upload_expired",
-  "upload_invalid_type",
-  "upload_oversize",
-  "upload_checksum_failed",
-  "upload_consumed",
-  "upload_discarded",
   "cancelled"
 ]);
 

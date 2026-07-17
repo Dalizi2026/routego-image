@@ -8,9 +8,11 @@ import {
   parseStudioOperationOutput,
   reserveUploadResourceInputSchema,
   reserveUploadResourceResultSchema,
+  routegoErrorCodeSchema,
   routegoOperationDefinitions,
   routegoOperationNames,
   studioOperationDefinitions,
+  uploadServiceErrorCodeSchema,
   uploadResourceDescriptorSchema,
   type UploadResourceDescriptor
 } from "../src/index";
@@ -135,6 +137,12 @@ describe("session upload reservation contracts", () => {
 });
 
 describe("upload lifecycle metadata and structured failures", () => {
+  it("keeps upload-specific errors outside the frozen public error enum", () => {
+    expect(routegoErrorCodeSchema.safeParse("upload_expired").success).toBe(false);
+    expect(uploadServiceErrorCodeSchema.parse("upload_expired")).toBe("upload_expired");
+    expect(uploadServiceErrorCodeSchema.parse("not_found")).toBe("not_found");
+  });
+
   it("requires finalized integrity metadata and supports reusable images", () => {
     const finalized = uploadResourceDescriptorSchema.parse(
       imageResource({

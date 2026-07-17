@@ -507,13 +507,17 @@ describe("stateful synthetic upload lifecycle", () => {
     expect(
       (await service.getUploadResourceStatus({ uploadResourceId })).resource?.status
     ).toBe("consumed");
+    expect(await service.finalizeUploadResource({ uploadResourceId })).toMatchObject({
+      status: "failed",
+      error: { code: "upload_consumed" }
+    });
 
     const repeated = await service.preflightLibraryMutation({
       mutation: { action: "import-zip", uploadResourceId }
     });
     expect(repeated).toMatchObject({
       status: "blocked",
-      items: [{ eligible: false, error: { code: "upload_consumed" } }]
+      items: [{ eligible: false, error: { code: "conflict" } }]
     });
   });
 });
