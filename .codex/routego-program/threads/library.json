@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "lane": "library",
+  "change": "add-routego-image-library",
+  "role": "openspec-apply-owner",
+  "status": "dispatch-pending",
+  "threadId": "pending",
+  "worktree": "pending",
+  "branch": "codex/routego-library",
+  "startingCommit": "9e29cca343f3eabad913438b616d9586d489336f",
+  "headCommit": null,
+  "generation": 0,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "lastHealthAudit": "pending",
+  "successorThreadId": null,
+  "dependsOn": [
+    "establish-routego-image-foundation"
+  ],
+  "ownership": {
+    "owned": [
+      "local provider configuration persistence",
+      "versioned JSON image library and search",
+      "favorites, deduplication, recycle bin, and portability",
+      "file locking, atomic writes, and ZIP import/export"
+    ],
+    "readOnly": [
+      "packages/contracts/**",
+      "packages/foundation/**",
+      "packages/mock-relay/**",
+      "openspec/specs/**"
+    ],
+    "forbiddenWithoutDeviation": [
+      "root dependency and lock files",
+      "shared schemas and Foundation public contracts",
+      "Creation and Studio implementation areas",
+      "plugin manifest and release workflow"
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "lane": "studio",
+  "change": "add-routego-studio",
+  "role": "openspec-apply-owner",
+  "status": "dispatch-pending",
+  "threadId": "pending",
+  "worktree": "pending",
+  "branch": "codex/routego-studio",
+  "startingCommit": "9e29cca343f3eabad913438b616d9586d489336f",
+  "headCommit": null,
+  "generation": 0,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "lastHealthAudit": "pending",
+  "successorThreadId": null,
+  "dependsOn": [
+    "establish-routego-image-foundation"
+  ],
+  "ownership": {
+    "owned": [
+      "Routego Studio React pages and components",
+      "generation, editing, library, and settings user interfaces",
+      "mask editor and image comparison interactions",
+      "Studio browser tests and responsive visual verification"
+    ],
+    "readOnly": [
+      "packages/contracts/**",
+      "packages/foundation/**",
+      "packages/mock-relay/**",
+      "openspec/specs/**"
+    ],
+    "forbiddenWithoutDeviation": [
+      "root dependency and lock files",
+      "shared schemas and Foundation public contracts",
+      "Creation and Library backend implementation areas",
+      "plugin manifest and release workflow"
+    ]
+  }
+}
