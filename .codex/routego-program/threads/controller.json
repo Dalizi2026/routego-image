@@ -65,6 +65,7 @@
     "A fresh Studio generation 2 task 019f7245-f614-7911-9ea1-c974cd82fa35 and isolated worktree C:\\Users\\MLTZ\\.codex\\worktrees\\ec66\\生图插件 were created from handoff commit 649e4fe1da0bacdeb0eca9c3d20378a209303fdd; real registration commit f89ee833fa1c6900d2c850ba7e65b42677cad25b was sent before any task 4.2 write.",
     "Controller generation 1 observed its second context compaction during the bounded Studio generation 2 registration handoff; no new large governance task may begin before a successor Controller handoff if another compaction occurs.",
     "Studio generation 2 accepted the handoff at f89ee833fa1c6900d2c850ba7e65b42677cad25b after fresh status/apply checks confirmed 7/11 and next task 4.2; generation 1 was archived and its Git worktree registration was removed before sole-owner activation.",
-    "The removed Studio generation 1 checkout left an unregistered directory containing ignored node_modules/packages residues; recursive cleanup was blocked by the execution environment, but no .git worktree metadata or apply ownership remains."
+    "The removed Studio generation 1 checkout left an unregistered directory containing ignored node_modules/packages residues; recursive cleanup was blocked by the execution environment, but no .git worktree metadata or apply ownership remains.",
+    "Studio task 4.2 gateway deviation was approved as a tasks-only scope correction: gateway.ts, mock-handler.ts, gateway.test.ts, and mock-bridge.test.ts may add the frozen manageLibrary bridge solely for create-folder/rename-folder; ZIP and destructive workflows remain path-free and all other public operations stay excluded."
   ]
 }

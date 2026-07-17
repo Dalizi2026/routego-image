@@ -41,6 +41,19 @@
     "allowedPath": "packages/studio/src/features/library/**",
     "scope": "Exact source-code exception only; runtime Library data remains forbidden."
   },
+  "planDeviation": {
+    "task": "4.2",
+    "status": "approved-tasks-only-scope-correction",
+    "reviewedHead": "09f95785a3281699e0c9d4fc5d262a2c1aa7104b",
+    "authorizedFiles": [
+      "packages/studio/src/api/gateway.ts",
+      "packages/studio/src/dev/mock-handler.ts",
+      "packages/studio/test/gateway.test.ts",
+      "packages/studio/test/mock-bridge.test.ts"
+    ],
+    "reason": "The frozen design requires folder create/rename through public manageLibrary, while both the Studio HTTP gateway and deterministic mock bridge exclude that operation.",
+    "safetyInvariant": "Only create-folder and rename-folder may use manageLibrary from Studio; all other public operations remain excluded and ZIP/destructive workflows continue through path-free preflight/execute and upload contracts."
+  },
   "applyOwnership": {
     "state": "active-single-owner",
     "activeOwnerThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
