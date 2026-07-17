@@ -62,6 +62,15 @@
     "reason": "The frozen design requires folder create/rename through public manageLibrary, while both the Studio HTTP gateway and deterministic mock bridge exclude that operation.",
     "safetyInvariant": "Only create-folder and rename-folder may use manageLibrary from Studio; all other public operations remain excluded and ZIP/destructive workflows continue through path-free preflight/execute and upload contracts."
   },
+  "task51PlanDeviation": {
+    "task": "5.1",
+    "status": "approved-tasks-only-scope-correction",
+    "reviewedHead": "90fe3c3b0362939f8827529eadf921cd59ca3254",
+    "authorizedFile": "packages/studio/src/features/creation/CreationWorkbench.tsx",
+    "focusedTest": "packages/studio/test/settings-workbench-sync.test.ts",
+    "reason": "The frozen settings requirement and task require workbench-default synchronization, while CreationWorkbench reads defaults only during state initialization and exposes no safe update seam.",
+    "safetyInvariant": "Synchronize only default-derived control fields across active, preserved, and batch drafts; preserve prompts, identifiers, uploads, targets, masks, invariants, results and workflow, and never remount, discard resources or dispatch provider calls."
+  },
   "applyOwnership": {
     "state": "active-single-owner",
     "activeOwnerThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",

@@ -70,6 +70,7 @@
     "Library generation 1 completed task 4.2 at clean checkpoint a966dd0dbc3f70b9dbc9246bb8c214289ca35ca4 with 141/141 Library tests and 8/10 OpenSpec progress, then stopped at observable compaction 2 before task 5.1.",
     "A fresh Library generation 2 task 019f7261-2c57-7a01-b519-e1de521819fe and isolated worktree C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件 were created from handoff commit af069a742b641605d516e888afafca8db5661e66; real registration commit b4b98f1124a07b66334fc33cf5d7516d1eba100d was sent before any task 5.1 write.",
     "Library generation 2 accepted the handoff at b4b98f1124a07b66334fc33cf5d7516d1eba100d after fresh status/apply checks confirmed 8/10 and next task 5.1; generation 1 was archived and its worktree removed before sole-owner activation.",
-    "Studio generation 2 completed task 4.2 at corrected governance HEAD 90fe3c3b0362939f8827529eadf921cd59ca3254 with 76/76 Studio tests, strict OpenSpec, builds, safety and exact scope checks; at observable compaction 1 the same sole owner was authorized to continue only task 5.1."
+    "Studio generation 2 completed task 4.2 at corrected governance HEAD 90fe3c3b0362939f8827529eadf921cd59ca3254 with 76/76 Studio tests, strict OpenSpec, builds, safety and exact scope checks; at observable compaction 1 the same sole owner was authorized to continue only task 5.1.",
+    "Studio task 5.1 defaults-sync deviation was approved as a tasks-only scope correction adding only CreationWorkbench.tsx and a focused settings-workbench sync test; the seam must preserve all non-default draft state and resources while applying validated defaults without remounting or provider calls."
   ]
 }
