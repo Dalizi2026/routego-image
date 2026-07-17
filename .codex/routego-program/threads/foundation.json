@@ -3,12 +3,12 @@
   "lane": "foundation",
   "change": "establish-routego-image-foundation",
   "role": "openspec-apply-owner",
-  "status": "waiting-for-audits",
+  "status": "planning",
   "threadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f453\\生图插件",
   "branch": "codex/routego-foundation",
   "startingCommit": "9875bdc6d63dcd300a7c00397f5952005f128cac",
-  "headCommit": null,
+  "headCommit": "f66d0a32d1744f37febacfb0a7422f6a68921183",
   "generation": 0,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -22,6 +22,20 @@
       "document": "docs/audits/legacy-plugin-audit.md",
       "verified": true
     },
-    "upstream": null
+    "upstream": {
+      "receivedAt": "2026-07-17T20:10:52.7831344+08:00",
+      "branch": "codex/routego-upstream-audit",
+      "branchHead": "236aac64f29e4f476f59a87e8fdeb5e5bf7ddf05",
+      "commit": "4b7909579f382cc1fec5ac79172a0aeeb3d70923",
+      "document": "docs/audits/gpt-image-playground-reuse.md",
+      "upstreamCommit": "a10477581b3d43ac98d39777e4445625a9db113d",
+      "verified": true,
+      "duplicateCompletionEvents": 1
+    }
+  },
+  "auditGate": {
+    "satisfied": true,
+    "heartbeatId": "routego-foundation",
+    "heartbeatDeleted": true
   }
 }
