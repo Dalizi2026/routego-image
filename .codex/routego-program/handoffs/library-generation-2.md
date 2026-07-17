@@ -1,0 +1,25 @@
+# Library generation 2 交接清单
+
+- 泳道/change：`library` / `add-routego-image-library`
+- 来源任务：`019f71ed-2149-73c2-851d-368a54c1ed5b`，generation 1
+- 继任任务：`019f7261-2c57-7a01-b519-e1de521819fe`，generation 2
+- 计划分支：`codex/routego-library-g2`
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\236b\生图插件`
+- 交接治理起始提交：`af069a742b641605d516e888afafca8db5661e66`
+- 真实登记提交：`b4b98f1124a07b66334fc33cf5d7516d1eba100d`
+- 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\8c92\生图插件`
+- 产品/OpenSpec 安全提交：`a966dd0dbc3f70b9dbc9246bb8c214289ca35ca4`
+- 4.2 实现：`ae0be0b8f197f8339c787ad1ade8b7363e217e83`
+- 4.2 OpenSpec 状态：`e80c5687db1ab2979c1eaada4a25c63fce7e7fef`
+- OpenSpec：`8/10`
+- 已完成：`1.1,1.2,2.1,3.1,3.2,3.3,4.1,4.2`
+- 下一任务：`5.1`
+- 剩余：`5.1,5.2`
+- 可观察压缩：`2`
+- Git：干净。
+- 最近验证：portability 16/16；Library 18 文件/141 测试；Library typecheck/build；repository safety；OpenSpec strict 7/7；diff 与允许范围审计均通过。
+- 本交接提交后 G1 暂停 apply，不得启动 5.1。
+- G2 在真实登记前只读；任何写入前完整重读权威文件，并运行 `openspec status --change add-routego-image-library --json` 与 `openspec instructions apply --change add-routego-image-library --json`。
+- G2 登记后创建 `codex/routego-library-g2`，确认 8/10、下一任务 5.1 和 Git clean，并发送 `[LIBRARY_HANDOFF_ACCEPTED]`。
+- Controller 归档 G1 并激活唯一 owner 后，G2 才能从 5.1 继续，不得重做已完成任务。
+- 不修改七个公共工具、共享契约、根依赖/锁文件、Creation/Studio/Integration 或发布文件；不接触真实凭证、图片、图库或中转。
