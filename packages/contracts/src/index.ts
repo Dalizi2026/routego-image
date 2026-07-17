@@ -5,4 +5,5 @@ export * from "./errors";
 export * from "./image";
 export * from "./provider";
 export * from "./service";
+export * from "./settings";
 export * from "./tools";
