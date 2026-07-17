@@ -4,3 +4,5 @@ export * from "./common";
 export * from "./errors";
 export * from "./image";
 export * from "./provider";
+export * from "./service";
+export * from "./tools";
