@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "lane": "foundation-extension",
+  "change": "extend-routego-image-foundation-contracts",
+  "role": "openspec-apply-owner",
+  "status": "archived",
+  "threadId": "019f708d-92bb-78b0-a23d-3a8d68255006",
+  "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\c358\\生图插件",
+  "branch": "codex/routego-foundation-extension",
+  "startingCommit": "c3b885221e154ee96e96eb00224893c483545c04",
+  "registrationCommit": "8fac9f29825db0f06c1459a421aaea7fa36ef8c6",
+  "headCommit": "c64c727f6dd449d41dd38cfb60a4bf849e719672",
+  "generation": 0,
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "context-summary-2026-07-17-c600405-task-3.1-staged-pd003-resolved",
+  "lastHealthAudit": "passed",
+  "successorThreadId": null,
+  "dependsOn": [
+    "establish-routego-image-foundation"
+  ],
+  "ownership": {
+    "owned": [
+      "packages/contracts/** shared browser-safe contract extensions",
+      "packages/mock-relay/** deterministic Studio and Library mock extensions",
+      "root package and pnpm lock dependency updates",
+      "minimal packages/creation, packages/library, and packages/studio importer scaffolds",
+      "openspec/changes/extend-routego-image-foundation-contracts/**"
+    ],
+    "forbidden": [
+      "real provider transport implementation",
+      "Library persistence and filesystem business implementation",
+      "Studio pages, components, and mask editor implementation",
+      "plugin manifest, installation, and release workflow",
+      "real API keys, user images, legacy config, and legacy library mutation"
+    ]
+  },
+  "integration": {
+    "mergeCommit": "710eb61",
+    "baselineCommit": "52f9e6e8653a3452a0e3175fa86ad7f208d2c912",
+    "specsSynced": true,
+    "archivePath": "openspec/changes/archive/2026-07-17-extend-routego-image-foundation-contracts",
+    "archivedAt": "2026-07-18T00:08:00+08:00"
+  },
+  "completion": {
+    "tasks": "5/5",
+    "validatedAt": "2026-07-17T23:56:51.1136527+08:00",
+    "verifiedHead": "eb96b046f7afa7884a5ac7033dff57d635e1d6b3",
+    "validation": {
+      "cleanFrozenInstall": "passed in a fresh detached worktree",
+      "openspecStrict": "7 passed, 0 failed",
+      "safety": "passed for 137 tracked files",
+      "typecheck": "passed",
+      "build": "passed",
+      "tests": "129 passed: contracts 51, foundation 48, mock-relay 30",
+      "packageExports": "passed for all seven workspace packages",
+      "publicOperations": "seven frozen operations unchanged",
+      "browserSafeContracts": "source, declarations, and emitted JavaScript contain no Node built-in imports",
+      "runtimeDependencies": "workspace packages, Zod, React, ReactDOM, and scheduler only; no native runtime dependency",
+      "importerAndDiffScope": "passed",
+      "gitClean": true
+    },
+    "blockers": [],
+    "residualRisks": [
+      "Real provider transport and billable relay behavior remain intentionally untested and belong to Integration.",
+      "Local clean verification passed on Windows with Node.js 24.15.0; supported Node.js 20.19+, macOS, and Linux execution still rely on later CI and integration acceptance."
+    ]
+  }
+}

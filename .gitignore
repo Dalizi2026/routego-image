@@ -18,6 +18,25 @@ test-results/
 *.pem
 routego-image-config.json
 library/
+!/packages/library/
+!/packages/library/**
+/packages/library/**/node_modules/
+/packages/library/**/dist/
+/packages/library/**/build/
+/packages/library/**/coverage/
+/packages/library/**/.cache/
+/packages/library/**/.typecheck/
+/packages/library/**/playwright-report/
+/packages/library/**/test-results/
+/packages/library/**/library/
+/packages/library/**/outputs/
+/packages/library/**/*.tsbuildinfo
+/packages/library/**/pnpm-debug.log*
+/packages/library/**/.env
+/packages/library/**/.env.*
+/packages/library/**/*.key
+/packages/library/**/*.pem
+/packages/library/**/routego-image-config.json
 outputs/
 
 # Editor and OS
