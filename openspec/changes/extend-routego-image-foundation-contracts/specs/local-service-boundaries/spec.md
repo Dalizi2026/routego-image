@@ -39,4 +39,3 @@ The Foundation mock SHALL implement the composed local service interface and SHA
 #### Scenario: Partial mutation fixture is selected
 - **WHEN** a bulk mutation uses the partial fixture
 - **THEN** the mock SHALL return at least one successful item and one structured failed item with overall partial status
-

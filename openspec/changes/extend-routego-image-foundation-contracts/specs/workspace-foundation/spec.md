@@ -31,4 +31,3 @@ The downstream importer dependency graph SHALL NOT introduce a native addon requ
 #### Scenario: Runtime dependencies are audited
 - **WHEN** the resolved production/runtime dependency paths for all workspace packages are inspected
 - **THEN** no package SHALL require node-gyp, prebuild installation, or a native addon compilation step on the target plugin runtime
-

@@ -32,4 +32,3 @@ Studio-facing ZIP import/export and destructive/bulk mutation contracts SHALL us
 #### Scenario: Legacy data remains untouched
 - **WHEN** a preflight references a legacy plugin, configuration, or image-library identifier/path indirectly
 - **THEN** the service SHALL return a structured safety error and SHALL NOT authorize deletion, overwrite, import, or migration
-

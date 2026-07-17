@@ -73,4 +73,3 @@ The shared package SHALL define preflight and execution schemas for destructive,
 #### Scenario: ZIP import and export use protected resources
 - **WHEN** Studio imports or exports a ZIP archive
 - **THEN** the contract SHALL use a session-scoped upload/resource identifier and protected browser resource descriptor rather than an arbitrary browser-supplied local path
-

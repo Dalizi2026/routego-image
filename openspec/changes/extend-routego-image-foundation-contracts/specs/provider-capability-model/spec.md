@@ -29,4 +29,3 @@ Capability-probe results SHALL represent `unknown`, `supported`, `unsupported`, 
 #### Scenario: Only a weaker fallback is possible
 - **WHEN** the capability can be completed only with weaker semantics such as re-uploading a previous output
 - **THEN** the result SHALL be `degraded` with a degradation reason and SHALL NOT claim native support
-

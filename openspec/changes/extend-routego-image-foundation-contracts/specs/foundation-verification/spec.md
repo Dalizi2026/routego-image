@@ -34,4 +34,3 @@ The change SHALL pass `openspec validate --all --strict --no-interactive`, repos
 #### Scenario: Hidden or out-of-scope residue exists
 - **WHEN** validation fails, an unapproved file/dependency appears, generated artifacts remain tracked/unignored, or Git is dirty
 - **THEN** tasks SHALL remain incomplete and no dependency-complete message SHALL be sent
-
