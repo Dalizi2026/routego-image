@@ -12,6 +12,13 @@
     "earlyHandoffOnFailedAudit": true,
     "successorMode": "new-thread-new-worktree"
   },
+  "conformancePolicy": {
+    "requireOpenSpecTaskId": true,
+    "verifyBeforeCommit": true,
+    "commitBeforeTaskCheckbox": true,
+    "stopOnScopeOrContractChange": true,
+    "deviationMessage": "PLAN_DEVIATION"
+  },
   "changes": [
     {
       "id": "establish-routego-image-foundation",

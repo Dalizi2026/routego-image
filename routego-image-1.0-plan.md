@@ -229,6 +229,14 @@ integrate-routego-image-plugin
 
 同一 change 只能有一个 OpenSpec apply-owner。子代理和审查代理不得修改 OpenSpec 工件或 `tasks.md`。
 
+### 7.6 规划一致性控制
+
+- 每个实现步骤必须对应一个已解锁的 OpenSpec 任务 ID；没有任务 ID 不写产品代码。
+- 任务开始前核对依赖、文件所有权和验收命令，任务结束后先验证并提交，再勾选完成。
+- 子代理只能处理任务中明确标记给其 owner 的文件，主代理负责审查和集成。
+- 任何公共契约、技术栈、目录所有权、依赖顺序、功能范围或验收标准变化都视为规划偏离，必须发送 `[PLAN_DEVIATION]` 并通过 OpenSpec update 修订后才能继续。
+- 禁止为了赶进度跳过任务、合并验收步骤、降低测试标准或在当前 change 提前实现后续 change 的功能。
+
 ## 8. Codex 多任务与 Git worktree
 
 - 当前任务是 Program Controller，负责基线、依赖关卡、线程登记和集成调度。
