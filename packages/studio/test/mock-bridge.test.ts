@@ -111,4 +111,129 @@ describe("explicit Vite deterministic mock bridge", () => {
     expect(serialized).not.toContain(SESSION_TOKEN);
     expect(serialized).not.toContain("rawBytes");
   });
+
+  it("bridges folder create and rename while every other public route stays unavailable", async () => {
+    const baseUrl = await startBridge();
+    const gateway = new HttpStudioGateway({
+      baseUrl,
+      session: new InMemoryStudioSession(SESSION_TOKEN)
+    });
+
+    await expect(
+      gateway.invoke("manageLibrary", { action: "create-folder", name: "Archive" })
+    ).resolves.toMatchObject({ action: "create-folder", affectedFolderIds: ["mock-folder"] });
+    await expect(
+      gateway.invoke("manageLibrary", {
+        action: "rename-folder",
+        folderId: "mock-folder-current",
+        name: "Finals"
+      })
+    ).resolves.toMatchObject({
+      action: "rename-folder",
+      affectedFolderIds: ["mock-folder-current"]
+    });
+
+    const blockedManage = await fetch(`${baseUrl}/api/v1/library/manage`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        [STUDIO_SESSION_HEADER]: SESSION_TOKEN
+      },
+      body: JSON.stringify({ action: "soft-delete", assetIds: ["mock-asset-output"] })
+    });
+    expect(blockedManage.status).toBe(400);
+
+    for (const path of [
+      "/api/v1/generate",
+      "/api/v1/edit",
+      "/api/v1/batch",
+      "/api/v1/library/search",
+      "/api/v1/studio/open"
+    ]) {
+      const response = await fetch(`${baseUrl}${path}`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          [STUDIO_SESSION_HEADER]: SESSION_TOKEN
+        },
+        body: "{}"
+      });
+      expect(response.status).toBe(404);
+    }
+  });
+
+  it("uploads and consumes one ZIP import and downloads a protected ZIP export", async () => {
+    const baseUrl = await startBridge();
+    const gateway = new HttpStudioGateway({
+      baseUrl,
+      session: new InMemoryStudioSession(SESSION_TOKEN)
+    });
+    const reserved = await gateway.invoke("reserveUploadResource", {
+      purpose: "zip-import",
+      declaredMimeType: "application/zip",
+      declaredByteLength: 256
+    });
+    if (reserved.resource === undefined) throw new Error("expected ZIP reservation");
+    await gateway.uploadBinary(
+      reserved.resource,
+      new Blob([new Uint8Array(256)], { type: "application/zip" })
+    );
+    const finalized = await gateway.invoke("finalizeUploadResource", {
+      uploadResourceId: reserved.resource.uploadResourceId
+    });
+    expect(finalized).toMatchObject({ status: "succeeded", resource: { status: "finalized" } });
+
+    const importPreflight = await gateway.invoke("preflightLibraryMutation", {
+      mutation: {
+        action: "import-zip",
+        uploadResourceId: reserved.resource.uploadResourceId
+      }
+    });
+    expect(importPreflight).toMatchObject({
+      status: "ready",
+      requiredConfirmations: ["zip-import"]
+    });
+    const imported = await gateway.invoke("executeLibraryMutation", {
+      preflightId: importPreflight.preflightId,
+      action: "import-zip",
+      confirmations: ["zip-import"]
+    });
+    expect(imported).toMatchObject({
+      status: "succeeded",
+      importedCount: 1,
+      skippedCount: 0
+    });
+    expect(
+      await gateway.invoke("getUploadResourceStatus", {
+        uploadResourceId: reserved.resource.uploadResourceId
+      })
+    ).toMatchObject({ status: "succeeded", resource: { status: "consumed" } });
+    expect(
+      await gateway.invoke("preflightLibraryMutation", {
+        mutation: {
+          action: "import-zip",
+          uploadResourceId: reserved.resource.uploadResourceId
+        }
+      })
+    ).toMatchObject({ status: "blocked", items: [{ eligible: false }] });
+
+    const exportPreflight = await gateway.invoke("preflightLibraryMutation", {
+      mutation: { action: "export-zip", assetIds: ["mock-asset-output"] }
+    });
+    const exported = await gateway.invoke("executeLibraryMutation", {
+      preflightId: exportPreflight.preflightId,
+      action: "export-zip",
+      confirmations: ["zip-export"]
+    });
+    expect(exported.outputResource).toMatchObject({
+      mimeType: "application/zip",
+      requiresSession: true
+    });
+    if (exported.outputResource === undefined) throw new Error("expected protected ZIP export");
+    const zip = await gateway.fetchProtectedBlob(exported.outputResource);
+    expect(zip).toMatchObject({ size: 256, type: "application/zip" });
+    expect(JSON.stringify({ imported, exported })).not.toMatch(
+      /(?:C:\\|\/Users\/|data:image|base64|Authorization)/u
+    );
+  });
 });

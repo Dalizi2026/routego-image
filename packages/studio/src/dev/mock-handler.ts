@@ -5,6 +5,7 @@ import {
   studioOperationDefinitions,
   studioOperationNames,
   type LocalRoutegoService,
+  type RoutegoManageLibraryInput,
   type StudioOperation
 } from "@routego-image/contracts";
 
@@ -20,7 +21,11 @@ const PNG_BYTES = new Uint8Array([
 const ZIP_BYTES = new Uint8Array(256);
 ZIP_BYTES.set([0x50, 0x4b, 0x05, 0x06]);
 
-type GatewayOperation = "status" | StudioOperation;
+type GatewayOperation = "status" | "manageLibrary" | StudioOperation;
+type StudioManageLibraryInput = Extract<
+  RoutegoManageLibraryInput,
+  { readonly action: "create-folder" | "rename-folder" }
+>;
 
 type OperationDefinition = {
   readonly http: { readonly method: "GET" | "POST"; readonly path: string };
@@ -47,8 +52,9 @@ function safeError(status: number, code: string, safeMessage: string): Response 
 }
 
 function operationDefinition(operation: GatewayOperation): OperationDefinition {
-  return operation === "status"
-    ? routegoOperationDefinitions.status
+  if (operation === "status") return routegoOperationDefinitions.status;
+  return operation === "manageLibrary"
+    ? routegoOperationDefinitions.manageLibrary
     : studioOperationDefinitions[operation];
 }
 
@@ -56,9 +62,18 @@ function findOperation(pathname: string): GatewayOperation | undefined {
   if (routegoOperationDefinitions.status.http.path === pathname) {
     return "status";
   }
+  if (routegoOperationDefinitions.manageLibrary.http.path === pathname) {
+    return "manageLibrary";
+  }
   return studioOperationNames.find(
     (operation) => studioOperationDefinitions[operation].http.path === pathname
   );
+}
+
+function isAllowedManageLibraryInput(value: unknown): value is StudioManageLibraryInput {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+  const action = (value as { readonly action?: unknown }).action;
+  return action === "create-folder" || action === "rename-folder";
 }
 
 function decodeQuery(url: URL): Record<string, unknown> {
@@ -120,6 +135,13 @@ async function dispatchOperation(
   } catch {
     return safeError(400, "invalid_input", "The request did not match the frozen local contract.");
   }
+  if (operation === "manageLibrary" && !isAllowedManageLibraryInput(input)) {
+    return safeError(
+      400,
+      "invalid_input",
+      "Studio permits only folder creation and rename through the public Library bridge."
+    );
+  }
 
   let output: unknown;
   try {
@@ -130,7 +152,15 @@ async function dispatchOperation(
   }
 
   try {
-    return json(definition.outputSchema.parse(output));
+    const parsedOutput = definition.outputSchema.parse(output);
+    if (
+      operation === "manageLibrary" &&
+      (parsedOutput as { readonly action?: unknown }).action !==
+        (input as StudioManageLibraryInput).action
+    ) {
+      throw new Error("manage-library-action-mismatch");
+    }
+    return json(parsedOutput);
   } catch {
     return safeError(
       500,

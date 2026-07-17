@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import type {
+  ExecuteLibraryMutationResult,
   LibraryAssetDetail,
   StudioLibrarySearchItem
 } from "@routego-image/contracts";
@@ -16,6 +17,7 @@ import type { StudioGateway } from "../../api";
 import { AsyncStatePanel, ProtectedImage } from "../../components";
 import { useI18n } from "../../i18n";
 import { ImageComparison } from "./ImageComparison";
+import { LibraryMutationPanel } from "./LibraryMutationPanel";
 import {
   orderedLibraryRelationships,
   relationshipResourceInput,
@@ -36,6 +38,7 @@ import {
   LibraryQueryError,
   retreatLibraryPage
 } from "./query";
+import { remainingSelectedAssetIds } from "./mutations";
 import type {
   AssetDetailState,
   FolderState,
@@ -108,7 +111,11 @@ const copy = {
     error: "结构化错误",
     foldersEmpty: "未归入档案夹",
     retention: "30 天保留策略",
-    mutationLater: "恢复、删除、文件夹变更与 ZIP 操作属于任务 4.2，本页仅展示当前允许动作。"
+    mutationLater: "使用图库多选和安全变更台执行文件夹、回收站与 ZIP 操作。",
+    selectItem: "选择图库项目",
+    selectPage: "选择当前页",
+    clearPage: "取消当前页选择",
+    selectedCount: "已选择"
   },
   en: {
     libraryEyebrow: "ARCHIVE / 02",
@@ -170,7 +177,11 @@ const copy = {
     error: "Structured error",
     foldersEmpty: "No folder membership",
     retention: "30-day retention policy",
-    mutationLater: "Restore, deletion, folder mutation, and ZIP workflows belong to task 4.2. This view only lists current allowed actions."
+    mutationLater: "Use Library multi-selection and the guarded mutation desk for folder, Trash, and ZIP actions.",
+    selectItem: "Select Library item",
+    selectPage: "Select current page",
+    clearPage: "Clear current-page selection",
+    selectedCount: "Selected"
   }
 } as const;
 
@@ -359,18 +370,31 @@ function GalleryCard({
   item,
   labels,
   language,
-  selected,
+  detailSelected,
+  checked,
+  onCheckedChange,
   onOpen
 }: {
   readonly gateway: StudioGateway;
   readonly item: StudioLibrarySearchItem;
   readonly labels: Labels;
   readonly language: "zh" | "en";
-  readonly selected: boolean;
+  readonly detailSelected: boolean;
+  readonly checked: boolean;
+  readonly onCheckedChange: (checked: boolean) => void;
   readonly onOpen: () => void;
 }) {
   return (
-    <article className={`library-card${selected ? " is-selected" : ""}`}>
+    <article className={`library-card${detailSelected ? " is-selected" : ""}${checked ? " is-checked" : ""}`}>
+      <label className="library-card__selection">
+        <input
+          type="checkbox"
+          checked={checked}
+          aria-label={`${labels.selectItem}: ${item.prompt}`}
+          onChange={(event) => onCheckedChange(event.target.checked)}
+        />
+        <span aria-hidden="true">{checked ? "✓" : "+"}</span>
+      </label>
       <button
         className="library-card__open"
         type="button"
@@ -619,7 +643,9 @@ export function LibraryWorkspace({
   const [filterErrors, setFilterErrors] = useState<Readonly<Record<string, string>>>({});
   const [searchRevision, setSearchRevision] = useState(0);
   const [folderRevision, setFolderRevision] = useState(0);
+  const [detailRevision, setDetailRevision] = useState(0);
   const [selectedAssetId, setSelectedAssetId] = useState<string | undefined>();
+  const [selectedAssetIds, setSelectedAssetIds] = useState<readonly string[]>([]);
   const [detailState, setDetailState] = useState<AssetDetailState>({ status: "idle" });
   const [relationshipResources, setRelationshipResources] = useState<
     readonly RelationshipResourceState[]
@@ -756,7 +782,7 @@ export function LibraryWorkspace({
     return () => {
       active = false;
     };
-  }, [gateway, labels.detailFailure, labels.relationFailure, selectedAssetId]);
+  }, [detailRevision, gateway, labels.detailFailure, labels.relationFailure, selectedAssetId]);
 
   const applyFilters = useCallback(() => {
     try {
@@ -820,7 +846,38 @@ export function LibraryWorkspace({
     [gateway, labels.detailFailure]
   );
 
+  const refreshLibraryState = useCallback(() => {
+    setSearchRevision((value) => value + 1);
+    setFolderRevision((value) => value + 1);
+    setDetailRevision((value) => value + 1);
+  }, []);
+
+  const handleMutationResult = useCallback(
+    (result: ExecuteLibraryMutationResult) => {
+      setSelectedAssetIds((current) => remainingSelectedAssetIds(current, result));
+      const leavesCurrentView =
+        result.action === "permanent-delete" ||
+        (view === "library" && result.action === "soft-delete") ||
+        (view === "trash" && result.action === "restore");
+      if (
+        leavesCurrentView &&
+        selectedAssetId !== undefined &&
+        result.items.some(
+          (item) =>
+            item.status === "succeeded" &&
+            (item.targetId === selectedAssetId || item.affectedAssetId === selectedAssetId)
+        )
+      ) {
+        setSelectedAssetId(undefined);
+      }
+    },
+    [selectedAssetId, view]
+  );
+
   const items = searchState.status === "ready" ? searchState.items : [];
+  const currentPageIds = items.map((item) => item.assetId);
+  const allCurrentPageSelected =
+    currentPageIds.length > 0 && currentPageIds.every((assetId) => selectedAssetIds.includes(assetId));
   const total = searchState.status === "ready" || searchState.status === "empty"
     ? searchState.total
     : undefined;
@@ -877,6 +934,20 @@ export function LibraryWorkspace({
 
       <div className="library-workspace__summary">
         <span>{labels.page} {page.index + 1}</span>
+        <button
+          type="button"
+          disabled={currentPageIds.length === 0}
+          onClick={() =>
+            setSelectedAssetIds((current) =>
+              allCurrentPageSelected
+                ? current.filter((assetId) => !currentPageIds.includes(assetId))
+                : [...new Set([...current, ...currentPageIds])]
+            )
+          }
+        >
+          {allCurrentPageSelected ? labels.clearPage : labels.selectPage}
+        </button>
+        <span>{labels.selectedCount} {selectedAssetIds.length}</span>
         {total === undefined ? null : <span>{labels.total} {total}</span>}
       </div>
 
@@ -907,12 +978,30 @@ export function LibraryWorkspace({
               item={item}
               labels={labels}
               language={language}
-              selected={selectedAssetId === item.assetId}
+              detailSelected={selectedAssetId === item.assetId}
+              checked={selectedAssetIds.includes(item.assetId)}
+              onCheckedChange={(checked) =>
+                setSelectedAssetIds((current) =>
+                  checked
+                    ? [...new Set([...current, item.assetId])]
+                    : current.filter((assetId) => assetId !== item.assetId)
+                )
+              }
               onOpen={() => setSelectedAssetId(item.assetId)}
             />
           ))}
         </div>
       )}
+
+      <LibraryMutationPanel
+        gateway={gateway}
+        view={view}
+        folders={folderState.status === "ready" ? folderState.folders : []}
+        selectedAssetIds={selectedAssetIds}
+        onFoldersChange={(folders) => setFolderState({ status: "ready", folders })}
+        onMutationResult={handleMutationResult}
+        onRefresh={refreshLibraryState}
+      />
 
       <nav className="library-pagination" aria-label={`${labels.page} ${page.index + 1}`}>
         <button

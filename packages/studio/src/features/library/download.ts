@@ -8,6 +8,18 @@ export interface LibraryDownload {
   readonly resource: BrowserResourceDescriptor;
 }
 
+export async function fetchProtectedResourceDownload(
+  gateway: StudioGateway,
+  resource: BrowserResourceDescriptor,
+  fileName: string
+): Promise<LibraryDownload> {
+  return {
+    blob: await gateway.fetchProtectedBlob(resource),
+    resource,
+    fileName
+  };
+}
+
 function extension(mimeType: BrowserResourceDescriptor["mimeType"]): string {
   return mimeType === "image/jpeg"
     ? "jpg"

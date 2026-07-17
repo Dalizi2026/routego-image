@@ -5,6 +5,7 @@ import {
   uploadResourceDescriptorSchema,
   type BrowserResourceDescriptor,
   type LocalRoutegoService,
+  type RoutegoManageLibraryInput,
   type StudioOperation,
   type UploadResourceDescriptor
 } from "@routego-image/contracts";
@@ -17,10 +18,19 @@ import {
 } from "./resources";
 import type { StudioSession } from "./session";
 
-export type StudioGatewayOperation = "status" | StudioOperation;
+export type StudioManageLibraryInput = Extract<
+  RoutegoManageLibraryInput,
+  { readonly action: "create-folder" | "rename-folder" }
+>;
+
+export type StudioGatewayOperation = "status" | "manageLibrary" | StudioOperation;
 
 export type StudioGatewayInput<Operation extends StudioGatewayOperation> =
-  LocalRoutegoService[Operation] extends (input: infer Input) => Promise<unknown> ? Input : never;
+  Operation extends "manageLibrary"
+    ? StudioManageLibraryInput
+    : LocalRoutegoService[Operation] extends (input: infer Input) => Promise<unknown>
+      ? Input
+      : never;
 
 export type StudioGatewayOutput<Operation extends StudioGatewayOperation> =
   LocalRoutegoService[Operation] extends (input: never) => Promise<infer Output> ? Output : never;
@@ -53,9 +63,22 @@ type OperationDefinition = {
 const LOOPBACK_HOSTNAMES = new Set(["127.0.0.1", "[::1]", "::1"]);
 
 function operationDefinition(operation: StudioGatewayOperation): OperationDefinition {
-  return operation === "status"
-    ? routegoOperationDefinitions.status
-    : studioOperationDefinitions[operation];
+  if (operation === "status") return routegoOperationDefinitions.status;
+  if (operation === "manageLibrary") return routegoOperationDefinitions.manageLibrary;
+  const definition = studioOperationDefinitions[operation as StudioOperation];
+  if (definition === undefined) {
+    throw new StudioGatewayError(
+      "invalid_input",
+      "Studio blocked a public operation that is not exposed to the browser."
+    );
+  }
+  return definition;
+}
+
+function isAllowedManageLibraryInput(value: unknown): value is StudioManageLibraryInput {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+  const action = (value as { readonly action?: unknown }).action;
+  return action === "create-folder" || action === "rename-folder";
 }
 
 function normalizeLoopbackBaseUrl(value: string | URL): URL {
@@ -138,6 +161,12 @@ export class HttpStudioGateway implements StudioGateway {
     operation: Operation,
     input: StudioGatewayInput<Operation>
   ): Promise<StudioGatewayOutput<Operation>> {
+    if (operation === "manageLibrary" && !isAllowedManageLibraryInput(input)) {
+      throw new StudioGatewayError(
+        "invalid_input",
+        "Studio permits only folder creation and rename through the public Library bridge."
+      );
+    }
     const definition = operationDefinition(operation);
     let parsedInput: unknown;
     try {
@@ -191,7 +220,15 @@ export class HttpStudioGateway implements StudioGateway {
     let output: unknown;
     try {
       output = await response.json();
-      return definition.outputSchema.parse(output) as StudioGatewayOutput<Operation>;
+      const parsedOutput = definition.outputSchema.parse(output);
+      if (
+        operation === "manageLibrary" &&
+        (parsedOutput as { readonly action?: unknown }).action !==
+          (parsedInput as StudioManageLibraryInput).action
+      ) {
+        throw new Error("manage-library-action-mismatch");
+      }
+      return parsedOutput as StudioGatewayOutput<Operation>;
     } catch {
       throw new StudioGatewayError(
         "invalid_output",
