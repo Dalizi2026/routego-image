@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "foundation-waiting-for-audits",
+  "status": "foundation-applying",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -64,7 +64,7 @@
       "id": "routego-foundation",
       "kind": "heartbeat",
       "intervalMinutes": 10,
-      "status": "ACTIVE",
+      "status": "DELETED",
       "targetThreadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
       "deleteWhen": "legacy and upstream audits are accepted by foundation"
     }
