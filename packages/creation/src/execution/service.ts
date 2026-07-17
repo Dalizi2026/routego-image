@@ -1,21 +1,27 @@
 import {
+  routegoBatchInputSchema,
   routegoEditInputSchema,
   routegoGenerateInputSchema
 } from "@routego-image/contracts";
 
+import { createBatchExecutor, type CreationBatchService } from "./batch";
 import { createResolvedImageExecutor } from "./executor";
 import type { CreationImageService, ImageExecutionDependencies } from "./types";
 
 export function createCreationImageService(
   dependencies: ImageExecutionDependencies
-): CreationImageService {
+): CreationImageService & CreationBatchService {
   const executor = createResolvedImageExecutor(dependencies);
+  const batch = createBatchExecutor({ executor });
   return {
     generate(input) {
       return executor.execute(routegoGenerateInputSchema.parse(input));
     },
     edit(input) {
       return executor.execute(routegoEditInputSchema.parse(input));
+    },
+    batch(input) {
+      return batch.execute(routegoBatchInputSchema.parse(input));
     }
   };
 }
