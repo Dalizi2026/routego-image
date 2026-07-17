@@ -3,12 +3,12 @@
   "lane": "studio",
   "change": "add-routego-studio",
   "role": "openspec-apply-owner",
-  "status": "handoff-awaiting-acceptance",
+  "status": "applying",
   "threadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\8b8b\\生图插件",
   "branch": "codex/routego-studio-g1",
   "startingCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
-  "headCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
+  "headCommit": "2475cdc6b4fe9b397074ff3c240a22ab044b22e0",
   "generation": 1,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -23,8 +23,8 @@
   "openspecProgress": "4/11",
   "nextTask": "2.2",
   "applyOwnership": {
-    "state": "awaiting-successor-acceptance",
-    "activeOwnerThreadId": null,
+    "state": "active-single-owner",
+    "activeOwnerThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
     "predecessorThreadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
     "successorThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881"
   },
@@ -35,13 +35,13 @@
     "headCommit": "2475cdc6b4fe9b397074ff3c240a22ab044b22e0",
     "productCheckpointCommit": "bffe22b43c288bc16ea0c3dae6a4627b5ab5dafb",
     "observableCompactions": 2,
-    "status": "handoff-suspended"
+    "status": "archived"
   },
   "continuityGovernance": {
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "included-in-successor-instructions"
+    "status": "delivered-and-accepted"
   },
   "dependsOn": [
     "establish-routego-image-foundation",

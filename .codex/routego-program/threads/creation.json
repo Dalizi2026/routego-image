@@ -20,7 +20,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "delivery-pending"
+    "status": "delivered"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
