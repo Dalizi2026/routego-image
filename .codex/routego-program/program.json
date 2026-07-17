@@ -51,5 +51,15 @@
     "libraryThreadId": null,
     "studioThreadId": null,
     "integrationThreadId": null
+  },
+  "automations": {
+    "foundationAuditGate": {
+      "id": "routego-foundation",
+      "kind": "heartbeat",
+      "intervalMinutes": 10,
+      "status": "ACTIVE",
+      "targetThreadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
+      "deleteWhen": "legacy and upstream audits are accepted by foundation"
+    }
   }
 }
