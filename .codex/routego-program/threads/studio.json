@@ -10,8 +10,8 @@
   "startingCommit": "e0177a29431e237859e001473fcba29c23fdd1cc",
   "headCommit": null,
   "generation": 0,
-  "observableCompactions": 1,
-  "lastCompactionFingerprint": "context-summary-2026-07-18-7a7709d-task-1.1-unlocked",
+  "observableCompactions": 2,
+  "lastCompactionFingerprint": "context-summary-2026-07-18-task-2.1-in-progress-mask-parallel",
   "lastHealthAudit": "passed",
   "successorThreadId": null,
   "dependsOn": [
