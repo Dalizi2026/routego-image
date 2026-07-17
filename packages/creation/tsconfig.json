@@ -6,11 +6,16 @@
     "outDir": "../../.typecheck/creation",
     "rootDir": ".",
     "tsBuildInfoFile": "../../.typecheck/creation.tsbuildinfo",
+    "baseUrl": ".",
+    "paths": {
+      "@routego-image/mock-relay": ["../mock-relay/src/index.ts"]
+    },
     "types": ["node"]
   },
   "references": [
     { "path": "../contracts" },
-    { "path": "../foundation" }
+    { "path": "../foundation" },
+    { "path": "../mock-relay" }
   ],
   "include": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
 }
