@@ -6,7 +6,7 @@
   "threadId": "019f715f-c042-7590-a38b-ffb406315903",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d46b\\生图插件",
   "branch": "codex/routego-controller-g1",
-  "headCommit": "f6e1b309213bb87d741199377c2bebdaa9cbcad0",
+  "headCommit": "daee4625cca6c14834e162c61da7b57f56c391f2",
   "generation": 1,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "2026-07-18-studio-successor-and-lane-monitor-checkpoint",
@@ -43,6 +43,7 @@
     "Generation 1 observed its first context compaction while handling the Studio generation-1 successor and unified lane-continuity monitoring requirement.",
     "Studio generation 0 was suspended at product checkpoint bffe22b43c288bc16ea0c3dae6a4627b5ab5dafb after 4/11 tasks and two observable compactions; a fresh generation-1 task/worktree was registered before task 2.2.",
     "A 15-minute heartbeat named routego-lane-continuity-monitor was created as a missed-message fallback for Creation, Library, and Studio; structured lane messages remain the primary path.",
-    "Studio generation 1 accepted the handoff at registered HEAD 2475cdc6b4fe9b397074ff3c240a22ab044b22e0 after fresh OpenSpec status/apply checks confirmed 4/11 and next task 2.2; generation 0 was then archived before sole-owner activation."
+    "Studio generation 1 accepted the handoff at registered HEAD 2475cdc6b4fe9b397074ff3c240a22ab044b22e0 after fresh OpenSpec status/apply checks confirmed 4/11 and next task 2.2; generation 0 was then archived before sole-owner activation.",
+    "The Studio successor recorded sole apply-owner activation at cac0330c673bb59441cf5c871065c8e243dc6818 and resumed with a fresh apply read for task 2.2."
   ]
 }
