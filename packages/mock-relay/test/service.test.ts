@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  capabilityProbeResultSchema,
+  executeLibraryMutationResultSchema,
+  getAssetDetailResultSchema,
   imageOperationResultSchema,
+  parseStudioOperationOutput,
   parseRoutegoOperationOutput,
+  preflightLibraryMutationResultSchema,
+  readSettingsResultSchema,
   routegoBatchResultSchema
 } from "@routego-image/contracts";
 import { createMockRoutegoService } from "../src/index";
@@ -122,5 +128,135 @@ describe("deterministic mock application service", () => {
     expect(search.items).toEqual([]);
     expect(manage.affectedFolderIds).toEqual(["mock-folder"]);
     expect(studio.url).toBe("http://127.0.0.1:43119/?token=mock-session-token");
+  });
+
+  it("returns deterministic redacted settings and write-only profile updates", async () => {
+    const service = createMockRoutegoService();
+    const first = await service.readSettings({});
+    const second = await service.readSettings({});
+    expect(first).toEqual(second);
+    expect(readSettingsResultSchema.parse(first)).toEqual(first);
+    expect(first.profiles[0]).toMatchObject({ hasApiKey: true, apiKeyPreview: "mock-present" });
+
+    const replacement = "synthetic-replacement-value";
+    const updated = await service.upsertProviderProfile({
+      name: "Updated synthetic relay",
+      endpoints: {
+        generation: {
+          mode: "exact-generation-endpoint",
+          value: "https://mock.invalid/v1/images/generations"
+        }
+      },
+      apiKey: { operation: "replace", value: replacement },
+      setActive: true
+    });
+    expect(updated.profile).toMatchObject({ hasApiKey: true, isActive: true });
+    expect(JSON.stringify(updated)).not.toContain(replacement);
+
+    const cleared = await service.upsertProviderProfile({
+      profileId: updated.profile.id,
+      name: "Updated synthetic relay",
+      endpoints: {
+        generation: {
+          mode: "exact-generation-endpoint",
+          value: "https://mock.invalid/v1/images/generations"
+        }
+      },
+      apiKey: { operation: "clear" }
+    });
+    expect(cleared.profile).toMatchObject({ hasApiKey: false });
+    expect(cleared.profile).not.toHaveProperty("apiKeyPreview");
+  });
+
+  it("models supported, failed, and degraded capability probes without real requests", async () => {
+    const input = {
+      providerId: "mock-provider",
+      model: "mock-image-model",
+      capability: "single-image-input" as const,
+      transport: "single-endpoint-json" as const,
+      requestShape: "single-endpoint-json:image",
+      confirmBillableProbe: true as const
+    };
+    const supported = await createMockRoutegoService({ fixture: "success" }).probeCapabilities(
+      input
+    );
+    const failed = await createMockRoutegoService({ fixture: "failure" }).probeCapabilities(input);
+    const degraded = await createMockRoutegoService({ fixture: "degraded" }).probeCapabilities(
+      input
+    );
+
+    expect(capabilityProbeResultSchema.parse(supported).record.state).toBe("supported");
+    expect(capabilityProbeResultSchema.parse(failed)).toMatchObject({
+      status: "failed",
+      record: { state: "unknown" },
+      error: { code: "timeout" }
+    });
+    expect(capabilityProbeResultSchema.parse(degraded)).toMatchObject({
+      status: "completed",
+      record: { state: "degraded" }
+    });
+  });
+
+  it("provides synthetic folders, full relationships, and relative browser resources", async () => {
+    const service = createMockRoutegoService({ fixture: "degraded" });
+    const folders = await service.listFolders({ includeDeleted: true });
+    const detail = await service.getAssetDetail({ assetId: "mock-asset-output" });
+    const resource = await service.getBrowserResource({ assetId: "mock-asset-output" });
+
+    expect(folders.folders.map((folder) => folder.state)).toEqual(["active", "deleted"]);
+    expect(getAssetDetailResultSchema.parse(detail).asset?.relationships.map((item) => item.role)).toEqual([
+      "source",
+      "target",
+      "reference",
+      "supporting",
+      "mask",
+      "output"
+    ]);
+    expect(detail.asset?.execution.degradedContinuation).toBe(true);
+    expect(resource.resource?.relativeUrl).toMatch(/^\/api\/v1\/library\/resources\//u);
+    expect(resource.resource?.requiresSession).toBe(true);
+    expect(JSON.stringify({ detail, resource })).not.toContain("C:\\");
+    expect(JSON.stringify({ detail, resource })).not.toContain("/Users/");
+  });
+
+  it("preserves per-item partial mutation outcomes from a deterministic preflight", async () => {
+    const service = createMockRoutegoService({
+      fixtureByOperation: {
+        preflightLibraryMutation: "partial",
+        executeLibraryMutation: "partial"
+      }
+    });
+    const preflight = await service.preflightLibraryMutation({
+      mutation: { action: "permanent-delete", assetIds: ["mock-asset-a", "mock-asset-b"] }
+    });
+    expect(preflightLibraryMutationResultSchema.parse(preflight)).toMatchObject({
+      status: "partial",
+      requiredConfirmations: ["permanent-delete"]
+    });
+    expect(preflight.items.map((item) => item.eligible)).toEqual([true, false]);
+
+    const result = await service.executeLibraryMutation({
+      preflightId: preflight.preflightId,
+      action: "permanent-delete",
+      confirmations: ["permanent-delete"]
+    });
+    expect(executeLibraryMutationResultSchema.parse(result)).toMatchObject({ status: "partial" });
+    expect(result.items.map((item) => item.status)).toEqual(["succeeded", "failed"]);
+  });
+
+  it("returns structured local-service failures and exposes invalid-output for boundary tests", async () => {
+    await expect(
+      createMockRoutegoService({ fixtureByOperation: { readSettings: "failure" } }).readSettings({})
+    ).rejects.toMatchObject({ code: "not_found", receivedAnyOutput: false });
+
+    const missing = await createMockRoutegoService({
+      fixtureByOperation: { getAssetDetail: "failure" }
+    }).getAssetDetail({ assetId: "mock-missing" });
+    expect(missing).toMatchObject({ status: "failed", error: { code: "not_found" } });
+
+    const invalid = await createMockRoutegoService({
+      fixtureByOperation: { getBrowserResource: "invalid-output" }
+    }).getBrowserResource({ assetId: "mock-asset" });
+    expect(() => parseStudioOperationOutput("getBrowserResource", invalid)).toThrow();
   });
 });

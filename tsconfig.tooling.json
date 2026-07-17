@@ -8,6 +8,7 @@
     "playwright.config.ts",
     "tooling/**/*.ts",
     "packages/*/tsup.config.ts",
-    "packages/*/vitest.config.ts"
+    "packages/*/vitest.config.ts",
+    "packages/*/vite.config.ts"
   ]
 }
