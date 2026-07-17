@@ -12,6 +12,17 @@
 
 若任一权威文件缺失或互相矛盾，停止实现并通知 Program Controller。
 
+线程状态中的 `threadId: pending` 表示 Program Controller 已在创建该顶层任务，属于合法启动状态；任务应核对 lane、角色、起始 commit 和 worktree 后继续只读审计，等待真实 ID 回填，不得把 `pending` 单独视为阻塞。
+
+## 顶层任务与子代理
+
+- Program Controller 只为 Foundation、Creation、Library、Studio、Integration 这类 OpenSpec change 负责人创建用户可见的顶层 Codex 新任务。
+- 顶层任务必须拥有独立 worktree、分支、线程状态文件、清晰标题，并在任务列表中置顶。
+- 旧插件审计、上游审计、模块拆分、测试、审查等有界工作，默认由对应顶层任务在自己的线程内派发子代理。
+- 子代理不得再创建新的用户顶层任务，除非上下文交接协议明确要求创建继任任务。
+- 常规步骤、读取进度和非阻塞发现不回传 Program Controller；只回传真实阻塞、契约变更请求和最终交付。
+- Program Controller 通过任务状态文件和 `read_thread` 主动检查进度，避免把所有工作日志灌入控制线程上下文。
+
 ## OpenSpec 所有权
 
 - 每个 change 只有任务主代理可以运行 apply 或修改该 change 的 OpenSpec 工件及 `tasks.md`。

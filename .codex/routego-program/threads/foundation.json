@@ -3,7 +3,7 @@
   "lane": "foundation",
   "change": "establish-routego-image-foundation",
   "role": "openspec-apply-owner",
-  "status": "active",
+  "status": "waiting-for-audits",
   "threadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f453\\生图插件",
   "branch": "codex/routego-foundation",
