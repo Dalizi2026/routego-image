@@ -89,7 +89,7 @@ export interface RuntimeProviderProfile {
   readonly defaultModel?: string;
   readonly models: readonly string[];
   readonly capabilities: readonly ProviderCapabilityRecord[];
-  readonly apiKey?: string;
+  readonly credential?: string;
 }
 
 export interface LibrarySettingsStoreOptions {
@@ -218,8 +218,8 @@ async function readVersionedDocument<T>(options: {
   }
 }
 
-function apiKeyPreview(apiKey: string): string {
-  return `key-${createHash("sha256").update(apiKey, "utf8").digest("hex").slice(0, 10)}`;
+function apiKeyPreview(credential: string): string {
+  return `key-${createHash("sha256").update(credential, "utf8").digest("hex").slice(0, 10)}`;
 }
 
 function descriptorEndpoints(endpoints: ProviderEndpointSet): ProviderProfileDescriptor["endpoints"] {
@@ -441,15 +441,15 @@ export class LibrarySettingsStore {
     profile: StoredProviderProfile,
     state: LoadedState
   ): ProviderProfileDescriptor {
-    const apiKey = state.credentials.apiKeys[profile.id];
+    const credential = state.credentials.apiKeys[profile.id];
     return {
       id: profile.id,
       name: profile.name,
       endpoints: descriptorEndpoints(profile.endpoints),
       ...(profile.defaultModel === undefined ? {} : { defaultModel: profile.defaultModel }),
       models: [...profile.models],
-      hasApiKey: apiKey !== undefined,
-      ...(apiKey === undefined ? {} : { apiKeyPreview: apiKeyPreview(apiKey) }),
+      hasApiKey: credential !== undefined,
+      ...(credential === undefined ? {} : { apiKeyPreview: apiKeyPreview(credential) }),
       isActive: state.config.activeProviderId === profile.id,
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt
@@ -792,7 +792,7 @@ export class LibrarySettingsStore {
     if (!selectedId) throw new LibraryError("config_missing", "No active provider is configured.");
     const profile = state.config.profiles.find((item) => item.id === selectedId);
     if (!profile) throw new LibraryError("config_corrupt", "The active provider is unavailable.");
-    const apiKey = state.credentials.apiKeys[profile.id];
+    const credential = state.credentials.apiKeys[profile.id];
     return {
       id: profile.id,
       name: profile.name,
@@ -801,7 +801,7 @@ export class LibrarySettingsStore {
       ...(profile.defaultModel === undefined ? {} : { defaultModel: profile.defaultModel }),
       models: profile.models,
       capabilities: profile.capabilities,
-      ...(apiKey === undefined ? {} : { apiKey })
+      ...(credential === undefined ? {} : { credential })
     };
   }
 

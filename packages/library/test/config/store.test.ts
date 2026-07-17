@@ -88,10 +88,10 @@ describe("Library settings persistence", () => {
     expect(await readFile(store.paths.credentials, "utf8")).toContain(syntheticCredential);
 
     await upsert(store, { operation: "unchanged" }, created.profile.id);
-    expect((await store.getRuntimeProviderProfile()).apiKey).toBe(syntheticCredential);
+    expect((await store.getRuntimeProviderProfile()).credential).toBe(syntheticCredential);
     await upsert(store, { operation: "clear" }, created.profile.id);
     expect((await store.readSettings({})).profiles[0]).toMatchObject({ hasApiKey: false });
-    expect((await store.getRuntimeProviderProfile()).apiKey).toBeUndefined();
+    expect((await store.getRuntimeProviderProfile()).credential).toBeUndefined();
   });
 
   it("keeps credential documents owner-only on POSIX", async () => {
