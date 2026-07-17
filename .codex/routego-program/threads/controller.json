@@ -54,6 +54,7 @@
     "Integration remains undispatched until both Library and Studio changes are completed, independently accepted, merged, synchronized, and archived.",
     "The post-archive Creation baseline passed strict validation for 10 main specs, safety, workspace typecheck/build, 257 tests, all seven package exports, diff checks, and Git cleanliness.",
     "Studio generation 1 checkpointed at 5/11 and observable compaction 1 while task 3.2 was already in progress; Controller authorized finishing only that atomic task and prohibited starting another large task before the next continuity review.",
-    "Library generation 1 completed task 3.2 at 676afa2a692d585ce7240362fd3ae98780380d69 with 82/82 Library tests and clean scope; with no new compaction or blocker, Controller authorized continuing task 3.3."
+    "Library generation 1 completed task 3.2 at 676afa2a692d585ce7240362fd3ae98780380d69 with 82/82 Library tests and clean scope; with no new compaction or blocker, Controller authorized continuing task 3.3.",
+    "Studio generation 1 completed task 3.2 at 5d6712103908d4d94a0c570aa26d8498d2b1ffe2 with 58/58 Studio tests, builds, strict validation, scope and browser checks; at observable compaction 1 and a clean sole-owner boundary, Controller authorized continuing task 4.1."
   ]
 }
