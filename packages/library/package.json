@@ -1,0 +1,23 @@
+{
+  "name": "@routego-image/library",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --build tsconfig.json --pretty false"
+  },
+  "dependencies": {
+    "@routego-image/contracts": "workspace:*",
+    "@routego-image/foundation": "workspace:*"
+  }
+}

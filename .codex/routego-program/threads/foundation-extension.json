@@ -11,9 +11,9 @@
   "registrationCommit": "8fac9f29825db0f06c1459a421aaea7fa36ef8c6",
   "headCommit": null,
   "generation": 0,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "pending",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "context-summary-2026-07-17-c600405-task-3.1-staged-pd003-resolved",
+  "lastHealthAudit": "passed",
   "successorThreadId": null,
   "dependsOn": [
     "establish-routego-image-foundation"
@@ -32,6 +32,30 @@
       "Studio pages, components, and mask editor implementation",
       "plugin manifest, installation, and release workflow",
       "real API keys, user images, legacy config, and legacy library mutation"
+    ]
+  },
+  "completion": {
+    "tasks": "5/5",
+    "validatedAt": "2026-07-17T23:56:51.1136527+08:00",
+    "verifiedHead": "eb96b046f7afa7884a5ac7033dff57d635e1d6b3",
+    "validation": {
+      "cleanFrozenInstall": "passed in a fresh detached worktree",
+      "openspecStrict": "7 passed, 0 failed",
+      "safety": "passed for 137 tracked files",
+      "typecheck": "passed",
+      "build": "passed",
+      "tests": "129 passed: contracts 51, foundation 48, mock-relay 30",
+      "packageExports": "passed for all seven workspace packages",
+      "publicOperations": "seven frozen operations unchanged",
+      "browserSafeContracts": "source, declarations, and emitted JavaScript contain no Node built-in imports",
+      "runtimeDependencies": "workspace packages, Zod, React, ReactDOM, and scheduler only; no native runtime dependency",
+      "importerAndDiffScope": "passed",
+      "gitClean": true
+    },
+    "blockers": [],
+    "residualRisks": [
+      "Real provider transport and billable relay behavior remain intentionally untested and belong to Integration.",
+      "Local clean verification passed on Windows with Node.js 24.15.0; supported Node.js 20.19+, macOS, and Linux execution still rely on later CI and integration acceptance."
     ]
   }
 }
