@@ -6,7 +6,7 @@
   "threadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
   "worktree": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "branch": "main",
-  "headCommit": "52f9e6e8653a3452a0e3175fa86ad7f208d2c912",
+  "headCommit": "23dd083e1b9cad43aafc6564f247a6025913c749",
   "generation": 0,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "2026-07-17-foundation-14-of-16-context-summary",
@@ -28,6 +28,7 @@
     "Foundation Extension task 3.1 found that generic library ignore and safety rules collide with the required packages/library importer; a path-exact safety exception was authorized through PD-003.",
     "Foundation Extension completed 5/5 at c64c727f6dd449d41dd38cfb60a4bf849e719672, independently revalidated, and merged into main at 710eb61.",
     "Six corrective delta specs were synced into the frozen main specifications and the change was archived before downstream wakeup.",
-    "The post-extension main baseline passed frozen install, strict OpenSpec, safety, typecheck, build, 129 tests, and all seven package export checks."
+    "The post-extension main baseline passed frozen install, strict OpenSpec, safety, typecheck, build, 129 tests, and all seven package export checks.",
+    "Creation, Library, and Studio each checkpointed their non-frozen artifacts, merged the exact frozen baseline, resolved only governance-state conflicts, and resumed OpenSpec planning."
   ]
 }
