@@ -11,9 +11,9 @@
   "registrationCommit": "8fac9f29825db0f06c1459a421aaea7fa36ef8c6",
   "headCommit": null,
   "generation": 0,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "pending",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "context-summary-2026-07-17-c600405-task-3.1-staged-pd003-resolved",
+  "lastHealthAudit": "passed",
   "successorThreadId": null,
   "dependsOn": [
     "establish-routego-image-foundation"
