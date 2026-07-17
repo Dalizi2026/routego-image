@@ -12,6 +12,36 @@
     "earlyHandoffOnFailedAudit": true,
     "successorMode": "new-thread-new-worktree"
   },
+  "laneContinuityPolicy": {
+    "silentIdleForbidden": true,
+    "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
+    "requiredBeforeIncompleteIdle": [
+      "LANE_CHECKPOINT",
+      "BLOCKED",
+      "PLAN_DEVIATION",
+      "DEPENDENCY_COMPLETE",
+      "LANE_COMPLETE"
+    ],
+    "checkpointRequiredFields": [
+      "lane/change",
+      "branch/fullHeadSha",
+      "openspecProgress",
+      "completedAndNextTaskIds",
+      "gitClean",
+      "recentVerification",
+      "observableCompactions",
+      "stopReason",
+      "recommendedAction"
+    ],
+    "secondCompactionAction": "commit a safe checkpoint; if the next task is a large atomic task, request a new-thread/new-worktree successor before idle",
+    "thirdCompactionAction": "mandatory new-thread/new-worktree successor handoff",
+    "controllerRequiredActions": [
+      "send follow-up for allowed small work",
+      "create successor for large work",
+      "record a real blocker and wait for external input"
+    ],
+    "directStructuredMessagesRemainPrimary": true
+  },
   "conformancePolicy": {
     "requireOpenSpecTaskId": true,
     "verifyBeforeCommit": true,
@@ -80,7 +110,8 @@
     "upstreamAuditThreadId": "019f6fe8-6fd4-73f0-b83b-1805925c5301",
     "creationThreadId": "019f7084-17c4-7442-94e5-458f59b20086",
     "libraryThreadId": "019f7084-17ce-75d0-932b-12878f95f48f",
-    "studioThreadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
+    "studioThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
+    "studioPredecessorThreadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
     "integrationThreadId": null
   },
   "automations": {
@@ -91,6 +122,20 @@
       "status": "DELETED",
       "targetThreadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
       "deleteWhen": "legacy and upstream audits are accepted by foundation"
+    },
+    "laneContinuityMonitor": {
+      "id": "routego-lane-continuity-monitor",
+      "kind": "heartbeat",
+      "intervalMinutes": 15,
+      "status": "ACTIVE",
+      "targetThreadId": "019f715f-c042-7590-a38b-ffb406315903",
+      "lanes": [
+        "creation",
+        "library",
+        "studio"
+      ],
+      "behavior": "ignore active lanes; report incomplete idle lanes missing a structured checkpoint; prevent duplicate wakeups and concurrent apply owners",
+      "deleteWhen": "creation, library, and studio changes are all complete"
     }
   }
 }

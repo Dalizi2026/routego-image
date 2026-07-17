@@ -6,10 +6,10 @@
   "threadId": "019f715f-c042-7590-a38b-ffb406315903",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d46b\\生图插件",
   "branch": "codex/routego-controller-g1",
-  "headCommit": "4b0efaffc55773cc5218c1acee858742f8ae0f46",
+  "headCommit": "f6e1b309213bb87d741199377c2bebdaa9cbcad0",
   "generation": 1,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "2026-07-18-studio-successor-and-lane-monitor-checkpoint",
   "lastHealthAudit": "passed",
   "successorThreadId": null,
   "predecessorThreadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
@@ -39,6 +39,9 @@
     "The third observable context compaction triggered the mandatory new-thread/new-worktree Controller handoff before Browser Boundary verification or merge.",
     "Program Controller generation 1 was created as pinned task 019f715f-c042-7590-a38b-ffb406315903 in isolated worktree C:\\Users\\MLTZ\\.codex\\worktrees\\d46b\\生图插件 from handoff commit 10edc9b71280677cfa5f27e56252ec931cf22f0d, accepted the handoff at 5d016a61ae5bcda6e87722aa17a87ff5b1d3350a, and the source Controller archived.",
     "Generation 1 independently revalidated Browser Boundary, preserved successor governance while merging at 526acaa4ae1a877d231a556ad10ad2b5f355a78b, synchronized four affected delta specs while auditing all six main specs, and archived the change at 4b0efaffc55773cc5218c1acee858742f8ae0f46.",
-    "The post-archive frozen candidate passed strict OpenSpec 6/6, safety, typecheck, build, 183 tests, all seven package exports, public-operation freeze, browser-safe audits, deterministic mock repeat checks, dependency and scope audits, and Git cleanliness."
+    "The post-archive frozen candidate passed strict OpenSpec 6/6, safety, typecheck, build, 183 tests, all seven package exports, public-operation freeze, browser-safe audits, deterministic mock repeat checks, dependency and scope audits, and Git cleanliness.",
+    "Generation 1 observed its first context compaction while handling the Studio generation-1 successor and unified lane-continuity monitoring requirement.",
+    "Studio generation 0 was suspended at product checkpoint bffe22b43c288bc16ea0c3dae6a4627b5ab5dafb after 4/11 tasks and two observable compactions; a fresh generation-1 task/worktree was registered before task 2.2.",
+    "A 15-minute heartbeat named routego-lane-continuity-monitor was created as a missed-message fallback for Creation, Library, and Studio; structured lane messages remain the primary path."
   ]
 }
