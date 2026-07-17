@@ -6,7 +6,7 @@
   "threadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
   "worktree": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "branch": "main",
-  "headCommit": "c3b885221e154ee96e96eb00224893c483545c04",
+  "headCommit": "8fac9f29825db0f06c1459a421aaea7fa36ef8c6",
   "generation": 0,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "2026-07-17-foundation-14-of-16-context-summary",
@@ -23,6 +23,7 @@
     "Creation, Library, and Studio lane registrations were prepared from the frozen Foundation baseline before user-visible task creation.",
     "Three independent pinned Codex tasks and worktrees were created for Creation, Library, and Studio and their real thread IDs were registered centrally.",
     "Parallel lane startingCommit values were aligned to the actual committed registration baseline e0177a2 after startup audit identified the pre-registration Foundation commit value.",
-    "Studio and Library independently confirmed shared contract and workspace importer gaps before product implementation; downstream apply was paused and a Foundation Extension gate was authorized."
+    "Studio and Library independently confirmed shared contract and workspace importer gaps before product implementation; downstream apply was paused and a Foundation Extension gate was authorized.",
+    "A fresh pinned Foundation Extension task and isolated worktree were created to own PD-002 without expanding the three downstream lane file scopes."
   ]
 }
