@@ -3,12 +3,12 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "handoff-awaiting-acceptance",
+  "status": "applying",
   "threadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\8c92\\生图插件",
   "branch": "codex/routego-library-g1",
   "startingCommit": "d5fc0c3ed7cb5f006c124203e100627064d8c65f",
-  "headCommit": "d5fc0c3ed7cb5f006c124203e100627064d8c65f",
+  "headCommit": "ad4c53672fe270444f8750322c3d4575e7753c69",
   "generation": 1,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -23,8 +23,8 @@
   "openspecProgress": "4/10",
   "nextTask": "3.2",
   "applyOwnership": {
-    "state": "awaiting-successor-acceptance",
-    "activeOwnerThreadId": null,
+    "state": "active-single-owner",
+    "activeOwnerThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "predecessorThreadId": "019f7084-17ce-75d0-932b-12878f95f48f",
     "successorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b"
   },
@@ -35,7 +35,7 @@
     "headCommit": "ad4c53672fe270444f8750322c3d4575e7753c69",
     "productCheckpointCommit": "15775de3354cd49a256f95cbe06261e779a3e19d",
     "observableCompactions": 2,
-    "status": "handoff-suspended"
+    "status": "archived"
   },
   "continuityGovernance": {
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
