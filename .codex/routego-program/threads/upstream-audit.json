@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "lane": "upstream-audit",
+  "change": null,
+  "role": "independent-auditor",
+  "status": "active",
+  "threadId": "019f6fe8-6fd4-73f0-b83b-1805925c5301",
+  "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\68bd\\生图插件",
+  "branch": "codex/routego-upstream-audit",
+  "startingCommit": "9875bdc6d63dcd300a7c00397f5952005f128cac",
+  "headCommit": null,
+  "generation": 0,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "lastHealthAudit": "pending",
+  "successorThreadId": null
+}

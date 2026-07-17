@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "bootstrap",
+  "status": "foundation-active",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -44,9 +44,9 @@
     }
   ],
   "dispatch": {
-    "foundationThreadId": null,
-    "legacyAuditThreadId": null,
-    "upstreamAuditThreadId": null,
+    "foundationThreadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
+    "legacyAuditThreadId": "019f6fe8-6fad-7dc1-8057-eeb45e80211e",
+    "upstreamAuditThreadId": "019f6fe8-6fd4-73f0-b83b-1805925c5301",
     "creationThreadId": null,
     "libraryThreadId": null,
     "studioThreadId": null,
