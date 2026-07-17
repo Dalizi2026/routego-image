@@ -250,6 +250,9 @@ integrate-routego-image-plugin
 4. 为顶层任务设置清晰标题并置顶，确保它在 Codex 任务列表中可见。
 5. 任务内部的审计、模块实现和测试使用子代理，不再由 Program Controller 创建额外顶层任务。
 6. 子任务只在真实阻塞或最终里程碑时向 Program Controller 回传；常规进度保留在自己的线程和状态文件中，避免污染控制线程上下文。
+7. Codex 线程完成一轮并进入 `idle` 后不会自行轮询其他独立线程；任何“等待其他任务后自动继续”都必须配置显式唤醒。
+8. 前置任务完成后必须使用 `send_message_to_thread` 向依赖方发送结构化 `AUDIT_COMPLETE`/`DEPENDENCY_COMPLETE` follow-up；该消息负责触发依赖线程的新一轮。
+9. 关键依赖门禁可以附加临时 heartbeat 作为漏发兜底，但不得用高频轮询代替直接完成事件；门禁满足后必须删除或暂停 heartbeat。
 
 ## 9. 上下文压缩检测与自动交接
 
@@ -282,6 +285,8 @@ Codex 没有公开精确的 `compactionCount`，因此使用“可观测压缩�
 8. 创建失败时旧任务保持只读并通知 Program Controller，不继续高风险开发，也不循环创建多个继任任务。
 
 此协议同样适用于 Program Controller 和最终集成任务。
+
+线程在 final answer 后视为停止执行。没有新的用户消息、线程 follow-up、子代理结果回传或 heartbeat 唤醒时，线程不得声称会继续监控或自动恢复工作。
 
 ## 10. 测试与验收
 
