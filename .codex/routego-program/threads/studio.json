@@ -28,6 +28,13 @@
   "currentAtomicTask": null,
   "worktreeClean": true,
   "dirtyReason": null,
+  "planDeviation": {
+    "task": "4.1",
+    "status": "approved-tasks-only-scope-correction",
+    "reviewedHead": "5d6712103908d4d94a0c570aa26d8498d2b1ffe2",
+    "authorizedFile": "packages/studio/src/features/creation/CreationWorkbench.tsx",
+    "reason": "The frozen design/spec requires identifier-only Library retry/edit handoff, while CreationWorkbench exclusively owns draft state and exposes no ingestion seam."
+  },
   "applyOwnership": {
     "state": "active-single-owner",
     "activeOwnerThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
@@ -47,7 +54,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "task-3.2-complete-authorize-4.1"
+    "status": "task-4.1-scope-correction-approved"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
