@@ -232,13 +232,24 @@ integrate-routego-image-plugin
 ## 8. Codex 多任务与 Git worktree
 
 - 当前任务是 Program Controller，负责基线、依赖关卡、线程登记和集成调度。
-- 首批并行任务：Foundation、旧插件审计、上游复用审计。
+- Foundation 是首个顶层 Codex 新任务；旧插件审计、上游复用审计、契约核对和测试拆分原则上由 Foundation 线程内部的子代理完成。
+- 本次启动时已提前创建的 Legacy Audit 与 Upstream Audit 顶层任务作为一次性例外：允许完成当前文档后立即归档，不再复制这种拓扑。
+- Foundation 在两份审计最终报告可用前只能创建 proposal 初稿，不得冻结 design/specs，也不得进入 apply。
 - Foundation 完成并合入后，自动派发 Creation、Library、Studio 三个独立 Codex 任务和 worktree。
 - 三条实现泳道完成后，再创建一个完全新的 Integration & Acceptance 任务。
 - 每个用户任务的主代理可以启动子代理，但默认最多两个；子代理必须拥有互不重叠的文件范围。
 - 线程交付格式固定为：OpenSpec 任务 ID、commit SHA、测试结果、阻塞项、残余风险和推荐下一步。
 - 不允许多个代理同时修改根锁文件、共享 Schema、插件 manifest 或同一个 `tasks.md`。
 - 主线始终保持可验证；失败合并通过 `git revert` 回滚，禁止破坏性 reset。
+
+顶层任务创建协议：
+
+1. Program Controller 先创建包含 `threadId: pending`、lane、角色、起始 commit 和计划分支的线程状态文件并提交。
+2. 再调用 Codex `create_thread`，使用已提交的主线状态创建新 worktree。
+3. 获得真实 thread ID 后更新中央登记；新任务不得因 ID 暂为 `pending` 停止启动审计。
+4. 为顶层任务设置清晰标题并置顶，确保它在 Codex 任务列表中可见。
+5. 任务内部的审计、模块实现和测试使用子代理，不再由 Program Controller 创建额外顶层任务。
+6. 子任务只在真实阻塞或最终里程碑时向 Program Controller 回传；常规进度保留在自己的线程和状态文件中，避免污染控制线程上下文。
 
 ## 9. 上下文压缩检测与自动交接
 
