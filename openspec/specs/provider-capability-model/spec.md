@@ -89,4 +89,3 @@ Capability evidence SHALL be scoped by provider, model, endpoint, transport, and
 #### Scenario: Single image support verified
 - **WHEN** a provider accepts one Tier A `image` data URL
 - **THEN** the model SHALL NOT infer support for an `images` array or more than one image
-

@@ -40,4 +40,3 @@ Foundation SHALL own root dependency, lockfile, workspace, shared TypeScript, bu
 #### Scenario: Downstream lane needs a root dependency change
 - **WHEN** Creation, Library, or Studio requires a change to Foundation-owned root configuration
 - **THEN** the change SHALL be coordinated through the Program Controller and the applicable OpenSpec artifact before editing the shared file
-

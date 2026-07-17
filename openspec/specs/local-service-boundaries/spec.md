@@ -66,4 +66,3 @@ The application boundary SHALL return structured values from a long-running serv
 #### Scenario: Successful result lifecycle
 - **WHEN** an operation completes successfully after multiple fetch-like activities
 - **THEN** the service SHALL return the validated success value and release resources normally without requiring `process.exit()`
-

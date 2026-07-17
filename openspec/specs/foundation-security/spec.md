@@ -85,4 +85,3 @@ Text contracts, JSON, diagnostics, and repository documents SHALL use UTF-8, and
 #### Scenario: International input and path
 - **WHEN** a contract contains Chinese text, emoji, spaces, or platform-specific newlines in a permitted string/path field
 - **THEN** UTF-8 serialization and parsing SHALL preserve the value without replacement characters
-

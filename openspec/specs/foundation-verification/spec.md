@@ -53,4 +53,3 @@ Foundation SHALL pass `openspec validate --all --strict --no-interactive`, all r
 #### Scenario: Hidden incomplete item
 - **WHEN** a task, test, audit dependency, safety check, or strict validation remains incomplete or failing
 - **THEN** the change SHALL NOT be reported complete or ready for downstream apply
-

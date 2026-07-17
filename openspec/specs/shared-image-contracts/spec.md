@@ -75,4 +75,3 @@ The error contract SHALL expose a stable code/category, processing stage, safe u
 #### Scenario: Output received before failure
 - **WHEN** a provider stream or multi-output response fails after returning an image
 - **THEN** the error/result SHALL preserve the received artifact, set `receivedAnyOutput` and `mayHaveBilled` appropriately, and SHALL NOT present the operation as safely replayable
-
