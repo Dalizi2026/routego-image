@@ -6,9 +6,11 @@
 - OpenSpec change：`add-routego-studio`
 - 来源任务：`019f7084-180c-7c91-aaa0-c92820ffcac8`
 - 来源代次：`0`
-- 继任任务：`pending`，创建后以线程登记为准
+- 继任任务：`019f71d8-03f8-7c20-a816-8bed99e07881`
 - 继任代次：`1`
 - 计划分支：`codex/routego-studio-g1`
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\8b8b\生图插件`
+- 交接治理起始提交：`09344228f537d306f1be3b73a43f64afbdf1aae2`
 - 可观察上下文压缩：`2`
 - 交接原因：来源任务在第二次压缩后完成安全检查点，但剩余任务均为大型原子工作；按治理要求不得让旧任务直接开始 `2.2`，必须使用全新任务和新 worktree 接管。
 
