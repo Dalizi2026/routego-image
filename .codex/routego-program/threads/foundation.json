@@ -3,7 +3,7 @@
   "lane": "foundation",
   "change": "establish-routego-image-foundation",
   "role": "openspec-apply-owner",
-  "status": "applying",
+  "status": "blocked-plan-deviation",
   "threadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f453\\生图插件",
   "branch": "codex/routego-foundation",
@@ -41,7 +41,7 @@
   "taskProgress": {
     "lastCompletedTask": "2.3",
     "implementationReadyThrough": "4.2",
-    "lastHealthAuditAt": "2026-07-17T21:35:29.0737592+08:00",
+    "lastHealthAuditAt": "2026-07-17T21:39:30.1184156+08:00",
     "newCompactionMarkerObserved": false
   },
   "subagents": {
@@ -54,9 +54,16 @@
     },
     "verification": {
       "task": "/root/foundation_verification",
-      "status": "active",
+      "status": "paused-plan-deviation",
       "startedAt": "2026-07-17T21:37:00+08:00",
       "ownsTasks": ["5.1", "5.2", "5.3"]
     }
+  },
+  "planDeviation": {
+    "status": "awaiting-controller-openspec-update",
+    "reportedAt": "2026-07-17T21:39:30.1184156+08:00",
+    "controllerThreadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
+    "affectedTasks": ["3.1", "3.2", "4.1", "4.2"],
+    "reason": "Required package root barrel exports are outside the task file scopes declared in tasks.md."
   }
 }
