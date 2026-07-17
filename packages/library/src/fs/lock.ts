@@ -90,13 +90,24 @@ async function recoverStaleLock(
     age = now - (Number.isFinite(createdAt) ? createdAt : fileStat.mtimeMs);
   } catch (error) {
     if (isNodeError(error, "ENOENT")) return true;
+    if (isNodeError(error, "EPERM") || isNodeError(error, "EACCES") || isNodeError(error, "EBUSY")) {
+      return false;
+    }
     throw error;
   }
 
   if (age < staleMs || (metadata !== undefined && isProcessAlive(metadata.pid))) return false;
   const token = metadata?.token;
   if (beforeTokenRecheck) await beforeTokenRecheck();
-  const current = await readLock(lockPath);
+  let current: LockMetadata | undefined;
+  try {
+    current = await readLock(lockPath);
+  } catch (error) {
+    if (isNodeError(error, "EPERM") || isNodeError(error, "EACCES") || isNodeError(error, "EBUSY")) {
+      return false;
+    }
+    throw error;
+  }
   if ((token !== undefined && current?.token !== token) || (token === undefined && current !== undefined)) {
     return false;
   }

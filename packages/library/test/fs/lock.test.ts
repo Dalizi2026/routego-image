@@ -36,6 +36,22 @@ describe("file locks", () => {
     expect(order).toEqual(["first-start", "first-end", "second"]);
   });
 
+  it("treats a Windows sharing denial during lock publication as contention", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "routego-lock-sharing-"));
+    roots.push(root);
+    const lockPath = path.join(root, "index.lock");
+    const first = await acquireFileLock(lockPath, "index");
+    const second = acquireFileLock(lockPath, "index", {
+      timeoutMs: 250,
+      retryMinMs: 1,
+      retryMaxMs: 5
+    });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    await first.release();
+    await expect(second).resolves.toMatchObject({ path: lockPath });
+    await (await second).release();
+  });
+
   it("times out without deleting a live lock", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "routego-lock-timeout-"));
     roots.push(root);
