@@ -61,12 +61,12 @@ export function redactFreeText(value: string): string {
   return sanitizeUrlMatches(value)
     .replace(/data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=_-]+/giu, REDACTED_IMAGE_DATA)
     .replace(
-      /\b(x[-_ ]?routego[-_ ]?session|x[-_ ]?api[-_ ]?key|set[-_ ]?cookie|cookie|proxy[-_ ]?authorization|authorization)\s*[:=]\s*[^\r\n]*/giu,
+      /\b(x[-_ ]?routego[-_ ]?session|x[-_ ]?api[-_ ]?key|set[-_ ]?cookie|cookie|proxy[-_ ]?authorization|authorization)\s*[:=：＝]\s*[^\r\n,;；，。！？]*/giu,
       (_match, label: string) => `${label}: ${REDACTED_VALUE}`
     )
     .replace(/\bBearer\s+[A-Za-z0-9._~+/=-]+/giu, `Bearer ${REDACTED_VALUE}`)
     .replace(
-      /\b(x[-_ ]?routego[-_ ]?session|x[-_ ]?api[-_ ]?key|api[-_ ]?key|proxy[-_ ]?authorization|authorization|set[-_ ]?cookie|cookie|session[-_ ]?token|access[-_ ]?token|refresh[-_ ]?token|bearer[-_ ]?token|client[-_ ]?secret|token|password|secret)\s*[:=]\s*[^\s,;]+/giu,
+      /\b(x[-_ ]?routego[-_ ]?session|x[-_ ]?api[-_ ]?key|api[-_ ]?key|proxy[-_ ]?authorization|authorization|set[-_ ]?cookie|cookie|session[-_ ]?token|access[-_ ]?token|refresh[-_ ]?token|bearer[-_ ]?token|client[-_ ]?secret|token|password|secret)\s*[:=：＝]\s*[^\s,;；，。！？]+/giu,
       (_match, label: string) => `${label}=${REDACTED_VALUE}`
     );
 }
