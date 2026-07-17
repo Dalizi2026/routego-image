@@ -12,6 +12,9 @@ import {
   routegoOperationNames,
   studioOperationDefinitions,
   studioOperationNames,
+  outputDirectoryMutationSchema,
+  updateSettingsInputSchema,
+  updateSettingsResultSchema,
   upsertProviderProfileInputSchema,
   upsertProviderProfileResultSchema
 } from "../src/index";
@@ -240,6 +243,80 @@ describe("model refresh and confirmed capability probe contracts", () => {
   });
 });
 
+describe("defaults and output-directory mutation contracts", () => {
+  it("distinguishes unchanged, default, clear, and confirmed replace", () => {
+    for (const operation of ["unchanged", "default", "clear"] as const) {
+      expect(outputDirectoryMutationSchema.parse({ operation })).toEqual({ operation });
+      expect(
+        outputDirectoryMutationSchema.safeParse({ operation, path: "C:\\Pictures\\routego" })
+          .success
+      ).toBe(false);
+    }
+
+    expect(
+      outputDirectoryMutationSchema.parse({
+        operation: "replace",
+        path: "C:\\Users\\Synthetic User\\Pictures\\routego-image",
+        confirmLocalPath: true
+      })
+    ).toMatchObject({ operation: "replace", confirmLocalPath: true });
+    expect(
+      outputDirectoryMutationSchema.parse({
+        operation: "replace",
+        path: "/Users/synthetic/Pictures/routego-image",
+        confirmLocalPath: true
+      }).operation
+    ).toBe("replace");
+  });
+
+  it("rejects unconfirmed, relative, URL, and empty settings updates", () => {
+    for (const value of [
+      {
+        operation: "replace",
+        path: "C:\\Users\\Synthetic\\Pictures",
+        confirmLocalPath: false
+      },
+      { operation: "replace", path: "Pictures/routego-image", confirmLocalPath: true },
+      { operation: "replace", path: "https://example.invalid/output", confirmLocalPath: true },
+      { operation: "replace", path: "file:///tmp/output", confirmLocalPath: true }
+    ]) {
+      expect(outputDirectoryMutationSchema.safeParse(value).success).toBe(false);
+    }
+    expect(updateSettingsInputSchema.safeParse({}).success).toBe(false);
+  });
+
+  it("returns complete updated settings without echoing an absolute path", () => {
+    const input = updateSettingsInputSchema.parse({
+      defaults: { ...defaults, quality: "high", count: 2 },
+      outputDirectory: {
+        operation: "replace",
+        path: "C:\\Users\\Synthetic User\\Pictures\\routego-image",
+        confirmLocalPath: true
+      }
+    });
+    expect(input.defaults).toMatchObject({ quality: "high", count: 2 });
+
+    const result = updateSettingsResultSchema.parse({
+      schemaVersion: 1,
+      activeProviderId: "provider-a",
+      profiles: [profile],
+      defaults: input.defaults,
+      outputDirectory: { configured: true, display: "Pictures/routego-image" }
+    });
+    expect(result.defaults).toMatchObject({ quality: "high", count: 2 });
+    expect(JSON.stringify(result)).not.toContain("C:\\Users\\Synthetic User");
+    expect(
+      updateSettingsResultSchema.safeParse({
+        ...result,
+        outputDirectory: {
+          configured: true,
+          display: "C:\\Users\\Synthetic User\\Pictures\\routego-image"
+        }
+      }).success
+    ).toBe(false);
+  });
+});
+
 describe("separate Studio operation registry", () => {
   it("keeps the seven public operations and MCP tool names frozen", () => {
     expect(routegoOperationNames).toEqual([
@@ -279,7 +356,9 @@ describe("separate Studio operation registry", () => {
       "discardUploadResource",
       "studioGenerate",
       "studioEdit",
-      "studioBatch"
+      "studioBatch",
+      "searchStudioLibrary",
+      "updateSettings"
     ]);
     expect(studioOperationNames.some((name) => routegoOperationNames.includes(name as never))).toBe(
       false
@@ -310,5 +389,15 @@ describe("separate Studio operation registry", () => {
         requestShape: "single-endpoint-json:image"
       })
     ).toThrow();
+
+    expect(
+      parseStudioOperationOutput("updateSettings", {
+        schemaVersion: 1,
+        activeProviderId: "provider-a",
+        profiles: [profile],
+        defaults,
+        outputDirectory: { configured: false }
+      })
+    ).toMatchObject({ defaults });
   });
 });

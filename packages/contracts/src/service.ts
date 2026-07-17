@@ -13,6 +13,8 @@ import {
   preflightLibraryMutationResultSchema,
   reorderFoldersInputSchema,
   reorderFoldersResultSchema,
+  studioLibrarySearchInputSchema,
+  studioLibrarySearchResultSchema,
   type ExecuteLibraryMutationInput,
   type ExecuteLibraryMutationResult,
   type GetAssetDetailInput,
@@ -24,7 +26,9 @@ import {
   type PreflightLibraryMutationInput,
   type PreflightLibraryMutationResult,
   type ReorderFoldersInput,
-  type ReorderFoldersResult
+  type ReorderFoldersResult,
+  type StudioLibrarySearchInput,
+  type StudioLibrarySearchResult
 } from "./library";
 import {
   capabilityProbeInputSchema,
@@ -39,6 +43,8 @@ import {
   setActiveProviderProfileResultSchema,
   upsertProviderProfileInputSchema,
   upsertProviderProfileResultSchema,
+  updateSettingsInputSchema,
+  updateSettingsResultSchema,
   type CapabilityProbeInput,
   type CapabilityProbeResult,
   type ReadSettingsInput,
@@ -50,7 +56,9 @@ import {
   type SetActiveProviderProfileInput,
   type SetActiveProviderProfileResult,
   type UpsertProviderProfileInput,
-  type UpsertProviderProfileResult
+  type UpsertProviderProfileResult,
+  type UpdateSettingsInput,
+  type UpdateSettingsResult
 } from "./settings";
 import {
   studioBatchInputSchema,
@@ -142,7 +150,9 @@ export const studioOperationNames = [
   "discardUploadResource",
   "studioGenerate",
   "studioEdit",
-  "studioBatch"
+  "studioBatch",
+  "searchStudioLibrary",
+  "updateSettings"
 ] as const;
 
 export type StudioOperation = (typeof studioOperationNames)[number];
@@ -295,6 +305,16 @@ export const studioOperationDefinitions = {
     http: { method: "POST", path: "/api/v1/studio/creation/batch" },
     inputSchema: studioBatchInputSchema,
     outputSchema: studioBatchResultSchema
+  },
+  searchStudioLibrary: {
+    http: { method: "POST", path: "/api/v1/studio/library/search" },
+    inputSchema: studioLibrarySearchInputSchema,
+    outputSchema: studioLibrarySearchResultSchema
+  },
+  updateSettings: {
+    http: { method: "POST", path: "/api/v1/settings/update" },
+    inputSchema: updateSettingsInputSchema,
+    outputSchema: updateSettingsResultSchema
   }
 } as const satisfies Record<
   StudioOperation,
@@ -324,9 +344,11 @@ export interface StudioSettingsService {
   ): Promise<SetActiveProviderProfileResult>;
   refreshModels(input: RefreshModelsInput): Promise<RefreshModelsResult>;
   probeCapabilities(input: CapabilityProbeInput): Promise<CapabilityProbeResult>;
+  updateSettings(input: UpdateSettingsInput): Promise<UpdateSettingsResult>;
 }
 
 export interface StudioLibraryService {
+  searchStudioLibrary(input: StudioLibrarySearchInput): Promise<StudioLibrarySearchResult>;
   listFolders(input: ListFoldersInput): Promise<ListFoldersResult>;
   reorderFolders(input: ReorderFoldersInput): Promise<ReorderFoldersResult>;
   getAssetDetail(input: GetAssetDetailInput): Promise<GetAssetDetailResult>;

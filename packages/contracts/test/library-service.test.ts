@@ -4,7 +4,9 @@ import {
   browserResourceDescriptorSchema,
   executeLibraryMutationInputSchema,
   executeLibraryMutationResultSchema,
+  getAssetDetailInputSchema,
   getAssetDetailResultSchema,
+  getBrowserResourceInputSchema,
   getBrowserResourceResultSchema,
   libraryAssetDetailSchema,
   libraryMutationRequestSchema,
@@ -15,6 +17,9 @@ import {
   preflightLibraryMutationResultSchema,
   relativeBrowserResourceUrlSchema,
   reorderFoldersInputSchema,
+  routegoSearchLibraryInputSchema,
+  studioLibrarySearchInputSchema,
+  studioLibrarySearchResultSchema,
   studioOperationDefinitions,
   studioOperationNames
 } from "../src/index";
@@ -233,6 +238,104 @@ describe("session-protected browser resources", () => {
   });
 });
 
+describe("path-free Studio Library search", () => {
+  it("reuses the complete public filter and cursor input semantics", () => {
+    const input = {
+      query: "synthetic sky",
+      models: ["gpt-image-2"],
+      from: "2026-07-01T00:00:00.000Z",
+      to: "2026-07-31T23:59:59.000Z",
+      kinds: ["edit" as const],
+      sizes: ["1024x1024"],
+      statuses: ["partial" as const],
+      folderIds: ["folder-a"],
+      includeDeleted: false,
+      sort: "created-desc" as const,
+      limit: 20,
+      cursor: "cursor-page-2"
+    };
+    expect(studioLibrarySearchInputSchema).toBe(routegoSearchLibraryInputSchema);
+    expect(studioLibrarySearchInputSchema.parse(input)).toEqual(
+      routegoSearchLibraryInputSchema.parse(input)
+    );
+  });
+
+  it("returns stable asset/artifact IDs and an optional protected thumbnail without paths", () => {
+    const result = studioLibrarySearchResultSchema.parse({
+      schemaVersion: 1,
+      items: [
+        {
+          assetId: "asset-output",
+          artifactId: "artifact-output",
+          prompt: requestedParams.prompt,
+          model: "gpt-image-2",
+          kind: "edit",
+          mimeType: "image/png",
+          width: 1024,
+          height: 1024,
+          status: "partial",
+          folderIds: ["folder-a"],
+          createdAt: TEST_TIMESTAMP,
+          thumbnail: resource
+        }
+      ],
+      nextCursor: "cursor-next",
+      total: 1
+    });
+    const item = result.items[0]!;
+    expect(getAssetDetailInputSchema.parse({ assetId: item.assetId }).assetId).toBe(
+      "asset-output"
+    );
+    expect(
+      getBrowserResourceInputSchema.parse({
+        assetId: item.assetId,
+        artifactId: item.artifactId,
+        rendition: "thumbnail"
+      })
+    ).toMatchObject({ assetId: "asset-output", artifactId: "artifact-output" });
+    expect(JSON.stringify(result)).not.toMatch(/(?:filePath|"path"|C:\\|\/Users\/)/u);
+  });
+
+  it("rejects path leakage, unsafe thumbnails, and invalid deletion state", () => {
+    const base = {
+      assetId: "asset-output",
+      artifactId: "artifact-output",
+      prompt: "Synthetic",
+      model: "gpt-image-2",
+      kind: "generate" as const,
+      mimeType: "image/png" as const,
+      width: 1024,
+      height: 1024,
+      status: "succeeded" as const,
+      folderIds: ["folder-a"],
+      createdAt: TEST_TIMESTAMP
+    };
+    expect(
+      studioLibrarySearchResultSchema.safeParse({
+        schemaVersion: 1,
+        items: [{ ...base, filePath: "C:\\Users\\person\\image.png" }]
+      }).success
+    ).toBe(false);
+    expect(
+      studioLibrarySearchResultSchema.safeParse({
+        schemaVersion: 1,
+        items: [
+          {
+            ...base,
+            thumbnail: { ...resource, relativeUrl: "https://example.invalid/image.png" }
+          }
+        ]
+      }).success
+    ).toBe(false);
+    expect(
+      studioLibrarySearchResultSchema.safeParse({
+        schemaVersion: 1,
+        items: [{ ...base, status: "deleted" }]
+      }).success
+    ).toBe(false);
+  });
+});
+
 describe("preflighted Library mutation and per-item partial results", () => {
   it("uses asset/upload resource identifiers and rejects browser filesystem paths", () => {
     expect(
@@ -366,7 +469,9 @@ describe("Library Studio operation definitions", () => {
       "discardUploadResource",
       "studioGenerate",
       "studioEdit",
-      "studioBatch"
+      "studioBatch",
+      "searchStudioLibrary",
+      "updateSettings"
     ]);
     for (const operation of [
       "listFolders",
@@ -392,5 +497,12 @@ describe("Library Studio operation definitions", () => {
         folders: [folderA, folderB]
       })
     ).toMatchObject({ folders: [{ id: "folder-a" }, { id: "folder-b" }] });
+    expect(
+      parseStudioOperationOutput("searchStudioLibrary", {
+        schemaVersion: 1,
+        items: [],
+        total: 0
+      })
+    ).toEqual({ schemaVersion: 1, items: [], total: 0 });
   });
 });
