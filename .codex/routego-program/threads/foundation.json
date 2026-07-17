@@ -12,6 +12,16 @@
   "generation": 0,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "lastHealthAudit": "pending",
-  "successorThreadId": null
+  "lastHealthAudit": "passed",
+  "successorThreadId": null,
+  "auditReceipts": {
+    "legacy": {
+      "receivedAt": "2026-07-17T20:08:08.8434739+08:00",
+      "branch": "codex/routego-legacy-audit",
+      "commit": "59fe151b3747def15b9d21f9b0aa9898e5957164",
+      "document": "docs/audits/legacy-plugin-audit.md",
+      "verified": true
+    },
+    "upstream": null
+  }
 }
