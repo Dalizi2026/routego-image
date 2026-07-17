@@ -6,7 +6,7 @@
   "threadId": null,
   "worktree": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "branch": "main",
-  "headCommit": null,
+  "headCommit": "9875bdc6d63dcd300a7c00397f5952005f128cac",
   "generation": 0,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "2026-07-17-initial-plan-context-summary",
@@ -14,6 +14,7 @@
   "successorThreadId": null,
   "notes": [
     "The first observable context compaction occurred before execution started.",
-    "The repository default branch was normalized to main during bootstrap."
+    "The repository default branch was normalized to main during bootstrap.",
+    "Foundation, legacy audit, and upstream audit threads were dispatched from the planning baseline."
   ]
 }
