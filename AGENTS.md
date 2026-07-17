@@ -34,6 +34,17 @@
 - 任务只有在代码已提交、测试通过并合入对应集成基线后才能标记完成。
 - 需求或共享契约变化必须先更新 OpenSpec，再继续实现。
 
+## 规划一致性门禁
+
+- 开始每个任务前，主代理必须重新读取 `openspec instructions apply --change <change> --json`，确认准确的任务 ID、依赖、文件所有权和验证命令。
+- 实现只能覆盖当前任务声明的能力和文件范围；不得顺手重构、增加产品功能、替换技术栈或修改尚未解锁的后续任务。
+- 子代理提示必须引用明确的 OpenSpec 任务 ID、允许文件和禁止文件；没有任务 ID 的实现工作不得派发。
+- 遇到需要修改公共 Schema、架构、依赖边界、任务顺序、范围或验收标准的情况，立即停止相关实现并向 Program Controller 发送 `[PLAN_DEVIATION]`，说明原因、影响和建议的 OpenSpec 修订。
+- 未经 OpenSpec update 和 Program Controller 确认，不得以“实现更方便”为由偏离已确认设计。
+- 完成任务时必须按顺序执行：运行任务列出的验证、检查 Git 差异范围、提交实现、记录 commit SHA，最后由唯一 apply-owner 勾选 `tasks.md`。
+- 测试失败、工作区不干净、出现范围外文件或提交尚未形成时，不得勾选任务完成。
+- 每完成一个任务组，主代理必须进行规划一致性审计：对照 proposal、design、全部相关 specs、tasks 和审计风险清单，确认没有遗漏、提前实现或隐式范围扩张。
+
 ## 并行文件所有权
 
 - Foundation/Integration 独占共享 Schema、根依赖、锁文件、workspace 配置、插件 manifest 和发布流程。
