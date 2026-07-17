@@ -8,10 +8,10 @@
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\8b8b\\生图插件",
   "branch": "codex/routego-studio-g1",
   "startingCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
-  "headCommit": "281d25cf0e232186ce3e4608ec6dc8c3b8d18098",
+  "headCommit": "4255fd00f519903ba95690086a95c2b0c07ba932",
   "generation": 1,
-  "observableCompactions": 1,
-  "lastCompactionFingerprint": "context-checkpoint-2026-07-18-task-3.2-mask-integration-started",
+  "observableCompactions": 2,
+  "lastCompactionFingerprint": "context-checkpoint-2026-07-18-task-4.1-library-ui-integration-wip",
   "lastHealthAudit": "passed",
   "successorThreadId": null,
   "predecessorThreadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
@@ -30,7 +30,8 @@
     "repositorySafety": "227 tracked files passed",
     "openspec": "strict validation passed",
     "browser": "unknown mask capability and 390x844 responsive mock checks passed with no console warnings/errors or horizontal overflow",
-    "maskIntegration": "supported/degraded/unknown gates, target resolution, PNG finalize/slot-zero binding, upload failure recovery, saved/unsaved close, and resource discard regressions passed"
+    "maskIntegration": "supported/degraded/unknown gates, target resolution, PNG finalize/slot-zero binding, upload failure recovery, saved/unsaved close, and resource discard regressions passed",
+    "libraryTask41Wip": "Studio TypeScript build passed for the path-free query, comparison, handoff, download, and Library workspace source checkpoint; app integration and focused tests remain pending"
   },
   "applyOwnership": {
     "state": "active-single-owner",
