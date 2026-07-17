@@ -3,23 +3,26 @@
   "lane": "studio",
   "change": "add-routego-studio",
   "role": "openspec-apply-owner",
-  "status": "applying",
+  "status": "handoff-pending-successor",
   "threadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\8b8b\\生图插件",
   "branch": "codex/routego-studio-g1",
   "startingCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
-  "headCommit": "d3e229ac910b909554ecdeaa7fc6911a7e01d156",
+  "headCommit": "313fafba3a1d49d6b65db30fb679fd77d8760d18",
   "generation": 1,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "context-checkpoint-2026-07-18-task-4.1-library-ui-integration-wip",
   "lastHealthAudit": "passed",
-  "successorThreadId": null,
+  "successorThreadId": "pending",
+  "successorGeneration": 2,
+  "successorBranch": "codex/routego-studio-g2",
+  "successorStartingBaseCommit": "313fafba3a1d49d6b65db30fb679fd77d8760d18",
   "predecessorThreadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
   "predecessorGeneration": 0,
   "productCheckpointCommit": "bffe22b43c288bc16ea0c3dae6a4627b5ab5dafb",
   "handoffCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
   "registrationCommit": "2475cdc6b4fe9b397074ff3c240a22ab044b22e0",
-  "handoffFile": ".codex/routego-program/handoffs/studio-generation-1.md",
+  "handoffFile": ".codex/routego-program/handoffs/studio-generation-2.md",
   "openspecProgress": "7/11",
   "lastCompletedTask": "4.1",
   "nextTask": "4.2",
@@ -41,10 +44,10 @@
     "scope": "Exact source-code exception only; runtime Library data remains forbidden."
   },
   "applyOwnership": {
-    "state": "active-single-owner",
-    "activeOwnerThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
-    "predecessorThreadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
-    "successorThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881"
+    "state": "suspended-for-successor-handoff",
+    "activeOwnerThreadId": null,
+    "predecessorThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
+    "successorThreadId": "pending"
   },
   "predecessor": {
     "threadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
@@ -59,7 +62,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "compaction-2-current-task-complete-successor-required"
+    "status": "generation-2-handoff-pending"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
