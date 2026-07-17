@@ -2,6 +2,7 @@ import { defineConfig, type Options } from "tsup";
 
 const baseOptions = {
   entry: ["src/index.ts"],
+  tsconfig: "tsconfig.build.json",
   format: ["esm"],
   target: "node20",
   platform: "neutral",
