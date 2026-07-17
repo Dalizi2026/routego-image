@@ -3,6 +3,9 @@
   "references": [
     { "path": "./packages/contracts" },
     { "path": "./packages/foundation" },
-    { "path": "./packages/mock-relay" }
+    { "path": "./packages/mock-relay" },
+    { "path": "./packages/creation" },
+    { "path": "./packages/library" },
+    { "path": "./packages/studio" }
   ]
 }
