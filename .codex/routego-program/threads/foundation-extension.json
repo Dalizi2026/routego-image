@@ -36,6 +36,7 @@
   },
   "integration": {
     "mergeCommit": "710eb61",
+    "baselineCommit": "52f9e6e8653a3452a0e3175fa86ad7f208d2c912",
     "specsSynced": true,
     "archivePath": "openspec/changes/archive/2026-07-17-extend-routego-image-foundation-contracts",
     "archivedAt": "2026-07-18T00:08:00+08:00"
