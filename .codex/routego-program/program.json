@@ -116,6 +116,22 @@
     "studioPredecessorThreadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
     "integrationThreadId": null
   },
+  "laneCompletions": {
+    "creation": {
+      "status": "merged-synced-archived",
+      "sourceThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
+      "deliveryCommit": "624e7390b902814620d3eeb583ed43a57fd8243a",
+      "mergeCommit": "ebe5b564c3990fa89f5616b636aab0ce053b144a",
+      "specSyncCommit": "86214f666e10e080f6f4ac419d99402f282ef46e",
+      "archivePath": "openspec/changes/archive/2026-07-17-add-routego-image-creation",
+      "archiveCommit": null,
+      "integrationNotified": false,
+      "waitingFor": [
+        "add-routego-image-library",
+        "add-routego-studio"
+      ]
+    }
+  },
   "automations": {
     "foundationAuditGate": {
       "id": "routego-foundation",
