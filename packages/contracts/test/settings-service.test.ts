@@ -272,7 +272,11 @@ describe("separate Studio operation registry", () => {
       "getAssetDetail",
       "getBrowserResource",
       "preflightLibraryMutation",
-      "executeLibraryMutation"
+      "executeLibraryMutation",
+      "reserveUploadResource",
+      "finalizeUploadResource",
+      "getUploadResourceStatus",
+      "discardUploadResource"
     ]);
     expect(studioOperationNames.some((name) => routegoOperationNames.includes(name as never))).toBe(
       false

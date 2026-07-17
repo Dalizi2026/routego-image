@@ -8,3 +8,4 @@ export * from "./provider";
 export * from "./service";
 export * from "./settings";
 export * from "./tools";
+export * from "./upload";

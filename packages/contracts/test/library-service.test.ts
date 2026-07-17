@@ -359,7 +359,11 @@ describe("Library Studio operation definitions", () => {
       "getAssetDetail",
       "getBrowserResource",
       "preflightLibraryMutation",
-      "executeLibraryMutation"
+      "executeLibraryMutation",
+      "reserveUploadResource",
+      "finalizeUploadResource",
+      "getUploadResourceStatus",
+      "discardUploadResource"
     ]);
     for (const operation of [
       "listFolders",

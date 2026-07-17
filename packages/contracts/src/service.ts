@@ -80,6 +80,24 @@ import {
   type RoutegoStatusInput,
   type RoutegoStatusResult
 } from "./tools";
+import {
+  discardUploadResourceInputSchema,
+  discardUploadResourceResultSchema,
+  finalizeUploadResourceInputSchema,
+  finalizeUploadResourceResultSchema,
+  getUploadResourceStatusInputSchema,
+  getUploadResourceStatusResultSchema,
+  reserveUploadResourceInputSchema,
+  reserveUploadResourceResultSchema,
+  type DiscardUploadResourceInput,
+  type DiscardUploadResourceResult,
+  type FinalizeUploadResourceInput,
+  type FinalizeUploadResourceResult,
+  type GetUploadResourceStatusInput,
+  type GetUploadResourceStatusResult,
+  type ReserveUploadResourceInput,
+  type ReserveUploadResourceResult
+} from "./upload";
 
 export const routegoOperationNames = [
   "status",
@@ -105,7 +123,11 @@ export const studioOperationNames = [
   "getAssetDetail",
   "getBrowserResource",
   "preflightLibraryMutation",
-  "executeLibraryMutation"
+  "executeLibraryMutation",
+  "reserveUploadResource",
+  "finalizeUploadResource",
+  "getUploadResourceStatus",
+  "discardUploadResource"
 ] as const;
 
 export type StudioOperation = (typeof studioOperationNames)[number];
@@ -223,6 +245,26 @@ export const studioOperationDefinitions = {
     http: { method: "POST", path: "/api/v1/library/mutations/execute" },
     inputSchema: executeLibraryMutationInputSchema,
     outputSchema: executeLibraryMutationResultSchema
+  },
+  reserveUploadResource: {
+    http: { method: "POST", path: "/api/v1/uploads/reserve" },
+    inputSchema: reserveUploadResourceInputSchema,
+    outputSchema: reserveUploadResourceResultSchema
+  },
+  finalizeUploadResource: {
+    http: { method: "POST", path: "/api/v1/uploads/finalize" },
+    inputSchema: finalizeUploadResourceInputSchema,
+    outputSchema: finalizeUploadResourceResultSchema
+  },
+  getUploadResourceStatus: {
+    http: { method: "POST", path: "/api/v1/uploads/status" },
+    inputSchema: getUploadResourceStatusInputSchema,
+    outputSchema: getUploadResourceStatusResultSchema
+  },
+  discardUploadResource: {
+    http: { method: "POST", path: "/api/v1/uploads/discard" },
+    inputSchema: discardUploadResourceInputSchema,
+    outputSchema: discardUploadResourceResultSchema
   }
 } as const satisfies Record<
   StudioOperation,
@@ -267,10 +309,24 @@ export interface StudioLibraryService {
   ): Promise<ExecuteLibraryMutationResult>;
 }
 
+export interface StudioUploadService {
+  reserveUploadResource(input: ReserveUploadResourceInput): Promise<ReserveUploadResourceResult>;
+  finalizeUploadResource(
+    input: FinalizeUploadResourceInput
+  ): Promise<FinalizeUploadResourceResult>;
+  getUploadResourceStatus(
+    input: GetUploadResourceStatusInput
+  ): Promise<GetUploadResourceStatusResult>;
+  discardUploadResource(
+    input: DiscardUploadResourceInput
+  ): Promise<DiscardUploadResourceResult>;
+}
+
 export interface LocalRoutegoService
   extends RoutegoService,
     StudioSettingsService,
-    StudioLibraryService {}
+    StudioLibraryService,
+    StudioUploadService {}
 
 export function parseRoutegoOperationInput(operation: RoutegoOperation, input: unknown): unknown {
   return routegoOperationDefinitions[operation].inputSchema.parse(input);
