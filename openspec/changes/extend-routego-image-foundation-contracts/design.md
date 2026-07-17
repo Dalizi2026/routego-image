@@ -19,7 +19,7 @@ Exclusive file ownership for this change:
 - `packages/contracts/**`
 - `packages/mock-relay/**`
 - minimal `packages/creation/**`, `packages/library/**`, and `packages/studio/**`
-- root package/workspace/TypeScript importer configuration and `pnpm-lock.yaml`
+- root package/workspace/TypeScript importer configuration, `.gitignore`, package export and repository safety checks, and `pnpm-lock.yaml`
 
 ## Goals / Non-Goals
 
@@ -95,6 +95,8 @@ Each downstream package receives a private package manifest, TypeScript project,
 
 Root TypeScript references and the committed lockfile include all three importers. No additional third-party dependency is permitted without a planning deviation.
 
+The repository's generic `library/` ignore and safety rules protect local user data, but they collide with the required source package name `packages/library`. The Foundation Extension therefore owns one exact exception: `.gitignore` unignores only `/packages/library/` and its contents, and the safety checker exempts only the `library` segment at `segments[0] === "packages" && segments[1] === "library"`. Any other `library` path remains ignored/rejected, and any other forbidden segment nested below `packages/library` remains rejected. Force-adding ignored files is not an accepted workaround.
+
 ### 7. Verification and error handling
 
 All new operation definitions carry input and output Zod schemas. Boundary parsers fail closed on invalid mock or service output using the existing `internal_contract` model. Tests cover redaction, invalid secret/result fields, confirmation rules, relative resource URLs, relationship completeness, partial results, fixture determinism, public-operation freeze, package exports, and browser-safe build output without Node built-in imports.
@@ -109,6 +111,7 @@ The final gate runs a clean frozen install, strict OpenSpec validation, safety, 
 - [Risk] Synthetic mock data could accidentally resemble real secrets or user images. → Mitigation: use explicit mock identifiers, a fixed one-pixel synthetic data URL only where existing image-operation fixtures require it, and repository safety/redaction tests.
 - [Risk] React/Vite dependencies expand the lockfile and include platform-specific optional build artifacts. → Mitigation: keep them development/build-time for Studio where appropriate, audit runtime dependency paths, and require no native addon on the target plugin runtime.
 - [Risk] Importer scaffolds could be mistaken for feature completion. → Mitigation: expose only package/version/type import probes, include no page, transport, storage, or mutation implementation, and keep all downstream product tasks paused.
+- [Risk] Exempting the package name `library` could accidentally weaken user-data protection. → Mitigation: unignore and safety logic match only the exact repository source prefix `packages/library`; staged synthetic probes verify that root and unrelated `library` paths remain blocked and are removed immediately after the test.
 
 ## Migration Plan
 
