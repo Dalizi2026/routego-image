@@ -8,7 +8,7 @@
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
-  "headCommit": "b4b98f1124a07b66334fc33cf5d7516d1eba100d",
+  "headCommit": "937c5ca1e8e6ab49deb699673a2f9c9ee3b87d1f",
   "generation": 2,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -21,19 +21,22 @@
   "registrationCommit": "b4b98f1124a07b66334fc33cf5d7516d1eba100d",
   "controllerRegistrationCommit": "9189b7a4f8155b5e62def6f786e5d7723eb8a3f0",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
-  "openspecProgress": "8/10",
-  "lastCompletedTask": "4.2",
-  "nextTask": "5.1",
-  "lastImplementationCommit": "ae0be0b8f197f8339c787ad1ade8b7363e217e83",
-  "lastOpenSpecCommit": "e80c5687db1ab2979c1eaada4a25c63fce7e7fef",
+  "openspecProgress": "9/10",
+  "lastCompletedTask": "5.1",
+  "nextTask": "5.2",
+  "lastImplementationCommit": "8feb9dc2d4f53336d1190fc069b2774ddf4c241b",
+  "lastOpenSpecCommit": "478e674e3c1d4d80db6d96821c156511012b96fc",
   "recentValidation": {
-    "focusedPortability": "16/16 passed",
-    "libraryTests": "18 files, 141 tests passed",
+    "focusedPortability": "16/16 passed in task 4.2",
+    "libraryTests": "19 files, 144 tests passed",
     "libraryTypecheck": "passed",
     "libraryBuild": "passed",
     "repositorySafety": "passed",
-    "openspec": "strict validation 7/7 passed",
-    "scope": "git diff check and allowed-file audit passed"
+    "rootTypecheckBuildTest": "passed",
+    "packageExports": "all seven packages and Library smoke passed",
+    "runtimeDependencies": "workspace contracts/foundation plus pure-JS zod; no native runtime dependency",
+    "openspec": "9/10, next task 5.2",
+    "scope": "task 5.1 allowed-file and diff checks passed"
   },
   "applyOwnership": {
     "state": "active-single-owner",
@@ -55,7 +58,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-active-task-5.1"
+    "status": "generation-2-active-task-5.2"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
