@@ -21,4 +21,5 @@
 - G2 在真实登记前只读；任何写入前完整重读权威文件，并运行 `openspec status --change add-routego-image-library --json` 与 `openspec instructions apply --change add-routego-image-library --json`。
 - G2 登记后创建 `codex/routego-library-g2`，确认 8/10、下一任务 5.1 和 Git clean，并发送 `[LIBRARY_HANDOFF_ACCEPTED]`。
 - Controller 归档 G1 并激活唯一 owner 后，G2 才能从 5.1 继续，不得重做已完成任务。
+- G2 已在 `b4b98f1124a07b66334fc33cf5d7516d1eba100d` 接受交接；Controller 通过 `c9ac706321500b01dabbf92ed81ba39cd566127e` 归档 G1、移除旧 worktree，并激活 G2 为唯一 apply-owner。
 - 不修改七个公共工具、共享契约、根依赖/锁文件、Creation/Studio/Integration 或发布文件；不接触真实凭证、图片、图库或中转。
