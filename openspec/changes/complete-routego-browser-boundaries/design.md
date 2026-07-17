@@ -112,7 +112,7 @@ Upload reservations keep synthetic lifecycle state. Finalize returns fixed synth
 
 ### 9. Structured errors are explicit and fail closed
 
-The shared error code enum adds upload/resource-specific codes for expiry, invalid MIME, oversize, checksum mismatch, and consumed state; ordinary missing resources use `not_found`. Studio output parsers reject any unknown field or invalid status/artifact/error combination. Success never carries an error, failed always carries one, partial must contain output or failed slots, and automatic retry metadata remains forbidden after output/billing risk.
+Upload/resource-specific codes for expiry, invalid MIME, oversize, checksum mismatch, consumed, and discarded state live in an upload-local error schema used only by Studio/local upload operations; ordinary missing resources use `not_found`. The frozen public `routegoErrorCodeSchema` and public MCP result schemas remain unchanged. Studio output parsers reject any unknown field or invalid status/artifact/error combination. Success never carries an error, failed always carries one, partial must contain output or failed slots, and automatic retry metadata remains forbidden after output/billing risk.
 
 ### 10. Verification and ownership gates
 
