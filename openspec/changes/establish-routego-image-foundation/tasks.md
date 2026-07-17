@@ -13,7 +13,7 @@
 ## 3. Provider policy and security primitives
 
 - [x] 3.1 `[lane=foundation owner=runtime-subagent deps=2.1,2.2 files=packages/foundation/src/provider/**]` Implement pure endpoint normalization and capability routing: exact endpoint by default, opt-in legacy base normalization, no derived models/Edits/Responses paths, scoped evidence transitions, billable-probe confirmation, degraded continuation, and no cross-transport replay decision. Verification: focused Vitest cases cover Tier A text/image, Tier B/C gating, unknown/unsupported/degraded states, transient failures, and partial-output retry prohibition.
-- [ ] 3.2 `[lane=foundation owner=runtime-subagent deps=2.2 files=packages/foundation/src/security/**]` Implement recursive non-mutating redaction, safe endpoint diagnostics, loopback bind/origin/session-token policy, constant-time token comparison, Windows/POSIX path containment with protected legacy roots, and default-no-authorization download policy including redirect decisions. Verification: focused Vitest cases cover nested/free-text secrets, URL credentials/query/fragment, CORS/CSRF rejection, traversal/cross-root cases, and credential stripping.
+- [x] 3.2 `[lane=foundation owner=runtime-subagent deps=2.2 files=packages/foundation/src/security/**]` Implement recursive non-mutating redaction, safe endpoint diagnostics, loopback bind/origin/session-token policy, constant-time token comparison, Windows/POSIX path containment with protected legacy roots, and default-no-authorization download policy including redirect decisions. Verification: focused Vitest cases cover nested/free-text secrets, URL credentials/query/fragment, CORS/CSRF rejection, traversal/cross-root cases, and credential stripping.
 
 ## 4. Service and relay test doubles
 
