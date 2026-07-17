@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "lane": "foundation-extension",
+  "change": "extend-routego-image-foundation-contracts",
+  "role": "openspec-apply-owner",
+  "status": "dispatch-pending",
+  "threadId": "pending",
+  "worktree": "pending",
+  "branch": "codex/routego-foundation-extension",
+  "startingCommit": "c3b885221e154ee96e96eb00224893c483545c04",
+  "headCommit": null,
+  "generation": 0,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "lastHealthAudit": "pending",
+  "successorThreadId": null,
+  "dependsOn": [
+    "establish-routego-image-foundation"
+  ],
+  "ownership": {
+    "owned": [
+      "packages/contracts/** shared browser-safe contract extensions",
+      "packages/mock-relay/** deterministic Studio and Library mock extensions",
+      "root package and pnpm lock dependency updates",
+      "minimal packages/creation, packages/library, and packages/studio importer scaffolds",
+      "openspec/changes/extend-routego-image-foundation-contracts/**"
+    ],
+    "forbidden": [
+      "real provider transport implementation",
+      "Library persistence and filesystem business implementation",
+      "Studio pages, components, and mask editor implementation",
+      "plugin manifest, installation, and release workflow",
+      "real API keys, user images, legacy config, and legacy library mutation"
+    ]
+  }
+}
