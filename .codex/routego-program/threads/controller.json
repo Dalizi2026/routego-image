@@ -58,6 +58,7 @@
     "Studio generation 1 completed task 3.2 at 5d6712103908d4d94a0c570aa26d8498d2b1ffe2 with 58/58 Studio tests, builds, strict validation, scope and browser checks; at observable compaction 1 and a clean sole-owner boundary, Controller authorized continuing task 4.1.",
     "Studio task 4.1 scope clarification was approved as a tasks-only correction adding only CreationWorkbench.tsx for identifier-only, one-shot Library retry/edit draft ingestion; proposal, design, and specs already express the required behavior.",
     "Library generation 1 completed task 3.3 at c897416e7b536cb3163143fbcd95b5f8be1586b3 with 94/94 Library tests and clean scope; at observable compaction 1, Controller authorized continuing only task 4.1.",
-    "Studio generation 1 established the mandatory compaction-2 safe WIP checkpoint bf9532c57878a5e851c92ae046cc6065f8e462d3 during task 4.1; Controller authorized finishing only task 4.1 and requires a new-thread/new-worktree successor before task 4.2."
+    "Studio generation 1 established the mandatory compaction-2 safe WIP checkpoint bf9532c57878a5e851c92ae046cc6065f8e462d3 during task 4.1; Controller authorized finishing only task 4.1 and requires a new-thread/new-worktree successor before task 4.2.",
+    "Library generation 1 completed task 4.1 at b88a07d96acd006bb47882c53312722c171cd8c7 with 125/125 Library tests and clean scope; at observable compaction 1, Controller authorized continuing only task 4.2."
   ]
 }
