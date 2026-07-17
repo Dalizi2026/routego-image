@@ -3,7 +3,7 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "blocked-on-browser-boundary",
+  "status": "planning",
   "threadId": "019f7084-17ce-75d0-932b-12878f95f48f",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f5a6\\生图插件",
   "branch": "codex/routego-library",
@@ -26,6 +26,13 @@
     "baselineCommit": "52f9e6e8653a3452a0e3175fa86ad7f208d2c912",
     "releaseCommit": "23dd083e1b9cad43aafc6564f247a6025913c749",
     "resumeMergeCommit": "8012f79"
+  },
+  "browserBoundary": {
+    "branch": "codex/routego-browser-boundary",
+    "commit": "bf09ca71db2791457f10ca6a92dd63bcc319c01a",
+    "mergeCommit": "526acaa4ae1a877d231a556ad10ad2b5f355a78b",
+    "baselineCommit": "4b0efaffc55773cc5218c1acee858742f8ae0f46",
+    "archivePath": "openspec/changes/archive/2026-07-18-complete-routego-browser-boundaries"
   },
   "ownership": {
     "owned": [

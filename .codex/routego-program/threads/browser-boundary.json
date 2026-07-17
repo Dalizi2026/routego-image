@@ -3,17 +3,17 @@
   "lane": "foundation-browser-boundary",
   "change": "complete-routego-browser-boundaries",
   "role": "openspec-apply-owner",
-  "status": "planning",
+  "status": "archived",
   "threadId": "019f70fa-6768-72f3-8350-5a95ea02d4e8",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f862\\生图插件",
   "branch": "codex/routego-browser-boundary",
   "startingCommit": "ff0d2a88524c768c15b5c7a67dc8ead3aa8989c9",
   "registrationCommit": "b356425f07eb514544a9665d9a095e28d2035bff",
-  "headCommit": null,
+  "headCommit": "bf09ca71db2791457f10ca6a92dd63bcc319c01a",
   "generation": 0,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "pending",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "2026-07-18-delivery-correction-context-summary",
+  "lastHealthAudit": "passed",
   "successorThreadId": null,
   "dependsOn": [
     "extend-routego-image-foundation-contracts"
@@ -37,6 +37,49 @@
       "plugin manifest, installation, and release workflow",
       "new public MCP tools",
       "real API keys, user images, legacy config, and legacy library mutation"
+    ]
+  },
+  "integration": {
+    "mergeCommit": "526acaa4ae1a877d231a556ad10ad2b5f355a78b",
+    "baselineCommit": "4b0efaffc55773cc5218c1acee858742f8ae0f46",
+    "specsSynced": true,
+    "syncedCapabilities": [
+      "foundation-security",
+      "foundation-verification",
+      "local-service-boundaries",
+      "shared-image-contracts"
+    ],
+    "unchangedCapabilities": [
+      "provider-capability-model",
+      "workspace-foundation"
+    ],
+    "archivePath": "openspec/changes/archive/2026-07-18-complete-routego-browser-boundaries",
+    "archivedAt": "2026-07-18T03:09:08+08:00"
+  },
+  "completion": {
+    "tasks": "5/5",
+    "validatedAt": "2026-07-18T03:09:08+08:00",
+    "verifiedImplementationHead": "8e4fc91f5774fb9845ff255a6845fc3c6b4a9b6b",
+    "deliveryCommit": "bf09ca71db2791457f10ca6a92dd63bcc319c01a",
+    "validation": {
+      "frozenInstall": "passed",
+      "openspecStrict": "6 main specs passed after archive; 7 items passed before archive",
+      "safety": "passed for 153 tracked files on the Controller baseline",
+      "typecheck": "passed",
+      "build": "passed",
+      "tests": "183 passed: contracts 92, foundation 48, mock-relay 43",
+      "packageExports": "passed for all seven workspace packages",
+      "publicOperations": "exactly seven frozen public operations unchanged",
+      "browserSafeContracts": "source, declarations, and emitted JavaScript contain no Node built-in imports",
+      "mockDeterminism": "43 tests passed on two consecutive runs",
+      "runtimeDependenciesAndScope": "passed",
+      "gitClean": true
+    },
+    "blockers": [],
+    "residualRisks": [
+      "Real upload staging, contained storage, integrity checks, dimensions, expiry, and durable resources remain Library responsibilities.",
+      "Provider execution remains a Creation responsibility; real HTTP session/origin/binary streaming and resolver/executor composition remain Integration responsibilities.",
+      "Studio UI/browser journeys and macOS/Linux plus Node 20.19 acceptance remain downstream and Integration work."
     ]
   }
 }
