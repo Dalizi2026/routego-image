@@ -2,14 +2,22 @@ import { describe, expect, it } from "vitest";
 
 import {
   capabilityProbeResultSchema,
+  discardUploadResourceResultSchema,
   executeLibraryMutationResultSchema,
+  finalizeUploadResourceResultSchema,
   getAssetDetailResultSchema,
+  getUploadResourceStatusResultSchema,
   imageOperationResultSchema,
   parseStudioOperationOutput,
   parseRoutegoOperationOutput,
   preflightLibraryMutationResultSchema,
   readSettingsResultSchema,
-  routegoBatchResultSchema
+  reserveUploadResourceResultSchema,
+  routegoBatchResultSchema,
+  studioBatchResultSchema,
+  studioImageOperationResultSchema,
+  studioLibrarySearchResultSchema,
+  updateSettingsResultSchema
 } from "@routego-image/contracts";
 import { createMockRoutegoService } from "../src/index";
 
@@ -27,6 +35,41 @@ function editInput(overrides: Record<string, unknown> = {}) {
     prompt: "离线编辑提示 🎨",
     targetImage: { path: "/synthetic/target image.png" },
     invariants: { preserve: ["subject and composition"] },
+    ...overrides
+  };
+}
+
+function studioGenerateInput(overrides: Record<string, unknown> = {}) {
+  return {
+    kind: "generate" as const,
+    prompt: "Synthetic path-free Studio generate",
+    ...overrides
+  };
+}
+
+function studioEditInput(overrides: Record<string, unknown> = {}) {
+  return {
+    kind: "edit" as const,
+    prompt: "Synthetic path-free Studio edit",
+    references: [
+      {
+        image: { source: "asset" as const, assetId: "mock-asset-generate-success" },
+        role: "style" as const
+      }
+    ],
+    target: { source: "artifact" as const, artifactId: "mock-artifact-output" },
+    supportingImages: [
+      {
+        image: { source: "upload" as const, uploadResourceId: "mock-upload-supporting" },
+        role: "supporting" as const
+      }
+    ],
+    mask: {
+      image: { source: "upload" as const, uploadResourceId: "mock-upload-mask" },
+      targetSlot: 0 as const
+    },
+    invariants: { preserve: ["subject and composition"] },
+    action: "edit" as const,
     ...overrides
   };
 }
@@ -125,7 +168,7 @@ describe("deterministic mock application service", () => {
 
     expect(status.apiKeyPreview).toBe("mock-present");
     expect(status.endpoint?.display).not.toContain("token=");
-    expect(search.items).toEqual([]);
+    expect(search.items.map((item) => item.status)).toEqual(["partial", "succeeded"]);
     expect(manage.affectedFolderIds).toEqual(["mock-folder"]);
     expect(studio.url).toBe("http://127.0.0.1:43119/?token=mock-session-token");
   });
@@ -203,7 +246,11 @@ describe("deterministic mock application service", () => {
     const detail = await service.getAssetDetail({ assetId: "mock-asset-output" });
     const resource = await service.getBrowserResource({ assetId: "mock-asset-output" });
 
-    expect(folders.folders.map((folder) => folder.state)).toEqual(["active", "deleted"]);
+    expect(folders.folders.map((folder) => folder.state)).toEqual([
+      "active",
+      "active",
+      "deleted"
+    ]);
     expect(getAssetDetailResultSchema.parse(detail).asset?.relationships.map((item) => item.role)).toEqual([
       "source",
       "target",
@@ -258,5 +305,296 @@ describe("deterministic mock application service", () => {
       fixtureByOperation: { getBrowserResource: "invalid-output" }
     }).getBrowserResource({ assetId: "mock-asset" });
     expect(() => parseStudioOperationOutput("getBrowserResource", invalid)).toThrow();
+  });
+});
+
+describe("deterministic non-empty Studio gallery", () => {
+  it("keeps stable filtering, sorting, pagination, and deleted-state behavior", async () => {
+    const firstService = createMockRoutegoService();
+    const secondService = createMockRoutegoService();
+    const firstPage = await firstService.searchStudioLibrary({ limit: 1 });
+    const repeatedPage = await secondService.searchStudioLibrary({ limit: 1 });
+    expect(firstPage).toEqual(repeatedPage);
+    expect(studioLibrarySearchResultSchema.parse(firstPage)).toEqual(firstPage);
+    expect(firstPage.items.map((item) => item.assetId)).toEqual(["mock-asset-output"]);
+    expect(firstPage.nextCursor).toBe("mock-cursor:1");
+
+    const secondPage = await firstService.searchStudioLibrary({
+      limit: 1,
+      cursor: firstPage.nextCursor
+    });
+    expect(secondPage.items.map((item) => item.assetId)).toEqual([
+      "mock-asset-generate-success"
+    ]);
+
+    const all = await firstService.searchStudioLibrary({ includeDeleted: true, limit: 10 });
+    expect(all.total).toBe(3);
+    expect(all.items.map((item) => item.status)).toEqual([
+      "partial",
+      "succeeded",
+      "deleted"
+    ]);
+
+    const filters = await Promise.all([
+      firstService.searchStudioLibrary({ query: "astronaut" }),
+      firstService.searchStudioLibrary({ kinds: ["edit"] }),
+      firstService.searchStudioLibrary({ statuses: ["deleted"], includeDeleted: true }),
+      firstService.searchStudioLibrary({ folderIds: ["mock-folder-edits"] }),
+      firstService.searchStudioLibrary({ sizes: ["1536x1024"] })
+    ]);
+    expect(filters.map((result) => result.items.map((item) => item.assetId))).toEqual([
+      ["mock-asset-generate-success"],
+      ["mock-asset-output"],
+      ["mock-asset-generate-deleted"],
+      ["mock-asset-output"],
+      ["mock-asset-output"]
+    ]);
+  });
+
+  it("aligns search IDs with detail, relationships, and protected resources", async () => {
+    const service = createMockRoutegoService();
+    const search = await service.searchStudioLibrary({ kinds: ["edit"] });
+    const item = search.items[0]!;
+    const detail = await service.getAssetDetail({ assetId: item.assetId });
+    const resource = await service.getBrowserResource({
+      assetId: item.assetId,
+      artifactId: item.artifactId,
+      rendition: "preview"
+    });
+    expect(getAssetDetailResultSchema.parse(detail).asset?.renditions[0]?.artifactId).toBe(
+      item.artifactId
+    );
+    expect(detail.asset?.relationships.map((relationship) => relationship.role)).toEqual([
+      "source",
+      "target",
+      "reference",
+      "supporting",
+      "mask",
+      "output"
+    ]);
+    expect(resource.resource?.relativeUrl).toMatch(/^\/api\/v1\/library\/resources\//u);
+    const serialized = JSON.stringify(search);
+    expect(serialized).not.toContain('"path"');
+    expect(serialized).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64)/u);
+  });
+});
+
+describe("stateful synthetic upload lifecycle", () => {
+  it("finalizes and reuses image uploads until explicit discard", async () => {
+    const service = createMockRoutegoService();
+    const reserved = await service.reserveUploadResource({
+      purpose: "reference",
+      declaredMimeType: "image/png",
+      declaredByteLength: 68,
+      expectedSha256: "a".repeat(64)
+    });
+    const uploadResourceId = reserved.resource!.uploadResourceId;
+    expect(reserveUploadResourceResultSchema.parse(reserved)).toMatchObject({
+      status: "succeeded",
+      resource: { reusePolicy: "reusable-until-expiry" }
+    });
+
+    const finalized = await service.finalizeUploadResource({ uploadResourceId });
+    expect(finalizeUploadResourceResultSchema.parse(finalized)).toMatchObject({
+      status: "succeeded",
+      resource: {
+        status: "finalized",
+        finalized: { detectedMimeType: "image/png", sha256: "a".repeat(64) }
+      }
+    });
+
+    const request = studioGenerateInput({
+      references: [
+        {
+          image: { source: "upload", uploadResourceId },
+          role: "reference"
+        }
+      ]
+    });
+    expect((await service.studioGenerate(request)).status).toBe("succeeded");
+    expect((await service.studioGenerate(request)).status).toBe("succeeded");
+    expect(
+      getUploadResourceStatusResultSchema.parse(
+        await service.getUploadResourceStatus({ uploadResourceId })
+      ).resource?.status
+    ).toBe("finalized");
+
+    const discarded = await service.discardUploadResource({ uploadResourceId });
+    expect(discardUploadResourceResultSchema.parse(discarded).resource?.status).toBe("discarded");
+    expect(await service.finalizeUploadResource({ uploadResourceId })).toMatchObject({
+      status: "failed",
+      error: { code: "upload_discarded" }
+    });
+  });
+
+  it.each([
+    ["expired", "upload_expired"],
+    ["invalid-type", "upload_invalid_type"],
+    ["oversize", "upload_oversize"],
+    ["checksum-failed", "upload_checksum_failed"],
+    ["consumed", "upload_consumed"],
+    ["discarded", "upload_discarded"]
+  ] as const)("returns structured %s finalization failure", async (fixture, code) => {
+    const service = createMockRoutegoService({
+      fixtureByOperation: { finalizeUploadResource: fixture }
+    });
+    const reserved = await service.reserveUploadResource({
+      purpose: fixture === "consumed" ? "zip-import" : "image",
+      declaredMimeType: fixture === "consumed" ? "application/zip" : "image/png",
+      declaredByteLength: 68
+    });
+    const result = await service.finalizeUploadResource({
+      uploadResourceId: reserved.resource!.uploadResourceId
+    });
+    expect(finalizeUploadResourceResultSchema.parse(result)).toMatchObject({
+      status: "failed",
+      error: { code }
+    });
+  });
+
+  it("reports not-found, oversize reservation, and expired status without paths", async () => {
+    const service = createMockRoutegoService();
+    expect(await service.finalizeUploadResource({ uploadResourceId: "missing-upload" })).toMatchObject({
+      status: "failed",
+      error: { code: "not_found" }
+    });
+    expect(
+      await service.reserveUploadResource({
+        purpose: "image",
+        declaredMimeType: "image/png",
+        declaredByteLength: 52_428_801
+      })
+    ).toMatchObject({ status: "failed", error: { code: "upload_oversize" } });
+
+    const expiring = createMockRoutegoService({
+      fixtureByOperation: { getUploadResourceStatus: "expired" }
+    });
+    const reserved = await expiring.reserveUploadResource({
+      purpose: "image",
+      declaredMimeType: "image/png",
+      declaredByteLength: 68
+    });
+    const status = await expiring.getUploadResourceStatus({
+      uploadResourceId: reserved.resource!.uploadResourceId
+    });
+    expect(status).toMatchObject({ status: "failed", error: { code: "upload_expired" } });
+    expect(JSON.stringify(status)).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64)/u);
+  });
+
+  it("consumes a finalized ZIP exactly once through Library import", async () => {
+    const service = createMockRoutegoService();
+    const reserved = await service.reserveUploadResource({
+      purpose: "zip-import",
+      declaredMimeType: "application/zip",
+      declaredByteLength: 256
+    });
+    const uploadResourceId = reserved.resource!.uploadResourceId;
+    await service.finalizeUploadResource({ uploadResourceId });
+    const preflight = await service.preflightLibraryMutation({
+      mutation: { action: "import-zip", uploadResourceId }
+    });
+    expect(preflight).toMatchObject({ status: "ready", requiredConfirmations: ["zip-import"] });
+    const imported = await service.executeLibraryMutation({
+      preflightId: preflight.preflightId,
+      action: "import-zip",
+      confirmations: ["zip-import"]
+    });
+    expect(imported).toMatchObject({
+      status: "succeeded",
+      importedCount: 1,
+      skippedCount: 0
+    });
+    expect(
+      (await service.getUploadResourceStatus({ uploadResourceId })).resource?.status
+    ).toBe("consumed");
+    expect(await service.finalizeUploadResource({ uploadResourceId })).toMatchObject({
+      status: "failed",
+      error: { code: "upload_consumed" }
+    });
+
+    const repeated = await service.preflightLibraryMutation({
+      mutation: { action: "import-zip", uploadResourceId }
+    });
+    expect(repeated).toMatchObject({
+      status: "blocked",
+      items: [{ eligible: false, error: { code: "conflict" } }]
+    });
+  });
+});
+
+describe("path-free Studio creation mock outcomes", () => {
+  it("returns success, partial batch, degraded edit, and capability failure", async () => {
+    const success = await createMockRoutegoService().studioGenerate(studioGenerateInput());
+    expect(studioImageOperationResultSchema.parse(success).status).toBe("succeeded");
+
+    const partialService = createMockRoutegoService({
+      fixtureByOperation: { studioBatch: "partial" }
+    });
+    const batch = await partialService.studioBatch({
+      tasks: [
+        { id: "studio-task-generate", operation: studioGenerateInput() },
+        { id: "studio-task-edit", operation: studioEditInput() }
+      ],
+      concurrency: 2
+    });
+    expect(studioBatchResultSchema.parse(batch)).toMatchObject({ status: "partial" });
+    expect(batch.items.map((item) => item.result.status)).toEqual(["succeeded", "failed"]);
+
+    const degraded = await createMockRoutegoService({
+      fixtureByOperation: { studioEdit: "degraded" }
+    }).studioEdit(studioEditInput());
+    expect(degraded).toMatchObject({
+      status: "succeeded",
+      execution: { degradedContinuation: true }
+    });
+
+    const failed = await createMockRoutegoService({
+      fixtureByOperation: { studioEdit: "failure" }
+    }).studioEdit(studioEditInput());
+    expect(failed).toMatchObject({
+      status: "failed",
+      error: { code: "capability_unavailable" }
+    });
+
+    const serialized = JSON.stringify({ success, batch, degraded, failed });
+    expect(serialized).not.toContain('"path"');
+    expect(serialized).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64|Authorization)/u);
+  });
+});
+
+describe("stateful synthetic settings mutation", () => {
+  it("reflects defaults and every output-directory operation in later reads", async () => {
+    const service = createMockRoutegoService();
+    const initial = await service.readSettings({});
+    const replacementPath = "C:\\Users\\Synthetic User\\Pictures\\routego-image";
+    const replaced = await service.updateSettings({
+      defaults: { ...initial.defaults, quality: "high", count: 2 },
+      outputDirectory: {
+        operation: "replace",
+        path: replacementPath,
+        confirmLocalPath: true
+      }
+    });
+    expect(updateSettingsResultSchema.parse(replaced)).toMatchObject({
+      defaults: { quality: "high", count: 2 },
+      outputDirectory: { configured: true }
+    });
+    expect(JSON.stringify(replaced)).not.toContain(replacementPath);
+    expect(await service.readSettings({})).toEqual(replaced);
+
+    const unchanged = await service.updateSettings({
+      outputDirectory: { operation: "unchanged" }
+    });
+    expect(unchanged.outputDirectory).toEqual(replaced.outputDirectory);
+
+    const cleared = await service.updateSettings({ outputDirectory: { operation: "clear" } });
+    expect(cleared.outputDirectory).toEqual({ configured: false });
+
+    const defaulted = await service.updateSettings({ outputDirectory: { operation: "default" } });
+    expect(defaulted.outputDirectory).toEqual({
+      configured: true,
+      display: "Default Pictures/routego-image"
+    });
+    expect(readSettingsResultSchema.parse(await service.readSettings({}))).toEqual(defaulted);
   });
 });

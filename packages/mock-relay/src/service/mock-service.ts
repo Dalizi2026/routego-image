@@ -3,12 +3,18 @@ import { createHash } from "node:crypto";
 import {
   capabilityProbeInputSchema,
   capabilityProbeResultSchema,
+  discardUploadResourceInputSchema,
+  discardUploadResourceResultSchema,
   executeLibraryMutationInputSchema,
   executeLibraryMutationResultSchema,
+  finalizeUploadResourceInputSchema,
+  finalizeUploadResourceResultSchema,
   getAssetDetailInputSchema,
   getAssetDetailResultSchema,
   getBrowserResourceInputSchema,
   getBrowserResourceResultSchema,
+  getUploadResourceStatusInputSchema,
+  getUploadResourceStatusResultSchema,
   identifierSchema,
   imageOperationResultSchema,
   listFoldersInputSchema,
@@ -19,6 +25,8 @@ import {
   readSettingsResultSchema,
   refreshModelsInputSchema,
   refreshModelsResultSchema,
+  reserveUploadResourceInputSchema,
+  reserveUploadResourceResultSchema,
   removeProviderProfileInputSchema,
   removeProviderProfileResultSchema,
   reorderFoldersInputSchema,
@@ -38,17 +46,35 @@ import {
   routegoServiceErrorSchema,
   setActiveProviderProfileInputSchema,
   setActiveProviderProfileResultSchema,
+  studioBatchInputSchema,
+  studioBatchResultSchema,
+  studioEditInputSchema,
+  studioGenerateInputSchema,
+  studioImageOperationResultSchema,
+  studioLibrarySearchInputSchema,
+  studioLibrarySearchResultSchema,
+  studioServiceErrorSchema,
+  uploadServiceErrorSchema,
+  uploadResourceDescriptorSchema,
+  updateSettingsInputSchema,
+  updateSettingsResultSchema,
   upsertProviderProfileInputSchema,
   upsertProviderProfileResultSchema,
   type BrowserResourceDescriptor,
   type CapabilityProbeInput,
   type CapabilityProbeResult,
+  type DiscardUploadResourceInput,
+  type DiscardUploadResourceResult,
   type ExecuteLibraryMutationInput,
   type ExecuteLibraryMutationResult,
+  type FinalizeUploadResourceInput,
+  type FinalizeUploadResourceResult,
   type GetAssetDetailInput,
   type GetAssetDetailResult,
   type GetBrowserResourceInput,
   type GetBrowserResourceResult,
+  type GetUploadResourceStatusInput,
+  type GetUploadResourceStatusResult,
   type ImageArtifact,
   type ImageOperationRequest,
   type ImageOperationResult,
@@ -86,9 +112,25 @@ import {
   type RoutegoStatusResult,
   type SetActiveProviderProfileInput,
   type SetActiveProviderProfileResult,
+  type StudioBatchInput,
+  type StudioBatchResult,
+  type StudioEditInput,
+  type StudioGenerateInput,
+  type StudioImageArtifact,
+  type StudioImageRelationship,
+  type StudioImageOperationRequest,
+  type StudioImageOperationResult,
+  type StudioLibrarySearchInput,
+  type StudioLibrarySearchResult,
+  type StudioServiceError,
   type StudioOperation,
+  type UploadResourceDescriptor,
   type UpsertProviderProfileInput,
-  type UpsertProviderProfileResult
+  type UpsertProviderProfileResult,
+  type ReserveUploadResourceInput,
+  type ReserveUploadResourceResult,
+  type UpdateSettingsInput,
+  type UpdateSettingsResult
 } from "@routego-image/contracts";
 import { describeProviderEndpoint } from "@routego-image/foundation";
 
@@ -97,7 +139,14 @@ export type MockServiceFixture =
   | "failure"
   | "partial"
   | "degraded"
-  | "invalid-output";
+  | "invalid-output"
+  | "expired"
+  | "not-found"
+  | "invalid-type"
+  | "oversize"
+  | "checksum-failed"
+  | "consumed"
+  | "discarded";
 
 export type MockServiceOperation = RoutegoOperation | StudioOperation;
 
@@ -141,16 +190,36 @@ function invalidOutput<T>(): T {
 
 export class MockRoutegoService implements LocalRoutegoService {
   readonly #options: MockRoutegoServiceOptions;
+  readonly #uploads = new Map<string, UploadResourceDescriptor>();
   readonly #preflights = new Map<
     string,
     { readonly action: LibraryMutationRequest["action"]; readonly targetIds: readonly string[] }
   >();
+  #settings: ReadSettingsResult;
 
   constructor(options: MockRoutegoServiceOptions = {}) {
     this.#options = options;
     if (options.requestId !== undefined) {
       identifierSchema.parse(options.requestId);
     }
+    this.#settings = readSettingsResultSchema.parse({
+      schemaVersion: 1,
+      activeProviderId: "mock-provider",
+      profiles: [this.#profile()],
+      defaults: {
+        model: "mock-image-model",
+        size: "auto",
+        aspectRatio: "auto",
+        quality: "auto",
+        format: "png",
+        count: 1,
+        partialImages: 0,
+        transparentMode: "off",
+        moderation: "auto",
+        saveToLibrary: true
+      },
+      outputDirectory: { configured: true, display: "Pictures/routego-image/mock" }
+    });
   }
 
   #fixture(operation: MockServiceOperation): MockServiceFixture {
@@ -163,6 +232,16 @@ export class MockRoutegoService implements LocalRoutegoService {
 
   #timestamp(): string {
     return this.#options.timestamp ?? DEFAULT_TIMESTAMP;
+  }
+
+  #timestampWithOffset(minutes: number): string {
+    return new Date(Date.parse(this.#timestamp()) + minutes * 60_000).toISOString();
+  }
+
+  #redactedOutputDirectoryDisplay(path: string): string {
+    const segments = path.split(/[\\/]/u).filter((segment) => segment.length > 0);
+    const tail = segments.slice(-2).join("/");
+    return tail.length > 0 ? `…/${tail}` : "Selected local output directory";
   }
 
   #error(
@@ -198,6 +277,45 @@ export class MockRoutegoService implements LocalRoutegoService {
     });
   }
 
+  #uploadError(
+    code:
+      | "not_found"
+      | "upload_expired"
+      | "upload_invalid_type"
+      | "upload_oversize"
+      | "upload_checksum_failed"
+      | "upload_consumed"
+      | "upload_discarded",
+    safeMessage: string
+  ) {
+    return uploadServiceErrorSchema.parse({
+      code,
+      category: code === "not_found" ? "persistence" : "validation",
+      stage: "validate",
+      safeMessage,
+      retryDisposition: "user-confirmation",
+      partialArtifacts: [],
+      receivedAnyOutput: false,
+      mayHaveBilled: false
+    });
+  }
+
+  #libraryUploadError(
+    code:
+      | "not_found"
+      | "upload_expired"
+      | "upload_invalid_type"
+      | "upload_oversize"
+      | "upload_checksum_failed"
+      | "upload_consumed"
+      | "upload_discarded",
+    safeMessage: string
+  ): RoutegoServiceError {
+    return code === "not_found"
+      ? this.#error("not_found", safeMessage)
+      : this.#error("conflict", safeMessage);
+  }
+
   #profile(overrides: Partial<ProviderProfileDescriptor> = {}): ProviderProfileDescriptor {
     const { hasApiKey = true, apiKeyPreview, ...rest } = overrides;
     return {
@@ -220,12 +338,23 @@ export class MockRoutegoService implements LocalRoutegoService {
     };
   }
 
-  #folders(ids: readonly string[] = ["mock-folder-primary", "mock-folder-archive"]): LibraryFolderDescriptor[] {
+  #folders(
+    ids: readonly string[] = [
+      "mock-folder-primary",
+      "mock-folder-edits",
+      "mock-folder-archive"
+    ]
+  ): LibraryFolderDescriptor[] {
     return ids.map((id, index) => ({
       id,
-      name: index === 0 ? "Synthetic primary" : `Synthetic folder ${index + 1}`,
+      name:
+        id === "mock-folder-primary"
+          ? "Synthetic primary"
+          : id === "mock-folder-edits"
+            ? "Synthetic edits"
+            : "Synthetic archive",
       order: index,
-      assetCount: index === 0 ? 2 : 1,
+      assetCount: id === "mock-folder-primary" ? 2 : 1,
       state: id.includes("archive") ? "deleted" : "active",
       createdAt: this.#timestamp(),
       updatedAt: this.#timestamp()
@@ -234,26 +363,57 @@ export class MockRoutegoService implements LocalRoutegoService {
 
   #browserResource(
     resourceId = "mock-resource-preview",
-    mimeType: BrowserResourceDescriptor["mimeType"] = "image/png"
+    mimeType: BrowserResourceDescriptor["mimeType"] = "image/png",
+    scope: "library" | "creation" = "library"
   ): BrowserResourceDescriptor {
     const isImage = mimeType.startsWith("image/");
     return {
       resourceId,
-      relativeUrl: `/api/v1/library/resources/${resourceId}`,
+      relativeUrl:
+        scope === "library"
+          ? `/api/v1/library/resources/${resourceId}`
+          : `/api/v1/resources/${resourceId}`,
       requiresSession: true,
       mimeType,
       byteLength: isImage ? Buffer.from(MOCK_IMAGE_BASE64, "base64").byteLength : 256,
       ...(isImage ? { width: 1, height: 1 } : {}),
       etag: deterministicId("mock-etag", { resourceId, mimeType }),
-      expiresAt: "2026-01-01T00:05:00.000Z"
+      expiresAt: this.#timestampWithOffset(5)
     };
   }
 
-  #libraryParameters(): LibraryOperationParameters {
+  #libraryParameters(
+    kind: "generate" | "edit",
+    prompt: string,
+    size: "1024x1024" | "1536x1024" | "1024x1536"
+  ): LibraryOperationParameters {
+    const base = {
+      kind,
+      prompt,
+      references: [],
+      size,
+      aspectRatio: size === "1024x1024" ? "1:1" : size === "1536x1024" ? "3:2" : "2:3",
+      quality: "high" as const,
+      format: "png" as const,
+      count: 1,
+      partialImages: kind === "edit" ? 1 : 0,
+      transparentMode: "off" as const,
+      moderation: "auto" as const,
+      action: kind === "edit" ? ("edit" as const) : ("auto" as const),
+      imageIds: [],
+      fileIds: [],
+      outputDirectoryMode: "default" as const,
+      saveToLibrary: true
+    };
+    if (kind === "generate") {
+      return { ...base, kind: "generate", supportingImages: [] };
+    }
     return {
+      ...base,
       kind: "edit",
-      prompt: "Synthetic edit request for downstream Studio development.",
-      references: [{ assetId: "mock-asset-reference", role: "style", label: "Synthetic style" }],
+      references: [
+        { assetId: "mock-asset-reference", role: "style", label: "Synthetic style" }
+      ],
       target: { assetId: "mock-asset-target", label: "Synthetic target" },
       supportingImages: [
         {
@@ -267,40 +427,118 @@ export class MockRoutegoService implements LocalRoutegoService {
         allowedChanges: ["background"],
         preserve: ["subject and composition"],
         forbiddenChanges: []
-      },
-      size: "1024x1024",
-      aspectRatio: "1:1",
-      quality: "high",
-      format: "png",
-      count: 1,
-      partialImages: 0,
-      transparentMode: "off",
-      moderation: "auto",
-      action: "edit",
-      imageIds: [],
-      fileIds: [],
-      outputDirectoryMode: "default",
-      saveToLibrary: true
+      }
     };
   }
 
   #assetDetail(
     fixture: Exclude<MockServiceFixture, "invalid-output" | "failure">,
     assetId: string
-  ): LibraryAssetDetail {
-    const parameters = this.#libraryParameters();
-    const partial = fixture === "partial";
+  ): LibraryAssetDetail | undefined {
+    const seed =
+      assetId === "mock-asset-generate-success"
+        ? {
+            kind: "generate" as const,
+            status: "succeeded" as const,
+            prompt: "Synthetic astronaut cat in a quiet darkroom.",
+            size: "1024x1024" as const,
+            artifactId: "mock-artifact-generate-success",
+            createdOffset: -20,
+            folders: ["mock-folder-primary"]
+          }
+        : assetId === "mock-asset-output"
+          ? {
+              kind: "edit" as const,
+              status: "partial" as const,
+              prompt: "Synthetic edit request for downstream Studio development.",
+              size: "1536x1024" as const,
+              artifactId: "mock-artifact-output",
+              createdOffset: -10,
+              folders: ["mock-folder-primary", "mock-folder-edits"]
+            }
+          : assetId === "mock-asset-generate-deleted"
+            ? {
+                kind: "generate" as const,
+                status: "deleted" as const,
+                prompt: "Synthetic deleted portrait study.",
+                size: "1024x1536" as const,
+                artifactId: "mock-artifact-generate-deleted",
+                createdOffset: -30,
+                folders: ["mock-folder-archive"]
+              }
+            : undefined;
+    if (!seed) {
+      return undefined;
+    }
+
+    const parameters = this.#libraryParameters(seed.kind, seed.prompt, seed.size);
+    const partial = seed.status === "partial" || fixture === "partial";
+    const deleted = seed.status === "deleted";
+    const createdAt = this.#timestampWithOffset(seed.createdOffset);
+    const folderMap = new Map(this.#folders().map((folder) => [folder.id, folder]));
+    const relationships =
+      seed.kind === "edit"
+        ? [
+            {
+              id: `${assetId}-rel-source`,
+              role: "source" as const,
+              relatedAssetId: "mock-asset-source",
+              order: 0
+            },
+            {
+              id: `${assetId}-rel-target`,
+              role: "target" as const,
+              relatedAssetId: "mock-asset-target",
+              order: 1
+            },
+            {
+              id: `${assetId}-rel-reference`,
+              role: "reference" as const,
+              relatedAssetId: "mock-asset-reference",
+              order: 2
+            },
+            {
+              id: `${assetId}-rel-supporting`,
+              role: "supporting" as const,
+              relatedAssetId: "mock-asset-supporting",
+              order: 3
+            },
+            {
+              id: `${assetId}-rel-mask`,
+              role: "mask" as const,
+              relatedAssetId: "mock-asset-mask",
+              order: 4
+            },
+            {
+              id: `${assetId}-rel-output`,
+              role: "output" as const,
+              relatedAssetId: assetId,
+              artifactId: seed.artifactId,
+              order: 5
+            }
+          ]
+        : [
+            {
+              id: `${assetId}-rel-output`,
+              role: "output" as const,
+              relatedAssetId: assetId,
+              artifactId: seed.artifactId,
+              order: 0
+            }
+          ];
+
     return {
       id: assetId,
       prompt: parameters.prompt,
       model: "mock-image-model",
-      kind: "edit",
-      status: partial ? "partial" : "succeeded",
+      kind: seed.kind,
+      status: deleted ? "deleted" : partial ? "partial" : "succeeded",
       mimeType: "image/png",
-      width: 1,
-      height: 1,
-      createdAt: this.#timestamp(),
-      updatedAt: this.#timestamp(),
+      width: seed.size === "1536x1024" ? 1536 : 1024,
+      height: seed.size === "1024x1536" ? 1536 : 1024,
+      createdAt,
+      updatedAt: this.#timestampWithOffset(seed.createdOffset + 1),
+      ...(deleted ? { deletedAt: this.#timestampWithOffset(-5) } : {}),
       requestedParams: parameters,
       effectiveParams: parameters,
       execution: {
@@ -329,51 +567,102 @@ export class MockRoutegoService implements LocalRoutegoService {
         : {}),
       renditions: [
         {
-          artifactId: "mock-artifact-output",
+          artifactId: seed.artifactId,
           phase: partial ? "partial" : "final",
           mimeType: "image/png",
           byteLength: Buffer.from(MOCK_IMAGE_BASE64, "base64").byteLength,
-          width: 1,
-          height: 1,
+          width: seed.size === "1536x1024" ? 1536 : 1024,
+          height: seed.size === "1024x1536" ? 1536 : 1024,
           sha256: createHash("sha256").update(MOCK_IMAGE_BASE64, "base64").digest("hex"),
-          createdAt: this.#timestamp()
+          createdAt
         }
       ],
-      relationships: [
-        { id: "mock-rel-source", role: "source", relatedAssetId: "mock-asset-source", order: 0 },
-        { id: "mock-rel-target", role: "target", relatedAssetId: "mock-asset-target", order: 1 },
-        {
-          id: "mock-rel-reference",
-          role: "reference",
-          relatedAssetId: "mock-asset-reference",
-          order: 2
-        },
-        {
-          id: "mock-rel-supporting",
-          role: "supporting",
-          relatedAssetId: "mock-asset-supporting",
-          order: 3
-        },
-        { id: "mock-rel-mask", role: "mask", relatedAssetId: "mock-asset-mask", order: 4 },
-        {
-          id: "mock-rel-output",
-          role: "output",
-          relatedAssetId: assetId,
-          artifactId: "mock-artifact-output",
-          order: 5
-        }
-      ],
-      folders: [
-        { folderId: "mock-folder-primary", name: "Synthetic primary", state: "active", order: 0 }
-      ],
-      allowedActions: [
-        "edit",
-        "retry",
-        "assign-folders",
-        "soft-delete",
-        "export-zip",
-        "download"
-      ]
+      relationships,
+      folders: seed.folders.map((folderId) => {
+        const folder = folderMap.get(folderId)!;
+        return {
+          folderId,
+          name: folder.name,
+          state: folder.state,
+          order: folder.order
+        };
+      }),
+      allowedActions: deleted
+        ? ["restore", "permanent-delete", "export-zip", "download"]
+        : ["edit", "retry", "assign-folders", "soft-delete", "export-zip", "download"]
+    };
+  }
+
+  #galleryDetails(): LibraryAssetDetail[] {
+    return [
+      this.#assetDetail("success", "mock-asset-generate-success")!,
+      this.#assetDetail("success", "mock-asset-output")!,
+      this.#assetDetail("success", "mock-asset-generate-deleted")!
+    ];
+  }
+
+  #galleryPage(input: ReturnType<typeof routegoSearchLibraryInputSchema.parse>): {
+    readonly items: LibraryAssetDetail[];
+    readonly total: number;
+    readonly nextCursor?: string;
+  } {
+    const query = input.query?.toLocaleLowerCase();
+    const filtered = this.#galleryDetails().filter((asset) => {
+      if (!input.includeDeleted && asset.status === "deleted") {
+        return false;
+      }
+      if (query && !asset.prompt.toLocaleLowerCase().includes(query)) {
+        return false;
+      }
+      if (input.models.length > 0 && !input.models.includes(asset.model)) {
+        return false;
+      }
+      if (input.from && Date.parse(asset.createdAt) < Date.parse(input.from)) {
+        return false;
+      }
+      if (input.to && Date.parse(asset.createdAt) > Date.parse(input.to)) {
+        return false;
+      }
+      if (input.kinds.length > 0 && !input.kinds.includes(asset.kind)) {
+        return false;
+      }
+      if (input.sizes.length > 0 && !input.sizes.includes(asset.effectiveParams.size)) {
+        return false;
+      }
+      if (input.statuses.length > 0 && !input.statuses.includes(asset.status)) {
+        return false;
+      }
+      if (
+        input.folderIds.length > 0 &&
+        !asset.folders.some((folder) => input.folderIds.includes(folder.folderId))
+      ) {
+        return false;
+      }
+      return true;
+    });
+
+    filtered.sort((left, right) => {
+      const tieBreak = left.id.localeCompare(right.id);
+      if (input.sort === "created-asc") {
+        return Date.parse(left.createdAt) - Date.parse(right.createdAt) || tieBreak;
+      }
+      if (input.sort === "prompt-asc") {
+        return left.prompt.localeCompare(right.prompt) || tieBreak;
+      }
+      if (input.sort === "prompt-desc") {
+        return right.prompt.localeCompare(left.prompt) || tieBreak;
+      }
+      return Date.parse(right.createdAt) - Date.parse(left.createdAt) || tieBreak;
+    });
+
+    const match = input.cursor?.match(/^mock-cursor:(\d+)$/u);
+    const offset = match ? Number.parseInt(match[1]!, 10) : 0;
+    const items = filtered.slice(offset, offset + input.limit);
+    const nextOffset = offset + items.length;
+    return {
+      items,
+      total: filtered.length,
+      ...(nextOffset < filtered.length ? { nextCursor: `mock-cursor:${nextOffset}` } : {})
     };
   }
 
@@ -507,6 +796,174 @@ export class MockRoutegoService implements LocalRoutegoService {
     });
   }
 
+  #studioArtifact(
+    requestId: string,
+    phase: "partial" | "final" = "final",
+    saveToLibrary = true
+  ): StudioImageArtifact {
+    const artifactId = deterministicId("mock-studio-artifact", { requestId, phase });
+    return {
+      artifactId,
+      ...(saveToLibrary
+        ? { assetId: deterministicId("mock-studio-asset", { requestId, phase }) }
+        : {}),
+      slot: 0,
+      phase,
+      resource: this.#browserResource(
+        deterministicId("mock-studio-resource", { requestId, phase }),
+        "image/png",
+        "creation"
+      ),
+      createdAt: this.#timestamp()
+    };
+  }
+
+  #studioRelationships(
+    request: StudioImageOperationRequest,
+    outputArtifactId: string,
+    partial: boolean
+  ): StudioImageRelationship[] {
+    const relationships: StudioImageRelationship[] = [];
+    let order = 0;
+    if (request.kind === "edit") {
+      relationships.push({
+        role: "target",
+        input: request.target,
+        outputArtifactId,
+        order: order++
+      });
+    }
+    for (const reference of request.references) {
+      relationships.push({
+        role: "reference",
+        input: reference.image,
+        outputArtifactId,
+        order: order++
+      });
+    }
+    if (request.kind === "edit") {
+      for (const supporting of request.supportingImages) {
+        relationships.push({
+          role: "supporting",
+          input: supporting.image,
+          outputArtifactId,
+          order: order++
+        });
+      }
+      if (request.mask) {
+        relationships.push({
+          role: "mask",
+          input: request.mask.image,
+          outputArtifactId,
+          order: order++,
+          targetSlot: 0
+        });
+      }
+    }
+    relationships.push({
+      role: partial ? "stream-partial" : "output",
+      outputArtifactId,
+      order
+    });
+    return relationships;
+  }
+
+  #studioImageResult(
+    fixture: Exclude<MockServiceFixture, "invalid-output">,
+    request: StudioImageOperationRequest,
+    requestId: string
+  ): StudioImageOperationResult {
+    if (fixture === "failure") {
+      const error = studioServiceErrorSchema.parse({
+        code: "capability_unavailable",
+        category: "capability",
+        stage: "route",
+        safeMessage: "The selected synthetic Studio fixture has no image-input capability.",
+        retryDisposition: "user-confirmation",
+        partialArtifacts: [],
+        receivedAnyOutput: false,
+        mayHaveBilled: false
+      });
+      return studioImageOperationResultSchema.parse({
+        schemaVersion: 1,
+        requestId,
+        status: "failed",
+        requestedParams: request,
+        effectiveParams: request,
+        execution: {
+          attemptCount: 0,
+          providerRequestCount: 0,
+          receivedAnyOutput: false,
+          mayHaveBilled: false,
+          degradedContinuation: false,
+          providerImageIds: []
+        },
+        finalArtifacts: [],
+        partialArtifacts: [],
+        failedSlots: [],
+        relationships: [],
+        error
+      });
+    }
+
+    if (fixture === "partial") {
+      const artifact = this.#studioArtifact(requestId, "partial", request.saveToLibrary);
+      const error = studioServiceErrorSchema.parse({
+        code: "invalid_response",
+        category: "protocol",
+        stage: "stream",
+        safeMessage: "The synthetic Studio stream ended after a partial image.",
+        retryDisposition: "never",
+        partialArtifacts: [artifact],
+        receivedAnyOutput: true,
+        mayHaveBilled: true
+      });
+      return studioImageOperationResultSchema.parse({
+        schemaVersion: 1,
+        requestId,
+        status: "partial",
+        requestedParams: request,
+        effectiveParams: request,
+        execution: {
+          transport: "openai-responses",
+          attemptCount: 1,
+          providerRequestCount: 1,
+          receivedAnyOutput: true,
+          mayHaveBilled: true,
+          degradedContinuation: false,
+          providerImageIds: []
+        },
+        finalArtifacts: [],
+        partialArtifacts: [artifact],
+        failedSlots: [{ slot: 0, error }],
+        relationships: this.#studioRelationships(request, artifact.artifactId, true),
+        error
+      });
+    }
+
+    const artifact = this.#studioArtifact(requestId, "final", request.saveToLibrary);
+    return studioImageOperationResultSchema.parse({
+      schemaVersion: 1,
+      requestId,
+      status: "succeeded",
+      requestedParams: request,
+      effectiveParams: request,
+      execution: {
+        transport: "single-endpoint-json",
+        attemptCount: 1,
+        providerRequestCount: 1,
+        receivedAnyOutput: true,
+        mayHaveBilled: true,
+        degradedContinuation: fixture === "degraded",
+        providerImageIds: []
+      },
+      finalArtifacts: [artifact],
+      partialArtifacts: [],
+      failedSlots: [],
+      relationships: this.#studioRelationships(request, artifact.artifactId, false)
+    });
+  }
+
   async status(input: RoutegoStatusInput): Promise<RoutegoStatusResult> {
     const parsed = routegoStatusInputSchema.parse(input);
     if (this.#fixture("status") === "invalid-output") {
@@ -557,24 +1014,7 @@ export class MockRoutegoService implements LocalRoutegoService {
     if (fixture === "failure") {
       throw this.#error("not_found", "The synthetic settings fixture is unavailable.");
     }
-    return readSettingsResultSchema.parse({
-      schemaVersion: 1,
-      activeProviderId: "mock-provider",
-      profiles: [this.#profile()],
-      defaults: {
-        model: "mock-image-model",
-        size: "auto",
-        aspectRatio: "auto",
-        quality: "auto",
-        format: "png",
-        count: 1,
-        partialImages: 0,
-        transparentMode: "off",
-        moderation: "auto",
-        saveToLibrary: true
-      },
-      outputDirectory: { configured: true, display: "Pictures/routego-image/mock" }
-    });
+    return readSettingsResultSchema.parse(this.#settings);
   }
 
   async upsertProviderProfile(
@@ -588,8 +1028,14 @@ export class MockRoutegoService implements LocalRoutegoService {
     if (fixture === "failure") {
       throw this.#error("conflict", "The synthetic provider profile could not be saved.");
     }
-    const hasApiKey = parsed.apiKey.operation !== "clear";
     const profileId = parsed.profileId ?? deterministicId("mock-provider", parsed.name);
+    const existing = this.#settings.profiles.find((profile) => profile.id === profileId);
+    const hasApiKey =
+      parsed.apiKey.operation === "replace"
+        ? true
+        : parsed.apiKey.operation === "clear"
+          ? false
+          : (existing?.hasApiKey ?? false);
     const endpoints = {
       generation: describeProviderEndpoint(
         parsed.endpoints.generation.value,
@@ -624,14 +1070,30 @@ export class MockRoutegoService implements LocalRoutegoService {
       id: profileId,
       name: parsed.name,
       endpoints,
-      ...(parsed.defaultModel ? { defaultModel: parsed.defaultModel, models: [parsed.defaultModel] } : {}),
+      ...(parsed.defaultModel
+        ? { defaultModel: parsed.defaultModel, models: [parsed.defaultModel] }
+        : existing?.defaultModel
+          ? { defaultModel: existing.defaultModel, models: existing.models }
+          : {}),
       hasApiKey,
-      isActive: parsed.setActive
+      isActive: parsed.setActive || (existing?.isActive ?? false),
+      createdAt: existing?.createdAt ?? this.#timestamp(),
+      updatedAt: this.#timestamp()
+    });
+    const remaining = this.#settings.profiles.filter((item) => item.id !== profileId);
+    const profiles = [...remaining, profile].map((item) =>
+      profile.isActive ? { ...item, isActive: item.id === profile.id } : item
+    );
+    const activeProviderId = profiles.find((item) => item.isActive)?.id;
+    this.#settings = readSettingsResultSchema.parse({
+      ...this.#settings,
+      profiles,
+      ...(activeProviderId ? { activeProviderId } : { activeProviderId: undefined })
     });
     return upsertProviderProfileResultSchema.parse({
       schemaVersion: 1,
       profile,
-      ...(profile.isActive ? { activeProviderId: profile.id } : {})
+      ...(activeProviderId ? { activeProviderId } : {})
     });
   }
 
@@ -646,9 +1108,20 @@ export class MockRoutegoService implements LocalRoutegoService {
     if (fixture === "failure") {
       throw this.#error("conflict", "The active synthetic provider profile cannot be removed.");
     }
+    if (!this.#settings.profiles.some((profile) => profile.id === parsed.profileId)) {
+      throw this.#error("not_found", "The synthetic provider profile does not exist.");
+    }
+    const profiles = this.#settings.profiles.filter((profile) => profile.id !== parsed.profileId);
+    const activeProviderId = profiles.find((profile) => profile.isActive)?.id;
+    this.#settings = readSettingsResultSchema.parse({
+      ...this.#settings,
+      profiles,
+      ...(activeProviderId ? { activeProviderId } : { activeProviderId: undefined })
+    });
     return removeProviderProfileResultSchema.parse({
       schemaVersion: 1,
-      removedProfileId: parsed.profileId
+      removedProfileId: parsed.profileId,
+      ...(activeProviderId ? { activeProviderId } : {})
     });
   }
 
@@ -663,10 +1136,25 @@ export class MockRoutegoService implements LocalRoutegoService {
     if (fixture === "failure") {
       throw this.#error("not_found", "The synthetic provider profile does not exist.");
     }
+    const selected = this.#settings.profiles.find((profile) => profile.id === parsed.profileId);
+    if (!selected) {
+      throw this.#error("not_found", "The synthetic provider profile does not exist.");
+    }
+    const profiles = this.#settings.profiles.map((profile) => ({
+      ...profile,
+      isActive: profile.id === parsed.profileId,
+      updatedAt: profile.id === parsed.profileId ? this.#timestamp() : profile.updatedAt
+    }));
+    const profile = profiles.find((item) => item.id === parsed.profileId)!;
+    this.#settings = readSettingsResultSchema.parse({
+      ...this.#settings,
+      activeProviderId: parsed.profileId,
+      profiles
+    });
     return setActiveProviderProfileResultSchema.parse({
       schemaVersion: 1,
       activeProviderId: parsed.profileId,
-      profile: this.#profile({ id: parsed.profileId, isActive: true })
+      profile
     });
   }
 
@@ -686,12 +1174,22 @@ export class MockRoutegoService implements LocalRoutegoService {
         error: this.#error("timeout", "The synthetic non-billable model refresh timed out.")
       });
     }
+    const models =
+      fixture === "degraded"
+        ? ["mock-image-model"]
+        : ["mock-image-model", "mock-image-model-v2"];
+    this.#settings = readSettingsResultSchema.parse({
+      ...this.#settings,
+      profiles: this.#settings.profiles.map((profile) =>
+        profile.id === parsed.providerId ? { ...profile, models, updatedAt: this.#timestamp() } : profile
+      )
+    });
     return refreshModelsResultSchema.parse({
       schemaVersion: 1,
       providerId: parsed.providerId,
       status: "succeeded",
       billable: false,
-      models: fixture === "degraded" ? ["mock-image-model"] : ["mock-image-model", "mock-image-model-v2"],
+      models,
       refreshedAt: this.#timestamp()
     });
   }
@@ -747,6 +1245,38 @@ export class MockRoutegoService implements LocalRoutegoService {
         ? { error: this.#error("timeout", "The synthetic capability probe timed out.") }
         : {})
     });
+  }
+
+  async updateSettings(input: UpdateSettingsInput): Promise<UpdateSettingsResult> {
+    const parsed = updateSettingsInputSchema.parse(input);
+    const fixture = this.#fixture("updateSettings");
+    if (fixture === "invalid-output") {
+      return invalidOutput<UpdateSettingsResult>();
+    }
+    if (fixture === "failure") {
+      throw this.#error("conflict", "The synthetic settings update was rejected.");
+    }
+
+    let outputDirectory = this.#settings.outputDirectory;
+    if (parsed.outputDirectory) {
+      if (parsed.outputDirectory.operation === "default") {
+        outputDirectory = { configured: true, display: "Default Pictures/routego-image" };
+      } else if (parsed.outputDirectory.operation === "clear") {
+        outputDirectory = { configured: false };
+      } else if (parsed.outputDirectory.operation === "replace") {
+        outputDirectory = {
+          configured: true,
+          display: this.#redactedOutputDirectoryDisplay(parsed.outputDirectory.path)
+        };
+      }
+    }
+
+    this.#settings = updateSettingsResultSchema.parse({
+      ...this.#settings,
+      defaults: parsed.defaults ?? this.#settings.defaults,
+      outputDirectory
+    });
+    return updateSettingsResultSchema.parse(this.#settings);
   }
 
   async generate(input: RoutegoGenerateInput): Promise<ImageOperationResult> {
@@ -813,11 +1343,406 @@ export class MockRoutegoService implements LocalRoutegoService {
   }
 
   async searchLibrary(input: RoutegoSearchLibraryInput): Promise<RoutegoSearchLibraryResult> {
-    routegoSearchLibraryInputSchema.parse(input);
-    if (this.#fixture("searchLibrary") === "invalid-output") {
+    const parsed = routegoSearchLibraryInputSchema.parse(input);
+    const fixture = this.#fixture("searchLibrary");
+    if (fixture === "invalid-output") {
       return invalidOutput<RoutegoSearchLibraryResult>();
     }
-    return routegoSearchLibraryResultSchema.parse({ schemaVersion: 1, items: [], total: 0 });
+    if (fixture === "failure") {
+      throw this.#error("conflict", "The synthetic public gallery search failed.");
+    }
+    const page = this.#galleryPage(parsed);
+    return routegoSearchLibraryResultSchema.parse({
+      schemaVersion: 1,
+      items: page.items.map((asset) => ({
+        id: asset.id,
+        path: `/synthetic/routego-image/${asset.id}.png`,
+        prompt: asset.prompt,
+        model: asset.model,
+        kind: asset.kind,
+        mimeType: asset.mimeType,
+        width: asset.width,
+        height: asset.height,
+        status: asset.status,
+        folderIds: asset.folders.map((folder) => folder.folderId),
+        createdAt: asset.createdAt,
+        ...(asset.deletedAt ? { deletedAt: asset.deletedAt } : {})
+      })),
+      ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
+      total: page.total
+    });
+  }
+
+  async studioGenerate(input: StudioGenerateInput): Promise<StudioImageOperationResult> {
+    const request = studioGenerateInputSchema.parse(input);
+    const fixture = this.#fixture("studioGenerate");
+    if (fixture === "invalid-output") {
+      return invalidOutput<StudioImageOperationResult>();
+    }
+    return this.#studioImageResult(
+      fixture,
+      request,
+      this.#requestId("studioGenerate", request)
+    );
+  }
+
+  async studioEdit(input: StudioEditInput): Promise<StudioImageOperationResult> {
+    const request = studioEditInputSchema.parse(input);
+    const fixture = this.#fixture("studioEdit");
+    if (fixture === "invalid-output") {
+      return invalidOutput<StudioImageOperationResult>();
+    }
+    return this.#studioImageResult(fixture, request, this.#requestId("studioEdit", request));
+  }
+
+  async studioBatch(input: StudioBatchInput): Promise<StudioBatchResult> {
+    const parsed = studioBatchInputSchema.parse(input);
+    const fixture = this.#fixture("studioBatch");
+    if (fixture === "invalid-output") {
+      return invalidOutput<StudioBatchResult>();
+    }
+    const requestId = this.#requestId("studioBatch", parsed);
+    const items = parsed.tasks.map((task, index) => {
+      const itemFixture =
+        fixture === "partial"
+          ? parsed.tasks.length === 1
+            ? "partial"
+            : index === 0
+              ? "success"
+              : "failure"
+          : fixture;
+      return {
+        id: task.id,
+        result: this.#studioImageResult(
+          itemFixture,
+          task.operation,
+          deterministicId(`mock-studio-batch-${task.id}`, {
+            requestId,
+            operation: task.operation
+          })
+        )
+      };
+    });
+    const allSucceeded = items.every((item) => item.result.status === "succeeded");
+    const allFailed = items.every((item) => item.result.status === "failed");
+    return studioBatchResultSchema.parse({
+      schemaVersion: 1,
+      requestId,
+      status: allSucceeded ? "succeeded" : allFailed ? "failed" : "partial",
+      concurrency: parsed.concurrency,
+      taskIds: parsed.tasks.map((task) => task.id),
+      items
+    });
+  }
+
+  async searchStudioLibrary(
+    input: StudioLibrarySearchInput
+  ): Promise<StudioLibrarySearchResult> {
+    const parsed = studioLibrarySearchInputSchema.parse(input);
+    const fixture = this.#fixture("searchStudioLibrary");
+    if (fixture === "invalid-output") {
+      return invalidOutput<StudioLibrarySearchResult>();
+    }
+    if (fixture === "failure") {
+      throw this.#error("conflict", "The synthetic Studio gallery search failed.");
+    }
+    const page = this.#galleryPage(parsed);
+    return studioLibrarySearchResultSchema.parse({
+      schemaVersion: 1,
+      items: page.items.map((asset) => {
+        const artifactId = asset.renditions[0]!.artifactId;
+        return {
+          assetId: asset.id,
+          artifactId,
+          prompt: asset.prompt,
+          model: asset.model,
+          kind: asset.kind,
+          mimeType: asset.mimeType,
+          width: asset.width,
+          height: asset.height,
+          status: asset.status,
+          folderIds: asset.folders.map((folder) => folder.folderId),
+          createdAt: asset.createdAt,
+          ...(asset.deletedAt ? { deletedAt: asset.deletedAt } : {}),
+          thumbnail: this.#browserResource(
+            deterministicId("mock-thumbnail", { assetId: asset.id, artifactId }),
+            "image/png"
+          )
+        };
+      }),
+      ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
+      total: page.total
+    });
+  }
+
+  async reserveUploadResource(
+    input: ReserveUploadResourceInput
+  ): Promise<ReserveUploadResourceResult> {
+    const parsed = reserveUploadResourceInputSchema.parse(input);
+    const fixture = this.#fixture("reserveUploadResource");
+    if (fixture === "invalid-output") {
+      return invalidOutput<ReserveUploadResourceResult>();
+    }
+
+    const maxBytes = parsed.purpose === "zip-import" ? 536_870_912 : 52_428_800;
+    const failureCode =
+      fixture === "expired"
+        ? "upload_expired"
+        : fixture === "not-found"
+          ? "not_found"
+          : fixture === "oversize" || parsed.declaredByteLength > maxBytes
+            ? "upload_oversize"
+            : fixture === "checksum-failed"
+              ? "upload_checksum_failed"
+              : fixture === "consumed"
+                ? "upload_consumed"
+                : fixture === "discarded"
+                  ? "upload_discarded"
+                  : fixture === "invalid-type" || fixture === "failure"
+                    ? "upload_invalid_type"
+                    : undefined;
+    if (failureCode) {
+      return reserveUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError(
+          failureCode,
+          `The synthetic upload reservation failed with ${failureCode}.`
+        )
+      });
+    }
+
+    const uploadResourceId = deterministicId("mock-upload", parsed);
+    const allowedMimeTypes =
+      parsed.purpose === "zip-import"
+        ? (["application/zip"] as const)
+        : parsed.purpose === "mask"
+          ? (["image/png"] as const)
+          : (["image/png", "image/jpeg", "image/webp"] as const);
+    const resource = uploadResourceDescriptorSchema.parse({
+      uploadResourceId,
+      purpose: parsed.purpose,
+      status: "reserved",
+      reusePolicy:
+        parsed.purpose === "zip-import" ? "single-consume" : "reusable-until-expiry",
+      binaryUpload: {
+        method: "PUT",
+        relativeUrl: `/api/v1/uploads/${uploadResourceId}/content`,
+        requiresSession: true,
+        requiresOrigin: true,
+        allowedMimeTypes,
+        maxBytes,
+        expiresAt: this.#timestampWithOffset(5)
+      },
+      declaredMimeType: parsed.declaredMimeType,
+      declaredByteLength: parsed.declaredByteLength,
+      ...(parsed.expectedSha256 ? { expectedSha256: parsed.expectedSha256 } : {}),
+      createdAt: this.#timestamp()
+    });
+    this.#uploads.set(uploadResourceId, resource);
+    return reserveUploadResourceResultSchema.parse({
+      schemaVersion: 1,
+      status: "succeeded",
+      resource
+    });
+  }
+
+  async finalizeUploadResource(
+    input: FinalizeUploadResourceInput
+  ): Promise<FinalizeUploadResourceResult> {
+    const parsed = finalizeUploadResourceInputSchema.parse(input);
+    const fixture = this.#fixture("finalizeUploadResource");
+    if (fixture === "invalid-output") {
+      return invalidOutput<FinalizeUploadResourceResult>();
+    }
+    const resource = this.#uploads.get(parsed.uploadResourceId);
+    if (fixture === "not-found" || !resource) {
+      return finalizeUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("not_found", "The synthetic upload resource was not found.")
+      });
+    }
+    if (resource.status === "consumed" || fixture === "consumed") {
+      return finalizeUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("upload_consumed", "The synthetic ZIP upload was consumed.")
+      });
+    }
+    if (resource.status === "discarded" || fixture === "discarded") {
+      return finalizeUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("upload_discarded", "The synthetic upload was discarded.")
+      });
+    }
+    if (resource.status === "expired" || fixture === "expired") {
+      const { finalized, consumedAt, discardedAt, error, ...base } = resource;
+      void finalized;
+      void consumedAt;
+      void discardedAt;
+      void error;
+      this.#uploads.set(
+        parsed.uploadResourceId,
+        uploadResourceDescriptorSchema.parse({ ...base, status: "expired" })
+      );
+      return finalizeUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("upload_expired", "The synthetic upload expired.")
+      });
+    }
+    if (resource.status === "finalized") {
+      return finalizeUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "succeeded",
+        resource
+      });
+    }
+
+    const failureCode =
+      fixture === "oversize"
+        ? "upload_oversize"
+        : fixture === "checksum-failed"
+          ? "upload_checksum_failed"
+          : fixture === "invalid-type" || fixture === "failure"
+            ? "upload_invalid_type"
+            : undefined;
+    if (failureCode) {
+      const uploadError = this.#uploadError(
+        failureCode,
+        `The synthetic upload finalization failed with ${failureCode}.`
+      );
+      const { finalized, consumedAt, discardedAt, error, ...base } = resource;
+      void finalized;
+      void consumedAt;
+      void discardedAt;
+      void error;
+      this.#uploads.set(
+        parsed.uploadResourceId,
+        uploadResourceDescriptorSchema.parse({
+          ...base,
+          status: "failed",
+          error: uploadError
+        })
+      );
+      return finalizeUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: uploadError
+      });
+    }
+
+    const { finalized, consumedAt, discardedAt, error, ...base } = resource;
+    void finalized;
+    void consumedAt;
+    void discardedAt;
+    void error;
+    const finalizedResource = uploadResourceDescriptorSchema.parse({
+      ...base,
+      status: "finalized",
+      finalized: {
+        detectedMimeType: resource.declaredMimeType,
+        byteLength: resource.declaredByteLength,
+        sha256:
+          resource.expectedSha256 ??
+          createHash("sha256").update(parsed.uploadResourceId, "utf8").digest("hex"),
+        ...(resource.declaredMimeType.startsWith("image/") ? { width: 1, height: 1 } : {}),
+        finalizedAt: this.#timestampWithOffset(1)
+      }
+    });
+    this.#uploads.set(parsed.uploadResourceId, finalizedResource);
+    return finalizeUploadResourceResultSchema.parse({
+      schemaVersion: 1,
+      status: "succeeded",
+      resource: finalizedResource
+    });
+  }
+
+  async getUploadResourceStatus(
+    input: GetUploadResourceStatusInput
+  ): Promise<GetUploadResourceStatusResult> {
+    const parsed = getUploadResourceStatusInputSchema.parse(input);
+    const fixture = this.#fixture("getUploadResourceStatus");
+    if (fixture === "invalid-output") {
+      return invalidOutput<GetUploadResourceStatusResult>();
+    }
+    const resource = this.#uploads.get(parsed.uploadResourceId);
+    if (fixture === "not-found" || !resource) {
+      return getUploadResourceStatusResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("not_found", "The synthetic upload resource was not found.")
+      });
+    }
+    if (fixture === "expired" || resource.status === "expired") {
+      return getUploadResourceStatusResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("upload_expired", "The synthetic upload expired.")
+      });
+    }
+    return getUploadResourceStatusResultSchema.parse({
+      schemaVersion: 1,
+      status: "succeeded",
+      resource
+    });
+  }
+
+  async discardUploadResource(
+    input: DiscardUploadResourceInput
+  ): Promise<DiscardUploadResourceResult> {
+    const parsed = discardUploadResourceInputSchema.parse(input);
+    const fixture = this.#fixture("discardUploadResource");
+    if (fixture === "invalid-output") {
+      return invalidOutput<DiscardUploadResourceResult>();
+    }
+    const resource = this.#uploads.get(parsed.uploadResourceId);
+    if (fixture === "not-found" || !resource) {
+      return discardUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("not_found", "The synthetic upload resource was not found.")
+      });
+    }
+    if (fixture === "expired" || resource.status === "expired") {
+      return discardUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("upload_expired", "The synthetic upload expired.")
+      });
+    }
+    if (fixture === "consumed" || resource.status === "consumed") {
+      return discardUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#uploadError("upload_consumed", "The synthetic ZIP upload was consumed.")
+      });
+    }
+    if (resource.status === "discarded") {
+      return discardUploadResourceResultSchema.parse({
+        schemaVersion: 1,
+        status: "succeeded",
+        resource
+      });
+    }
+    const { finalized, consumedAt, discardedAt, error, ...base } = resource;
+    void finalized;
+    void consumedAt;
+    void discardedAt;
+    void error;
+    const discardedResource = uploadResourceDescriptorSchema.parse({
+      ...base,
+      status: "discarded",
+      discardedAt: this.#timestampWithOffset(1)
+    });
+    this.#uploads.set(parsed.uploadResourceId, discardedResource);
+    return discardUploadResourceResultSchema.parse({
+      schemaVersion: 1,
+      status: "succeeded",
+      resource: discardedResource
+    });
   }
 
   async manageLibrary(input: RoutegoManageLibraryInput): Promise<RoutegoManageLibraryResult> {
@@ -896,10 +1821,18 @@ export class MockRoutegoService implements LocalRoutegoService {
         error: this.#error("not_found", "The synthetic Library asset was not found.")
       });
     }
+    const asset = this.#assetDetail(fixture, parsed.assetId);
+    if (!asset) {
+      return getAssetDetailResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#error("not_found", "The synthetic Library asset was not found.")
+      });
+    }
     return getAssetDetailResultSchema.parse({
       schemaVersion: 1,
       status: "succeeded",
-      asset: this.#assetDetail(fixture, parsed.assetId)
+      asset
     });
   }
 
@@ -948,7 +1881,40 @@ export class MockRoutegoService implements LocalRoutegoService {
     const partial = fixture === "partial" && targets.length > 1;
     const blocked = fixture === "failure";
     const items = targets.map((targetId, index) => {
-      const eligible = !blocked && (!partial || index === 0);
+      const upload =
+        parsed.mutation.action === "import-zip" ? this.#uploads.get(targetId) : undefined;
+      const uploadError =
+        parsed.mutation.action !== "import-zip"
+          ? undefined
+          : !upload
+            ? this.#libraryUploadError("not_found", "The synthetic ZIP upload was not found.")
+            : upload.purpose !== "zip-import"
+              ? this.#libraryUploadError(
+                  "upload_invalid_type",
+                  "The synthetic upload is not a ZIP import resource."
+                )
+              : upload.status === "consumed"
+                ? this.#libraryUploadError(
+                    "upload_consumed",
+                    "The synthetic ZIP upload was consumed."
+                  )
+                : upload.status === "expired"
+                  ? this.#libraryUploadError(
+                      "upload_expired",
+                      "The synthetic ZIP upload expired."
+                    )
+                  : upload.status === "discarded"
+                    ? this.#libraryUploadError(
+                        "upload_discarded",
+                        "The synthetic ZIP upload was discarded."
+                      )
+                    : upload.status !== "finalized"
+                      ? this.#error(
+                          "conflict",
+                          "The synthetic ZIP upload must be finalized before import."
+                        )
+                      : undefined;
+      const eligible = !blocked && !uploadError && (!partial || index === 0);
       return {
         targetId,
         targetKind: parsed.mutation.action === "import-zip" ? "upload-resource" : "asset",
@@ -961,10 +1927,12 @@ export class MockRoutegoService implements LocalRoutegoService {
         ...(eligible
           ? {}
           : {
-              error: this.#error(
-                "conflict",
-                "The synthetic target is blocked by a concurrent state change."
-              )
+              error:
+                uploadError ??
+                this.#error(
+                  "conflict",
+                  "The synthetic target is blocked by a concurrent state change."
+                )
             })
       };
     });
@@ -976,7 +1944,7 @@ export class MockRoutegoService implements LocalRoutegoService {
       preflightId,
       action: parsed.mutation.action,
       status,
-      expiresAt: "2026-01-01T00:05:00.000Z",
+      expiresAt: this.#timestampWithOffset(5),
       requiredConfirmations: requiredConfirmation ? [requiredConfirmation] : [],
       items,
       warnings: fixture === "degraded" ? ["Synthetic degraded preflight warning."] : [],
@@ -1014,7 +1982,71 @@ export class MockRoutegoService implements LocalRoutegoService {
     const partial = fixture === "partial" && preflight.targetIds.length > 1;
     const failed = fixture === "failure";
     const items = preflight.targetIds.map((targetId, index) => {
-      const succeeded = !failed && (!partial || index === 0);
+      const upload = parsed.action === "import-zip" ? this.#uploads.get(targetId) : undefined;
+      const fixtureUploadError =
+        parsed.action !== "import-zip"
+          ? undefined
+          : fixture === "not-found"
+            ? this.#libraryUploadError("not_found", "The synthetic ZIP upload was not found.")
+            : fixture === "expired"
+              ? this.#libraryUploadError(
+                  "upload_expired",
+                  "The synthetic ZIP upload expired."
+                )
+              : fixture === "invalid-type"
+                ? this.#libraryUploadError(
+                    "upload_invalid_type",
+                    "The synthetic upload is not an importable ZIP."
+                  )
+                : fixture === "oversize"
+                  ? this.#libraryUploadError(
+                      "upload_oversize",
+                      "The synthetic ZIP upload is oversized."
+                    )
+                  : fixture === "checksum-failed"
+                    ? this.#libraryUploadError(
+                        "upload_checksum_failed",
+                        "The synthetic ZIP checksum failed."
+                      )
+                    : fixture === "consumed"
+                      ? this.#libraryUploadError(
+                          "upload_consumed",
+                          "The synthetic ZIP upload was consumed."
+                        )
+                      : fixture === "discarded"
+                        ? this.#libraryUploadError(
+                            "upload_discarded",
+                            "The synthetic ZIP upload was discarded."
+                          )
+                        : undefined;
+      const stateUploadError =
+        parsed.action !== "import-zip" || fixtureUploadError
+          ? undefined
+          : !upload
+            ? this.#libraryUploadError("not_found", "The synthetic ZIP upload was not found.")
+            : upload.status === "consumed"
+              ? this.#libraryUploadError(
+                  "upload_consumed",
+                  "The synthetic ZIP upload was consumed."
+                )
+              : upload.status === "expired"
+                ? this.#libraryUploadError(
+                    "upload_expired",
+                    "The synthetic ZIP upload expired."
+                  )
+                : upload.status === "discarded"
+                  ? this.#libraryUploadError(
+                      "upload_discarded",
+                      "The synthetic ZIP upload was discarded."
+                    )
+                  : upload.status !== "finalized"
+                    ? this.#error(
+                        "conflict",
+                        "The synthetic ZIP upload must be finalized before import."
+                      )
+                    : undefined;
+      const itemError = fixtureUploadError ?? stateUploadError;
+      const succeeded = !failed && !itemError && (!partial || index === 0);
       return succeeded
         ? {
             targetId,
@@ -1025,10 +2057,12 @@ export class MockRoutegoService implements LocalRoutegoService {
         : {
             targetId,
             status: "failed" as const,
-            error: this.#error(
-              "conflict",
-              "The synthetic mutation target changed after preflight."
-            )
+            error:
+              itemError ??
+              this.#error(
+                "conflict",
+                "The synthetic mutation target changed after preflight."
+              )
           };
     });
     const succeededCount = items.filter((item) => item.status === "succeeded").length;
@@ -1038,6 +2072,28 @@ export class MockRoutegoService implements LocalRoutegoService {
         : succeededCount === 0
           ? "failed"
           : "partial";
+    if (parsed.action === "import-zip") {
+      for (const item of items) {
+        if (item.status !== "succeeded") {
+          continue;
+        }
+        const upload = this.#uploads.get(item.targetId);
+        if (!upload || upload.status !== "finalized" || upload.purpose !== "zip-import") {
+          continue;
+        }
+        const { discardedAt, error, ...base } = upload;
+        void discardedAt;
+        void error;
+        this.#uploads.set(
+          item.targetId,
+          uploadResourceDescriptorSchema.parse({
+            ...base,
+            status: "consumed",
+            consumedAt: this.#timestampWithOffset(2)
+          })
+        );
+      }
+    }
     return executeLibraryMutationResultSchema.parse({
       schemaVersion: 1,
       preflightId: parsed.preflightId,
