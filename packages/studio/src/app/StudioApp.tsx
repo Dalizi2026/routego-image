@@ -4,6 +4,7 @@ import type { ReadSettingsResult, RoutegoStatusResult } from "@routego-image/con
 
 import { StudioGatewayError, type StudioGateway } from "../api";
 import { AppNavigation, AsyncStatePanel, NoticeStack } from "../components";
+import { CreationWorkbench } from "../features/creation";
 import { I18nProvider, useI18n, type MessageKey } from "../i18n";
 import "../styles/index.css";
 import {
@@ -204,10 +205,12 @@ function StatusLedger({
 }
 
 function StudioWorkspace({
+  gateway,
   service,
   settings,
   routeContent
 }: {
+  readonly gateway: StudioGateway;
   readonly service: RoutegoStatusResult;
   readonly settings: ReadSettingsResult;
   readonly routeContent?: Partial<Record<StudioRoute, ReactNode>>;
@@ -217,6 +220,16 @@ function StudioWorkspace({
     ...initialStudioAppState,
     notices: noticesFor(service, settings)
   });
+  const content = {
+    workbench: (
+      <CreationWorkbench
+        gateway={gateway}
+        defaults={settings.defaults}
+        availability={{ imageInput: false, edit: false }}
+      />
+    ),
+    ...routeContent
+  } satisfies Partial<Record<StudioRoute, ReactNode>>;
   const headingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -256,7 +269,7 @@ function StudioWorkspace({
       />
       <main id="studio-workspace" className="studio-workspace" ref={headingRef}>
         <section className="studio-workspace__primary" aria-live="polite">
-          {routeContent?.[state.route] ?? <RouteOverview route={state.route} />}
+          {content[state.route] ?? <RouteOverview route={state.route} />}
         </section>
         <StatusLedger service={service} settings={settings} />
       </main>
@@ -317,6 +330,7 @@ export function StudioApp({
     <I18nProvider>
       {boot.status === "ready" ? (
         <StudioWorkspace
+          gateway={gateway}
           service={boot.service}
           settings={boot.settings}
           {...(routeContent === undefined ? {} : { routeContent })}
