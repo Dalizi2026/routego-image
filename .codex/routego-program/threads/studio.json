@@ -3,12 +3,12 @@
   "lane": "studio",
   "change": "add-routego-studio",
   "role": "openspec-apply-owner",
-  "status": "handoff-awaiting-acceptance",
+  "status": "applying",
   "threadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\ec66\\生图插件",
   "branch": "codex/routego-studio-g2",
   "startingCommit": "649e4fe1da0bacdeb0eca9c3d20378a209303fdd",
-  "headCommit": "649e4fe1da0bacdeb0eca9c3d20378a209303fdd",
+  "headCommit": "f89ee833fa1c6900d2c850ba7e65b42677cad25b",
   "generation": 2,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -18,6 +18,9 @@
   "predecessorGeneration": 1,
   "productCheckpointCommit": "313fafba3a1d49d6b65db30fb679fd77d8760d18",
   "handoffCommit": "649e4fe1da0bacdeb0eca9c3d20378a209303fdd",
+  "registrationCommit": "f89ee833fa1c6900d2c850ba7e65b42677cad25b",
+  "controllerRegistrationCommit": "9a8d5d90180a5cdfa5c5945b95b57bfc0ff9f701",
+  "controllerActivationCommit": "fe58fff02ac6f64248262ac57f90f5f40f18717e",
   "handoffFile": ".codex/routego-program/handoffs/studio-generation-2.md",
   "openspecProgress": "7/11",
   "lastCompletedTask": "4.1",
@@ -40,8 +43,8 @@
     "scope": "Exact source-code exception only; runtime Library data remains forbidden."
   },
   "applyOwnership": {
-    "state": "awaiting-successor-acceptance",
-    "activeOwnerThreadId": null,
+    "state": "active-single-owner",
+    "activeOwnerThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
     "predecessorThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
     "successorThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35"
   },
@@ -49,16 +52,17 @@
     "threadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\8b8b\\生图插件",
     "branch": "codex/routego-studio-g1",
-    "headCommit": "649e4fe1da0bacdeb0eca9c3d20378a209303fdd",
+    "headCommit": "f89ee833fa1c6900d2c850ba7e65b42677cad25b",
     "productCheckpointCommit": "313fafba3a1d49d6b65db30fb679fd77d8760d18",
     "observableCompactions": 2,
-    "status": "handoff-suspended"
+    "status": "archived",
+    "worktreeRemoved": true
   },
   "continuityGovernance": {
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-handoff-awaiting-acceptance"
+    "status": "generation-2-active-task-4.2"
   },
   "dependsOn": [
     "establish-routego-image-foundation",

@@ -6,6 +6,9 @@
 - 计划分支：`codex/routego-studio-g2`
 - 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\ec66\生图插件`
 - 交接治理起始提交：`649e4fe1da0bacdeb0eca9c3d20378a209303fdd`
+- 真实登记提交：`f89ee833fa1c6900d2c850ba7e65b42677cad25b`
+- Controller 登记提交：`9a8d5d90180a5cdfa5c5945b95b57bfc0ff9f701`
+- Controller 激活提交：`fe58fff02ac6f64248262ac57f90f5f40f18717e`
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\8b8b\生图插件`
 - 产品/OpenSpec 安全提交：`313fafba3a1d49d6b65db30fb679fd77d8760d18`
 - OpenSpec：`7/11`
@@ -22,4 +25,5 @@
 - G2 在真实登记前只读；任何写入前完整重读权威文件，并运行 `openspec status --change add-routego-studio --json` 与 `openspec instructions apply --change add-routego-studio --json`。
 - G2 登记后创建 `codex/routego-studio-g2`，确认 7/11、下一任务 4.2 和 Git clean，并发送 `[STUDIO_HANDOFF_ACCEPTED]`。
 - Controller 归档 G1 并激活唯一 owner 后，G2 才能从 4.2 继续，不得重做已完成任务。
+- G2 已在 `f89ee833fa1c6900d2c850ba7e65b42677cad25b` 接受交接；G1 随后归档并移除旧 worktree，G2 成为唯一 apply-owner。
 - 不修改七个公共工具、共享契约、根依赖/锁文件、Creation/Library 后端或发布文件；不接触真实凭证、图片、图库或中转。
