@@ -6,7 +6,7 @@
   "threadId": "019f715f-c042-7590-a38b-ffb406315903",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d46b\\生图插件",
   "branch": "codex/routego-controller-g1",
-  "headCommit": "9a8d5d90180a5cdfa5c5945b95b57bfc0ff9f701",
+  "headCommit": "9189b7a4f8155b5e62def6f786e5d7723eb8a3f0",
   "generation": 1,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "context-checkpoint-compaction-2-2026-07-18-studio-g2-registration-in-progress",
@@ -68,6 +68,7 @@
     "The removed Studio generation 1 checkout left an unregistered directory containing ignored node_modules/packages residues; recursive cleanup was blocked by the execution environment, but no .git worktree metadata or apply ownership remains.",
     "Studio task 4.2 gateway deviation was approved as a tasks-only scope correction: gateway.ts, mock-handler.ts, gateway.test.ts, and mock-bridge.test.ts may add the frozen manageLibrary bridge solely for create-folder/rename-folder; ZIP and destructive workflows remain path-free and all other public operations stay excluded.",
     "Library generation 1 completed task 4.2 at clean checkpoint a966dd0dbc3f70b9dbc9246bb8c214289ca35ca4 with 141/141 Library tests and 8/10 OpenSpec progress, then stopped at observable compaction 2 before task 5.1.",
-    "A fresh Library generation 2 task 019f7261-2c57-7a01-b519-e1de521819fe and isolated worktree C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件 were created from handoff commit af069a742b641605d516e888afafca8db5661e66; real registration commit b4b98f1124a07b66334fc33cf5d7516d1eba100d was sent before any task 5.1 write."
+    "A fresh Library generation 2 task 019f7261-2c57-7a01-b519-e1de521819fe and isolated worktree C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件 were created from handoff commit af069a742b641605d516e888afafca8db5661e66; real registration commit b4b98f1124a07b66334fc33cf5d7516d1eba100d was sent before any task 5.1 write.",
+    "Library generation 2 accepted the handoff at b4b98f1124a07b66334fc33cf5d7516d1eba100d after fresh status/apply checks confirmed 8/10 and next task 5.1; generation 1 was archived and its worktree removed before sole-owner activation."
   ]
 }

@@ -3,12 +3,12 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "handoff-awaiting-acceptance",
+  "status": "applying",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
-  "headCommit": "af069a742b641605d516e888afafca8db5661e66",
+  "headCommit": "b4b98f1124a07b66334fc33cf5d7516d1eba100d",
   "generation": 2,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -19,6 +19,7 @@
   "productCheckpointCommit": "a966dd0dbc3f70b9dbc9246bb8c214289ca35ca4",
   "handoffCommit": "af069a742b641605d516e888afafca8db5661e66",
   "registrationCommit": "b4b98f1124a07b66334fc33cf5d7516d1eba100d",
+  "controllerRegistrationCommit": "9189b7a4f8155b5e62def6f786e5d7723eb8a3f0",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
   "openspecProgress": "8/10",
   "lastCompletedTask": "4.2",
@@ -35,8 +36,8 @@
     "scope": "git diff check and allowed-file audit passed"
   },
   "applyOwnership": {
-    "state": "awaiting-successor-acceptance",
-    "activeOwnerThreadId": null,
+    "state": "active-single-owner",
+    "activeOwnerThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
     "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "successorThreadId": "019f7261-2c57-7a01-b519-e1de521819fe"
   },
@@ -47,13 +48,14 @@
     "headCommit": "b4b98f1124a07b66334fc33cf5d7516d1eba100d",
     "productCheckpointCommit": "a966dd0dbc3f70b9dbc9246bb8c214289ca35ca4",
     "observableCompactions": 2,
-    "status": "handoff-suspended"
+    "status": "archived",
+    "worktreeRemoved": true
   },
   "continuityGovernance": {
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-handoff-awaiting-acceptance"
+    "status": "generation-2-active-task-5.1"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
