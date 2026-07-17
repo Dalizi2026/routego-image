@@ -123,6 +123,13 @@ function parsePositiveInteger(value: unknown, label: string, maximum = Number.MA
   return value as number;
 }
 
+function parseNonNegativeInteger(value: unknown, label: string, maximum: number): number {
+  if (!Number.isSafeInteger(value) || (value as number) < 0 || (value as number) > maximum) {
+    throw new LibraryError("config_corrupt", `${label} is invalid.`);
+  }
+  return value as number;
+}
+
 function mimeExtension(mimeType: LibraryImageMimeType): string {
   return mimeType === "image/png" ? ".png" : mimeType === "image/jpeg" ? ".jpg" : ".webp";
 }
@@ -144,7 +151,7 @@ function parseBlob(value: unknown): StoredImageBlob {
     record["relativePath"].includes("\0") ||
     record["relativePath"].includes("\\") ||
     record["relativePath"].split("/").includes("..") ||
-    !/^blobs\/\d{4}\/\d{2}\/.+/u.test(record["relativePath"]) ||
+    !/^blobs\/\d{4}\/(?:0[1-9]|1[0-2])\/[^/]+$/u.test(record["relativePath"]) ||
     !record["relativePath"].toLowerCase().endsWith(mimeExtension(mimeType))
   ) {
     throw new LibraryError("config_corrupt", "Library blob path is invalid.");
@@ -217,7 +224,7 @@ function parseFolder(value: unknown): StoredLibraryFolder {
     id: parseId(record["id"], "Folder identity"),
     name,
     normalizedName: record["normalizedName"],
-    order: parsePositiveInteger((record["order"] as number) + 1, "Folder order", 100_001) - 1,
+    order: parseNonNegativeInteger(record["order"], "Folder order", 100_000),
     state,
     createdAt,
     updatedAt,
@@ -277,8 +284,12 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   }
   const renditions = record["renditions"].map(parseRendition);
   const primaryArtifactId = parseId(record["primaryArtifactId"], "Primary artifact identity");
-  if (!renditions.some((item) => item.artifactId === primaryArtifactId)) {
+  const primaryRendition = renditions.find((item) => item.artifactId === primaryArtifactId);
+  if (!primaryRendition) {
     throw new LibraryError("config_corrupt", "Primary artifact is missing from the asset renditions.");
+  }
+  if (status === "succeeded" && primaryRendition.phase !== "final") {
+    throw new LibraryError("config_corrupt", "Succeeded Library assets require a final rendition.");
   }
   if (!Array.isArray(record["relationships"]) || record["relationships"].length > 128) {
     throw new LibraryError("config_corrupt", "Library asset relationships are invalid.");
@@ -340,6 +351,15 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   const updatedAt = parseTimestamp(record["updatedAt"], "Asset update time");
   if (Date.parse(createdAt) > Date.parse(updatedAt)) {
     throw new LibraryError("config_corrupt", "Library asset timestamps are inconsistent.");
+  }
+  if (
+    renditions.some(
+      (rendition) =>
+        Date.parse(rendition.createdAt) < Date.parse(createdAt) ||
+        Date.parse(rendition.createdAt) > Date.parse(updatedAt)
+    )
+  ) {
+    throw new LibraryError("config_corrupt", "Library rendition timestamps are inconsistent.");
   }
   return {
     id: parseId(record["id"], "Asset identity"),
@@ -415,6 +435,12 @@ export function parseImageLibraryIndex(value: unknown): ImageLibraryIndex {
     if (asset.folderIds.some((id) => !folderIds.has(id))) {
       throw new LibraryError("config_corrupt", "Library asset references a missing folder.");
     }
+  }
+  const referencedBlobIds = new Set(
+    assets.flatMap((asset) => asset.renditions.map((rendition) => rendition.blobSha256))
+  );
+  if (blobs.some((blob) => !referencedBlobIds.has(blob.sha256))) {
+    throw new LibraryError("config_corrupt", "Library index contains an unreferenced blob record.");
   }
   for (const asset of assets) {
     for (const relationship of asset.relationships) {
