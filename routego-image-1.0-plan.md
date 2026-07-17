@@ -186,13 +186,16 @@ openspec init --tools codex --profile core
 
 生成并使用六个 Skills：`openspec-explore`、`openspec-propose`、`openspec-update-change`、`openspec-apply-change`、`openspec-sync-specs`、`openspec-archive-change`。
 
-采用五个互相隔离的 changes：
+采用互相隔离的核心 changes，并在启动审计发现共享边界遗漏时插入有界 corrective gates：
 
 ```text
 establish-routego-image-foundation
                 |
                 v
 extend-routego-image-foundation-contracts
+                |
+                v
+complete-routego-browser-boundaries
                 |
        +--------+--------+
        |        |        |
@@ -219,6 +222,14 @@ integrate-routego-image-plugin
 - `extend-routego-image-foundation-contracts` 负责补齐 Studio/Library 所需的 browser-safe 设置、图库详情、收藏夹排序、受控图片资源和批量部分失败契约，扩展 deterministic mock service，并预建 Creation、Library、Studio package importer。
 - 保持首版七个公开 MCP 工具不变；Studio 专用设置与资源操作使用共享 Schema 的本地 HTTP/Studio service 子接口，不扩大公开 MCP 工具数量。
 - Foundation Extension 合入主线并重新冻结契约前，Creation、Library、Studio 可以保存非冻结提案草稿，但不得进入 apply 或写产品代码。
+
+### 7.1.2 Browser Boundary gate
+
+- `complete-routego-browser-boundaries` 负责补齐浏览器到本地服务的反向资源流：会话上传资源、path-free Studio generate/edit/batch 请求与结果/SSE、path-free 图库搜索、设置默认值/输出目录写入，以及可驱动完整浏览器旅程的 deterministic mock 数据。
+- 浏览器只持有 `assetId`、`artifactId`、`uploadResourceId` 和受会话保护的相对资源 URL；不得提交或接收任意本地文件路径、provider 凭证或未受控外部图片 URL。
+- 二进制上传由受 session/origin/大小/MIME/过期策略保护的本地 HTTP 资源路由承载，JSON 契约只传递预留、完成状态和稳定资源 ID，日志不得包含字节或 Base64。
+- Creation 只执行解析后的内部图像任务；Library/上传存储只负责资源解析；Integration 负责把两者组合成一个 `LocalRoutegoService`。任何单一功能泳道不得猜测或直接读取其他泳道的文件路径。
+- 保持七个公开 MCP 工具不变。该 gate 合入前，三条功能泳道可以保留非冻结工件，但不得冻结受影响的 design/specs/tasks 或进入 apply。
 
 ### 7.2 Creation
 
@@ -253,7 +264,7 @@ integrate-routego-image-plugin
 - Foundation 是首个顶层 Codex 新任务；旧插件审计、上游复用审计、契约核对和测试拆分原则上由 Foundation 线程内部的子代理完成。
 - 本次启动时已提前创建的 Legacy Audit 与 Upstream Audit 顶层任务作为一次性例外：允许完成当前文档后立即归档，不再复制这种拓扑。
 - Foundation 在两份审计最终报告可用前只能创建 proposal 初稿，不得冻结 design/specs，也不得进入 apply。
-- Foundation 完成并合入后，自动派发 Creation、Library、Studio 三个独立 Codex 任务和 worktree；若启动审计触发 Foundation Extension gate，则三条任务保持已创建但暂停 apply，待修复基线完成后由结构化依赖消息统一唤醒。
+- Foundation 完成并合入后，自动派发 Creation、Library、Studio 三个独立 Codex 任务和 worktree；若启动审计触发 Foundation Extension 或 Browser Boundary gate，则三条任务保持已创建但暂停 apply，待修复基线完成后由结构化依赖消息统一唤醒。
 - 三条实现泳道完成后，再创建一个完全新的 Integration & Acceptance 任务。
 - 每个用户任务的主代理可以启动子代理，但默认最多两个；子代理必须拥有互不重叠的文件范围。
 - 线程交付格式固定为：OpenSpec 任务 ID、commit SHA、测试结果、阻塞项、残余风险和推荐下一步。
