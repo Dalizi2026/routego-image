@@ -52,6 +52,9 @@ for (const packageDefinition of packages) {
   if (typeof rootExport?.import !== "string" || typeof rootExport?.types !== "string") {
     throw new Error(`${manifest.name} must publish import and types entries at the package root`);
   }
+  if (rootExport.development !== "./src/index.ts") {
+    throw new Error(`${manifest.name} must expose its source entry only under the development condition`);
+  }
   for (const target of [rootExport.import, rootExport.types]) {
     if (!target.startsWith("./dist/")) {
       throw new Error(`${manifest.name} package root export must resolve inside dist`);

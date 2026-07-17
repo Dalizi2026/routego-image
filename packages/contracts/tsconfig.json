@@ -2,7 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "../../.typecheck/contracts",
     "rootDir": ".",
+    "tsBuildInfoFile": "../../.typecheck/contracts.tsbuildinfo",
     "types": []
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]

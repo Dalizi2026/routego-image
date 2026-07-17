@@ -15,6 +15,7 @@ const trackedFiles = execFileSync("git", ["ls-files", "-z"], {
 const violations = [];
 const forbiddenPathSegments = new Set([
   ".cache",
+  ".typecheck",
   "coverage",
   "dist",
   "build",

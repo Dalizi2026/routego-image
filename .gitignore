@@ -1,6 +1,7 @@
 # Dependencies and builds
 node_modules/
 *.tsbuildinfo
+.typecheck/
 pnpm-debug.log*
 dist/
 build/
