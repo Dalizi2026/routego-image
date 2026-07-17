@@ -13,7 +13,13 @@
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsup",
+    "build": "pnpm run build:lib && pnpm run build:app",
+    "build:app": "vite build",
+    "build:lib": "tsup",
+    "dev": "vite --host 127.0.0.1",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "test:gateway": "vitest run test/gateway.test.ts test/mock-bridge.test.ts test/session.test.ts",
     "typecheck": "tsc --build tsconfig.json --pretty false"
   },
   "dependencies": {

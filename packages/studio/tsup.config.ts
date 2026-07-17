@@ -1,5 +1,6 @@
 import { createPackageConfig } from "../../tooling/tsup-preset";
 
 export default createPackageConfig({
-  platform: "browser"
+  platform: "browser",
+  target: "es2022"
 });
