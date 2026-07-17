@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "references": [{ "path": "../contracts" }],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

@@ -133,13 +133,13 @@ After merge, exported schemas, tool/route identifiers, provider states, error co
 - [Mock behavior can be mistaken for provider proof] → Mark all mock evidence as synthetic and prohibit it from setting production capability state.
 - [Windows and POSIX path semantics differ] → Test containment with both path modules and reject ambiguous cross-root input.
 - [Audited upstream logic may carry hidden application assumptions] → Pin the exact SHA, copy only approved pure logic later, preserve attribution, and reject upstream application/store/build architecture.
-- [Playwright increases install size] → Keep it development-only and use a single browser-stack smoke test in Foundation; Studio owns full browser journeys.
+- [Playwright increases install size] → Keep it development-only as shared configuration; Studio owns all browser test files and journeys.
 
 ## Migration Plan
 
 1. Build and validate Foundation entirely on `codex/routego-foundation`.
 2. Keep the completed audit documents immutable as evidence and map their conclusions into specs, tests, provenance, and compatibility records.
-3. Run root safety checks, typecheck, build, Vitest, Playwright smoke tests, and strict OpenSpec validation.
+3. Run root safety checks, typecheck, build, Vitest, and strict OpenSpec validation; Studio validates the shared Playwright configuration when its browser suite is added.
 4. Merge Foundation into the controller's integration baseline and freeze public exports before Creation, Library, and Studio begin apply.
 5. There is no runtime deployment or data migration in this change. Rollback is a normal Git revert of the Foundation merge; legacy plugin files and local user data remain untouched.
 

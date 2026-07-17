@@ -1,5 +1,7 @@
 # Dependencies and builds
 node_modules/
+*.tsbuildinfo
+pnpm-debug.log*
 dist/
 build/
 coverage/
