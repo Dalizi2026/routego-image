@@ -22,8 +22,7 @@ describe("honest creation result presentation", () => {
   it("distinguishes success, degraded, partial, and failure", () => {
     expect(
       describeCreationResult(result("succeeded", { receivedAnyOutput: true, mayHaveBilled: true }))
-        .tone
-    ).toBe("success");
+    ).toMatchObject({ tone: "success", retryRequiresConfirmation: true });
     expect(
       describeCreationResult(
         result("succeeded", { receivedAnyOutput: true, mayHaveBilled: true, degraded: true })
@@ -31,10 +30,13 @@ describe("honest creation result presentation", () => {
     ).toBe("degraded");
     expect(
       describeCreationResult(result("partial", { receivedAnyOutput: true, mayHaveBilled: true }))
-    ).toMatchObject({ tone: "partial", manualRetryWarning: expect.any(String) });
+    ).toMatchObject({
+      tone: "partial",
+      manualRetryWarning: expect.any(String),
+      retryRequiresConfirmation: true
+    });
     expect(
       describeCreationResult(result("failed", { receivedAnyOutput: false, mayHaveBilled: false }))
-        .tone
-    ).toBe("failure");
+    ).toMatchObject({ tone: "failure", retryRequiresConfirmation: false });
   });
 });

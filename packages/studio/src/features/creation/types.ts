@@ -1,5 +1,6 @@
 import type {
   ReadSettingsResult,
+  StudioBatchResult,
   StudioImageInputRef,
   StudioImageOperationResult,
   UploadResourcePurpose
@@ -61,6 +62,8 @@ export interface CreationControls {
   readonly partialImages: ReadSettingsResult["defaults"]["partialImages"];
   readonly transparentMode: ReadSettingsResult["defaults"]["transparentMode"];
   readonly moderation: ReadSettingsResult["defaults"]["moderation"];
+  readonly action: "auto" | "generate" | "edit";
+  readonly previousResponseId?: string | undefined;
   readonly saveToLibrary: boolean;
 }
 
@@ -80,10 +83,20 @@ export interface CreationDraft {
   readonly controls: CreationControls;
 }
 
-export interface CreationAvailability {
-  readonly imageInput: boolean;
-  readonly edit: boolean;
+export interface BatchDraftItem {
+  readonly id: string;
+  readonly draft: CreationDraft;
 }
+
+export type BatchSubmissionState =
+  | { readonly status: "idle" }
+  | { readonly status: "submitting"; readonly taskIds: readonly string[] }
+  | {
+      readonly status: "result";
+      readonly result: StudioBatchResult;
+      readonly replayAcknowledged: boolean;
+    }
+  | { readonly status: "failure"; readonly safeMessage: string };
 
 export type SubmissionState =
   | { readonly status: "idle" }

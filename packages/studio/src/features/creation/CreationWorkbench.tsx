@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type ChangeEvent,
@@ -12,6 +13,23 @@ import type { StudioGateway } from "../../api";
 import { ProtectedImage } from "../../components";
 import { useI18n } from "../../i18n";
 import {
+  combineCapabilityDecisions,
+  CreationCapabilityError,
+  normalizeCreationDraftForCapabilities,
+  UNCONFIRMED_CAPABILITY_MESSAGE,
+  useCapabilityRegistry,
+  validateCreationCapabilities,
+  type CapabilityDecision
+} from "../capabilities";
+import {
+  BatchDraftError,
+  buildStudioBatchRequest,
+  cloneCreationDraft,
+  createBatchDraftItem,
+  moveBatchDraftItem
+} from "./batch";
+import { BatchEditor } from "./BatchEditor";
+import {
   buildStudioCreationRequest,
   CreationDraftError,
   createEditHandoff,
@@ -19,7 +37,8 @@ import {
 } from "./draft";
 import { describeCreationResult } from "./result";
 import type {
-  CreationAvailability,
+  BatchDraftItem,
+  BatchSubmissionState,
   CreationDraft,
   CreationInputSlot,
   DraftImageInput,
@@ -34,7 +53,7 @@ import {
 } from "./upload";
 import "./creation.css";
 
-const UNCONFIRMED_MESSAGE = "当前中转未确认支持";
+const UNCONFIRMED_MESSAGE = UNCONFIRMED_CAPABILITY_MESSAGE;
 
 const copy = {
   zh: {
@@ -43,6 +62,8 @@ const copy = {
     subtitle: "提示词、参考图与输出参数始终保留为本地草稿；失败不会清空当前工作。",
     generate: "生成",
     edit: "编辑",
+    singleWorkflow: "单项工作台",
+    batchWorkflow: "批量队列",
     prompt: "提示词",
     promptPlaceholder: "描述画面、光线、构图和必须保留的细节…",
     references: "参考图",
@@ -79,7 +100,12 @@ const copy = {
     billing: "可能计费",
     output: "已收到输出",
     yes: "是",
-    no: "否"
+    no: "否",
+    continuation: "连续编辑",
+    previousResponse: "上一响应标识",
+    retryAcknowledge: "我确认要创建一次新的明确请求",
+    capabilityTitle: "能力证据",
+    capabilityTransient: "最近探测失败，保留此前能力状态"
   },
   en: {
     eyebrow: "CREATE / 01",
@@ -87,6 +113,8 @@ const copy = {
     subtitle: "Prompts, references, and output controls remain a local draft. Failures never clear current work.",
     generate: "Generate",
     edit: "Edit",
+    singleWorkflow: "Single workbench",
+    batchWorkflow: "Batch queue",
     prompt: "Prompt",
     promptPlaceholder: "Describe the scene, light, composition, and details that must remain…",
     references: "References",
@@ -123,7 +151,12 @@ const copy = {
     billing: "May have billed",
     output: "Received output",
     yes: "Yes",
-    no: "No"
+    no: "No",
+    continuation: "Continuation",
+    previousResponse: "Previous response ID",
+    retryAcknowledge: "I understand this creates a new explicit request",
+    capabilityTitle: "Capability evidence",
+    capabilityTransient: "The latest probe failed; the previous capability state was preserved"
   }
 } as const;
 
@@ -208,6 +241,7 @@ function FileDropzone({
   purpose,
   slot,
   disabled,
+  hint,
   labels,
   onFiles
 }: {
@@ -215,6 +249,7 @@ function FileDropzone({
   readonly purpose: "reference" | "target" | "supporting";
   readonly slot: CreationInputSlot;
   readonly disabled: boolean;
+  readonly hint?: string | undefined;
   readonly labels: CreationLabels;
   readonly onFiles: (slot: CreationInputSlot, files: readonly File[]) => void;
 }) {
@@ -246,9 +281,56 @@ function FileDropzone({
           }}
         />
         <span>{labels.drop}</span>
-        <small>{disabled ? UNCONFIRMED_MESSAGE : labels.dropHint}</small>
+        <small>{disabled ? UNCONFIRMED_MESSAGE : hint ?? labels.dropHint}</small>
       </label>
     </div>
+  );
+}
+
+function CapabilityHint({ decision }: { readonly decision: CapabilityDecision }) {
+  return (
+    <small
+      className={`capability-hint capability-hint--${decision.state}`}
+      data-capability={decision.capability}
+    >
+      <strong>{decision.state}</strong>
+      <span>
+        {decision.enabled
+          ? decision.detail ?? "已由当前 provider/model 的作用域证据确认。"
+          : decision.unavailableMessage}
+      </span>
+      {decision.transientFailure ? <em>{decision.transientFailure}</em> : null}
+    </small>
+  );
+}
+
+function CapabilityLedger({
+  title,
+  transientLabel,
+  decisions
+}: {
+  readonly title: string;
+  readonly transientLabel: string;
+  readonly decisions: readonly CapabilityDecision[];
+}) {
+  return (
+    <section className="capability-ledger" aria-labelledby="capability-ledger-title">
+      <h3 id="capability-ledger-title">{title}</h3>
+      <ul>
+        {decisions.map((decision) => (
+          <li key={decision.capability} data-state={decision.state}>
+            <span>{decision.capability}</span>
+            <strong>{decision.state}</strong>
+            {decision.detail ? <small>{decision.detail}</small> : null}
+            {decision.transientFailure ? (
+              <small>
+                {transientLabel}: {decision.transientFailure}
+              </small>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -257,14 +339,18 @@ function ResultPanel({
   result,
   labels,
   editAvailable,
+  retryAcknowledged,
   onRetry,
+  onRetryAcknowledged,
   onEdit
 }: {
   readonly gateway: StudioGateway;
   readonly result: StudioImageOperationResult;
   readonly labels: CreationLabels;
   readonly editAvailable: boolean;
+  readonly retryAcknowledged: boolean;
   readonly onRetry: () => void;
+  readonly onRetryAcknowledged: (value: boolean) => void;
   readonly onEdit: (artifactId: string) => void;
 }) {
   const presentation = describeCreationResult(result);
@@ -315,14 +401,29 @@ function ResultPanel({
         </div>
       </dl>
       {presentation.manualRetryWarning ? (
-        <p className="creation-result__warning">{presentation.manualRetryWarning}</p>
+        <label className="creation-result__warning">
+          <span>{presentation.manualRetryWarning}</span>
+          <span>
+            <input
+              type="checkbox"
+              checked={retryAcknowledged}
+              onChange={(event) => onRetryAcknowledged(event.target.checked)}
+            />
+            {labels.retryAcknowledge}
+          </span>
+        </label>
       ) : null}
       {result.failedSlots.map((slot) => (
         <p className="creation-result__error" key={slot.slot}>
           Slot {slot.slot}: {slot.error.safeMessage}
         </p>
       ))}
-      <button className="studio-button" type="button" onClick={onRetry}>
+      <button
+        className="studio-button"
+        type="button"
+        disabled={presentation.retryRequiresConfirmation && !retryAcknowledged}
+        onClick={onRetry}
+      >
         {labels.retryRequest}
       </button>
     </section>
@@ -331,24 +432,62 @@ function ResultPanel({
 
 export function CreationWorkbench({
   gateway,
-  defaults,
-  availability
+  defaults
 }: {
   readonly gateway: StudioGateway;
   readonly defaults: ReadSettingsResult["defaults"];
-  readonly availability: CreationAvailability;
 }) {
   const { language } = useI18n();
   const labels = copy[language];
-  const [draft, setDraft] = useState<CreationDraft>(() => {
-    const initial = createInitialCreationDraft(defaults);
-    return {
-      ...initial,
-      controls: { ...initial.controls, partialImages: 0, transparentMode: "off" }
-    };
-  });
+  const { resolve } = useCapabilityRegistry();
+  const singleImageDecision = resolve("single-image-input");
+  const multiImageDecision = resolve("multi-image-input");
+  const editDecision = resolve("target-edit");
+  const customSizeDecision = resolve("custom-size");
+  const qualityDecision = resolve("quality-control");
+  const outputFormatDecision = resolve("output-format");
+  const compressionDecision = resolve("compression");
+  const variantDecision = resolve("native-variants");
+  const partialDecision = combineCapabilityDecisions("partial-images", [
+    resolve("streaming"),
+    resolve("partial-images")
+  ]);
+  const transparencyDecision = resolve("native-transparency");
+  const moderationDecision = resolve("moderation");
+  const responsesDecision = resolve("responses-state");
+  const initialDraft = useMemo(
+    () => normalizeCreationDraftForCapabilities(createInitialCreationDraft(defaults), resolve),
+    [defaults, resolve]
+  );
+  const [draft, setDraft] = useState<CreationDraft>(() => initialDraft);
+  const [singleDraft, setSingleDraft] = useState<CreationDraft>(() => cloneCreationDraft(initialDraft));
   const [submission, setSubmission] = useState<SubmissionState>({ status: "idle" });
+  const [retryAcknowledged, setRetryAcknowledged] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Readonly<Record<string, string>>>({});
+  const [workflow, setWorkflow] = useState<"single" | "batch">("single");
+  const [batchItems, setBatchItems] = useState<readonly BatchDraftItem[]>(() => [
+    createBatchDraftItem(initialDraft)
+  ]);
+  const [selectedBatchId, setSelectedBatchId] = useState(() => batchItems[0]!.id);
+  const [batchConcurrency, setBatchConcurrency] = useState(3);
+  const [batchSubmission, setBatchSubmission] = useState<BatchSubmissionState>({
+    status: "idle"
+  });
+
+  useEffect(() => {
+    if (workflow === "single") {
+      setSingleDraft(cloneCreationDraft(draft));
+    }
+  }, [draft, workflow]);
+
+  useEffect(() => {
+    if (workflow !== "batch") return;
+    setBatchItems((current) =>
+      current.map((item) =>
+        item.id === selectedBatchId ? { ...item, draft: cloneCreationDraft(draft) } : item
+      )
+    );
+  }, [draft, selectedBatchId, workflow]);
 
   const patchUpload = useCallback((item: UploadLifecycleItem) => {
     setDraft((current) => updateImage(current, item.id, (image) => ({ ...image, upload: item })));
@@ -356,7 +495,14 @@ export function CreationWorkbench({
 
   const beginUpload = useCallback(
     (slot: CreationInputSlot, files: readonly File[]) => {
-      const accepted = slot === "target" ? files.slice(0, 1) : files;
+      if (!singleImageDecision.enabled) return;
+      const currentPhysicalInputs =
+        draft.references.length + draft.supportingImages.length + (draft.target === undefined ? 0 : 1);
+      const evidenceLimit = multiImageDecision.record?.limits?.maxImages ?? 16;
+      const maximumInputs = multiImageDecision.enabled ? evidenceLimit : 1;
+      const remaining = Math.max(0, maximumInputs - currentPhysicalInputs);
+      const accepted = slot === "target" ? files.slice(0, Math.min(1, remaining)) : files.slice(0, remaining);
+      if (accepted.length === 0) return;
       const additions = accepted.map((file) => {
         const purpose = slot === "target" ? "target" : slot;
         const upload = createUploadItem(purpose, { name: file.name, blob: file });
@@ -381,7 +527,16 @@ export function CreationWorkbench({
         }
       }
     },
-    [gateway, patchUpload]
+    [
+      draft.references.length,
+      draft.supportingImages.length,
+      draft.target,
+      gateway,
+      multiImageDecision.enabled,
+      multiImageDecision.record?.limits?.maxImages,
+      patchUpload,
+      singleImageDecision.enabled
+    ]
   );
 
   const removeImage = useCallback(
@@ -427,9 +582,10 @@ export function CreationWorkbench({
     setFieldErrors({});
     let request;
     try {
+      validateCreationCapabilities(draft, resolve);
       request = buildStudioCreationRequest(draft);
     } catch (error) {
-      if (error instanceof CreationDraftError) {
+      if (error instanceof CreationDraftError || error instanceof CreationCapabilityError) {
         setFieldErrors(error.fields);
         setSubmission({ status: "failure", safeMessage: error.message });
         return;
@@ -438,6 +594,7 @@ export function CreationWorkbench({
       return;
     }
     setSubmission({ status: "submitting" });
+    setRetryAcknowledged(false);
     try {
       const result =
         request.kind === "generate"
@@ -450,7 +607,87 @@ export function CreationWorkbench({
         safeMessage: error instanceof Error ? error.message : "本地请求未完成。"
       });
     }
-  }, [draft, gateway]);
+  }, [draft, gateway, resolve]);
+
+  const selectBatchItem = useCallback((item: BatchDraftItem) => {
+    setSelectedBatchId(item.id);
+    setDraft(cloneCreationDraft(item.draft));
+    setFieldErrors({});
+    setSubmission({ status: "idle" });
+  }, []);
+
+  const addBatchItem = useCallback(() => {
+    if (batchItems.length >= 20) return;
+    const item = createBatchDraftItem(
+      normalizeCreationDraftForCapabilities(createInitialCreationDraft(defaults), resolve)
+    );
+    setBatchItems((current) => [...current, item]);
+    selectBatchItem(item);
+  }, [batchItems.length, defaults, resolve, selectBatchItem]);
+
+  const removeBatchItem = useCallback(
+    (item: BatchDraftItem) => {
+      if (batchItems.length <= 1) return;
+      const index = batchItems.findIndex((candidate) => candidate.id === item.id);
+      const next = batchItems.filter((candidate) => candidate.id !== item.id);
+      const nextSelection = next[Math.min(index, next.length - 1)] ?? next[0];
+      setBatchItems(next);
+      if (item.id === selectedBatchId && nextSelection !== undefined) {
+        selectBatchItem(nextSelection);
+      }
+    },
+    [batchItems, selectedBatchId, selectBatchItem]
+  );
+
+  const submitBatch = useCallback(async () => {
+    setFieldErrors({});
+    try {
+      batchItems.forEach((item, index) => {
+        try {
+          validateCreationCapabilities(item.draft, resolve);
+        } catch (error) {
+          if (error instanceof CreationCapabilityError) {
+            throw new BatchDraftError(`批量任务第 ${index + 1} 项被能力证据阻止。`, {
+              taskId: item.id,
+              fields: error.fields
+            });
+          }
+          throw error;
+        }
+      });
+      const request = buildStudioBatchRequest(batchItems, batchConcurrency);
+      setBatchSubmission({ status: "submitting", taskIds: request.tasks.map((task) => task.id) });
+      const result = await gateway.invoke("studioBatch", request);
+      setBatchSubmission({ status: "result", result, replayAcknowledged: false });
+    } catch (error) {
+      if (error instanceof BatchDraftError) {
+        setFieldErrors(error.fields);
+        setBatchSubmission({ status: "failure", safeMessage: error.message });
+        return;
+      }
+      setBatchSubmission({
+        status: "failure",
+        safeMessage: error instanceof Error ? error.message : "批量请求未完成。"
+      });
+    }
+  }, [batchConcurrency, batchItems, gateway, resolve]);
+
+  const switchWorkflow = useCallback(
+    (next: "single" | "batch") => {
+      if (next === workflow) return;
+      setWorkflow(next);
+      setFieldErrors({});
+      setSubmission({ status: "idle" });
+      if (next === "batch") {
+        setSingleDraft(cloneCreationDraft(draft));
+        const selected = batchItems.find((item) => item.id === selectedBatchId) ?? batchItems[0];
+        if (selected !== undefined) setDraft(cloneCreationDraft(selected.draft));
+      } else {
+        setDraft(cloneCreationDraft(singleDraft));
+      }
+    },
+    [batchItems, draft, selectedBatchId, singleDraft, workflow]
+  );
 
   const imageRows = useMemo(
     () => [
@@ -467,7 +704,71 @@ export function CreationWorkbench({
     }));
   };
 
-  const modeUnavailable = !availability.edit;
+  const modeUnavailable = !editDecision.enabled;
+  const physicalInputs =
+    draft.references.length + draft.supportingImages.length + (draft.target === undefined ? 0 : 1);
+  const referenceDisabled =
+    !singleImageDecision.enabled || (!multiImageDecision.enabled && physicalInputs >= 1);
+  const targetDisabled =
+    !editDecision.enabled ||
+    !singleImageDecision.enabled ||
+    (!multiImageDecision.enabled && physicalInputs >= 1 && draft.target === undefined);
+  const supportingDisabled =
+    !editDecision.enabled || !singleImageDecision.enabled || !multiImageDecision.enabled;
+  const allowedSizes = customSizeDecision.record?.limits?.supportedSizes;
+  const sizeOptions = customSizeDecision.enabled
+    ? ["auto", "1024x1024", "1536x1024", "1024x1536"].filter(
+        (value) => value === "auto" || allowedSizes === undefined || allowedSizes.includes(value)
+      )
+    : ["auto"];
+  const aspectOptions = customSizeDecision.enabled
+    ? (["auto", "square", "landscape", "portrait"] as const)
+    : (["auto"] as const);
+  const allowedQualities = qualityDecision.record?.limits?.supportedQualities;
+  const qualityOptions = qualityDecision.enabled
+    ? (["auto", "low", "medium", "high"] as const).filter(
+        (value) =>
+          value === "auto" || allowedQualities === undefined || allowedQualities.includes(value)
+      )
+    : (["auto"] as const);
+  const allowedFormats = outputFormatDecision.record?.limits?.supportedFormats;
+  const formatOptions = outputFormatDecision.enabled
+    ? (["png", "jpeg", "webp"] as const).filter(
+        (value) => value === "png" || allowedFormats === undefined || allowedFormats.includes(value)
+      )
+    : (["png"] as const);
+  const variantMaximum = Math.min(4, variantDecision.record?.limits?.maxVariants ?? 4);
+  const partialMaximum = partialDecision.enabled
+    ? Math.min(3, partialDecision.record?.limits?.maxPartialImages ?? 3)
+    : 0;
+  const moderationOptions = moderationDecision.enabled
+    ? (["auto", "low"] as const)
+    : (["auto"] as const);
+  const continuationOptions = responsesDecision.enabled
+    ? draft.mode === "edit"
+      ? (["auto", "generate", "edit"] as const)
+      : (["auto", "generate"] as const)
+    : (["auto"] as const);
+  const transparencyOptions =
+    transparencyDecision.state === "supported"
+      ? (["off", "auto", "chromakey", "native"] as const)
+      : transparencyDecision.state === "degraded"
+        ? (["off", "auto", "chromakey"] as const)
+        : (["off"] as const);
+  const capabilityDecisions = [
+    singleImageDecision,
+    multiImageDecision,
+    editDecision,
+    customSizeDecision,
+    qualityDecision,
+    outputFormatDecision,
+    compressionDecision,
+    variantDecision,
+    partialDecision,
+    transparencyDecision,
+    moderationDecision,
+    responsesDecision
+  ];
   return (
     <section className="creation-workbench">
       <header className="creation-workbench__header">
@@ -475,11 +776,59 @@ export function CreationWorkbench({
         <h1 tabIndex={-1}>{labels.title}</h1>
         <span>{labels.subtitle}</span>
       </header>
+      <div className="creation-workflow" role="group" aria-label="Creation workflow">
+        <button
+          type="button"
+          aria-pressed={workflow === "single"}
+          onClick={() => switchWorkflow("single")}
+        >
+          {labels.singleWorkflow}
+        </button>
+        <button
+          type="button"
+          aria-pressed={workflow === "batch"}
+          onClick={() => switchWorkflow("batch")}
+        >
+          {labels.batchWorkflow}
+        </button>
+      </div>
+      {workflow === "batch" ? (
+        <BatchEditor
+          items={batchItems}
+          selectedId={selectedBatchId}
+          concurrency={batchConcurrency}
+          submission={batchSubmission}
+          onSelect={selectBatchItem}
+          onAdd={addBatchItem}
+          onRemove={removeBatchItem}
+          onMove={(itemId, direction) =>
+            setBatchItems((current) => moveBatchDraftItem(current, itemId, direction))
+          }
+          onConcurrencyChange={(value) =>
+            setBatchConcurrency(Number.isFinite(value) ? Math.min(10, Math.max(1, value)) : 1)
+          }
+          onReplayAcknowledged={(value) =>
+            setBatchSubmission((current) =>
+              current.status === "result" ? { ...current, replayAcknowledged: value } : current
+            )
+          }
+          onSubmit={() => void submitBatch()}
+        />
+      ) : null}
       <div className="creation-mode" role="group" aria-label="Creation mode">
         <button
           type="button"
           aria-pressed={draft.mode === "generate"}
-          onClick={() => setDraft((current) => ({ ...current, mode: "generate" }))}
+          onClick={() =>
+            setDraft((current) => ({
+              ...current,
+              mode: "generate",
+              controls: {
+                ...current.controls,
+                action: current.controls.action === "edit" ? "auto" : current.controls.action
+              }
+            }))
+          }
         >
           {labels.generate}
         </button>
@@ -510,7 +859,12 @@ export function CreationWorkbench({
             title={labels.references}
             purpose="reference"
             slot="reference"
-            disabled={!availability.imageInput}
+            disabled={referenceDisabled}
+            hint={
+              singleImageDecision.state === "degraded"
+                ? singleImageDecision.detail
+                : undefined
+            }
             labels={labels}
             onFiles={beginUpload}
           />
@@ -533,7 +887,8 @@ export function CreationWorkbench({
                 title={labels.target}
                 purpose="target"
                 slot="target"
-                disabled={!availability.edit}
+                disabled={targetDisabled}
+                hint={editDecision.state === "degraded" ? editDecision.detail : undefined}
                 labels={labels}
                 onFiles={beginUpload}
               />
@@ -552,7 +907,8 @@ export function CreationWorkbench({
                 title={labels.supporting}
                 purpose="supporting"
                 slot="supporting"
-                disabled={!availability.edit}
+                disabled={supportingDisabled}
+                hint={multiImageDecision.state === "degraded" ? multiImageDecision.detail : undefined}
                 labels={labels}
                 onFiles={beginUpload}
               />
@@ -599,6 +955,8 @@ export function CreationWorkbench({
               <span>{labels.size}</span>
               <select
                 value={draft.controls.size}
+                disabled={!customSizeDecision.enabled}
+                title={customSizeDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
                 onChange={(event) =>
                   setDraft((current) => ({
                     ...current,
@@ -606,16 +964,20 @@ export function CreationWorkbench({
                   }))
                 }
               >
-                <option value="auto">auto</option>
-                <option value="1024x1024">1024×1024</option>
-                <option value="1536x1024">1536×1024</option>
-                <option value="1024x1536">1024×1536</option>
+                {sizeOptions.map((value) => (
+                  <option value={value} key={value}>
+                    {value}
+                  </option>
+                ))}
               </select>
+              <CapabilityHint decision={customSizeDecision} />
             </label>
             <label className="field">
               <span>{labels.ratio}</span>
               <select
                 value={draft.controls.aspectRatio}
+                disabled={!customSizeDecision.enabled}
+                title={customSizeDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
                 onChange={(event) =>
                   setDraft((current) => ({
                     ...current,
@@ -623,16 +985,20 @@ export function CreationWorkbench({
                   }))
                 }
               >
-                <option value="auto">auto</option>
-                <option value="square">1:1</option>
-                <option value="landscape">landscape</option>
-                <option value="portrait">portrait</option>
+                {aspectOptions.map((value) => (
+                  <option value={value} key={value}>
+                    {value === "square" ? "1:1" : value}
+                  </option>
+                ))}
               </select>
+              <CapabilityHint decision={customSizeDecision} />
             </label>
             <label className="field">
               <span>{labels.quality}</span>
               <select
                 value={draft.controls.quality}
+                disabled={!qualityDecision.enabled}
+                title={qualityDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
                 onChange={(event) =>
                   setDraft((current) => ({
                     ...current,
@@ -643,13 +1009,18 @@ export function CreationWorkbench({
                   }))
                 }
               >
-                {['auto', 'low', 'medium', 'high'].map((value) => <option key={value}>{value}</option>)}
+                {qualityOptions.map((value) => (
+                  <option key={value}>{value}</option>
+                ))}
               </select>
+              <CapabilityHint decision={qualityDecision} />
             </label>
             <label className="field">
               <span>{labels.format}</span>
               <select
                 value={draft.controls.format}
+                disabled={!outputFormatDecision.enabled}
+                title={outputFormatDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
                 onChange={(event) =>
                   setDraft((current) => ({
                     ...current,
@@ -661,17 +1032,22 @@ export function CreationWorkbench({
                   }))
                 }
               >
-                <option value="png">PNG</option>
-                <option value="jpeg">JPEG</option>
-                <option value="webp">WebP</option>
+                {formatOptions.map((value) => (
+                  <option value={value} key={value}>
+                    {value.toUpperCase()}
+                  </option>
+                ))}
               </select>
+              <CapabilityHint decision={outputFormatDecision} />
             </label>
             <label className="field">
               <span>{labels.count}</span>
               <input
                 type="number"
                 min={1}
-                max={4}
+                max={variantMaximum}
+                disabled={!variantDecision.enabled}
+                title={variantDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
                 value={draft.controls.count}
                 onChange={(event) =>
                   setDraft((current) => ({
@@ -680,6 +1056,7 @@ export function CreationWorkbench({
                   }))
                 }
               />
+              <CapabilityHint decision={variantDecision} />
             </label>
             <label className="field">
               <span>{labels.compression}</span>
@@ -687,7 +1064,8 @@ export function CreationWorkbench({
                 type="number"
                 min={0}
                 max={100}
-                disabled={draft.controls.format === "png"}
+                disabled={!compressionDecision.enabled || draft.controls.format === "png"}
+                title={compressionDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
                 value={draft.controls.compression ?? ""}
                 onChange={(event) =>
                   setDraft((current) => ({
@@ -699,23 +1077,60 @@ export function CreationWorkbench({
                   }))
                 }
               />
+              <CapabilityHint decision={compressionDecision} />
             </label>
             <label className="field">
               <span>{labels.partial}</span>
-              <select value={draft.controls.partialImages} disabled>
-                <option value={0}>0 · {UNCONFIRMED_MESSAGE}</option>
+              <select
+                value={draft.controls.partialImages}
+                disabled={!partialDecision.enabled}
+                title={partialDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    controls: { ...current.controls, partialImages: Number(event.target.value) }
+                  }))
+                }
+              >
+                {Array.from({ length: partialMaximum + 1 }, (_, value) => (
+                  <option value={value} key={value}>
+                    {value}
+                  </option>
+                ))}
               </select>
+              <CapabilityHint decision={partialDecision} />
             </label>
             <label className="field">
               <span>{labels.transparent}</span>
-              <select value={draft.controls.transparentMode} disabled>
-                <option value="off">off · {UNCONFIRMED_MESSAGE}</option>
+              <select
+                value={draft.controls.transparentMode}
+                disabled={!transparencyDecision.enabled}
+                title={transparencyDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    controls: {
+                      ...current.controls,
+                      transparentMode: event.target.value as CreationDraft["controls"]["transparentMode"],
+                      format: event.target.value === "off" ? current.controls.format : "png"
+                    }
+                  }))
+                }
+              >
+                {transparencyOptions.map((value) => (
+                  <option value={value} key={value}>
+                    {value}
+                  </option>
+                ))}
               </select>
+              <CapabilityHint decision={transparencyDecision} />
             </label>
             <label className="field">
               <span>{labels.moderation}</span>
               <select
                 value={draft.controls.moderation}
+                disabled={!moderationDecision.enabled}
+                title={moderationDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
                 onChange={(event) =>
                   setDraft((current) => ({
                     ...current,
@@ -726,11 +1141,62 @@ export function CreationWorkbench({
                   }))
                 }
               >
-                <option value="auto">auto</option>
-                <option value="low">low</option>
+                {moderationOptions.map((value) => (
+                  <option value={value} key={value}>
+                    {value}
+                  </option>
+                ))}
               </select>
+              <CapabilityHint decision={moderationDecision} />
+            </label>
+            <label className="field">
+              <span>{labels.continuation}</span>
+              <select
+                value={draft.controls.action}
+                disabled={!responsesDecision.enabled}
+                title={responsesDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    controls: {
+                      ...current.controls,
+                      action: event.target.value as CreationDraft["controls"]["action"]
+                    }
+                  }))
+                }
+              >
+                {continuationOptions.map((value) => (
+                  <option value={value} key={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+              <CapabilityHint decision={responsesDecision} />
+            </label>
+            <label className="field">
+              <span>{labels.previousResponse}</span>
+              <input
+                value={draft.controls.previousResponseId ?? ""}
+                disabled={!responsesDecision.enabled}
+                title={responsesDecision.enabled ? undefined : UNCONFIRMED_MESSAGE}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    controls: {
+                      ...current.controls,
+                      previousResponseId: event.target.value.trim() || undefined
+                    }
+                  }))
+                }
+              />
+              <CapabilityHint decision={responsesDecision} />
             </label>
           </div>
+          <CapabilityLedger
+            title={labels.capabilityTitle}
+            transientLabel={labels.capabilityTransient}
+            decisions={capabilityDecisions}
+          />
           <label className="save-toggle">
             <input
               type="checkbox"
@@ -744,18 +1210,20 @@ export function CreationWorkbench({
             />
             <span>{labels.save}</span>
           </label>
-          <button
-            className="creation-submit"
-            type="button"
-            disabled={submission.status === "submitting"}
-            onClick={() => void submit()}
-          >
-            {submission.status === "submitting"
-              ? labels.submitting
-              : draft.mode === "edit"
-                ? labels.submitEdit
-                : labels.submit}
-          </button>
+          {workflow === "single" ? (
+            <button
+              className="creation-submit"
+              type="button"
+              disabled={submission.status === "submitting"}
+              onClick={() => void submit()}
+            >
+              {submission.status === "submitting"
+                ? labels.submitting
+                : draft.mode === "edit"
+                  ? labels.submitEdit
+                  : labels.submit}
+            </button>
+          ) : null}
           {submission.status === "failure" ? (
             <p className="creation-error" role="alert">
               {submission.safeMessage}
@@ -770,13 +1238,15 @@ export function CreationWorkbench({
           )}
         </aside>
       </div>
-      {submission.status === "result" ? (
+      {workflow === "single" && submission.status === "result" ? (
         <ResultPanel
           gateway={gateway}
           result={submission.result}
           labels={labels}
-          editAvailable={availability.edit}
+          editAvailable={editDecision.enabled}
+          retryAcknowledged={retryAcknowledged}
           onRetry={() => void submit()}
+          onRetryAcknowledged={setRetryAcknowledged}
           onEdit={(artifactId) => {
             setDraft(createEditHandoff(submission.result, artifactId));
             setSubmission({ status: "idle" });

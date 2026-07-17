@@ -4,6 +4,7 @@ import type { ReadSettingsResult, RoutegoStatusResult } from "@routego-image/con
 
 import { StudioGatewayError, type StudioGateway } from "../api";
 import { AppNavigation, AsyncStatePanel, NoticeStack } from "../components";
+import { CapabilityProvider } from "../features/capabilities";
 import { CreationWorkbench } from "../features/creation";
 import { I18nProvider, useI18n, type MessageKey } from "../i18n";
 import "../styles/index.css";
@@ -225,7 +226,6 @@ function StudioWorkspace({
       <CreationWorkbench
         gateway={gateway}
         defaults={settings.defaults}
-        availability={{ imageInput: false, edit: false }}
       />
     ),
     ...routeContent
@@ -329,12 +329,18 @@ export function StudioApp({
   return (
     <I18nProvider>
       {boot.status === "ready" ? (
-        <StudioWorkspace
-          gateway={gateway}
-          service={boot.service}
-          settings={boot.settings}
-          {...(routeContent === undefined ? {} : { routeContent })}
-        />
+        <CapabilityProvider
+          providerId={boot.service.providerId}
+          model={boot.settings.defaults.model ?? boot.service.models[0]}
+          snapshots={boot.service.capabilities}
+        >
+          <StudioWorkspace
+            gateway={gateway}
+            service={boot.service}
+            settings={boot.settings}
+            {...(routeContent === undefined ? {} : { routeContent })}
+          />
+        </CapabilityProvider>
       ) : (
         <BootScreen state={boot} onRetry={() => setAttempt((value) => value + 1)} />
       )}

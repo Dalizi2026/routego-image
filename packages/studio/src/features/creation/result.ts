@@ -6,6 +6,7 @@ export interface CreationResultPresentation {
   readonly receivedAnyOutput: boolean;
   readonly mayHaveBilled: boolean;
   readonly manualRetryWarning?: string;
+  readonly retryRequiresConfirmation: boolean;
 }
 
 export function describeCreationResult(
@@ -20,6 +21,7 @@ export function describeCreationResult(
       title: "生成未完成",
       receivedAnyOutput: result.execution.receivedAnyOutput,
       mayHaveBilled: result.execution.mayHaveBilled,
+      retryRequiresConfirmation: riskWarning !== undefined,
       ...(riskWarning ? { manualRetryWarning: riskWarning } : {})
     };
   }
@@ -29,6 +31,7 @@ export function describeCreationResult(
       title: "部分图像已保留",
       receivedAnyOutput: result.execution.receivedAnyOutput,
       mayHaveBilled: result.execution.mayHaveBilled,
+      retryRequiresConfirmation: riskWarning !== undefined,
       ...(riskWarning ? { manualRetryWarning: riskWarning } : {})
     };
   }
@@ -38,6 +41,7 @@ export function describeCreationResult(
       title: "已通过降级路径完成",
       receivedAnyOutput: true,
       mayHaveBilled: result.execution.mayHaveBilled,
+      retryRequiresConfirmation: riskWarning !== undefined,
       ...(riskWarning ? { manualRetryWarning: riskWarning } : {})
     };
   }
@@ -45,6 +49,8 @@ export function describeCreationResult(
     tone: "success",
     title: "图像已生成",
     receivedAnyOutput: result.execution.receivedAnyOutput,
-    mayHaveBilled: result.execution.mayHaveBilled
+    mayHaveBilled: result.execution.mayHaveBilled,
+    retryRequiresConfirmation: riskWarning !== undefined,
+    ...(riskWarning ? { manualRetryWarning: riskWarning } : {})
   };
 }

@@ -42,6 +42,7 @@ export function createInitialCreationDraft(
       partialImages: defaults.partialImages,
       transparentMode: defaults.transparentMode,
       moderation: defaults.moderation,
+      action: "auto",
       saveToLibrary: defaults.saveToLibrary
     }
   };
@@ -89,7 +90,10 @@ function commonRequest(draft: CreationDraft) {
     partialImages: draft.controls.partialImages,
     transparentMode: draft.controls.transparentMode,
     moderation: draft.controls.moderation,
-    action: "auto" as const,
+    action: draft.controls.action,
+    ...(draft.controls.previousResponseId === undefined
+      ? {}
+      : { previousResponseId: draft.controls.previousResponseId }),
     imageIds: [],
     fileIds: [],
     saveToLibrary: draft.controls.saveToLibrary
@@ -190,6 +194,10 @@ export function createEditHandoff(
       partialImages: effective.partialImages,
       transparentMode: effective.transparentMode,
       moderation: effective.moderation,
+      action: effective.action,
+      ...(effective.previousResponseId === undefined
+        ? {}
+        : { previousResponseId: effective.previousResponseId }),
       saveToLibrary: effective.saveToLibrary
     }
   };
