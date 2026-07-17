@@ -97,4 +97,3 @@ Succeeded operations SHALL contain final artifacts and no top-level error; faile
 #### Scenario: Provider returned no usable output
 - **WHEN** all attempts end without a valid final or partial artifact
 - **THEN** Creation SHALL return `failed` and SHALL not reuse an old file or unrelated output as the current result
-

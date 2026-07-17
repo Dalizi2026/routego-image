@@ -90,4 +90,3 @@ Normalized results SHALL use unique stable request-local artifact IDs, preserve 
 #### Scenario: Invalid relationship is assembled
 - **WHEN** a relationship references an absent artifact or an artifact is placed in the wrong phase collection
 - **THEN** output validation SHALL fail closed as an internal contract error
-

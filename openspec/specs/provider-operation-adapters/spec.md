@@ -98,4 +98,3 @@ Creation SHALL produce a schema-valid effective request before submission, SHALL
 #### Scenario: Sensitive request is observed diagnostically
 - **WHEN** request preparation or submission fails while an API key or image data is in memory
 - **THEN** all returned/logged diagnostics SHALL be recursively redacted and SHALL not contain credentials, authorization headers, data URLs, or image bytes
-

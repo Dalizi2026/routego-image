@@ -93,4 +93,3 @@ Transport tests SHALL use injected in-memory streams, loopback listeners, determ
 #### Scenario: Test suite runs offline
 - **WHEN** the Creation transport suite runs on a supported development platform
 - **THEN** MCP, HTTP, session/origin, SSE, failure, and shutdown scenarios SHALL complete deterministically without a billable or external request
-
