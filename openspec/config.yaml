@@ -1,0 +1,31 @@
+schema: spec-driven
+
+context: |
+  Product: Routego Image 1.0, a personal Codex plugin for image generation and editing through the user's relay.
+  Read routego-image-1.0-plan.md, AGENTS.md, and docs/development/provider-capability-matrix.md before creating artifacts.
+  Architecture: Codex skill + local STDIO MCP/HTTP service + localhost Routego Studio.
+  Stack: pnpm workspace, Node.js 20.19+, TypeScript strict, Zod shared schemas, React/Vite, Vitest, Playwright, pure-JS build tooling.
+  Portability: Windows, macOS, and Linux. Avoid native addons and target-machine node_modules installs.
+  Provider baseline: the user may have only one image generation endpoint and API key. Never assume /images/edits or /responses exists.
+  The current legacy plugin sends image data URLs to the same generations endpoint for edit/reference workflows.
+  Data: versioned JSON library index with file locks and atomic replacement. Old config and images are preserved but not migrated.
+  Security: never store real keys, auth headers, or user images in specs, fixtures, logs, or the repository.
+  Workflow: five changes with one apply-owner per change. Git worktrees isolate code; OpenSpec owns requirements and task state.
+
+rules:
+  proposal:
+    - State the owned durable capabilities and dependency changes explicitly.
+    - Include non-goals and affected public interfaces.
+    - Do not claim unsupported provider capabilities.
+  specs:
+    - Use SHALL or MUST for requirements and include at least one Scenario per requirement.
+    - Cover capability states unknown, supported, unsupported, and degraded where provider behavior is involved.
+    - Include failure, redaction, and non-destructive file handling scenarios.
+  design:
+    - Define shared schemas, data flow, security boundaries, provider tier routing, error handling, directory ownership, tests, and alternatives.
+    - Record which files are exclusively owned by the change and which contracts are frozen dependencies.
+    - Avoid native runtime dependencies unless a design change is approved.
+  tasks:
+    - Use numbered checkbox tasks with lane, dependency, and verification information.
+    - Keep tasks atomic and assign each implementation file area to one owner.
+    - Include contract, failure, security, packaging, and cross-platform tests before marking a change complete.

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "lane": "controller",
+  "role": "program-controller",
+  "status": "active",
+  "threadId": null,
+  "worktree": "C:\\Users\\MLTZ\\Documents\\生图插件",
+  "branch": "main",
+  "headCommit": null,
+  "generation": 0,
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "2026-07-17-initial-plan-context-summary",
+  "lastHealthAudit": "passed",
+  "successorThreadId": null,
+  "notes": [
+    "The first observable context compaction occurred before execution started.",
+    "The repository default branch was normalized to main during bootstrap."
+  ]
+}

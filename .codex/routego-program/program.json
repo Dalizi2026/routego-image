@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "program": "routego-image-1.0",
+  "status": "bootstrap",
+  "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
+  "defaultBranch": "main",
+  "productPlan": "routego-image-1.0-plan.md",
+  "contextPolicy": {
+    "observableOnly": true,
+    "checkpointAt": 2,
+    "mandatoryHandoffAt": 3,
+    "earlyHandoffOnFailedAudit": true,
+    "successorMode": "new-thread-new-worktree"
+  },
+  "changes": [
+    {
+      "id": "establish-routego-image-foundation",
+      "lane": "foundation",
+      "dependsOn": []
+    },
+    {
+      "id": "add-routego-image-creation",
+      "lane": "creation",
+      "dependsOn": ["establish-routego-image-foundation"]
+    },
+    {
+      "id": "add-routego-image-library",
+      "lane": "library",
+      "dependsOn": ["establish-routego-image-foundation"]
+    },
+    {
+      "id": "add-routego-studio",
+      "lane": "studio",
+      "dependsOn": ["establish-routego-image-foundation"]
+    },
+    {
+      "id": "integrate-routego-image-plugin",
+      "lane": "integration",
+      "dependsOn": [
+        "add-routego-image-creation",
+        "add-routego-image-library",
+        "add-routego-studio"
+      ]
+    }
+  ],
+  "dispatch": {
+    "foundationThreadId": null,
+    "legacyAuditThreadId": null,
+    "upstreamAuditThreadId": null,
+    "creationThreadId": null,
+    "libraryThreadId": null,
+    "studioThreadId": null,
+    "integrationThreadId": null
+  }
+}
