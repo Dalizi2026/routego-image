@@ -8,7 +8,7 @@
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\8b8b\\生图插件",
   "branch": "codex/routego-studio-g1",
   "startingCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
-  "headCommit": "041b9bebbb3acbe84727077b40e435dedbc78fc5",
+  "headCommit": "281d25cf0e232186ce3e4608ec6dc8c3b8d18098",
   "generation": 1,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "context-checkpoint-2026-07-18-task-3.2-mask-integration-started",
@@ -20,16 +20,17 @@
   "handoffCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
   "registrationCommit": "2475cdc6b4fe9b397074ff3c240a22ab044b22e0",
   "handoffFile": ".codex/routego-program/handoffs/studio-generation-1.md",
-  "openspecProgress": "5/11",
-  "lastCompletedTask": "2.2",
-  "nextTask": "3.2",
+  "openspecProgress": "6/11",
+  "lastCompletedTask": "3.2",
+  "nextTask": "4.1",
   "recentValidation": {
     "studioTypecheck": "passed",
-    "studioTests": "17 files, 52 tests passed",
+    "studioTests": "18 files, 58 tests passed",
     "studioBuild": "library and Vite application builds passed",
     "repositorySafety": "227 tracked files passed",
     "openspec": "strict validation passed",
-    "browser": "desktop and mobile mock journeys passed with no console errors or horizontal overflow"
+    "browser": "unknown mask capability and 390x844 responsive mock checks passed with no console warnings/errors or horizontal overflow",
+    "maskIntegration": "supported/degraded/unknown gates, target resolution, PNG finalize/slot-zero binding, upload failure recovery, saved/unsaved close, and resource discard regressions passed"
   },
   "applyOwnership": {
     "state": "active-single-owner",
