@@ -13,6 +13,8 @@ import {
   preflightLibraryMutationResultSchema,
   reorderFoldersInputSchema,
   reorderFoldersResultSchema,
+  studioLibrarySearchInputSchema,
+  studioLibrarySearchResultSchema,
   type ExecuteLibraryMutationInput,
   type ExecuteLibraryMutationResult,
   type GetAssetDetailInput,
@@ -24,7 +26,9 @@ import {
   type PreflightLibraryMutationInput,
   type PreflightLibraryMutationResult,
   type ReorderFoldersInput,
-  type ReorderFoldersResult
+  type ReorderFoldersResult,
+  type StudioLibrarySearchInput,
+  type StudioLibrarySearchResult
 } from "./library";
 import {
   capabilityProbeInputSchema,
@@ -39,6 +43,8 @@ import {
   setActiveProviderProfileResultSchema,
   upsertProviderProfileInputSchema,
   upsertProviderProfileResultSchema,
+  updateSettingsInputSchema,
+  updateSettingsResultSchema,
   type CapabilityProbeInput,
   type CapabilityProbeResult,
   type ReadSettingsInput,
@@ -50,8 +56,22 @@ import {
   type SetActiveProviderProfileInput,
   type SetActiveProviderProfileResult,
   type UpsertProviderProfileInput,
-  type UpsertProviderProfileResult
+  type UpsertProviderProfileResult,
+  type UpdateSettingsInput,
+  type UpdateSettingsResult
 } from "./settings";
+import {
+  studioBatchInputSchema,
+  studioBatchResultSchema,
+  studioEditInputSchema,
+  studioGenerateInputSchema,
+  studioImageOperationResultSchema,
+  type StudioBatchInput,
+  type StudioBatchResult,
+  type StudioEditInput,
+  type StudioGenerateInput,
+  type StudioImageOperationResult
+} from "./studio-creation";
 import {
   imageOperationResultSchema,
   routegoBatchInputSchema,
@@ -80,6 +100,24 @@ import {
   type RoutegoStatusInput,
   type RoutegoStatusResult
 } from "./tools";
+import {
+  discardUploadResourceInputSchema,
+  discardUploadResourceResultSchema,
+  finalizeUploadResourceInputSchema,
+  finalizeUploadResourceResultSchema,
+  getUploadResourceStatusInputSchema,
+  getUploadResourceStatusResultSchema,
+  reserveUploadResourceInputSchema,
+  reserveUploadResourceResultSchema,
+  type DiscardUploadResourceInput,
+  type DiscardUploadResourceResult,
+  type FinalizeUploadResourceInput,
+  type FinalizeUploadResourceResult,
+  type GetUploadResourceStatusInput,
+  type GetUploadResourceStatusResult,
+  type ReserveUploadResourceInput,
+  type ReserveUploadResourceResult
+} from "./upload";
 
 export const routegoOperationNames = [
   "status",
@@ -105,7 +143,16 @@ export const studioOperationNames = [
   "getAssetDetail",
   "getBrowserResource",
   "preflightLibraryMutation",
-  "executeLibraryMutation"
+  "executeLibraryMutation",
+  "reserveUploadResource",
+  "finalizeUploadResource",
+  "getUploadResourceStatus",
+  "discardUploadResource",
+  "studioGenerate",
+  "studioEdit",
+  "studioBatch",
+  "searchStudioLibrary",
+  "updateSettings"
 ] as const;
 
 export type StudioOperation = (typeof studioOperationNames)[number];
@@ -223,6 +270,51 @@ export const studioOperationDefinitions = {
     http: { method: "POST", path: "/api/v1/library/mutations/execute" },
     inputSchema: executeLibraryMutationInputSchema,
     outputSchema: executeLibraryMutationResultSchema
+  },
+  reserveUploadResource: {
+    http: { method: "POST", path: "/api/v1/uploads/reserve" },
+    inputSchema: reserveUploadResourceInputSchema,
+    outputSchema: reserveUploadResourceResultSchema
+  },
+  finalizeUploadResource: {
+    http: { method: "POST", path: "/api/v1/uploads/finalize" },
+    inputSchema: finalizeUploadResourceInputSchema,
+    outputSchema: finalizeUploadResourceResultSchema
+  },
+  getUploadResourceStatus: {
+    http: { method: "POST", path: "/api/v1/uploads/status" },
+    inputSchema: getUploadResourceStatusInputSchema,
+    outputSchema: getUploadResourceStatusResultSchema
+  },
+  discardUploadResource: {
+    http: { method: "POST", path: "/api/v1/uploads/discard" },
+    inputSchema: discardUploadResourceInputSchema,
+    outputSchema: discardUploadResourceResultSchema
+  },
+  studioGenerate: {
+    http: { method: "POST", path: "/api/v1/studio/creation/generate" },
+    inputSchema: studioGenerateInputSchema,
+    outputSchema: studioImageOperationResultSchema
+  },
+  studioEdit: {
+    http: { method: "POST", path: "/api/v1/studio/creation/edit" },
+    inputSchema: studioEditInputSchema,
+    outputSchema: studioImageOperationResultSchema
+  },
+  studioBatch: {
+    http: { method: "POST", path: "/api/v1/studio/creation/batch" },
+    inputSchema: studioBatchInputSchema,
+    outputSchema: studioBatchResultSchema
+  },
+  searchStudioLibrary: {
+    http: { method: "POST", path: "/api/v1/studio/library/search" },
+    inputSchema: studioLibrarySearchInputSchema,
+    outputSchema: studioLibrarySearchResultSchema
+  },
+  updateSettings: {
+    http: { method: "POST", path: "/api/v1/settings/update" },
+    inputSchema: updateSettingsInputSchema,
+    outputSchema: updateSettingsResultSchema
   }
 } as const satisfies Record<
   StudioOperation,
@@ -252,9 +344,11 @@ export interface StudioSettingsService {
   ): Promise<SetActiveProviderProfileResult>;
   refreshModels(input: RefreshModelsInput): Promise<RefreshModelsResult>;
   probeCapabilities(input: CapabilityProbeInput): Promise<CapabilityProbeResult>;
+  updateSettings(input: UpdateSettingsInput): Promise<UpdateSettingsResult>;
 }
 
 export interface StudioLibraryService {
+  searchStudioLibrary(input: StudioLibrarySearchInput): Promise<StudioLibrarySearchResult>;
   listFolders(input: ListFoldersInput): Promise<ListFoldersResult>;
   reorderFolders(input: ReorderFoldersInput): Promise<ReorderFoldersResult>;
   getAssetDetail(input: GetAssetDetailInput): Promise<GetAssetDetailResult>;
@@ -267,10 +361,31 @@ export interface StudioLibraryService {
   ): Promise<ExecuteLibraryMutationResult>;
 }
 
+export interface StudioUploadService {
+  reserveUploadResource(input: ReserveUploadResourceInput): Promise<ReserveUploadResourceResult>;
+  finalizeUploadResource(
+    input: FinalizeUploadResourceInput
+  ): Promise<FinalizeUploadResourceResult>;
+  getUploadResourceStatus(
+    input: GetUploadResourceStatusInput
+  ): Promise<GetUploadResourceStatusResult>;
+  discardUploadResource(
+    input: DiscardUploadResourceInput
+  ): Promise<DiscardUploadResourceResult>;
+}
+
+export interface StudioCreationService {
+  studioGenerate(input: StudioGenerateInput): Promise<StudioImageOperationResult>;
+  studioEdit(input: StudioEditInput): Promise<StudioImageOperationResult>;
+  studioBatch(input: StudioBatchInput): Promise<StudioBatchResult>;
+}
+
 export interface LocalRoutegoService
   extends RoutegoService,
     StudioSettingsService,
-    StudioLibraryService {}
+    StudioLibraryService,
+    StudioUploadService,
+    StudioCreationService {}
 
 export function parseRoutegoOperationInput(operation: RoutegoOperation, input: unknown): unknown {
   return routegoOperationDefinitions[operation].inputSchema.parse(input);

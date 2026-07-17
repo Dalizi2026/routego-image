@@ -16,7 +16,7 @@ import {
   referenceRoleSchema,
   transparentModeSchema
 } from "./image";
-import { libraryAssetStatusSchema } from "./tools";
+import { libraryAssetStatusSchema, routegoSearchLibraryInputSchema } from "./tools";
 
 const uniqueIdentifiersSchema = (minimum: number, maximum: number) =>
   z
@@ -354,7 +354,8 @@ export const relativeBrowserResourceUrlSchema = z
   .max(2_048)
   .superRefine((value, context) => {
     if (
-      !value.startsWith("/api/v1/library/resources/") ||
+      (!value.startsWith("/api/v1/library/resources/") &&
+        !value.startsWith("/api/v1/resources/")) ||
       value.startsWith("//") ||
       value.includes("\\") ||
       value.includes("..") ||
@@ -364,7 +365,7 @@ export const relativeBrowserResourceUrlSchema = z
     ) {
       context.addIssue({
         code: "custom",
-        message: "Browser resources require a protected relative Library URL"
+        message: "Browser resources require a protected relative resource URL"
       });
     }
   });
@@ -430,6 +431,76 @@ export const getBrowserResourceResultSchema = z
         code: "custom",
         path: ["status"],
         message: "Failed resource lookup requires only a structured error"
+      });
+    }
+  });
+
+export const studioLibrarySearchInputSchema = routegoSearchLibraryInputSchema;
+
+export const studioLibrarySearchItemSchema = z
+  .object({
+    assetId: identifierSchema,
+    artifactId: identifierSchema,
+    prompt: z.string().max(32_000),
+    model: z.string().trim().min(1).max(200),
+    kind: imageOperationKindSchema,
+    mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]),
+    width: z.number().int().min(1).max(65_535),
+    height: z.number().int().min(1).max(65_535),
+    status: libraryAssetStatusSchema,
+    folderIds: z.array(identifierSchema).max(100),
+    createdAt: timestampSchema,
+    deletedAt: timestampSchema.optional(),
+    thumbnail: browserResourceDescriptorSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.status === "deleted" && value.deletedAt === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["deletedAt"],
+        message: "Deleted Studio search items require deletedAt"
+      });
+    }
+    if (value.status !== "deleted" && value.deletedAt !== undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["deletedAt"],
+        message: "Only deleted Studio search items can include deletedAt"
+      });
+    }
+    if (value.thumbnail && !value.thumbnail.mimeType.startsWith("image/")) {
+      context.addIssue({
+        code: "custom",
+        path: ["thumbnail", "mimeType"],
+        message: "Studio Library thumbnails require image resources"
+      });
+    }
+  });
+
+export const studioLibrarySearchResultSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    items: z.array(studioLibrarySearchItemSchema).max(200),
+    nextCursor: z.string().trim().min(1).max(2_000).optional(),
+    total: z.number().int().min(0).optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const assetIds = value.items.map((item) => item.assetId);
+    const artifactIds = value.items.map((item) => item.artifactId);
+    if (new Set(assetIds).size !== assetIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["items"],
+        message: "Studio Library search asset identifiers must be unique"
+      });
+    }
+    if (new Set(artifactIds).size !== artifactIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["items"],
+        message: "Studio Library search artifact identifiers must be unique"
       });
     }
   });
@@ -719,6 +790,9 @@ export type GetAssetDetailResult = z.output<typeof getAssetDetailResultSchema>;
 export type BrowserResourceDescriptor = z.infer<typeof browserResourceDescriptorSchema>;
 export type GetBrowserResourceInput = z.input<typeof getBrowserResourceInputSchema>;
 export type GetBrowserResourceResult = z.output<typeof getBrowserResourceResultSchema>;
+export type StudioLibrarySearchInput = z.input<typeof studioLibrarySearchInputSchema>;
+export type StudioLibrarySearchItem = z.infer<typeof studioLibrarySearchItemSchema>;
+export type StudioLibrarySearchResult = z.output<typeof studioLibrarySearchResultSchema>;
 export type LibraryMutationRequest = z.infer<typeof libraryMutationRequestSchema>;
 export type PreflightLibraryMutationInput = z.input<typeof preflightLibraryMutationInputSchema>;
 export type PreflightLibraryMutationResult = z.output<

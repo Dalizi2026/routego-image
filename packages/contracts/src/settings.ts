@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { identifierSchema, routegoSchemaVersionSchema, timestampSchema } from "./common";
+import {
+  filePathSchema,
+  identifierSchema,
+  routegoSchemaVersionSchema,
+  timestampSchema
+} from "./common";
 import { routegoServiceErrorSchema } from "./errors";
 import {
   providerCapabilityRecordSchema,
@@ -60,7 +65,19 @@ export const providerProfileDescriptorSchema = z
 export const settingsOutputDirectorySchema = z
   .object({
     configured: z.boolean(),
-    display: z.string().trim().min(1).max(1_024).optional()
+    display: z
+      .string()
+      .trim()
+      .min(1)
+      .max(1_024)
+      .refine(
+        (value) =>
+          !/^(?:[A-Za-z]:[\\/]|\\\\|\/|file:)/u.test(value) &&
+          !value.includes("\0") &&
+          !value.split(/[\\/]/u).includes(".."),
+        "Output directory display must be redacted rather than an absolute local path"
+      )
+      .optional()
   })
   .strict()
   .superRefine((value, context) => {
@@ -72,6 +89,29 @@ export const settingsOutputDirectorySchema = z
       });
     }
   });
+
+const confirmedLocalOutputDirectorySchema = filePathSchema
+  .refine(
+    (value) => /^(?:[A-Za-z]:[\\/]|\/)/u.test(value),
+    "Replacement output directory must be an absolute local path"
+  )
+  .refine(
+    (value) => !/^(?:file:|[A-Za-z][A-Za-z0-9+.-]*:\/\/)/u.test(value),
+    "Replacement output directory cannot be a URL"
+  );
+
+export const outputDirectoryMutationSchema = z.discriminatedUnion("operation", [
+  z.object({ operation: z.literal("unchanged") }).strict(),
+  z.object({ operation: z.literal("default") }).strict(),
+  z.object({ operation: z.literal("clear") }).strict(),
+  z
+    .object({
+      operation: z.literal("replace"),
+      path: confirmedLocalOutputDirectorySchema,
+      confirmLocalPath: z.literal(true)
+    })
+    .strict()
+]);
 
 export const readSettingsInputSchema = z
   .object({ schemaVersion: routegoSchemaVersionSchema.default(1) })
@@ -273,6 +313,24 @@ export const capabilityProbeResultSchema = z
     }
   });
 
+export const updateSettingsInputSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    defaults: routegoDefaultsSchema.optional(),
+    outputDirectory: outputDirectoryMutationSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.defaults === undefined && value.outputDirectory === undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "Settings update requires defaults or an output-directory mutation"
+      });
+    }
+  });
+
+export const updateSettingsResultSchema = readSettingsResultSchema;
+
 export type ApiKeyMutation = z.infer<typeof apiKeyMutationSchema>;
 export type ProviderProfileDescriptor = z.infer<typeof providerProfileDescriptorSchema>;
 export type ReadSettingsInput = z.input<typeof readSettingsInputSchema>;
@@ -287,3 +345,6 @@ export type RefreshModelsInput = z.input<typeof refreshModelsInputSchema>;
 export type RefreshModelsResult = z.output<typeof refreshModelsResultSchema>;
 export type CapabilityProbeInput = z.input<typeof capabilityProbeInputSchema>;
 export type CapabilityProbeResult = z.output<typeof capabilityProbeResultSchema>;
+export type OutputDirectoryMutation = z.infer<typeof outputDirectoryMutationSchema>;
+export type UpdateSettingsInput = z.input<typeof updateSettingsInputSchema>;
+export type UpdateSettingsResult = z.output<typeof updateSettingsResultSchema>;
