@@ -37,6 +37,12 @@
     "authorizedFile": "packages/studio/src/features/creation/CreationWorkbench.tsx",
     "reason": "The frozen design/spec requires identifier-only Library retry/edit handoff, while CreationWorkbench exclusively owns draft state and exposes no ingestion seam."
   },
+  "sharedRepositorySafetyFix": {
+    "status": "resolved-by-controller",
+    "commit": "a229e823c1c83812e3f4caf0b4626b3861be63f6",
+    "allowedPath": "packages/studio/src/features/library/**",
+    "scope": "Exact source-code exception only; runtime Library data remains forbidden."
+  },
   "applyOwnership": {
     "state": "active-single-owner",
     "activeOwnerThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
@@ -56,7 +62,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "compaction-2-finish-current-task-then-successor"
+    "status": "compaction-2-finish-current-task-with-shared-safety-fix-then-successor"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
