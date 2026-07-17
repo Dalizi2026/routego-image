@@ -3,7 +3,7 @@
   "lane": "studio",
   "change": "add-routego-studio",
   "role": "openspec-apply-owner",
-  "status": "planning",
+  "status": "resume-ready",
   "threadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\3a7b\\生图插件",
   "branch": "codex/routego-studio",
@@ -15,8 +15,15 @@
   "lastHealthAudit": "pending",
   "successorThreadId": null,
   "dependsOn": [
-    "establish-routego-image-foundation"
+    "establish-routego-image-foundation",
+    "extend-routego-image-foundation-contracts"
   ],
+  "foundationExtension": {
+    "branch": "codex/routego-foundation-extension",
+    "commit": "c64c727f6dd449d41dd38cfb60a4bf849e719672",
+    "mergeCommit": "710eb61",
+    "baselineCommit": "52f9e6e8653a3452a0e3175fa86ad7f208d2c912"
+  },
   "ownership": {
     "owned": [
       "Routego Studio React pages and components",

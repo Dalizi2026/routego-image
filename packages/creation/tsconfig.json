@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "../../.typecheck/creation",
+    "rootDir": ".",
+    "tsBuildInfoFile": "../../.typecheck/creation.tsbuildinfo",
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "../contracts" },
+    { "path": "../foundation" }
+  ],
+  "include": ["src/**/*.ts"]
+}

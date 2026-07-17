@@ -6,7 +6,7 @@
   "threadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
   "worktree": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "branch": "main",
-  "headCommit": "a5cf6b320291264e6a3c7f31aad3404b77e44b6d",
+  "headCommit": "52f9e6e8653a3452a0e3175fa86ad7f208d2c912",
   "generation": 0,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "2026-07-17-foundation-14-of-16-context-summary",
@@ -22,6 +22,12 @@
     "Foundation delta specs were synced to six main capabilities and the completed change was archived before downstream lane dispatch.",
     "Creation, Library, and Studio lane registrations were prepared from the frozen Foundation baseline before user-visible task creation.",
     "Three independent pinned Codex tasks and worktrees were created for Creation, Library, and Studio and their real thread IDs were registered centrally.",
-    "Parallel lane startingCommit values were aligned to the actual committed registration baseline e0177a2 after startup audit identified the pre-registration Foundation commit value."
+    "Parallel lane startingCommit values were aligned to the actual committed registration baseline e0177a2 after startup audit identified the pre-registration Foundation commit value.",
+    "Studio and Library independently confirmed shared contract and workspace importer gaps before product implementation; downstream apply was paused and a Foundation Extension gate was authorized.",
+    "A fresh pinned Foundation Extension task and isolated worktree were created to own PD-002 without expanding the three downstream lane file scopes.",
+    "Foundation Extension task 3.1 found that generic library ignore and safety rules collide with the required packages/library importer; a path-exact safety exception was authorized through PD-003.",
+    "Foundation Extension completed 5/5 at c64c727f6dd449d41dd38cfb60a4bf849e719672, independently revalidated, and merged into main at 710eb61.",
+    "Six corrective delta specs were synced into the frozen main specifications and the change was archived before downstream wakeup.",
+    "The post-extension main baseline passed frozen install, strict OpenSpec, safety, typecheck, build, 129 tests, and all seven package export checks."
   ]
 }

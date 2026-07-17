@@ -191,6 +191,9 @@ openspec init --tools codex --profile core
 ```text
 establish-routego-image-foundation
                 |
+                v
+extend-routego-image-foundation-contracts
+                |
        +--------+--------+
        |        |        |
        v        v        v
@@ -209,6 +212,13 @@ integrate-routego-image-plugin
 - 建立工程骨架、共享 Schema、服务边界、安全规则、mock relay 和测试框架。
 - 固定上游 commit、许可证和现有插件兼容清单。
 - Foundation 合入主线并冻结契约后，才允许三条功能泳道开始 apply。
+
+### 7.1.1 Foundation Extension gate
+
+- Foundation 完成后的下游启动审计若发现已确认范围缺少共享契约、mock 边界、workspace importer 或根锁文件依赖，必须由独立 Foundation Extension change 集中修复，不得授权各功能泳道并发修改共享 Schema 或锁文件。
+- `extend-routego-image-foundation-contracts` 负责补齐 Studio/Library 所需的 browser-safe 设置、图库详情、收藏夹排序、受控图片资源和批量部分失败契约，扩展 deterministic mock service，并预建 Creation、Library、Studio package importer。
+- 保持首版七个公开 MCP 工具不变；Studio 专用设置与资源操作使用共享 Schema 的本地 HTTP/Studio service 子接口，不扩大公开 MCP 工具数量。
+- Foundation Extension 合入主线并重新冻结契约前，Creation、Library、Studio 可以保存非冻结提案草稿，但不得进入 apply 或写产品代码。
 
 ### 7.2 Creation
 
@@ -243,7 +253,7 @@ integrate-routego-image-plugin
 - Foundation 是首个顶层 Codex 新任务；旧插件审计、上游复用审计、契约核对和测试拆分原则上由 Foundation 线程内部的子代理完成。
 - 本次启动时已提前创建的 Legacy Audit 与 Upstream Audit 顶层任务作为一次性例外：允许完成当前文档后立即归档，不再复制这种拓扑。
 - Foundation 在两份审计最终报告可用前只能创建 proposal 初稿，不得冻结 design/specs，也不得进入 apply。
-- Foundation 完成并合入后，自动派发 Creation、Library、Studio 三个独立 Codex 任务和 worktree。
+- Foundation 完成并合入后，自动派发 Creation、Library、Studio 三个独立 Codex 任务和 worktree；若启动审计触发 Foundation Extension gate，则三条任务保持已创建但暂停 apply，待修复基线完成后由结构化依赖消息统一唤醒。
 - 三条实现泳道完成后，再创建一个完全新的 Integration & Acceptance 任务。
 - 每个用户任务的主代理可以启动子代理，但默认最多两个；子代理必须拥有互不重叠的文件范围。
 - 线程交付格式固定为：OpenSpec 任务 ID、commit SHA、测试结果、阻塞项、残余风险和推荐下一步。

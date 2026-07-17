@@ -92,7 +92,16 @@ for (const file of trackedFiles) {
   const basename = segments.at(-1)?.toLowerCase() ?? "";
   const extension = path.posix.extname(file).toLowerCase();
 
-  if (segments.some((segment) => forbiddenPathSegments.has(segment.toLowerCase()))) {
+  if (
+    segments.some((segment, index) => {
+      const normalized = segment.toLowerCase();
+      const exactLibraryPackageSegment =
+        normalized === "library" &&
+        index === 1 &&
+        segments[0]?.toLowerCase() === "packages";
+      return forbiddenPathSegments.has(normalized) && !exactLibraryPackageSegment;
+    })
+  ) {
     report(file, "generated output, local library, cache, or report path");
   }
   if (
