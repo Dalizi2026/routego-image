@@ -55,7 +55,10 @@
     "productCheckpointCommit": "313fafba3a1d49d6b65db30fb679fd77d8760d18",
     "observableCompactions": 2,
     "status": "archived",
-    "worktreeRemoved": true
+    "gitWorktreeRegistrationRemoved": true,
+    "residualDirectoryExists": true,
+    "residualDirectoryContents": "ignored node_modules and packages residues; no Git worktree metadata",
+    "residualCleanupStatus": "blocked-by-environment-policy"
   },
   "continuityGovernance": {
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",

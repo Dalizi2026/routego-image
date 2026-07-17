@@ -23,5 +23,5 @@
 - G2 在真实登记前只读；任何写入前完整重读权威文件，并运行 `openspec status --change add-routego-studio --json` 与 `openspec instructions apply --change add-routego-studio --json`。
 - G2 登记后创建 `codex/routego-studio-g2`，确认 7/11、下一任务 4.2 和 Git clean，并发送 `[STUDIO_HANDOFF_ACCEPTED]`。
 - Controller 归档 G1 并激活唯一 owner 后，G2 才能从 4.2 继续，不得重做已完成任务。
-- G2 已在 `f89ee833fa1c6900d2c850ba7e65b42677cad25b` 接受交接；G1 随后归档并移除旧 worktree，G2 成为唯一 apply-owner。
+- G2 已在 `f89ee833fa1c6900d2c850ba7e65b42677cad25b` 接受交接；G1 随后归档并移除 Git worktree 登记，G2 成为唯一 apply-owner。旧路径仅残留无 `.git` 的忽略目录，环境策略阻止递归清理，不影响所有权互斥。
 - 不修改七个公共工具、共享契约、根依赖/锁文件、Creation/Library 后端或发布文件；不接触真实凭证、图片、图库或中转。
