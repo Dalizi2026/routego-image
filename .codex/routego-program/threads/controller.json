@@ -6,10 +6,10 @@
   "threadId": "019f715f-c042-7590-a38b-ffb406315903",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d46b\\生图插件",
   "branch": "codex/routego-controller-g1",
-  "headCommit": "d03389ec108bcfd9e79ed076048e50b430900028",
+  "headCommit": "f7ac0a356e1a38ee43da2b0a5c323efa845c5de0",
   "generation": 1,
-  "observableCompactions": 1,
-  "lastCompactionFingerprint": "2026-07-18-studio-successor-and-lane-monitor-checkpoint",
+  "observableCompactions": 2,
+  "lastCompactionFingerprint": "context-checkpoint-compaction-2-2026-07-18-studio-g2-registration-in-progress",
   "lastHealthAudit": "passed",
   "successorThreadId": null,
   "predecessorThreadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
@@ -60,6 +60,9 @@
     "Library generation 1 completed task 3.3 at c897416e7b536cb3163143fbcd95b5f8be1586b3 with 94/94 Library tests and clean scope; at observable compaction 1, Controller authorized continuing only task 4.1.",
     "Studio generation 1 established the mandatory compaction-2 safe WIP checkpoint bf9532c57878a5e851c92ae046cc6065f8e462d3 during task 4.1; Controller authorized finishing only task 4.1 and requires a new-thread/new-worktree successor before task 4.2.",
     "Library generation 1 completed task 4.1 at b88a07d96acd006bb47882c53312722c171cd8c7 with 125/125 Library tests and clean scope; at observable compaction 1, Controller authorized continuing only task 4.2.",
-    "Studio task 4.1 exposed a shared repository safety false positive for packages/studio/src/features/library/**; Controller fixed .gitignore and check-repository-safety with an exact source-only exception at a229e823c1c83812e3f4caf0b4626b3861be63f6, while all runtime Library paths remain forbidden."
+    "Studio task 4.1 exposed a shared repository safety false positive for packages/studio/src/features/library/**; Controller fixed .gitignore and check-repository-safety with an exact source-only exception at a229e823c1c83812e3f4caf0b4626b3861be63f6, while all runtime Library paths remain forbidden.",
+    "Studio generation 1 completed task 4.1 at 313fafba3a1d49d6b65db30fb679fd77d8760d18 with 68/68 tests, builds, strict OpenSpec, safety, scope and desktop/mobile browser checks, then stopped at observable compaction 2 before task 4.2.",
+    "A fresh Studio generation 2 task 019f7245-f614-7911-9ea1-c974cd82fa35 and isolated worktree C:\\Users\\MLTZ\\.codex\\worktrees\\ec66\\生图插件 were created from handoff commit 649e4fe1da0bacdeb0eca9c3d20378a209303fdd; real registration commit f89ee833fa1c6900d2c850ba7e65b42677cad25b was sent before any task 4.2 write.",
+    "Controller generation 1 observed its second context compaction during the bounded Studio generation 2 registration handoff; no new large governance task may begin before a successor Controller handoff if another compaction occurs."
   ]
 }
