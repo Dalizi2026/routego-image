@@ -8,7 +8,7 @@
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\8b8b\\生图插件",
   "branch": "codex/routego-studio-g1",
   "startingCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
-  "headCommit": "4255fd00f519903ba95690086a95c2b0c07ba932",
+  "headCommit": "d3e229ac910b909554ecdeaa7fc6911a7e01d156",
   "generation": 1,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "context-checkpoint-2026-07-18-task-4.1-library-ui-integration-wip",
@@ -20,18 +20,25 @@
   "handoffCommit": "09344228f537d306f1be3b73a43f64afbdf1aae2",
   "registrationCommit": "2475cdc6b4fe9b397074ff3c240a22ab044b22e0",
   "handoffFile": ".codex/routego-program/handoffs/studio-generation-1.md",
-  "openspecProgress": "6/11",
-  "lastCompletedTask": "3.2",
-  "nextTask": "4.1",
+  "openspecProgress": "7/11",
+  "lastCompletedTask": "4.1",
+  "nextTask": "4.2",
   "recentValidation": {
     "studioTypecheck": "passed",
-    "studioTests": "18 files, 58 tests passed",
+    "studioTests": "21 files, 68 tests passed",
     "studioBuild": "library and Vite application builds passed",
-    "repositorySafety": "227 tracked files passed",
+    "repositorySafety": "241 tracked files passed after the exact Studio Library source exception",
     "openspec": "strict validation passed",
-    "browser": "unknown mask capability and 390x844 responsive mock checks passed with no console warnings/errors or horizontal overflow",
+    "browser": "desktop and 390x844 deterministic mock checks passed for Library, Trash, detail relationships, keyboard comparison, protected download, identifier-only edit handoff, and one-shot draft preservation with no console warnings/errors or horizontal overflow",
     "maskIntegration": "supported/degraded/unknown gates, target resolution, PNG finalize/slot-zero binding, upload failure recovery, saved/unsaved close, and resource discard regressions passed",
-    "libraryTask41Wip": "Studio TypeScript build passed for the path-free query, comparison, handoff, download, and Library workspace source checkpoint; app integration and focused tests remain pending"
+    "libraryTask41": "path-free search/filter/sort/cursor pages, protected cards/detail/resources/download, comparison bounds, Trash retention, and identifier-only one-shot retry/edit handoff passed focused and browser regression checks"
+  },
+  "sharedRepositorySafetyFix": {
+    "status": "resolved-by-controller",
+    "sourceCommit": "a229e823c1c83812e3f4caf0b4626b3861be63f6",
+    "incorporatedCommit": "d0c9c41148c3d964ee6078c50d37b34d090c5cd7",
+    "allowedPath": "packages/studio/src/features/library/**",
+    "scope": "Exact source-code exception only; runtime Library data remains forbidden."
   },
   "applyOwnership": {
     "state": "active-single-owner",
@@ -52,7 +59,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "delivered-and-accepted"
+    "status": "compaction-2-current-task-complete-successor-required"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
