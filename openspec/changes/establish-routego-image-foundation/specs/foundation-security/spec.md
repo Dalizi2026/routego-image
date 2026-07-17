@@ -1,5 +1,3 @@
-> 非权威草稿：等待两份审计最终报告后重新核对。不得用于 OpenSpec apply。
-
 ## ADDED Requirements
 
 ### Requirement: Recursive secret and image-data redaction
@@ -64,3 +62,21 @@ The repository SHALL provide an automated safety check that fails on likely comm
 #### Scenario: Secret-like tracked content
 - **WHEN** a tracked source or fixture contains a likely real key or authorization header value
 - **THEN** the safety check SHALL fail with a file location while avoiding echoing the full secret
+
+### Requirement: Safe provider resource download policy
+Provider authorization SHALL NOT be forwarded to image result URLs by default, and any future authenticated download policy MUST be explicit, same-origin constrained, and revalidated on every redirect.
+
+#### Scenario: Provider returns an arbitrary image URL
+- **WHEN** an image response contains a URL without an explicit authenticated-download policy
+- **THEN** the downloader policy SHALL omit provider authorization credentials
+
+#### Scenario: Redirect changes origin
+- **WHEN** an authenticated resource request redirects to another origin
+- **THEN** the policy SHALL remove credentials and require the new target to pass protocol, address, size, and type validation
+
+### Requirement: UTF-8 and safe endpoint diagnostics
+Text contracts, JSON, diagnostics, and repository documents SHALL use UTF-8, and endpoint diagnostics SHALL redact URL userinfo, query credentials, and fragments.
+
+#### Scenario: International input and path
+- **WHEN** a contract contains Chinese text, emoji, spaces, or platform-specific newlines in a permitted string/path field
+- **THEN** UTF-8 serialization and parsing SHALL preserve the value without replacement characters

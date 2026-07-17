@@ -1,5 +1,3 @@
-> 非权威草稿：等待两份审计最终报告后重新核对。不得用于 OpenSpec apply。
-
 ## ADDED Requirements
 
 ### Requirement: Portable strict TypeScript workspace
@@ -25,11 +23,11 @@ The workspace SHALL separate browser-safe shared contracts, Node-side foundation
 - **THEN** it SHALL import them from the shared contracts package instead of copying their definitions
 
 ### Requirement: Reproducible root commands
-The project SHALL expose root commands for safety checking, type checking, building, unit/contract testing, and browser-stack smoke testing, and SHALL commit the workspace lockfile.
+The project SHALL expose root commands for safety checking, type checking, building, and unit/contract testing, SHALL provide shared Playwright configuration for the Studio lane, and SHALL commit the workspace lockfile.
 
 #### Scenario: Clean checkout verification
 - **WHEN** CI installs dependencies with the frozen lockfile and invokes the documented root commands
-- **THEN** every Foundation package and test suite SHALL be included without undocumented manual setup
+- **THEN** every Foundation package and Foundation-owned test suite SHALL be included without undocumented manual setup
 
 ### Requirement: Lane-owned shared configuration
 Foundation SHALL own root dependency, lockfile, workspace, shared TypeScript, build, test, and CI configuration until the integration baseline freezes them.

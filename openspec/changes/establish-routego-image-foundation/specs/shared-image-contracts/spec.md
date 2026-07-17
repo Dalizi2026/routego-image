@@ -1,5 +1,3 @@
-> 非权威草稿：等待两份审计最终报告后重新核对。不得用于 OpenSpec apply。
-
 ## ADDED Requirements
 
 ### Requirement: Runtime schemas are the shared contract source
@@ -14,7 +12,7 @@ The system SHALL define browser-safe Zod schemas and inferred TypeScript types a
 - **THEN** the value SHALL be rejected before business logic or provider transport is invoked
 
 ### Requirement: Unified image operation validation
-The image operation contract SHALL represent generate and edit requests, prompt text, up to 16 ordered references with roles and labels, one edit target, supporting images, an optional mask, edit invariants, size, quality, output format, compression, count, partial image preference, transparency mode, moderation, output destination, and library-save preference.
+The image operation contract SHALL represent generate and edit requests, prompt text, up to 16 ordered references with roles and labels, one edit target, supporting images, an optional mask, edit invariants, size and ratio intent, quality, output format, compression, variant count, partial image preference, transparency mode, moderation, continuation identifiers, output destination, and library-save preference.
 
 #### Scenario: Generate request with variants
 - **WHEN** a generate request provides a non-empty prompt and a count from 1 through 4
@@ -48,7 +46,7 @@ The shared package SHALL define validated inputs and results for `routego_status
 - **THEN** both transports SHALL reference the same operation identifier and input/result schemas
 
 ### Requirement: Structured results and failures
-Operation results SHALL include a request identifier, validated effective parameters, explicit status, output paths and image-display content when present, input/output relationships, partial-success information, and structured sanitized errors.
+Operation results SHALL include a request identifier, requested and effective parameters, explicit status, transport, attempt count, provider request count, output paths and image-display content when present, input/output relationships, partial/final artifacts, failed slots, `receivedAnyOutput`, `mayHaveBilled`, provider response/image identifiers when available, and structured sanitized errors.
 
 #### Scenario: Partial batch success
 - **WHEN** some batch items succeed and others fail
@@ -59,7 +57,7 @@ Operation results SHALL include a request identifier, validated effective parame
 - **THEN** the result SHALL set `degradedContinuation` to true and preserve the new input/output relationship
 
 ### Requirement: Transport-neutral structured errors
-The error contract SHALL expose a stable code, processing stage, safe user message, retryability, optional capability identifier, and sanitized details without authentication data or image bytes.
+The error contract SHALL expose a stable code/category, processing stage, safe user message, retry disposition, optional HTTP/provider code, optional capability identifier, partial artifacts, billing/output flags, and sanitized details without authentication data or image bytes.
 
 #### Scenario: Capability unavailable
 - **WHEN** no verified provider path can satisfy an image-input operation
@@ -68,3 +66,7 @@ The error contract SHALL expose a stable code, processing stage, safe user messa
 #### Scenario: Secret-bearing provider failure
 - **WHEN** a provider error contains authorization headers, tokens, or image data
 - **THEN** the structured error SHALL omit or redact those values before crossing MCP, HTTP, logs, or Studio boundaries
+
+#### Scenario: Output received before failure
+- **WHEN** a provider stream or multi-output response fails after returning an image
+- **THEN** the error/result SHALL preserve the received artifact, set `receivedAnyOutput` and `mayHaveBilled` appropriately, and SHALL NOT present the operation as safely replayable

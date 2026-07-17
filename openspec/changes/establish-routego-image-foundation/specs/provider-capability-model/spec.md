@@ -1,9 +1,7 @@
-> 非权威草稿：等待两份审计最终报告后重新核对。不得用于 OpenSpec apply。
-
 ## ADDED Requirements
 
 ### Requirement: Explicit provider protocol tiers
-The provider model SHALL distinguish `single-endpoint-json`, `openai-images`, and `openai-responses` protocols and SHALL treat the configured single image-generation endpoint as the default text-generation route.
+The provider model SHALL distinguish `single-endpoint-json`, `openai-images`, and `openai-responses` protocols, SHALL distinguish `exact-generation-endpoint` from `legacy-api-base`, and SHALL treat the configured exact image-generation endpoint as the default text-generation route.
 
 #### Scenario: Default provider configuration
 - **WHEN** the user has supplied only one image-generation endpoint and an API key
@@ -12,6 +10,14 @@ The provider model SHALL distinguish `single-endpoint-json`, `openai-images`, an
 #### Scenario: Unconfigured derived endpoint
 - **WHEN** an adapter can syntactically derive `/images/edits`, `/responses`, `/models`, or another path from the configured endpoint
 - **THEN** the model SHALL NOT treat the derived path as configured or supported
+
+#### Scenario: Explicit legacy API base
+- **WHEN** the user selects `legacy-api-base` compatibility for a base URL
+- **THEN** the model MAY apply the audited `/v1/images/generations` normalization rule while keeping models, Edits, and Responses endpoints unset
+
+#### Scenario: Unsafe endpoint syntax
+- **WHEN** an endpoint uses a non-HTTP(S) protocol, URL userinfo, or non-loopback cleartext HTTP
+- **THEN** the provider configuration SHALL reject it before storing or using credentials
 
 ### Requirement: Four-state capabilities with evidence
 Each provider/model/endpoint capability SHALL have exactly one state from `unknown`, `supported`, `unsupported`, or `degraded`, together with its evidence source and validation time when known.
@@ -71,3 +77,10 @@ The routing contract MUST NOT authorize switching transports and replaying the s
 #### Scenario: Partial result from Responses
 - **WHEN** a Responses operation has emitted any partial image result and then fails
 - **THEN** the routing decision SHALL preserve the partial outcome and SHALL NOT instruct an automatic retry through Images or the single endpoint
+
+### Requirement: Capability evidence is scoped
+Capability evidence SHALL be scoped by provider, model, endpoint, transport, and relevant request shape, including separate single-image and multi-image capabilities.
+
+#### Scenario: Single image support verified
+- **WHEN** a provider accepts one Tier A `image` data URL
+- **THEN** the model SHALL NOT infer support for an `images` array or more than one image

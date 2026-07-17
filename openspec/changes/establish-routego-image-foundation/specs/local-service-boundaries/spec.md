@@ -1,5 +1,3 @@
-> 非权威草稿：等待两份审计最终报告后重新核对。不得用于 OpenSpec apply。
-
 ## ADDED Requirements
 
 ### Requirement: One application-service interface
@@ -56,3 +54,10 @@ Mock relay observations SHALL retain only the method, path, content type, redact
 #### Scenario: Authorization and image input received
 - **WHEN** a mock request includes an authorization header and an image data URL
 - **THEN** the recorded observation SHALL contain neither the credential value nor the image bytes/base64 payload
+
+### Requirement: No legacy process-exit result protocol
+The application boundary SHALL return structured values from a long-running service interface and SHALL NOT use stdout marker lines plus forced process exit as a public success/failure protocol.
+
+#### Scenario: Successful result lifecycle
+- **WHEN** an operation completes successfully after multiple fetch-like activities
+- **THEN** the service SHALL return the validated success value and release resources normally without requiring `process.exit()`

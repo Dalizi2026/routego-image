@@ -1,5 +1,3 @@
-> 非权威草稿：等待两份审计最终报告后重新核对。不得用于 OpenSpec apply。
-
 ## ADDED Requirements
 
 ### Requirement: Contract and security regression suites
@@ -16,26 +14,22 @@ Tests SHALL cover text-only single endpoint, single endpoint with `image` data U
 - **WHEN** the Foundation test suite runs without API credentials or network access
 - **THEN** all provider contract fixtures SHALL execute deterministically and SHALL not create billable requests
 
-### Requirement: Browser-stack mock smoke test
-Foundation SHALL provide a Playwright-ready test configuration and at least one browser-stack request smoke test against a loopback mock boundary.
+### Requirement: Downstream browser test foundation
+Foundation SHALL provide shared Playwright configuration that the Studio lane can consume, while Studio retains ownership of browser test files and browser journeys.
 
-#### Scenario: Browser request to mock boundary
-- **WHEN** the Playwright smoke test sends a valid request to the loopback mock server
-- **THEN** it SHALL receive a shared-schema-valid response and the mock observation SHALL remain sanitized
+#### Scenario: Studio adds browser tests
+- **WHEN** the Studio lane creates Playwright tests
+- **THEN** those tests SHALL use the Foundation-owned root configuration without duplicating workspace or contract setup
 
 ### Requirement: Cross-platform continuous integration
-Continuous integration SHALL run frozen dependency installation, repository safety checks, type checking, build, contract/security tests, and browser smoke tests on Windows, Ubuntu, and macOS using Node.js 20.19 or newer.
+Continuous integration SHALL run frozen dependency installation, repository safety checks, type checking, build, and Foundation contract/security/mock tests on Windows, Ubuntu, and macOS using Node.js 20.19 or newer.
 
 #### Scenario: Platform-specific regression
 - **WHEN** path, shell, packaging, or runtime behavior works on one platform but fails on another supported platform
 - **THEN** at least one CI matrix job SHALL fail before integration
 
 ### Requirement: Evidence-backed upstream provenance
-Before Foundation is complete, the repository SHALL record the exact audited `CookSleep/gpt_image_playground` commit, its MIT license attribution, approved reuse boundaries, and required third-party notice using the completed Upstream Reuse Audit as evidence.
-
-#### Scenario: Audit evidence unavailable
-- **WHEN** the upstream audit has not supplied an exact commit and attribution
-- **THEN** the provenance task SHALL remain incomplete and no placeholder SHA or invented notice SHALL be committed
+Before Foundation is complete, the repository SHALL record audited `CookSleep/gpt_image_playground` commit `a10477581b3d43ac98d39777e4445625a9db113d`, `Copyright (c) 2026 CookSleep`, its complete MIT license, approved reuse boundaries, and required third-party notice using the completed Upstream Reuse Audit as evidence.
 
 #### Scenario: Provenance recorded
 - **WHEN** approved upstream-derived logic is identified for later extraction
