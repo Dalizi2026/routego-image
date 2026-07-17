@@ -86,4 +86,3 @@ Only explicitly selected new Library assets and supplied new-format ZIP resource
 #### Scenario: Legacy files exist
 - **WHEN** portability runs beside legacy data
 - **THEN** those files SHALL not be discovered, packaged, imported, overwritten, or deleted
-

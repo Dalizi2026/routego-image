@@ -134,4 +134,3 @@ All destructive paths SHALL be contained in approved new roots and reject traver
 #### Scenario: Legacy path is referenced
 - **WHEN** upload, ingest, resource, cleanup, or deletion resolves to legacy data
 - **THEN** mutation SHALL fail before filesystem access
-

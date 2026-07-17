@@ -91,4 +91,3 @@ Settings reads, diagnostics, errors, and portable summaries MUST omit keys, head
 #### Scenario: Settings are read after key storage
 - **WHEN** Studio reads settings
 - **THEN** it SHALL receive only `hasApiKey`, optional preview, redacted endpoints, defaults, and redacted output-directory state
-
