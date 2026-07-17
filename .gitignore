@@ -20,6 +20,8 @@ routego-image-config.json
 library/
 !/packages/library/
 !/packages/library/**
+!/packages/studio/src/features/library/
+!/packages/studio/src/features/library/**
 /packages/library/**/node_modules/
 /packages/library/**/dist/
 /packages/library/**/build/
