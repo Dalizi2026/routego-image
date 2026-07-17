@@ -10,8 +10,8 @@
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
   "headCommit": "478e674e3c1d4d80db6d96821c156511012b96fc",
   "generation": 2,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "library-g2-compaction-1-task-5.2-head-937c5ca1-2026-07-18",
   "lastHealthAudit": "passed",
   "successorThreadId": null,
   "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
@@ -59,7 +59,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-checkpoint-before-task-5.2"
+    "status": "generation-2-task-5.2-validation-after-compaction-1"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
