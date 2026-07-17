@@ -2,8 +2,10 @@
 
 - 泳道/change：`library` / `add-routego-image-library`
 - 来源任务：`019f71ed-2149-73c2-851d-368a54c1ed5b`，generation 1
-- 继任任务：`pending`，generation 2
+- 继任任务：`019f7261-2c57-7a01-b519-e1de521819fe`，generation 2
 - 计划分支：`codex/routego-library-g2`
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\236b\生图插件`
+- 交接治理起始提交：`af069a742b641605d516e888afafca8db5661e66`
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\8c92\生图插件`
 - 产品/OpenSpec 安全提交：`a966dd0dbc3f70b9dbc9246bb8c214289ca35ca4`
 - 4.2 实现：`ae0be0b8f197f8339c787ad1ade8b7363e217e83`
