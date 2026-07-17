@@ -110,7 +110,8 @@
     "upstreamAuditThreadId": "019f6fe8-6fd4-73f0-b83b-1805925c5301",
     "creationThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
     "creationPredecessorThreadId": "019f7084-17c4-7442-94e5-458f59b20086",
-    "libraryThreadId": "019f7084-17ce-75d0-932b-12878f95f48f",
+    "libraryThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
+    "libraryPredecessorThreadId": "019f7084-17ce-75d0-932b-12878f95f48f",
     "studioThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
     "studioPredecessorThreadId": "019f7084-180c-7c91-aaa0-c92820ffcac8",
     "integrationThreadId": null

@@ -47,6 +47,7 @@
     "The Studio successor recorded sole apply-owner activation at cac0330c673bb59441cf5c871065c8e243dc6818 and resumed with a fresh apply read for task 2.2.",
     "Creation obeyed the continuity policy by completing in-progress task 3.2 at 6/8, sending LANE_CHECKPOINT at 2efb2465fa92fc51b4f6bf5f744a29a320b62a63, and entering a generation-1 successor handoff before task 4.1.",
     "Creation generation 1 accepted at ca173854e51c221b751c2761164599245244f04f after fresh OpenSpec checks; generation 0 was archived before sole-owner activation for task 4.1.",
-    "The Creation successor recorded local sole-owner activation at 0cf3af53c56f17e18228bccb705054a7c2fb8933 before starting task 4.1."
+    "The Creation successor recorded local sole-owner activation at 0cf3af53c56f17e18228bccb705054a7c2fb8933 before starting task 4.1.",
+    "Library completed in-progress task 3.1 at 4/10, sent a clean LANE_CHECKPOINT at 15775de3354cd49a256f95cbe06261e779a3e19d, and entered a generation-1 successor handoff before task 3.2."
   ]
 }
