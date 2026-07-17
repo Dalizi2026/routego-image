@@ -108,7 +108,8 @@ export async function performUploadLifecycle(
   const uploading: UploadLifecycleItem = {
     ...item,
     status: "uploading",
-    uploadResourceId: reserved.resource.uploadResourceId
+    uploadResourceId: reserved.resource.uploadResourceId,
+    descriptor: reserved.resource
   };
   onChange(uploading);
   try {
@@ -142,6 +143,7 @@ export async function performUploadLifecycle(
     ...finalizing,
     status: "ready",
     uploadResourceId: finalized.resource.uploadResourceId,
+    descriptor: finalized.resource,
     safeMessage: undefined
   };
   onChange(ready);
@@ -197,6 +199,7 @@ export async function retryUploadLifecycle(
     ...item,
     status: "queued",
     uploadResourceId: undefined,
+    descriptor: undefined,
     safeMessage: undefined
   };
   onChange(queued);

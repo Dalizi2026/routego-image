@@ -15,7 +15,11 @@ import type {
   UploadResourceDescriptor
 } from "@routego-image/contracts";
 
-import type { ProtectedObjectUrl, StudioGateway } from "../../api";
+import {
+  createProtectedObjectUrl,
+  type ProtectedObjectUrl,
+  type StudioGateway
+} from "../../api";
 import {
   clearMaskBitmap,
   cloneMaskBitmap,
@@ -64,6 +68,9 @@ export type MaskEditorLanguage = "zh-CN" | "en";
 export interface MaskEditorProps {
   readonly gateway: Pick<StudioGateway, "fetchProtectedObjectUrl">;
   readonly target?: BrowserResourceDescriptor;
+  readonly targetBlob?: Blob;
+  readonly targetSize?: MaskSize;
+  readonly targetKey?: string;
   readonly targetAlt: string;
   readonly capability: MaskCapabilityState;
   readonly language?: MaskEditorLanguage;
@@ -98,7 +105,8 @@ type ActiveGesture =
 type MaskSetup =
   | {
       readonly status: "ready";
-      readonly target: BrowserResourceDescriptor;
+      readonly target?: BrowserResourceDescriptor;
+      readonly targetBlob?: Blob;
       readonly imageSize: MaskSize;
       readonly initial: MaskBitmap;
       readonly key: string;
@@ -190,31 +198,45 @@ const text = {
 
 function prepareMaskSetup(
   target: BrowserResourceDescriptor | undefined,
+  targetBlob: Blob | undefined,
+  targetSize: MaskSize | undefined,
+  targetKey: string | undefined,
   initialMask: MaskBitmap | undefined
 ): MaskSetup {
-  const key = target?.resourceId ?? "missing-target";
+  const key = targetKey ?? target?.resourceId ?? "missing-target";
+  const resourceSize =
+    target?.width === undefined || target.height === undefined
+      ? undefined
+      : { width: target.width, height: target.height };
   if (
-    !target ||
-    !target.mimeType.startsWith("image/") ||
-    target.width === undefined ||
-    target.height === undefined
+    resourceSize !== undefined &&
+    targetSize !== undefined &&
+    (resourceSize.width !== targetSize.width || resourceSize.height !== targetSize.height)
   ) {
     return { status: "failure", key };
   }
+  const imageSize = resourceSize ?? targetSize;
+  const validResource = target !== undefined && target.mimeType.startsWith("image/");
+  const validBlob =
+    targetBlob !== undefined && targetBlob.size > 0 && targetBlob.type.startsWith("image/");
+  if ((!validResource && !validBlob) || imageSize === undefined) {
+    return { status: "failure", key };
+  }
   try {
-    const empty = createEmptyMaskBitmap(target.width, target.height);
+    const empty = createEmptyMaskBitmap(imageSize.width, imageSize.height);
     if (
       initialMask &&
-      (initialMask.width !== target.width || initialMask.height !== target.height)
+      (initialMask.width !== imageSize.width || initialMask.height !== imageSize.height)
     ) {
       return { status: "failure", key };
     }
     return {
       status: "ready",
-      target,
-      imageSize: { width: target.width, height: target.height },
+      ...(validResource ? { target } : {}),
+      ...(validBlob ? { targetBlob } : {}),
+      imageSize,
       initial: initialMask ? cloneMaskBitmap(initialMask) : empty,
-      key: `${target.resourceId}:${target.width}x${target.height}`
+      key: `${key}:${imageSize.width}x${imageSize.height}`
     };
   } catch {
     return { status: "failure", key };
@@ -240,6 +262,9 @@ function clampBrushSize(size: number): number {
 export function MaskEditor({
   gateway,
   target,
+  targetBlob,
+  targetSize,
+  targetKey,
   targetAlt,
   capability,
   language = "zh-CN",
@@ -251,8 +276,8 @@ export function MaskEditor({
 }: MaskEditorProps) {
   const labels = text[language];
   const setup = useMemo(
-    () => prepareMaskSetup(target, initialMask),
-    [initialMask, target]
+    () => prepareMaskSetup(target, targetBlob, targetSize, targetKey, initialMask),
+    [initialMask, target, targetBlob, targetKey, targetSize]
   );
   const initialBitmap = setup.status === "ready" ? setup.initial : createEmptyMaskBitmap(1, 1);
   const [history, setHistory] = useState<MaskHistory>(() =>
@@ -324,8 +349,11 @@ export function MaskEditor({
     let objectUrl: ProtectedObjectUrl | undefined;
     setTargetDecoded(false);
     setTargetState({ status: "loading" });
-    void gateway
-      .fetchProtectedObjectUrl(setup.target)
+    const resourcePromise =
+      setup.target !== undefined
+        ? gateway.fetchProtectedObjectUrl(setup.target)
+        : Promise.resolve(createProtectedObjectUrl(setup.targetBlob!));
+    void resourcePromise
       .then((resource) => {
         objectUrl = resource;
         if (active) {
@@ -683,7 +711,7 @@ export function MaskEditor({
   let statusMessage: string = dirty ? labels.dirty : labels.clean;
   if (saveState === "encoding") statusMessage = labels.saving;
   if (saveState === "uploading") statusMessage = labels.uploading;
-  if (saveState === "success") statusMessage = labels.saved;
+  if (saveState === "success" && !dirty) statusMessage = labels.saved;
   if (saveState === "empty") statusMessage = labels.emptyMask;
   if (saveState === "failure") statusMessage = labels.saveFailure;
 
@@ -715,7 +743,8 @@ export function MaskEditor({
               targetState.status !== "ready" ||
               !targetDecoded ||
               saveState === "encoding" ||
-              saveState === "uploading"
+              saveState === "uploading" ||
+              (saveState === "success" && !dirty)
             }
             onClick={() => void saveMask()}
           >
@@ -737,7 +766,7 @@ export function MaskEditor({
       ) : setup.status !== "ready" ? (
         <section className="mask-editor__blocking" role="alert">
           <span className="mask-editor__blocking-code">TARGET / INVALID</span>
-          <h2>{target ? labels.setupFailure : labels.missingTarget}</h2>
+          <h2>{target || targetBlob ? labels.setupFailure : labels.missingTarget}</h2>
         </section>
       ) : (
         <main className="mask-editor__workspace">

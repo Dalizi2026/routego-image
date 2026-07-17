@@ -30,6 +30,11 @@ export function cloneCreationDraft(draft: CreationDraft): CreationDraft {
     references: draft.references.map((reference) => ({ ...reference })),
     target: draft.target === undefined ? undefined : { ...draft.target },
     supportingImages: draft.supportingImages.map((supporting) => ({ ...supporting })),
+    mask:
+      draft.mask === undefined
+        ? undefined
+        : { image: { ...draft.mask.image }, targetSlot: 0 },
+    maskUpload: draft.maskUpload === undefined ? undefined : { ...draft.maskUpload },
     invariants: {
       allowedChanges: [...draft.invariants.allowedChanges],
       preserve: [...draft.invariants.preserve],

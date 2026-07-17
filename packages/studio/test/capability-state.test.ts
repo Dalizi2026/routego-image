@@ -15,7 +15,12 @@ import {
   UNCONFIRMED_CAPABILITY_MESSAGE,
   validateCreationCapabilities
 } from "../src/features/capabilities";
-import { createInitialCreationDraft, type CreationDraft } from "../src/features/creation";
+import {
+  createInitialCreationDraft,
+  MaskIntegrationError,
+  validateMaskCapability,
+  type CreationDraft
+} from "../src/features/creation";
 
 const defaults = {
   model: "mock-image-model",
@@ -222,5 +227,53 @@ describe("scoped four-state capability evidence", () => {
         );
       }
     }
+  });
+
+  it("requires scoped mask evidence and literal target slot zero before edit submission", () => {
+    const base: CreationDraft = {
+      ...createInitialCreationDraft(defaults),
+      mode: "edit",
+      prompt: "Mask the synthetic target.",
+      target: {
+        id: "target-01",
+        role: "previous-output",
+        locator: { source: "asset", assetId: "asset-01" }
+      },
+      mask: {
+        image: { source: "upload", uploadResourceId: "upload-mask-01" },
+        targetSlot: 0
+      },
+      invariants: { allowedChanges: ["background"], preserve: ["subject"], forbiddenChanges: [] }
+    };
+    const editOnly = decisionFor([
+      record("single-image-input", "supported"),
+      record("target-edit", "supported")
+    ]);
+    expect(validateCreationCapabilities(base, editOnly)).toEqual([]);
+    expect(() => validateMaskCapability(base, editOnly("mask-edit"))).toThrow(
+      MaskIntegrationError
+    );
+    try {
+      validateMaskCapability(base, editOnly("mask-edit"));
+    } catch (error) {
+      expect((error as MaskIntegrationError).fields["mask"]).toBe(
+        UNCONFIRMED_CAPABILITY_MESSAGE
+      );
+    }
+    const supported = decisionFor([
+      record("single-image-input", "supported"),
+      record("target-edit", "supported"),
+      record("mask-edit", "supported")
+    ]);
+    expect(validateCreationCapabilities(base, supported)).toEqual([]);
+    expect(validateMaskCapability(base, supported("mask-edit"))).toEqual([]);
+    const degraded = decisionFor([
+      record("single-image-input", "supported"),
+      record("target-edit", "supported"),
+      record("mask-edit", "degraded")
+    ]);
+    expect(validateMaskCapability(base, degraded("mask-edit"))).toEqual([
+      "Uses a visible weaker fallback."
+    ]);
   });
 });

@@ -546,6 +546,112 @@
   cursor: pointer;
 }
 
+.mask-workbench {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--cyan-300) 7%, transparent), transparent 58%),
+    var(--ink-900);
+}
+
+.mask-workbench__heading,
+.mask-workbench__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mask-workbench__heading p,
+.mask-workbench__heading h3 {
+  margin: 0;
+}
+
+.mask-workbench__heading p {
+  color: var(--cyan-300);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+}
+
+.mask-workbench__heading h3 {
+  margin-top: 5px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.mask-workbench__ready {
+  color: var(--cyan-300);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+}
+
+.mask-workbench__actions {
+  justify-content: flex-start;
+}
+
+.mask-workbench__actions button,
+.mask-setup-panel button {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid var(--line-strong);
+  color: var(--paper-200);
+  background: transparent;
+  cursor: pointer;
+}
+
+.mask-workbench__actions button:disabled {
+  color: var(--paper-500);
+  cursor: not-allowed;
+}
+
+.mask-workbench > small[role="alert"] {
+  color: var(--red-400);
+}
+
+.mask-setup-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  padding: 24px;
+  place-items: center;
+  background: rgba(4, 5, 4, 0.9);
+  backdrop-filter: blur(12px);
+}
+
+.mask-setup-panel {
+  width: min(520px, 100%);
+  padding: clamp(24px, 5vw, 44px);
+  border: 1px solid var(--line-strong);
+  background: var(--ink-900);
+  box-shadow: var(--shadow-panel);
+}
+
+.mask-setup-panel > p:first-child {
+  color: var(--amber-400);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+}
+
+.mask-setup-panel h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 400;
+}
+
+.mask-setup-panel > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
 .invariants-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

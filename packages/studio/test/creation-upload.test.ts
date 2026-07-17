@@ -89,6 +89,10 @@ describe("Studio upload lifecycle", () => {
     ]);
     expect(gateway.uploadBinary).toHaveBeenCalledOnce();
     expect(ready).toMatchObject({ status: "ready", uploadResourceId: "upload-synthetic" });
+    expect(ready.descriptor).toMatchObject({
+      status: "finalized",
+      uploadResourceId: "upload-synthetic"
+    });
     expect(JSON.stringify(invoke.mock.calls)).not.toMatch(
       /(?:rawBytes|data:image|base64|C:\\|\/Users\/|Authorization)/u
     );

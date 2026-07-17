@@ -39,6 +39,7 @@ describe("capability-gated workbench markup", () => {
     expect(markup).toContain("当前中转未确认支持");
     expect(markup).toContain("能力证据");
     expect(markup).toContain('data-state="unknown"');
+    expect(markup).toContain("<span>mask-edit</span>");
     expect(markup).toContain('data-capability="native-transparency"');
     expect(markup).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64|Authorization)/u);
   });

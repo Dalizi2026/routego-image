@@ -71,6 +71,24 @@ describe("isolated full-screen mask editor", () => {
     expect(markup).toContain("disabled");
   });
 
+  it("accepts an in-memory finalized target blob with explicit dimensions", () => {
+    const markup = renderToStaticMarkup(
+      createElement(MaskEditor, {
+        gateway,
+        targetBlob: new Blob(["synthetic-target"], { type: "image/png" }),
+        targetSize: { width: 64, height: 32 },
+        targetKey: "upload:target-01",
+        targetAlt: "Synthetic uploaded target",
+        capability: "supported",
+        onUploadMask: vi.fn(),
+        onSave: vi.fn(),
+        onClose: vi.fn()
+      })
+    );
+    expect(markup).toContain("MASK → TARGET[0]");
+    expect(markup).not.toContain("TARGET / INVALID");
+  });
+
   it("defines keyboard and unsaved-close decisions deterministically", () => {
     expect(resolveMaskShortcut({ key: "z", ctrlKey: true })).toBe("undo");
     expect(resolveMaskShortcut({ key: "Z", metaKey: true, shiftKey: true })).toBe("redo");
@@ -90,5 +108,7 @@ describe("isolated full-screen mask editor", () => {
     expect(source).not.toMatch(/\bdrawImage\b/u);
     expect(source).not.toMatch(/\bconsole\./u);
     expect(source).not.toMatch(/localStorage|sessionStorage|data:image|;base64,/u);
+    expect(source).toContain("createProtectedObjectUrl");
+    expect(source).toContain("resource.revoke()");
   });
 });

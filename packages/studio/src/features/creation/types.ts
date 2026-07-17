@@ -1,8 +1,10 @@
 import type {
+  BrowserResourceDescriptor,
   ReadSettingsResult,
   StudioBatchResult,
   StudioImageInputRef,
   StudioImageOperationResult,
+  UploadResourceDescriptor,
   UploadResourcePurpose
 } from "@routego-image/contracts";
 
@@ -30,6 +32,7 @@ export interface UploadLifecycleItem {
   readonly source: UploadSource;
   readonly status: UploadLifecycleStatus;
   readonly uploadResourceId?: string | undefined;
+  readonly descriptor?: UploadResourceDescriptor | undefined;
   readonly safeMessage?: string | undefined;
 }
 
@@ -49,6 +52,7 @@ export interface DraftImageInput {
     | "previous-output";
   readonly label?: string | undefined;
   readonly locator?: StudioImageInputRef | undefined;
+  readonly resource?: BrowserResourceDescriptor | undefined;
   readonly upload?: UploadLifecycleItem | undefined;
 }
 
@@ -79,6 +83,11 @@ export interface CreationDraft {
   readonly references: readonly DraftImageInput[];
   readonly target?: DraftImageInput | undefined;
   readonly supportingImages: readonly DraftImageInput[];
+  readonly mask?: {
+    readonly image: StudioImageInputRef;
+    readonly targetSlot: 0;
+  } | undefined;
+  readonly maskUpload?: UploadLifecycleItem | undefined;
   readonly invariants: EditInvariantsDraft;
   readonly controls: CreationControls;
 }

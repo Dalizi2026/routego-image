@@ -131,6 +131,7 @@ export function buildStudioCreationRequest(draft: CreationDraft): StudioImageOpe
         role: supporting.role,
         ...(supporting.label?.trim() ? { label: supporting.label.trim() } : {})
       })),
+      ...(draft.mask === undefined ? {} : { mask: draft.mask }),
       invariants: {
         allowedChanges: draft.invariants.allowedChanges.filter((value) => value.trim() !== ""),
         preserve: draft.invariants.preserve.filter((value) => value.trim() !== ""),
@@ -180,9 +181,12 @@ export function createEditHandoff(
     target: {
       id: `handoff-target-${artifact.artifactId}`,
       role: "previous-output",
-      locator: targetLocator
+      locator: targetLocator,
+      resource: artifact.resource
     },
     supportingImages: [],
+    mask: undefined,
+    maskUpload: undefined,
     invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
     controls: {
       size: effective.size,

@@ -2,12 +2,17 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ChangeEvent,
-  type DragEvent
+  type DragEvent,
+  type KeyboardEvent
 } from "react";
 
-import type { ReadSettingsResult, StudioImageOperationResult } from "@routego-image/contracts";
+import type {
+  ReadSettingsResult,
+  StudioImageOperationResult
+} from "@routego-image/contracts";
 
 import type { StudioGateway } from "../../api";
 import { ProtectedImage } from "../../components";
@@ -21,6 +26,11 @@ import {
   validateCreationCapabilities,
   type CapabilityDecision
 } from "../capabilities";
+import {
+  MaskEditor,
+  type MaskPngUploadRequest,
+  type MaskUploadLocator
+} from "../mask";
 import {
   BatchDraftError,
   buildStudioBatchRequest,
@@ -36,6 +46,17 @@ import {
   createInitialCreationDraft
 } from "./draft";
 import { describeCreationResult } from "./result";
+import {
+  attachFinalizedMask,
+  clearDraftMask,
+  immediateMaskTarget,
+  MaskIntegrationError,
+  maskTargetIdentity,
+  resolveMaskTarget,
+  uploadMaskPng,
+  validateMaskCapability,
+  type ReadyMaskTarget
+} from "./mask-integration";
 import type {
   BatchDraftItem,
   BatchSubmissionState,
@@ -86,6 +107,12 @@ const copy = {
     preserve: "必须保留",
     forbidden: "禁止修改",
     invariantHint: "每行一项，至少填写一个约束。",
+    openMask: "打开遮罩编辑器",
+    removeMask: "移除已保存遮罩",
+    maskReady: "遮罩已绑定 TARGET[0]",
+    maskLoading: "正在准备受保护目标图…",
+    maskFailure: "目标图无法建立遮罩画布，请重试上传或更换目标。",
+    maskNeedsTarget: "先添加并完成一张编辑目标图。",
     submit: "开始生成",
     submitEdit: "提交编辑",
     submitting: "正在提交受保护请求…",
@@ -137,6 +164,12 @@ const copy = {
     preserve: "Preserve",
     forbidden: "Forbidden changes",
     invariantHint: "One item per line; at least one invariant is required.",
+    openMask: "Open mask editor",
+    removeMask: "Remove saved mask",
+    maskReady: "Mask bound to TARGET[0]",
+    maskLoading: "Preparing the protected target…",
+    maskFailure: "The target could not create a mask canvas. Retry the upload or replace it.",
+    maskNeedsTarget: "Add and finalize one edit target first.",
     submit: "Generate",
     submitEdit: "Submit edit",
     submitting: "Submitting a protected request…",
@@ -161,6 +194,12 @@ const copy = {
 } as const;
 
 type CreationLabels = { readonly [Key in keyof (typeof copy)["zh"]]: string };
+
+type MaskTargetState =
+  | { readonly status: "idle" }
+  | { readonly status: "loading" }
+  | { readonly status: "ready"; readonly target: ReadyMaskTarget }
+  | { readonly status: "failure"; readonly safeMessage: string };
 
 function lines(value: string): string[] {
   return value
@@ -443,6 +482,7 @@ export function CreationWorkbench({
   const singleImageDecision = resolve("single-image-input");
   const multiImageDecision = resolve("multi-image-input");
   const editDecision = resolve("target-edit");
+  const maskDecision = resolve("mask-edit");
   const customSizeDecision = resolve("custom-size");
   const qualityDecision = resolve("quality-control");
   const outputFormatDecision = resolve("output-format");
@@ -473,6 +513,21 @@ export function CreationWorkbench({
   const [batchSubmission, setBatchSubmission] = useState<BatchSubmissionState>({
     status: "idle"
   });
+  const [maskEditorOpen, setMaskEditorOpen] = useState(false);
+  const [maskTarget, setMaskTarget] = useState<MaskTargetState>({ status: "idle" });
+  const draftRef = useRef(draft);
+  const maskSetupRef = useRef<HTMLDivElement>(null);
+  const pendingMaskUploadRef = useRef<UploadLifecycleItem | undefined>(undefined);
+
+  useEffect(() => {
+    draftRef.current = draft;
+  }, [draft]);
+
+  useEffect(() => {
+    if (maskEditorOpen && maskTarget.status !== "ready") {
+      maskSetupRef.current?.focus();
+    }
+  }, [maskEditorOpen, maskTarget.status]);
 
   useEffect(() => {
     if (workflow === "single") {
@@ -493,6 +548,40 @@ export function CreationWorkbench({
     setDraft((current) => updateImage(current, item.id, (image) => ({ ...image, upload: item })));
   }, []);
 
+  const discardDetachedMaskUpload = useCallback(
+    (item: UploadLifecycleItem | undefined) => {
+      if (item === undefined) return;
+      void discardUploadLifecycle(gateway, item, (next) => {
+        if (pendingMaskUploadRef.current?.id === next.id) {
+          pendingMaskUploadRef.current = next;
+        }
+      }).catch(() => undefined);
+    },
+    [gateway]
+  );
+
+  const discardMaskResources = useCallback(
+    (saved: UploadLifecycleItem | undefined, pending: UploadLifecycleItem | undefined) => {
+      const unique = new Map<string, UploadLifecycleItem>();
+      if (saved !== undefined) unique.set(saved.id, saved);
+      if (pending !== undefined) unique.set(pending.id, pending);
+      unique.forEach(discardDetachedMaskUpload);
+      pendingMaskUploadRef.current = undefined;
+    },
+    [discardDetachedMaskUpload]
+  );
+
+  const resetMaskEditor = useCallback(() => {
+    setMaskEditorOpen(false);
+    setMaskTarget({ status: "idle" });
+  }, []);
+
+  const clearMaskForTargetChange = useCallback(() => {
+    const current = draftRef.current;
+    discardMaskResources(current.maskUpload, pendingMaskUploadRef.current);
+    resetMaskEditor();
+  }, [discardMaskResources, resetMaskEditor]);
+
   const beginUpload = useCallback(
     (slot: CreationInputSlot, files: readonly File[]) => {
       if (!singleImageDecision.enabled) return;
@@ -500,9 +589,19 @@ export function CreationWorkbench({
         draft.references.length + draft.supportingImages.length + (draft.target === undefined ? 0 : 1);
       const evidenceLimit = multiImageDecision.record?.limits?.maxImages ?? 16;
       const maximumInputs = multiImageDecision.enabled ? evidenceLimit : 1;
-      const remaining = Math.max(0, maximumInputs - currentPhysicalInputs);
+      const replacementCredit = slot === "target" && draft.target !== undefined ? 1 : 0;
+      const remaining = Math.max(0, maximumInputs - currentPhysicalInputs + replacementCredit);
       const accepted = slot === "target" ? files.slice(0, Math.min(1, remaining)) : files.slice(0, remaining);
       if (accepted.length === 0) return;
+      if (slot === "target") {
+        const previousTarget = draftRef.current.target;
+        if (previousTarget?.upload !== undefined) {
+          void discardUploadLifecycle(gateway, previousTarget.upload, patchUpload).catch(
+            () => undefined
+          );
+        }
+        clearMaskForTargetChange();
+      }
       const additions = accepted.map((file) => {
         const purpose = slot === "target" ? "target" : slot;
         const upload = createUploadItem(purpose, { name: file.name, blob: file });
@@ -514,7 +613,7 @@ export function CreationWorkbench({
         } satisfies DraftImageInput;
       });
       setDraft((current) => ({
-        ...current,
+        ...(slot === "target" ? clearDraftMask(current) : current),
         ...(slot === "reference"
           ? { references: [...current.references, ...additions].slice(0, 16) }
           : slot === "supporting"
@@ -531,6 +630,7 @@ export function CreationWorkbench({
       draft.references.length,
       draft.supportingImages.length,
       draft.target,
+      clearMaskForTargetChange,
       gateway,
       multiImageDecision.enabled,
       multiImageDecision.record?.limits?.maxImages,
@@ -541,26 +641,34 @@ export function CreationWorkbench({
 
   const removeImage = useCallback(
     (image: DraftImageInput) => {
+      const removesTarget = draftRef.current.target?.id === image.id;
       if (image.upload !== undefined) {
         void discardUploadLifecycle(gateway, image.upload, patchUpload).catch(() => undefined);
       }
+      if (removesTarget) {
+        clearMaskForTargetChange();
+      }
       setDraft((current) => ({
-        ...current,
+        ...(removesTarget ? clearDraftMask(current) : current),
         references: current.references.filter((item) => item.id !== image.id),
         target: current.target?.id === image.id ? undefined : current.target,
         supportingImages: current.supportingImages.filter((item) => item.id !== image.id)
       }));
     },
-    [gateway, patchUpload]
+    [clearMaskForTargetChange, gateway, patchUpload]
   );
 
   const retryUpload = useCallback(
     (image: DraftImageInput) => {
       if (image.upload !== undefined) {
+        if (draftRef.current.target?.id === image.id) {
+          clearMaskForTargetChange();
+          setDraft((current) => clearDraftMask(current));
+        }
         void retryUploadLifecycle(gateway, image.upload, patchUpload).catch(() => undefined);
       }
     },
-    [gateway, patchUpload]
+    [clearMaskForTargetChange, gateway, patchUpload]
   );
 
   const moveImage = (collection: "references" | "supportingImages", index: number, direction: -1 | 1) => {
@@ -578,14 +686,159 @@ export function CreationWorkbench({
     });
   };
 
+  const openMaskEditor = useCallback(async () => {
+    if (!maskDecision.enabled) return;
+    const target = draftRef.current.target;
+    const expectedKey = maskTargetIdentity(target);
+    setMaskEditorOpen(true);
+    if (target === undefined || expectedKey === undefined) {
+      setMaskTarget({ status: "failure", safeMessage: labels.maskNeedsTarget });
+      return;
+    }
+    setMaskTarget({ status: "loading" });
+    try {
+      const resolved = await resolveMaskTarget(gateway, target);
+      if (
+        draftRef.current.mode !== "edit" ||
+        maskTargetIdentity(draftRef.current.target) !== expectedKey
+      ) {
+        resetMaskEditor();
+        return;
+      }
+      if (resolved.resource !== undefined) {
+        setDraft((current) =>
+          maskTargetIdentity(current.target) === expectedKey && current.target !== undefined
+            ? { ...current, target: { ...current.target, resource: resolved.resource } }
+            : current
+        );
+      }
+      setMaskTarget({ status: "ready", target: resolved });
+    } catch (error) {
+      setMaskTarget({
+        status: "failure",
+        safeMessage: error instanceof Error ? error.message : labels.maskFailure
+      });
+    }
+  }, [gateway, labels.maskFailure, labels.maskNeedsTarget, maskDecision.enabled, resetMaskEditor]);
+
+  const uploadMask = useCallback(
+    async (request: MaskPngUploadRequest) => {
+      if (maskTarget.status !== "ready") {
+        throw new Error(labels.maskFailure);
+      }
+      const expectedKey = maskTarget.target.key;
+      let latest: UploadLifecycleItem | undefined;
+      const finalized = await uploadMaskPng(gateway, request, (item) => {
+        latest = item;
+        pendingMaskUploadRef.current = item;
+      });
+      if (maskTargetIdentity(draftRef.current.target) !== expectedKey) {
+        discardDetachedMaskUpload(finalized.item);
+        pendingMaskUploadRef.current = undefined;
+        throw new Error(labels.maskFailure);
+      }
+      pendingMaskUploadRef.current = latest ?? finalized.item;
+      return finalized.resource;
+    },
+    [discardDetachedMaskUpload, gateway, labels.maskFailure, maskTarget]
+  );
+
+  const saveMask = useCallback(
+    (locator: MaskUploadLocator) => {
+      const upload = pendingMaskUploadRef.current;
+      if (upload === undefined || maskTarget.status !== "ready") {
+        throw new Error(labels.maskFailure);
+      }
+      const current = draftRef.current;
+      if (maskTargetIdentity(current.target) !== maskTarget.target.key) {
+        discardDetachedMaskUpload(upload);
+        pendingMaskUploadRef.current = undefined;
+        throw new Error(labels.maskFailure);
+      }
+      const attached = attachFinalizedMask(current, locator, upload);
+      const previous = current.maskUpload;
+      draftRef.current = attached;
+      setDraft(attached);
+      pendingMaskUploadRef.current = undefined;
+      if (previous !== undefined && previous.id !== upload.id) {
+        discardDetachedMaskUpload(previous);
+      }
+    },
+    [discardDetachedMaskUpload, labels.maskFailure, maskTarget]
+  );
+
+  const closeMaskEditor = useCallback(() => {
+    const pending = pendingMaskUploadRef.current;
+    if (pending !== undefined && pending.id !== draftRef.current.maskUpload?.id) {
+      discardDetachedMaskUpload(pending);
+    }
+    pendingMaskUploadRef.current = undefined;
+    resetMaskEditor();
+  }, [discardDetachedMaskUpload, resetMaskEditor]);
+
+  const handleMaskSetupKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMaskEditor();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = Array.from(
+        maskSetupRef.current?.querySelectorAll<HTMLButtonElement>("button:not([disabled])") ?? []
+      );
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (first === undefined || last === undefined) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    },
+    [closeMaskEditor]
+  );
+
+  const removeMask = useCallback(() => {
+    const current = draftRef.current;
+    discardMaskResources(current.maskUpload, pendingMaskUploadRef.current);
+    const cleared = clearDraftMask(current);
+    draftRef.current = cleared;
+    setDraft(cleared);
+    resetMaskEditor();
+  }, [discardMaskResources, resetMaskEditor]);
+
+  const selectGenerateMode = useCallback(() => {
+    const current = draftRef.current;
+    discardMaskResources(current.maskUpload, pendingMaskUploadRef.current);
+    resetMaskEditor();
+    const next: CreationDraft = {
+      ...clearDraftMask(current),
+      mode: "generate",
+      controls: {
+        ...current.controls,
+        action: current.controls.action === "edit" ? "auto" : current.controls.action
+      }
+    };
+    draftRef.current = next;
+    setDraft(next);
+  }, [discardMaskResources, resetMaskEditor]);
+
   const submit = useCallback(async () => {
     setFieldErrors({});
     let request;
     try {
+      validateMaskCapability(draft, maskDecision);
       validateCreationCapabilities(draft, resolve);
       request = buildStudioCreationRequest(draft);
     } catch (error) {
-      if (error instanceof CreationDraftError || error instanceof CreationCapabilityError) {
+      if (
+        error instanceof CreationDraftError ||
+        error instanceof CreationCapabilityError ||
+        error instanceof MaskIntegrationError
+      ) {
         setFieldErrors(error.fields);
         setSubmission({ status: "failure", safeMessage: error.message });
         return;
@@ -607,7 +860,7 @@ export function CreationWorkbench({
         safeMessage: error instanceof Error ? error.message : "本地请求未完成。"
       });
     }
-  }, [draft, gateway, resolve]);
+  }, [draft, gateway, maskDecision, resolve]);
 
   const selectBatchItem = useCallback((item: BatchDraftItem) => {
     setSelectedBatchId(item.id);
@@ -628,6 +881,7 @@ export function CreationWorkbench({
   const removeBatchItem = useCallback(
     (item: BatchDraftItem) => {
       if (batchItems.length <= 1) return;
+      discardDetachedMaskUpload(item.draft.maskUpload);
       const index = batchItems.findIndex((candidate) => candidate.id === item.id);
       const next = batchItems.filter((candidate) => candidate.id !== item.id);
       const nextSelection = next[Math.min(index, next.length - 1)] ?? next[0];
@@ -636,7 +890,7 @@ export function CreationWorkbench({
         selectBatchItem(nextSelection);
       }
     },
-    [batchItems, selectedBatchId, selectBatchItem]
+    [batchItems, discardDetachedMaskUpload, selectedBatchId, selectBatchItem]
   );
 
   const submitBatch = useCallback(async () => {
@@ -644,9 +898,13 @@ export function CreationWorkbench({
     try {
       batchItems.forEach((item, index) => {
         try {
+          validateMaskCapability(item.draft, resolve("mask-edit"));
           validateCreationCapabilities(item.draft, resolve);
         } catch (error) {
-          if (error instanceof CreationCapabilityError) {
+          if (
+            error instanceof CreationCapabilityError ||
+            error instanceof MaskIntegrationError
+          ) {
             throw new BatchDraftError(`批量任务第 ${index + 1} 项被能力证据阻止。`, {
               taskId: item.id,
               fields: error.fields
@@ -755,10 +1013,15 @@ export function CreationWorkbench({
       : transparencyDecision.state === "degraded"
         ? (["off", "auto", "chromakey"] as const)
         : (["off"] as const);
+  const preparedMaskTarget = immediateMaskTarget(draft.target);
+  const canPrepareMaskTarget =
+    preparedMaskTarget !== undefined || draft.target?.locator?.source === "asset";
+  const maskActionDisabled = !maskDecision.enabled || !canPrepareMaskTarget;
   const capabilityDecisions = [
     singleImageDecision,
     multiImageDecision,
     editDecision,
+    maskDecision,
     customSizeDecision,
     qualityDecision,
     outputFormatDecision,
@@ -819,16 +1082,7 @@ export function CreationWorkbench({
         <button
           type="button"
           aria-pressed={draft.mode === "generate"}
-          onClick={() =>
-            setDraft((current) => ({
-              ...current,
-              mode: "generate",
-              controls: {
-                ...current.controls,
-                action: current.controls.action === "edit" ? "auto" : current.controls.action
-              }
-            }))
-          }
+          onClick={selectGenerateMode}
         >
           {labels.generate}
         </button>
@@ -903,6 +1157,43 @@ export function CreationWorkbench({
                   onMove={() => undefined}
                 />
               ) : null}
+              <section className="mask-workbench" aria-labelledby="mask-workbench-title">
+                <div className="mask-workbench__heading">
+                  <div>
+                    <p>MASK / TARGET[0]</p>
+                    <h3 id="mask-workbench-title">{labels.openMask}</h3>
+                  </div>
+                  {draft.mask !== undefined ? (
+                    <span className="mask-workbench__ready" role="status">
+                      {labels.maskReady}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="mask-workbench__actions">
+                  <button
+                    type="button"
+                    disabled={maskActionDisabled}
+                    title={
+                      !maskDecision.enabled
+                        ? UNCONFIRMED_MESSAGE
+                        : !canPrepareMaskTarget
+                          ? labels.maskNeedsTarget
+                          : undefined
+                    }
+                    onClick={() => void openMaskEditor()}
+                  >
+                    {labels.openMask}
+                  </button>
+                  {draft.mask !== undefined ? (
+                    <button type="button" onClick={removeMask}>
+                      {labels.removeMask}
+                    </button>
+                  ) : null}
+                </div>
+                {!canPrepareMaskTarget ? <small>{labels.maskNeedsTarget}</small> : null}
+                <CapabilityHint decision={maskDecision} />
+                {fieldErrors["mask"] ? <small role="alert">{fieldErrors["mask"]}</small> : null}
+              </section>
               <FileDropzone
                 title={labels.supporting}
                 purpose="supporting"
@@ -1248,11 +1539,69 @@ export function CreationWorkbench({
           onRetry={() => void submit()}
           onRetryAcknowledged={setRetryAcknowledged}
           onEdit={(artifactId) => {
-            setDraft(createEditHandoff(submission.result, artifactId));
+            discardMaskResources(draftRef.current.maskUpload, pendingMaskUploadRef.current);
+            resetMaskEditor();
+            const next = createEditHandoff(submission.result, artifactId);
+            draftRef.current = next;
+            setDraft(next);
             setSubmission({ status: "idle" });
             setFieldErrors({});
           }}
         />
+      ) : null}
+      {maskEditorOpen ? (
+        maskTarget.status === "ready" ? (
+          <MaskEditor
+            gateway={gateway}
+            {...(maskTarget.target.resource === undefined
+              ? {}
+              : { target: maskTarget.target.resource })}
+            {...(maskTarget.target.blob === undefined
+              ? {}
+              : { targetBlob: maskTarget.target.blob })}
+            targetSize={maskTarget.target.size}
+            targetKey={maskTarget.target.key}
+            targetAlt={labels.target}
+            capability={maskDecision.state}
+            language={language === "zh" ? "zh-CN" : "en"}
+            onUploadMask={uploadMask}
+            onSave={saveMask}
+            onClose={closeMaskEditor}
+          />
+        ) : (
+          <div
+            ref={maskSetupRef}
+            className="mask-setup-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="mask-setup-title"
+            aria-busy={maskTarget.status === "loading"}
+            tabIndex={-1}
+            onKeyDown={handleMaskSetupKeyDown}
+          >
+            <section className="mask-setup-panel">
+              <p>MASK / TARGET[0]</p>
+              <h2 id="mask-setup-title">{labels.openMask}</h2>
+              <p role={maskTarget.status === "failure" ? "alert" : "status"}>
+                {maskTarget.status === "loading"
+                  ? labels.maskLoading
+                  : maskTarget.status === "failure"
+                    ? maskTarget.safeMessage
+                    : labels.maskNeedsTarget}
+              </p>
+              <div>
+                {maskTarget.status === "failure" ? (
+                  <button type="button" onClick={() => void openMaskEditor()}>
+                    {labels.retry}
+                  </button>
+                ) : null}
+                <button type="button" onClick={closeMaskEditor}>
+                  {labels.remove}
+                </button>
+              </div>
+            </section>
+          </div>
+        )
       ) : null}
     </section>
   );
