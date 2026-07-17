@@ -3,15 +3,109 @@
   "lane": "foundation",
   "change": "establish-routego-image-foundation",
   "role": "openspec-apply-owner",
-  "status": "waiting-for-audits",
+  "status": "archived",
   "threadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f453\\生图插件",
   "branch": "codex/routego-foundation",
   "startingCommit": "9875bdc6d63dcd300a7c00397f5952005f128cac",
-  "headCommit": null,
+  "headCommit": "4732d7a6991d6169f8ac74066339f50247a37238",
   "generation": 0,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "pending",
-  "successorThreadId": null
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "checkpoint-summary-2026-07-17-e450789-runtime-delivered",
+  "lastHealthAudit": "passed",
+  "successorThreadId": null,
+  "auditReceipts": {
+    "legacy": {
+      "receivedAt": "2026-07-17T20:08:08.8434739+08:00",
+      "branch": "codex/routego-legacy-audit",
+      "commit": "59fe151b3747def15b9d21f9b0aa9898e5957164",
+      "document": "docs/audits/legacy-plugin-audit.md",
+      "verified": true
+    },
+    "upstream": {
+      "receivedAt": "2026-07-17T20:10:52.7831344+08:00",
+      "branch": "codex/routego-upstream-audit",
+      "branchHead": "236aac64f29e4f476f59a87e8fdeb5e5bf7ddf05",
+      "commit": "4b7909579f382cc1fec5ac79172a0aeeb3d70923",
+      "document": "docs/audits/gpt-image-playground-reuse.md",
+      "upstreamCommit": "a10477581b3d43ac98d39777e4445625a9db113d",
+      "verified": true,
+      "duplicateCompletionEvents": 1
+    }
+  },
+  "auditGate": {
+    "satisfied": true,
+    "heartbeatId": "routego-foundation",
+    "heartbeatDeleted": true
+  },
+  "taskProgress": {
+    "lastCompletedTask": "6.2",
+    "implementationReadyThrough": "6.2",
+    "lastHealthAuditAt": "2026-07-17T22:27:22.5229084+08:00",
+    "newCompactionMarkerObserved": false
+  },
+  "subagents": {
+    "runtime": {
+      "task": "/root/foundation_runtime",
+      "status": "completed",
+      "startedAt": "2026-07-17T20:42:10.7543416+08:00",
+      "reworkStartedAt": "2026-07-17T21:16:00+08:00",
+      "ownsTasks": [
+        "3.1",
+        "3.2",
+        "4.1",
+        "4.2"
+      ]
+    },
+    "verification": {
+      "task": "/root/foundation_verification",
+      "status": "completed",
+      "startedAt": "2026-07-17T21:37:00+08:00",
+      "resumedAt": "2026-07-17T21:43:09.5870662+08:00",
+      "ownsTasks": [
+        "5.1",
+        "5.2",
+        "5.3"
+      ]
+    }
+  },
+  "planDeviation": {
+    "status": "resolved",
+    "reportedAt": "2026-07-17T21:39:30.1184156+08:00",
+    "controllerThreadId": "019f6f8c-a875-78a2-8332-a85d84d122d2",
+    "affectedTasks": [
+      "3.1",
+      "3.2",
+      "4.1",
+      "4.2"
+    ],
+    "reason": "Required package root barrel exports are outside the task file scopes declared in tasks.md.",
+    "resolvedAt": "2026-07-17T21:43:09.5870662+08:00",
+    "resolutionCommit": "87204abd8154c03d990591f828e43cb130485aac"
+  },
+  "completion": {
+    "tasks": "16/16",
+    "validatedAt": "2026-07-17T22:27:22.5229084+08:00",
+    "validation": {
+      "openspecStrict": "passed",
+      "safety": "passed",
+      "typecheck": "passed",
+      "build": "passed",
+      "tests": "106 passed",
+      "packageExports": "passed",
+      "cleanInstall": "passed from committed lockfile",
+      "gitClean": true
+    },
+    "blockers": [],
+    "residualRisks": [
+      "Foundation provider behavior is verified with offline fixtures only; real relay acceptance belongs to Integration.",
+      "Windows local verification passed; macOS and Ubuntu execution depends on the committed CI matrix."
+    ]
+  },
+  "integration": {
+    "mergeCommit": "b4fa629",
+    "specsSynced": true,
+    "archivePath": "openspec/changes/archive/2026-07-17-establish-routego-image-foundation",
+    "archivedAt": "2026-07-17T22:33:00+08:00"
+  }
 }
