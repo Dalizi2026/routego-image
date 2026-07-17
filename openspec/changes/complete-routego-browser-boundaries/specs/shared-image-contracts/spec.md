@@ -123,4 +123,3 @@ The shared package SHALL define a Studio settings mutation that updates complete
 #### Scenario: Replacement lacks confirmation or result echoes the path
 - **WHEN** `replace` lacks literal confirmation, another operation carries a path, or a result contains the submitted full path
 - **THEN** shared input/output validation SHALL fail
-

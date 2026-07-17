@@ -52,4 +52,3 @@ Before completion, the change SHALL pass strict OpenSpec validation, repository 
 #### Scenario: Hidden incomplete or out-of-scope residue exists
 - **WHEN** any validation fails, a generated/cache artifact remains, Git is dirty, a task lacks a commit, or an out-of-scope file/dependency is present
 - **THEN** the task SHALL remain incomplete and `[BROWSER_BOUNDARY_COMPLETE]` SHALL NOT be sent
-

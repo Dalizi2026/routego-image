@@ -54,4 +54,3 @@ This corrective gate SHALL use only synthetic in-memory mock state and SHALL NOT
 #### Scenario: Tests run in an environment containing real local data
 - **WHEN** contract and mock tests execute on a developer machine
 - **THEN** their outcome SHALL be independent of environment variables, home-directory files, network access, real keys, and user images
-

@@ -45,4 +45,3 @@ The future loopback SSE adapter SHALL serialize only shared path-free `started`,
 #### Scenario: Invalid event is produced
 - **WHEN** a service event contains a path, data URL, credential, invalid sequence/status combination, or inconsistent billing/output flags
 - **THEN** the adapter SHALL fail closed with an internal-contract error instead of streaming invalid data
-
