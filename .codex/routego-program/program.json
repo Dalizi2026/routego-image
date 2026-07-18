@@ -114,7 +114,7 @@
     "libraryPredecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "studioThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
     "studioPredecessorThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
-    "integrationThreadId": "pending"
+    "integrationThreadId": "019f72fd-fb6f-7b52-b383-03471f42f05a"
   },
   "laneCompletions": {
     "creation": {
@@ -165,7 +165,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "registration-pending",
+    "status": "registered-awaiting-handoff-acceptance",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
