@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "9c2f74c6be84744b0674034ddf6b0c1725283ffe51d6d79a6ca971514a292b63",
+  "capsuleSha256": "b07b8db0991275d090bdd0f0ef82c6ab411b4c696285dc3175b88b3ddb3c0844",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -34,7 +34,7 @@
     "nextTaskId": "4.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.2.json",
-      "sha256": "fc9a336c73f3eb654f4135073dfc8cafa006819ca81537d5d14eb6d74ab8a138"
+      "sha256": "ffc4829428195c9e8f12b9ff3e1855e614c74ce29fa4815d270f59040f896822"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
@@ -65,7 +65,7 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": ["PD-009: owner-only OpenSpec update and exact two-file task-3.5 common-root correction must be accepted before task 4.2 product edits resume."],
+    "blockers": ["PD-009 Phase A: the exact two-file task-3.5 common-root corrective checkpoint must pass focused/full verification and Controller acceptance before the original four-file task 4.2 Phase B resumes."],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "taskBeyond4_2Locked": true,
@@ -112,7 +112,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 103785,
+    "expectedNormalizedUtf8Bytes": 104005,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

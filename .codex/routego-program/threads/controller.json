@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-authoritative-controller-generation-6-integration-generation-5-task-4.2-paused-pd-009-owner-openspec-update",
+  "status": "active-authoritative-controller-generation-6-integration-generation-5-task-4.2-pd-009-phase-a-authorized-phase-b-locked",
   "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
   "branch": "codex/routego-controller-g6",
@@ -36,7 +36,7 @@
     "integrationGeneration5ThreadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
     "integrationGeneration5Worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "integrationGeneration5StartingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
-    "integrationGeneration5AcceptedHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+    "integrationGeneration5AcceptedHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "integrationGeneration5GitClean": true,
     "integrationGeneration5ObservableCompactions": 1,
     "integrationGeneration5LastCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29",
@@ -44,13 +44,13 @@
     "openspecProgress": "16/29",
     "task4_1Accepted": true,
     "task4_2Locked": true,
-    "verification": "G5 activation incorporation fb35d1261dd6da5116e0bed36d936adbd01082a5 and clean Git passed. Controller independently confirmed the PD-009 12-result-partials versus 4-nested-error-partials mismatch and existing results.ts slice(0,4) precedent. Product work is paused until G5 commits the coherent existing-artifact OpenSpec update."
+    "verification": "PD-009 OpenSpec planning commit 8353f3b5024ffcf96c5c71adaa93bac53d93da57 has exact design/spec/tasks scope, strict validation 19/19, fresh apply 16/29, task 4.2 unchecked and Git clean. Only Phase A two-file correction is authorized; Phase B remains locked."
   },
   "currentOperation": {
     "id": "PD-009-task-4.2-common-root-terminal-projection-fix",
-    "state": "task-4.2-paused-pending-owner-openspec-update-then-two-file-task-3.5-correction",
-    "allowedNext": "Integration G5 may update only existing design/spec/tasks artifacts as specified by PD-009 and report that planning commit. After Controller acceptance it may create an exact two-file service.ts/service.test.ts corrective commit; only after that checkpoint is accepted may the original four-file task 4.2 phase resume.",
-    "forbidden": ["Any product edit before the owner-only OpenSpec update is accepted", "A route-layer synthetic failed terminal", "Mixing the two-file task-3.5 correction with the four-file task-4.2 implementation", "Controller product/OpenSpec edits", "external approval gates 7.2, 8.2 or 9.1 without fresh user approval"]
+    "state": "task-4.2-pd-009-phase-a-two-file-correction-authorized-phase-b-locked",
+    "allowedNext": "Integration G5 may implement and commit only packages/integration/src/composition/service.ts and packages/integration/test/service.test.ts, run the required focused/full verification and report the Phase A checkpoint. Phase B remains locked until Controller acceptance.",
+    "forbidden": ["A route-layer synthetic failed terminal", "Any Phase B runtime/test edit before Phase A checkpoint acceptance", "Mixing the two-file Phase A correction with the four-file Phase B implementation", "Controller product/OpenSpec edits", "external approval gates 7.2, 8.2 or 9.1 without fresh user approval"]
   },
   "integrationOwner": {
     "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
@@ -59,12 +59,12 @@
     "plannedBranch": "codex/routego-integration-g5",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "currentHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+    "currentHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
     "gitClean": true,
     "observableCompactions": 1,
     "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29",
-    "status": "activated-sole-apply-owner-task-4.2-paused-pd-009-owner-openspec-update",
+    "status": "activated-sole-apply-owner-task-4.2-pd-009-phase-a-authorized-phase-b-locked",
     "handoffAudit": {
       "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
       "reportedStartupFiles": 12,
@@ -101,11 +101,11 @@
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "currentHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+    "currentHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "gitClean": true,
     "observableCompactions": 1,
     "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29",
-    "status": "activated-sole-apply-owner-task-4.2-paused-pd-009-owner-openspec-update",
+    "status": "activated-sole-apply-owner-task-4.2-pd-009-phase-a-authorized-phase-b-locked",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-5.capsule.json"
   },
   "successor": {
