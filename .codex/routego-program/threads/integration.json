@@ -15,10 +15,10 @@
   "generation": 1,
   "observableCompactions": 3,
   "lastCompactionFingerprint": "2026-07-18-generation-1-compaction-3-before-task-1.5",
-  "lastHealthAudit": "passed-task-2.1-verification-and-task-state-audit; task-2.1-complete; task-2.2-held-for-fresh-controller-activation",
+  "lastHealthAudit": "passed-task-2.2-verification-and-task-state-audit; task-2.2-complete; task-2.3-held-for-fresh-controller-activation",
   "successorThreadId": null,
   "openspecState": "offline-apply-active",
-  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 6/29 apply tasks executed; tasks 1.1 through 2.1 implementation and sole-owner task-state commits verified; PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 accepted",
+  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 7/29 apply tasks executed; tasks 1.1 through 2.2 implementation and sole-owner task-state commits verified; PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 accepted",
   "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
     "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
@@ -44,18 +44,18 @@
   },
   "currentTaskActivation": {
     "decision": "PD-007",
-    "controllerGovernanceCommit": "6cbe964d3d42d285037666ac282143beb9f226c2",
+    "controllerGovernanceCommit": "56c2670b3ddb2b1a12804347f833d9196604d001",
     "planningCommit": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
-    "authorizedTask": "2.1",
-    "heldTask": "2.2",
+    "authorizedTask": "2.2",
+    "heldTask": "2.3",
     "externalStateAuthorized": false
   },
-  "nextTask": "2.2",
+  "nextTask": "2.3",
   "latestTaskCompletion": {
-    "taskId": "2.1",
-    "implementationCommit": "8aebff8bb61cf3f07fbeefb129b615e751387bb0",
-    "taskStateCommit": "5ba8ebc2ea0efb89fc0bd39d4dec04ac1084d494",
-    "verification": "passed: fresh apply instructions with dependencies 1.1-1.5 complete; frozen install; Integration tests 15/15; Integration typecheck; dependency-topological and direct Integration build; root typecheck and build; contracts public-tool tests 96/96; seven workspace package export smoke; pngjs/@types/pngjs MIT, no install scripts, no native files; repository safety 395 tracked files including staged Integration files; git diff --check; exact 11-file implementation scope audit; OpenSpec strict 19/19",
+    "taskId": "2.2",
+    "implementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
+    "taskStateCommit": "722c183fed4efdf62d7f678feacc30a9bd64c961",
+    "verification": "passed: fresh apply instructions with task 2.1 complete; focused Studio SSE/Gateway tests 26/26; full Studio tests 123/123; Studio typecheck and build; LF/CRLF/multiline/fragmented framing; strict MIME/UTF-8/line/event/body bounds; exact first started/request ID/sequence/terminal/EOF rules; DONE/sentinel/post-terminal rejection; abort/reader cancellation/lock release; in-memory session-only POST route; redaction/no-path/Base64 tests; repository safety 397 tracked files including staged SSE files; git diff --check; exact five-file implementation scope audit; OpenSpec strict 19/19",
     "externalStateTouched": false
   },
   "handoff": {
