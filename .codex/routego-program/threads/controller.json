@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-integration-generation-2-task-3.1-only",
+  "status": "pre-handoff-integration-generation-2-task-3.1-review-correction",
   "threadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1756\\生图插件",
   "branch": "codex/routego-controller-g4",
   "startingCommit": "e8b96e3685b939843d9029657bd2108116a38b03",
   "registrationCommit": "c292c2d461ed33000d7f154edba04908f36eedce",
-  "headCommit": "88b419296f5ba781b7d1c8aea7609f90c40985c3",
+  "headCommit": "8d18d8bb36c43b321046f674f8d8865b0cc3aba0",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 4,
-  "observableCompactions": 3,
-  "lastCompactionFingerprint": "g4-compaction-3-integration-g2-handoff-preparation-after-task-2.2-2026-07-18",
-  "lastHealthAudit": "passed-generation-4-compaction-3-checkpoint-and-integration-generation-2-compaction-3-clean-checkpoint-before-task-3.1-implementation",
+  "observableCompactions": 4,
+  "lastCompactionFingerprint": "g4-compaction-4-task-3.1-review-before-successor-handoff-2026-07-18",
+  "lastHealthAudit": "passed-generation-4-compaction-4-pre-handoff-authority-lineage-scope-test-build-safety-and-clean-git-audit; task-3.1-semantic-review-requires-exact-probe-correction",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -129,6 +129,8 @@
     "Integration generation 2 task 2.4 checkpoint 855afc11b1d8778d2cde1e8629ac49cd6581def6 was independently accepted after exact five-file scope and ancestry, stream-state/resource-lifecycle code review, Studio 140/140, typecheck, library and Vite builds, repository safety 400, strict OpenSpec 19/19, diff checks and clean Git. The 506.19 kB Vite advisory is non-failing and outside this task's configuration scope. Only one-file browser task 2.5 is activated; task 3.1 remains locked pending task-group review.",
     "Integration generation 2 completed its compaction-2 health audit before task 2.5 at clean HEAD 855afc11b1d8778d2cde1e8629ac49cd6581def6. Full authority, OpenSpec 9/29, task-2.5 one-file ownership, 15-minute fallback contract and external safety boundaries remain clear; PD-006 permits the same sole owner to execute only task 2.5 while task 3.1 stays locked.",
     "Integration generation 2 task 2.5 and the complete tasks 2.1-2.5 streaming gate at checkpoint 794595578a13a32770e999c351a647596aebbd0c were independently accepted. Exact one-file scope and commit ancestry passed; Playwright 11/11 plus focused streaming 4/4, Studio 140/140, typecheck, safety 400, strict OpenSpec 19/19, request/security/lifetime evidence and clean Git passed. Proposal, design, all 11 deltas and tasks show a coherent gate with no 3.x implementation or public-surface drift. Only task 3.1 is activated; task 3.2 remains locked.",
-    "Integration generation 2 reached observable compaction 3 after task 3.1 activation but before implementation. Its clean accepted HEAD 794595578a13a32770e999c351a647596aebbd0c is the mandatory safe Git checkpoint; full authority and OpenSpec 10/29 audits passed. The same sole owner may finish only already-activated task 3.1 and must stop before task 3.2."
+    "Integration generation 2 reached observable compaction 3 after task 3.1 activation but before implementation. Its clean accepted HEAD 794595578a13a32770e999c351a647596aebbd0c is the mandatory safe Git checkpoint; full authority and OpenSpec 10/29 audits passed. The same sole owner may finish only already-activated task 3.1 and must stop before task 3.2.",
+    "Integration task 3.1 checkpoint 5963a2a2c4fc18b7d0a0b2c219d336efb9b0c36f has correct three-commit ancestry and exact five-file scope; Integration 33/33, typecheck, dependency-order build, repository safety 405, strict OpenSpec 19/19, diff checks and Git cleanliness passed. It is not accepted because the probe matrix can persist false supported evidence: Edits and Responses multi-image probes send only one image, and generic HTTP success can claim feature-specific support without conclusive request/response evidence. Only probes.ts and provider.test.ts correction is authorized; task 3.2 remains locked.",
+    "Controller generation 4 reached observable compaction 4 during task-3.1 review. PD-006 pre-handoff is active: G4 may complete only this review correction and successor handoff preparation, and must not activate the large task 3.2. After corrected 3.1 acceptance, fresh Controller and Integration successor governance must complete before product work resumes."
   ]
 }
