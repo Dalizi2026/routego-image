@@ -3,15 +3,15 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "checkpoint-task-3.2-post-archive-fix-complete",
+  "status": "checkpoint-compaction-2-before-post-archive-task-5.2-finalization",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
-  "headCommit": "b226f6c1a9f09e2ebe57fc6599ce728f8dc9dfed",
+  "headCommit": "3cd8007e40675e6e5c1e93d2d09a34cc078944dc",
   "generation": 2,
-  "observableCompactions": 1,
-  "lastCompactionFingerprint": "library-g2-compaction-1-task-5.2-head-937c5ca1-2026-07-18",
+  "observableCompactions": 2,
+  "lastCompactionFingerprint": "library-g2-compaction-2-post-archive-task-5.2-head-3cd8007-2026-07-18",
   "lastHealthAudit": "passed",
   "successorThreadId": null,
   "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
@@ -75,7 +75,7 @@
     "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-checkpoint-before-post-archive-task-5.2"
+    "status": "generation-2-compaction-2-checkpoint-before-post-archive-task-5.2-finalization"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
