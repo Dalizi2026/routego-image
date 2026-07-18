@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-008-active-integration-generation-3-sole-owner-task-3.3-unlocked-not-started",
+  "status": "pd-008-active-integration-generation-3-sole-owner-task-3.4-unlocked-not-started",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -58,7 +58,7 @@
     "role": "program-controller",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
     "branch": "codex/routego-controller-g5",
-    "verifiedHeadBeforeContainingCommit": "5c186704eb49af9996b7b0dcbf31cb26dc3c2824",
+    "verifiedHeadBeforeContainingCommit": "5feb9e4cd72607dc914a2138c66aa82ba5129ec2",
     "status": "authoritative",
     "observableCompactions": 3,
     "lastCompactionFingerprint": "g5-compaction-3-during-task-3.2-acceptance-and-3.3-activation-2026-07-18"
@@ -69,8 +69,8 @@
     "generation": 3,
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
     "branch": "codex/routego-integration-g3",
-    "acceptedProductCommit": "11cae33251f996d6410f7953ce50af1c43ffd7fe",
-    "currentHead": "3ffd36a91402f58a7492905a706868c2874ba93d",
+    "acceptedProductCommit": "a7b939cb75d5ec170b105f7fe8f5b94a24ec7bce",
+    "currentHead": "941a119db3f2054da2bca97d6e0ccaa0188da991",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
@@ -79,14 +79,15 @@
   "successor": {
     "lane": "integration",
     "generation": 3,
-    "status": "activated-sole-apply-owner-task-3.3-unlocked-not-started",
+    "status": "activated-sole-apply-owner-task-3.4-unlocked-not-started",
     "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
     "plannedBranch": "codex/routego-integration-g3",
     "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
     "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
     "incorporationCommit": "12169d245d4f124f796ba137e1cb6410d5c7dff9",
-    "currentHead": "3ffd36a91402f58a7492905a706868c2874ba93d",
+    "currentHead": "941a119db3f2054da2bca97d6e0ccaa0188da991",
+    "latestActivationIncorporationHead": "a9ffc747ae0e9bd62097a0f4a7489516a6500140",
     "gitClean": true,
     "observableCompactions": 1,
     "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|57d2957789037945e423ac0417835b12acc132da|context-compaction-1-during-task-3.2|11/29",
@@ -113,34 +114,35 @@
     "lane": "integration",
     "openspec": {
       "totalTasks": 29,
-      "completedTasks": 12,
-      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2"],
-      "nextTaskId": "3.3"
+      "completedTasks": 13,
+      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3"],
+      "nextTaskId": "3.4"
     },
     "currentTask": {
-      "capsule": ".codex/routego-program/tasks/integration-3.3.json",
+      "capsule": ".codex/routego-program/tasks/integration-3.4.json",
       "locked": false,
       "activationAuthorized": true
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|3ffd36a91402f58a7492905a706868c2874ba93d|task-3.2-complete-controller-accepted|12/29",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|941a119db3f2054da2bca97d6e0ccaa0188da991|task-3.3-complete-controller-accepted|13/29",
     "messageType": "INTEGRATION_TASK_COMPLETED",
     "workerThreadId": "019f7557-3836-7822-82ab-1e850e4cf157",
-    "reportedHead": "3ffd36a91402f58a7492905a706868c2874ba93d",
-    "completedTaskId": "3.2",
-    "nextTaskId": "3.3",
-    "openspecProgress": "12/29",
+    "reportedHead": "941a119db3f2054da2bca97d6e0ccaa0188da991",
+    "completedTaskId": "3.3",
+    "nextTaskId": "3.4",
+    "openspecProgress": "13/29",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
-    "controllerIndependentVerification": "Integration typecheck, 102/102 tests, build, strict OpenSpec, repository safety 424, exact implementation/task-state/governance scopes and clean Git passed."
+    "controllerIndependentVerification": "Integration typecheck, 134/134 tests, build, strict OpenSpec 19/19, repository safety 429, exact implementation/task-state/governance scopes and clean Git passed."
   },
   "currentBlockers": [],
   "currentRisks": [
     "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence.",
-    "Task 3.2 orphan-accounting regressions cover the reproduced same-path replacement schedule; not every theoretical scheduler permutation is exhaustively enumerated."
+    "Task 3.2 orphan-accounting regressions cover the reproduced same-path replacement schedule; not every theoretical scheduler permutation is exhaustively enumerated.",
+    "Task 3.3 relies on RoutegoLibraryService for filesystem containment; upload discard or expiry after preparation remains a task 3.4 composition-lifecycle concern."
   ],
   "externalApprovalGates": {
     "tasks": ["7.2", "8.2", "9.1"],
@@ -192,8 +194,8 @@
       "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
       "branch": "codex/routego-integration-g3",
-      "acceptedHead": "3ffd36a91402f58a7492905a706868c2874ba93d",
-      "status": "sole-apply-owner-task-3.3-unlocked-not-started"
+      "acceptedHead": "941a119db3f2054da2bca97d6e0ccaa0188da991",
+      "status": "sole-apply-owner-task-3.4-unlocked-not-started"
     },
     "otherUnfinishedLanes": []
   },

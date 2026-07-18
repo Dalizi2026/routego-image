@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "eb4519925095d08b6942dab6a214c4585adacb9c2da3bbed49f748977a276c9d",
+  "contentSha256": "3095523a31c19959e13ef183fd48d0de2d251a906f73f085d6da9f8bbf5ccaf3",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "generation": 3,
   "sourceActivationHead": "57d2957789037945e423ac0417835b12acc132da",
-  "openspecProgress": "12/29",
+  "openspecProgress": "13/29",
   "gitClean": true,
   "externalStateAuthorized": false,
   "tasks": [
@@ -25,6 +25,22 @@
       "finalCorrection": "Use unique orphan record identity and identity-guarded subtraction, with deterministic same-path replacement and concurrent cleanup regressions.",
       "blockers": [],
       "residualRisk": "The reproduced replacement schedule is covered; not every theoretical scheduler permutation is exhaustively enumerated."
+    },
+    {
+      "taskId": "3.3",
+      "activationIncorporationHead": "a9ffc747ae0e9bd62097a0f4a7489516a6500140",
+      "implementationCommit": "a7b939cb75d5ec170b105f7fe8f5b94a24ec7bce",
+      "taskStateCommit": "537a0ffd4f3ba367d95dfa09282351808116b5db",
+      "checkpointCommit": "941a119db3f2054da2bca97d6e0ccaa0188da991",
+      "files": [
+        "packages/integration/src/composition/inputs.ts",
+        "packages/integration/src/composition/graph.ts",
+        "packages/integration/test/inputs.test.ts"
+      ],
+      "verification": "Fresh OpenSpec apply reported 13/29; Controller independently passed Integration typecheck, 134/134 tests, build, strict OpenSpec 19/19, repository safety 429, git diff checks, exact three-file scope and clean Git.",
+      "rootCauseFixes": "Use per-resolution and completion-time upload expiry checks; require explicit deterministic identity allocation; reject repeated artifact/upload ownership or metadata drift; validate unknown resolver structures before use; recursively freeze validated requests.",
+      "blockers": [],
+      "residualRisk": "Filesystem containment remains a RoutegoLibraryService boundary, and upload discard or expiry after preparation must be handled by task 3.4 before persistence or projection."
     }
   ],
   "relatedDecisions": [
