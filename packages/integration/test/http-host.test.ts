@@ -1,5 +1,6 @@
 import { EventEmitter } from "node:events";
 import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
+import { request as httpRequest, type IncomingMessage } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -101,6 +102,27 @@ function sessionTokenFromBootstrap(html: string): string {
 async function closeQuietly(host: IntegrationLoopbackHttpHost | undefined): Promise<void> {
   if (host === undefined) return;
   await host.close();
+}
+
+async function waitForStableCount(
+  read: () => number,
+  options: { readonly stableForMs?: number; readonly timeoutMs?: number } = {}
+): Promise<number> {
+  const stableForMs = options.stableForMs ?? 40;
+  const deadline = Date.now() + (options.timeoutMs ?? 2_000);
+  let value = read();
+  let lastChangeAt = Date.now();
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    const current = read();
+    if (current !== value) {
+      value = current;
+      lastChangeAt = Date.now();
+    } else if (value > 0 && Date.now() - lastChangeAt >= stableForMs) {
+      return value;
+    }
+  }
+  throw new Error("The response producer did not reach a stable backpressure wait.");
 }
 
 describe("StudioSessionManager", () => {
@@ -322,6 +344,111 @@ describe("IntegrationLoopbackHttpHost", () => {
       })).status).toBe(403);
       expect(sessions.size).toBe(0);
     } finally {
+      await host.close();
+    }
+  });
+
+  it("returns the active protected-resource iterator when a client disconnects during backpressure", async () => {
+    const { registry } = await staticFixture();
+    const diagnostics: unknown[] = [];
+    const descriptor = Object.freeze({ expiresAt: "2026-07-19T00:05:00.000Z" });
+    const originalExpiry = descriptor.expiresAt;
+    const chunk = Buffer.alloc(1024 * 1024, 0x5a);
+    const totalChunks = 64;
+    let nextCalls = 0;
+    let returnCalls = 0;
+    const closeLease = vi.fn();
+    async function* protectedResourceBody(): AsyncGenerator<Uint8Array> {
+      try {
+        for (let index = 0; index < totalChunks; index += 1) {
+          nextCalls += 1;
+          yield chunk;
+        }
+      } finally {
+        closeLease();
+      }
+    }
+    const source = protectedResourceBody();
+    const body: AsyncIterable<Uint8Array> = {
+      [Symbol.asyncIterator]() {
+        return {
+          next: () => source.next(),
+          return: async () => {
+            returnCalls += 1;
+            return source.return(undefined);
+          }
+        };
+      }
+    };
+    const extensionHandler = vi.fn(async (request: { readonly url: URL }) => {
+      if (request.url.pathname !== "/api/test/protected-large-resource") return undefined;
+      return {
+        status: 200,
+        headers: {
+          "cache-control": "no-store",
+          "content-length": String(chunk.byteLength * totalChunks),
+          "content-type": "image/png",
+          "x-content-type-options": "nosniff",
+          "x-routego-expires-at": descriptor.expiresAt
+        },
+        body
+      };
+    });
+    const local = service({ status: async () => statusResult() });
+    const host = new IntegrationLoopbackHttpHost({
+      service: local,
+      localService: local,
+      address: "127.0.0.1",
+      staticAssets: registry,
+      entryModuleRoute: "/assets/app.ab12cd.js",
+      extensionHandler,
+      logger(value) {
+        diagnostics.push(value);
+      }
+    });
+    let clientRequest: ReturnType<typeof httpRequest> | undefined;
+    let clientResponse: IncomingMessage | undefined;
+    try {
+      const launch = await host.openStudioSession();
+      expect((await fetch(launch.result.url)).status).toBe(200);
+      const origin = host.address!.origin;
+      clientResponse = await new Promise<IncomingMessage>((resolve, reject) => {
+        clientRequest = httpRequest(`${origin}/api/test/protected-large-resource`, {
+          headers: {
+            origin,
+            "x-routego-session": launch.session.sessionToken
+          }
+        }, (response) => {
+          response.pause();
+          resolve(response);
+        });
+        clientRequest.once("error", reject);
+        clientRequest.end();
+      });
+      clientResponse.on("error", () => undefined);
+      expect(clientResponse.statusCode).toBe(200);
+      expect(clientResponse.headers["content-length"]).toBe(String(chunk.byteLength * totalChunks));
+      expect(clientResponse.headers["x-routego-expires-at"]).toBe(originalExpiry);
+
+      const stalledNextCalls = await waitForStableCount(() => nextCalls);
+      expect(stalledNextCalls).toBeGreaterThan(0);
+      expect(stalledNextCalls).toBeLessThan(totalChunks);
+      clientResponse.destroy();
+      await vi.waitFor(() => {
+        expect(returnCalls).toBe(1);
+        expect(closeLease).toHaveBeenCalledTimes(1);
+      }, { interval: 5, timeout: 1_000 });
+      const nextCallsAfterDisconnect = nextCalls;
+      await new Promise((resolve) => setTimeout(resolve, 25));
+      expect(nextCalls).toBe(nextCallsAfterDisconnect);
+      expect(extensionHandler).toHaveBeenCalledTimes(1);
+      expect(descriptor.expiresAt).toBe(originalExpiry);
+      const renderedDiagnostics = JSON.stringify(diagnostics);
+      expect(renderedDiagnostics).not.toContain(launch.session.sessionToken);
+      expect(renderedDiagnostics).not.toMatch(/(?:Authorization|base64|\\Users\\|90,90,90)/u);
+    } finally {
+      clientResponse?.destroy();
+      clientRequest?.destroy();
       await host.close();
     }
   });

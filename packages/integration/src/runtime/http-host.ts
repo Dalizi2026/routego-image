@@ -1,4 +1,3 @@
-import { once } from "node:events";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 
@@ -70,6 +69,39 @@ function isAsyncIterable(value: unknown): value is AsyncIterable<RoutegoHttpBody
   return value !== null && typeof value === "object" && Symbol.asyncIterator in value;
 }
 
+function waitForResponseDrain(target: ServerResponse, signal: AbortSignal): Promise<boolean> {
+  if (signal.aborted || target.destroyed || target.writableEnded) return Promise.resolve(false);
+  return new Promise<boolean>((resolve, reject) => {
+    let settled = false;
+    const cleanup = () => {
+      target.off("drain", onDrain);
+      target.off("close", onClose);
+      target.off("error", onError);
+      signal.removeEventListener("abort", onAbort);
+    };
+    const settle = (drained: boolean) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(drained);
+    };
+    const onDrain = () => settle(true);
+    const onClose = () => settle(false);
+    const onAbort = () => settle(false);
+    const onError = (error: Error) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(error);
+    };
+    target.once("drain", onDrain);
+    target.once("close", onClose);
+    target.once("error", onError);
+    signal.addEventListener("abort", onAbort, { once: true });
+    if (signal.aborted || target.destroyed || target.writableEnded) settle(false);
+  });
+}
+
 async function writeResponse(
   response: RoutegoHttpResponse,
   target: ServerResponse,
@@ -89,13 +121,20 @@ async function writeResponse(
     target.end();
     return;
   }
+  const iterator = response.body[Symbol.asyncIterator]();
   try {
-    for await (const chunk of response.body) {
-      if (signal.aborted || target.destroyed) break;
-      if (!target.write(chunk)) await once(target, "drain");
+    while (!signal.aborted && !target.destroyed && !target.writableEnded) {
+      const result = await iterator.next();
+      if (result.done) break;
+      if (signal.aborted || target.destroyed || target.writableEnded) break;
+      if (!target.write(result.value) && !await waitForResponseDrain(target, signal)) break;
     }
   } finally {
-    if (!target.writableEnded && !target.destroyed) target.end();
+    try {
+      await iterator.return?.();
+    } finally {
+      if (!target.writableEnded && !target.destroyed) target.end();
+    }
   }
 }
 
