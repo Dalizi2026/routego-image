@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-5-active-sole-apply-owner-task-4.2-unlocked-not-started",
+  "status": "generation-5-active-sole-apply-owner-task-4.2-paused-pd-009-owner-openspec-update",
   "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
   "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
@@ -12,12 +12,12 @@
   "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
   "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
   "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-  "currentHead": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-  "latestActivationIncorporationHead": null,
+  "currentHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+  "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
   "gitCleanAtRegistration": true,
   "gitClean": true,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29",
   "soleApplyOwner": true,
   "frozen": false,
   "applyAuthorized": true,
@@ -42,12 +42,12 @@
     "completedTasks": 16,
     "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1"],
     "nextTaskId": "4.2",
-    "nextTaskLocked": false
+    "nextTaskLocked": true
   },
   "currentTask": {
     "id": "4.2",
     "capsule": ".codex/routego-program/tasks/integration-4.2.json",
-    "activationStatus": "unlocked-sole-owner-authorized-not-started",
+    "activationStatus": "paused-pd-009-pending-owner-openspec-update",
     "started": false
   },
   "handoff": {
@@ -58,16 +58,17 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|813deefd199e8b83a52d60dcc7ecd02b963f8bb2|generation-5-handoff-accepted-zero-compaction|16/29",
-    "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|156eb59e063a6ff99ff7671883974d4b5cb18bba|context-compaction-1-paused-before-pd-009-authorization|16/29",
+    "messageType": "INTEGRATION_CONTEXT_HEALTH_CHECKPOINT",
     "completedTaskId": "4.1",
     "nextTaskId": "4.2",
-    "reportedHead": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
+    "reportedHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
-    "sourceFrozen": true
+    "sourceFrozen": true,
+    "planDeviationAccepted": true
   },
   "latestTaskCompletion": {
     "taskId": "4.1",
@@ -87,11 +88,32 @@
     "verification": "Controller independently passed Integration typecheck, 169/169 tests and build, root 735 total tests across seven workspace packages, root build/typecheck, strict OpenSpec 19/19, seven-package exports, repository safety 442, exact implementation/task-state/checkpoint scopes and clean Git.",
     "externalStateTouched": false
   },
+  "planDeviation": {
+    "decision": ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
+    "status": "accepted-controller-locked-pending-owner-openspec-update",
+    "finding": "The task-3.5 service error projection can throw after the fifth through twelfth valid partial because the result maximum is 12 and the nested service-error maximum is 4.",
+    "requiredPlanningArtifacts": [
+      "openspec/changes/integrate-routego-image-plugin/design.md",
+      "openspec/changes/integrate-routego-image-plugin/specs/integrated-local-routego-service/spec.md",
+      "openspec/changes/integrate-routego-image-plugin/tasks.md"
+    ],
+    "correctiveAllowedFiles": [
+      "packages/integration/src/composition/service.ts",
+      "packages/integration/test/service.test.ts"
+    ],
+    "originalTaskAllowedFiles": [
+      "packages/integration/src/runtime/routes.ts",
+      "packages/integration/src/runtime/stream-route.ts",
+      "packages/integration/test/routes.test.ts",
+      "packages/integration/test/stream-route.test.ts"
+    ],
+    "nextGate": "owner-openspec-update-commit-controller-acceptance"
+  },
   "reportingContract": {
     "currentControllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
     "currentControllerGeneration": 6,
     "primary": "send_message_to_thread plus read_thread after every task/group/checkpoint/blocker/deviation/handoff/activation/delivery",
-    "fallback": "routego-program-continuity every 30 minutes archives its own run first, then reads compact state and deduplicates missed reports",
+    "fallback": "routego-program-continuity every 30 minutes records exact CODEX_THREAD_ID, reads compact state, deduplicates missed reports, then archives its own run by explicit ID as the final tool action",
     "acknowledgementRequiredBeforeAcceptance": true
   },
   "lowContextPolicy": {

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-008-controller-generation-6-active-integration-generation-5-sole-owner-task-4.2-unlocked-not-started",
+  "status": "pd-009-controller-generation-6-active-integration-generation-5-task-4.2-paused-pending-owner-openspec-common-root-update",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -13,7 +13,8 @@
     "activeDecisions": [
       ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
       ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
-      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
+      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+      ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md"
     ],
     "contextPolicy": {
       "observableOnly": true,
@@ -71,29 +72,29 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "branch": "codex/routego-integration-g5",
     "acceptedProductCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
-    "currentHead": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
+    "currentHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
     "gitClean": true,
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29"
   },
   "successor": {
     "lane": "integration",
     "generation": 5,
-    "status": "activated-sole-apply-owner-task-4.2-unlocked-not-started",
+    "status": "activated-sole-apply-owner-task-4.2-paused-pending-owner-openspec-common-root-update",
     "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "plannedBranch": "codex/routego-integration-g5",
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "currentHead": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "latestActivationIncorporationHead": null,
+    "currentHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+    "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
     "gitClean": true,
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null,
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-5.capsule.json"
   },
   "currentChange": {
@@ -107,15 +108,17 @@
     },
     "currentTask": {
       "capsule": ".codex/routego-program/tasks/integration-4.2.json",
-      "locked": false,
-      "activationAuthorized": true
+      "locked": true,
+      "activationAuthorized": true,
+      "commonRootCorrectionAuthorized": true,
+      "pauseReason": "PD-009 requires an owner-only coherent OpenSpec update before the two-file task-3.5 common-root correction and before the original four-file task-4.2 implementation resumes."
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|813deefd199e8b83a52d60dcc7ecd02b963f8bb2|generation-5-handoff-accepted-zero-compaction|16/29",
-    "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|156eb59e063a6ff99ff7671883974d4b5cb18bba|context-compaction-1-paused-before-pd-009-authorization|16/29",
+    "messageType": "INTEGRATION_CONTEXT_HEALTH_CHECKPOINT",
     "workerThreadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
-    "reportedHead": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
+    "reportedHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
     "completedTaskId": "4.1",
     "nextTaskId": "4.2",
     "openspecProgress": "16/29",
@@ -123,7 +126,8 @@
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
-    "controllerIndependentVerification": "Integration G5 incorporated registration as governance-only merge 813deefd199e8b83a52d60dcc7ecd02b963f8bb2 with parents cc49c06406a8526f1bdd43e4ab158421b367ee6c and 6aaa1510a29e4cd520d6a44d1d096160091488c1, read exactly 12 mandatory files at 98370 normalized UTF-8 bytes, passed the capsule validator with zero observable compactions and clean Git, and directly reported acceptance with Controller read-back."
+    "planDeviationAccepted": true,
+    "controllerIndependentVerification": "Controller reproduced the schema-bound mismatch: Studio results allow 12 partial artifacts, nested Studio service errors allow 4, service.ts passed the full list while results.ts already bounds the nested projection. The producer defect can suppress the required failed terminal event for valid 5-12 partial cases, so task 4.2 is paused for an owner-only OpenSpec update and an exact two-file task-3.5 common-root correction before the four-file route phase resumes."
   },
   "controllerSuccessor": {
     "lane": "controller",
@@ -176,7 +180,9 @@
     "directReportingPrimary": true,
     "continuityFallbackIntervalMinutes": 30
   },
-  "currentBlockers": [],
+  "currentBlockers": [
+    "Integration G5 must commit and report the PD-009 owner-only OpenSpec update before any product edit; the exact two-file common-root corrective checkpoint must then be accepted before the original four-file task 4.2 phase resumes."
+  ],
   "currentRisks": [
     "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence.",
     "Task 3.2 orphan-accounting regressions cover the reproduced same-path replacement schedule; not every theoretical scheduler permutation is exhaustively enumerated.",
@@ -254,8 +260,8 @@
       "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
       "branch": "codex/routego-integration-g5",
-      "acceptedHead": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-      "status": "sole-apply-owner-task-4.2-unlocked-not-started"
+      "acceptedHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+      "status": "sole-apply-owner-task-4.2-paused-pending-owner-openspec-common-root-update"
     },
     "otherUnfinishedLanes": []
   },
