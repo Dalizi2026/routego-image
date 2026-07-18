@@ -51,6 +51,9 @@
     "finding": "Public ZIP export can return outputPath with no warning while producing a truncated invalid ZIP when FileHandle.write performs a legal partial write.",
     "rootCause": "packages/library/src/service.ts #copyExportToPublicPath awaits FileHandle.write(chunk) once and ignores bytesWritten instead of looping until the full chunk is written.",
     "reproduction": "Controlled FileHandle prototype forced one half-chunk write; manageLibrary export returned outputPath=true and warnings=[], but decodeZipArchive rejected the 542-byte output.",
+    "additionalFinding": "Public ZIP output path protection can be bypassed through a directory junction or symlink whose lexical path is outside protected roots but whose canonical target is inside protected legacy data.",
+    "additionalRootCause": "service.ts validates only the normalized lexical output path before createExclusiveFile follows existing linked directory components.",
+    "additionalReproduction": "A temporary apparently-safe junction targeting protected-legacy accepted export.zip, returned outputPath with no warning, and created the file inside protected-legacy.",
     "requiredOwnerTask": "Reopen task 5.1 within its existing service.ts/conformance-test scope, add a write-all root fix and regression test, then rerun task 5.2 clean conformance and issue a new delivery SHA."
   },
   "applyOwnership": {
@@ -136,7 +139,8 @@
       "gitClean": true
     },
     "blockers": [
-      "Controller reproduction confirmed public ZIP export false success on legal partial FileHandle writes."
+      "Controller reproduction confirmed public ZIP export false success on legal partial FileHandle writes.",
+      "Controller reproduction confirmed protected-root bypass through a directory junction/symlink in the public ZIP output path."
     ],
     "residualRisks": [
       "Provider execution, HTTP/MCP transport, session/origin enforcement and resolver/executor composition remain Creation/Integration responsibilities.",
