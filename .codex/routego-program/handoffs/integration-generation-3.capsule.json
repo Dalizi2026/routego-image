@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "6f7446903533359b43fac1a828388342f3e242ec5617dc4f5ff340448791abff",
+  "capsuleSha256": "935fd8af5b53d8f7484c0e09e5b110c7e5b72d081cd7323ca2f8dbaae1e8253d",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,7 +22,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
     "plannedBranch": "codex/routego-integration-g3",
     "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "registrationStatus": "registered-awaiting-low-context-acceptance",
+    "registrationStatus": "activated-sole-owner-task-3.2-unlocked",
     "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
     "registrationCommitSemantics": "The registration commit is recorded after a fresh successor task/worktree exists; a containing commit cannot self-reference its own SHA."
   },
@@ -33,11 +33,11 @@
     "nextTaskId": "3.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-3.2.json",
-      "sha256": "0806da96fb3bd3cfc819d0de9c347a8c83cb7716f29398dcf459e261c69dae63"
+      "sha256": "eb835dcff13e2e858f176cbde848ae416012400719a3ee218ea6767384c8b038"
     },
-    "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
-    "successorApplyAuthorized": false
+    "taskLocked": false,
+    "sourceIsSoleApplyOwner": false,
+    "successorApplyAuthorized": true
   },
   "completedEvidence": [
     {
@@ -54,9 +54,7 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": [
-      "Successor registration, low-context acceptance, G2 archival and explicit sole-owner activation are required before task 3.2."
-    ],
+    "blockers": [],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "residualRisks": [
@@ -99,7 +97,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 91249,
+    "expectedNormalizedUtf8Bytes": 91424,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

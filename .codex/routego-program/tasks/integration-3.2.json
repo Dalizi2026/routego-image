@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "0806da96fb3bd3cfc819d0de9c347a8c83cb7716f29398dcf459e261c69dae63",
+  "contentSha256": "eb835dcff13e2e858f176cbde848ae416012400719a3ee218ea6767384c8b038",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "3.2",
-  "status": "locked-pending-successor-acceptance-source-archive-and-sole-owner-activation",
+  "status": "authorized-for-integration-generation-3-sole-apply-owner-not-started",
   "sourceCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -74,9 +74,20 @@
   ],
   "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
   "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "activation": {
+    "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "controllerGeneration": 5,
+    "successorThreadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+    "successorGeneration": 3,
+    "acceptedHead": "12169d245d4f124f796ba137e1cb6410d5c7dff9",
+    "sourceOwnerArchived": true,
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "started": false
+  },
   "unresolvedIssues": [],
   "knownRisks": [
-    "Task 3.2 is large and must not begin before sole-owner activation.",
+    "Task 3.2 is large and must remain within its exact four-file scope and declared verification boundary.",
     "Native dependencies, real images, real relay and billable requests remain prohibited."
   ],
   "externalStateAuthorized": false

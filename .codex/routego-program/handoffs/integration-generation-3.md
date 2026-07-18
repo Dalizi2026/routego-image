@@ -12,11 +12,11 @@
 - registration：`3741896e20154699eaec0417a5ef511b4e71c73b`
 - accepted product：`d974cb0d16b7e14ca0766392c7d52356b4967d3c`
 - OpenSpec：11/29，next `3.2`
-- G2 仍是冻结的唯一 apply owner；G3 已登记但未接受、未激活；3.2 锁定
+- G3 已完成低上下文验收并成为唯一 apply owner；G2 已由 Controller 归档；3.2 已解锁但尚未开始
 - 当前 task capsule：`.codex/routego-program/tasks/integration-3.2.json`
 - 完成任务 evidence：`.codex/routego-program/evidence/integration-generation-2-tasks.json`
 - 旧完整交接原文：commit `428c1a904299f7043feb3fd08d5c0265f3098243` 中本路径，SHA-256 `ca13ad7277ab712e3b1f0d889b9b3f0e50d2aa6b1dd66e52875336acc452bfbb`
 
-G3 只读取 capsule 的 mandatoryFiles，最多 12 个文件、120 KiB。acceptance 前若发生一次上下文压缩，发送 `HANDOFF_CONTEXT_BUDGET_FAILED` 并停止；验证器失败发送 `HANDOFF_AUDIT_FAILED`。
+G3 的接管验收在 `observableCompactions=0` 下完成。启动字节统一按 CRLF 规范化为 LF 后计算；验收值为 12 个文件、91,249 字节。验证器失败发送 `HANDOFF_AUDIT_FAILED`。
 
-直接 `send_message_to_thread` 后 `read_thread` 回读是主链；30 分钟自动化只做漏报兜底。G3 接受前不得归档 G2，G2 归档和显式 sole-owner activation 前不得开始 3.2。
+直接 `send_message_to_thread` 后 `read_thread` 回读是主链；30 分钟自动化只做漏报兜底。G3 只能先执行 3.2，并在任务/任务组/checkpoint/阻塞/偏差/交付后立即直报 Controller 与回读确认。

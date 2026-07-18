@@ -304,8 +304,11 @@ try {
 }
 
 if (program && lane) {
-  const registered = capsule.successor.registrationStatus.startsWith("registered");
-  const laneIdentityMatches = registered
+  const successorIsCurrent = /^(registered|accepted|activated)/.test(
+    capsule.successor.registrationStatus,
+  );
+  const activated = capsule.successor.registrationStatus.startsWith("activated");
+  const laneIdentityMatches = successorIsCurrent
     ? lane.change === capsule.change &&
       lane.generation === capsule.generation.successor &&
       lane.threadId === capsule.successor.threadId &&
@@ -314,13 +317,16 @@ if (program && lane) {
       lane.sourceOwner?.threadId === capsule.source.threadId &&
       lane.sourceOwner?.worktree === capsule.source.worktree &&
       lane.sourceOwner?.branch === capsule.source.branch &&
-      lane.sourceOwner?.soleApplyOwner === true
+      lane.soleApplyOwner === activated &&
+      lane.applyAuthorized === activated &&
+      lane.sourceOwner?.soleApplyOwner === !activated &&
+      lane.sourceOwner?.archived === activated
     : lane.change === capsule.change &&
       lane.generation === capsule.generation.source &&
       lane.threadId === capsule.source.threadId &&
       lane.worktree === capsule.source.worktree &&
       lane.branch === capsule.source.branch;
-  const successorMatches = registered
+  const successorMatches = successorIsCurrent
     ? program.successor.threadId === capsule.successor.threadId &&
       program.successor.worktree === capsule.successor.worktree &&
       program.successor.plannedBranch === capsule.successor.plannedBranch
