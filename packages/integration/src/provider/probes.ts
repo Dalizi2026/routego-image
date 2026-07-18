@@ -33,6 +33,11 @@ import { readBoundedResponseBytes } from "./models";
 export const DEFAULT_CAPABILITY_PROBE_TIMEOUT_MS = 120_000;
 export const MAX_CAPABILITY_PROBE_ERROR_BYTES = 32 * 1024;
 export const MAX_CAPABILITY_PROBE_SUCCESS_BYTES = 8 * 1024 * 1024;
+// Capability probes inspect proof images rather than materializing unrestricted provider output.
+// These limits cover normal image-model proof sizes while capping pngjs' decoded RGBA allocation at 16 MiB.
+export const MAX_CAPABILITY_PROBE_PNG_DIMENSION = 4_096;
+export const MAX_CAPABILITY_PROBE_PNG_PIXELS = 4 * 1_024 * 1_024;
+export const MAX_CAPABILITY_PROBE_PNG_RGBA_BYTES = 16 * 1_024 * 1_024;
 
 export interface CapabilityProbeOwner extends ProviderProfileReader {
   persistCapabilityProbe(result: CapabilityProbeResult): Promise<void>;
@@ -390,6 +395,77 @@ interface ProbeImageOutput {
   readonly hasTransparency?: boolean;
 }
 
+interface BoundedPngHeader {
+  readonly width: number;
+  readonly height: number;
+  readonly decodedRgbaBytes: number;
+}
+
+const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+const PNG_IHDR_TOTAL_BYTES = 33;
+const PNG_BIT_DEPTHS_BY_COLOR_TYPE = new Map<number, ReadonlySet<number>>([
+  [0, new Set([1, 2, 4, 8, 16])],
+  [2, new Set([8, 16])],
+  [3, new Set([1, 2, 4, 8])],
+  [4, new Set([8, 16])],
+  [6, new Set([8, 16])]
+]);
+
+function pngCrc32(bytes: Buffer, start: number, end: number): number {
+  let crc = 0xffff_ffff;
+  for (let position = start; position < end; position += 1) {
+    crc ^= bytes[position]!;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb8_8320 : 0);
+    }
+  }
+  return (crc ^ 0xffff_ffff) >>> 0;
+}
+
+function boundedPngHeader(bytes: Buffer): BoundedPngHeader | undefined {
+  if (
+    bytes.byteLength < PNG_IHDR_TOTAL_BYTES ||
+    !bytes.subarray(0, PNG_SIGNATURE.byteLength).equals(PNG_SIGNATURE) ||
+    bytes.readUInt32BE(8) !== 13 ||
+    bytes.toString("ascii", 12, 16) !== "IHDR" ||
+    bytes.readUInt32BE(29) !== pngCrc32(bytes, 12, 29)
+  ) {
+    return undefined;
+  }
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  const bitDepth = bytes[24];
+  const colorType = bytes[25];
+  const compressionMethod = bytes[26];
+  const filterMethod = bytes[27];
+  const interlaceMethod = bytes[28];
+  if (
+    width < 1 ||
+    height < 1 ||
+    bitDepth === undefined ||
+    colorType === undefined ||
+    !PNG_BIT_DEPTHS_BY_COLOR_TYPE.get(colorType)?.has(bitDepth) ||
+    compressionMethod !== 0 ||
+    filterMethod !== 0 ||
+    (interlaceMethod !== 0 && interlaceMethod !== 1)
+  ) {
+    return undefined;
+  }
+  const pixels = width * height;
+  const decodedRgbaBytes = pixels * 4;
+  if (
+    !Number.isSafeInteger(pixels) ||
+    !Number.isSafeInteger(decodedRgbaBytes) ||
+    width > MAX_CAPABILITY_PROBE_PNG_DIMENSION ||
+    height > MAX_CAPABILITY_PROBE_PNG_DIMENSION ||
+    pixels > MAX_CAPABILITY_PROBE_PNG_PIXELS ||
+    decodedRgbaBytes > MAX_CAPABILITY_PROBE_PNG_RGBA_BYTES
+  ) {
+    return undefined;
+  }
+  return { width, height, decodedRgbaBytes };
+}
+
 const JPEG_START_OF_FRAME_MARKERS = new Set([
   0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf
 ]);
@@ -473,12 +549,19 @@ function strictBase64Bytes(value: string): Uint8Array | undefined {
 function inspectInlineImage(value: string): ProbeImageOutput | undefined {
   const bytes = strictBase64Bytes(value);
   if (bytes === undefined) return undefined;
-  if (
-    bytes.byteLength >= 8 &&
-    Buffer.from(bytes.subarray(0, 8)).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
-  ) {
+  const pngBytes = Buffer.from(bytes);
+  if (pngBytes.subarray(0, PNG_SIGNATURE.byteLength).equals(PNG_SIGNATURE)) {
+    const header = boundedPngHeader(pngBytes);
+    if (header === undefined) return undefined;
     try {
-      const decoded = PNG.sync.read(Buffer.from(bytes));
+      const decoded = PNG.sync.read(pngBytes);
+      if (
+        decoded.width !== header.width ||
+        decoded.height !== header.height ||
+        decoded.data.byteLength !== header.decodedRgbaBytes
+      ) {
+        return undefined;
+      }
       let hasTransparency = false;
       for (let offset = 3; offset < decoded.data.length; offset += 4) {
         if (decoded.data[offset] !== 255) {

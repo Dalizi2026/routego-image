@@ -35,6 +35,9 @@ import {
 } from "../src/provider/models";
 import {
   CAPABILITY_PROBE_PAIRS,
+  MAX_CAPABILITY_PROBE_PNG_DIMENSION,
+  MAX_CAPABILITY_PROBE_PNG_PIXELS,
+  MAX_CAPABILITY_PROBE_PNG_RGBA_BYTES,
   probeProviderCapability,
   type CapabilityProbeOwner,
   type CapabilityProbePair
@@ -146,6 +149,55 @@ function jpegBase64(): string {
     0x00,
     0xff, 0xd9
   ]).toString("base64");
+}
+
+function crc32(bytes: Buffer): number {
+  let crc = 0xffff_ffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb8_8320 : 0);
+    }
+  }
+  return (crc ^ 0xffff_ffff) >>> 0;
+}
+
+function pngHeaderBase64(options: {
+  readonly width: number;
+  readonly height: number;
+  readonly bitDepth?: number;
+  readonly colorType?: number;
+  readonly compressionMethod?: number;
+  readonly filterMethod?: number;
+  readonly interlaceMethod?: number;
+  readonly chunkLength?: number;
+  readonly chunkType?: string;
+  readonly truncateAt?: number;
+  readonly corruptCrc?: boolean;
+}): string {
+  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  const type = Buffer.from(options.chunkType ?? "IHDR", "ascii");
+  const data = Buffer.alloc(13);
+  data.writeUInt32BE(options.width >>> 0, 0);
+  data.writeUInt32BE(options.height >>> 0, 4);
+  data[8] = options.bitDepth ?? 8;
+  data[9] = options.colorType ?? 6;
+  data[10] = options.compressionMethod ?? 0;
+  data[11] = options.filterMethod ?? 0;
+  data[12] = options.interlaceMethod ?? 0;
+  const length = Buffer.alloc(4);
+  length.writeUInt32BE(options.chunkLength ?? 13, 0);
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE((crc32(Buffer.concat([type, data])) + (options.corruptCrc === true ? 1 : 0)) >>> 0, 0);
+  const header = Buffer.concat([signature, length, type, data, crc]);
+  return header.subarray(0, options.truncateAt ?? header.byteLength).toString("base64");
+}
+
+function probeImageResponse(base64: string): Response {
+  return new Response(JSON.stringify({ data: [{ b64_json: base64 }] }), {
+    status: 200,
+    headers: { "content-type": "application/json" }
+  });
 }
 
 function successfulProbeResponse(
@@ -732,6 +784,112 @@ describe("exact confirmed capability probes", () => {
       record: { state: "unknown" },
       error: { code: "invalid_response" }
     });
+  });
+
+  it("accepts a valid PNG exactly at the capability-proof dimension, pixel, and RGBA limits", async () => {
+    expect(MAX_CAPABILITY_PROBE_PNG_PIXELS).toBe(
+      MAX_CAPABILITY_PROBE_PNG_DIMENSION * 1_024
+    );
+    expect(MAX_CAPABILITY_PROBE_PNG_RGBA_BYTES).toBe(
+      MAX_CAPABILITY_PROBE_PNG_PIXELS * 4
+    );
+    const boundaryPng = pngBase64({
+      width: MAX_CAPABILITY_PROBE_PNG_DIMENSION,
+      height: 1_024
+    });
+    const readSpy = vi.spyOn(PNG.sync, "read");
+    const { owner } = mockProbeOwner();
+    const fetchImpl = vi.fn<typeof fetch>(async () => probeImageResponse(boundaryPng));
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic"
+    }), { fetch: fetchImpl, now: () => now });
+
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(readSpy).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({
+      status: "completed",
+      mayHaveBilled: true,
+      record: { state: "supported" }
+    });
+  });
+
+  it("rejects unsafe or malformed PNG IHDR values before pngjs allocation", async () => {
+    const cases = [
+      {
+        label: "unsafe integer pixel multiplication",
+        value: pngHeaderBase64({ width: 0xffff_ffff, height: 0xffff_ffff })
+      },
+      {
+        label: "one dimension over",
+        value: pngHeaderBase64({
+          width: MAX_CAPABILITY_PROBE_PNG_DIMENSION + 1,
+          height: 1
+        })
+      },
+      {
+        label: "one row over the pixel and RGBA bound",
+        value: pngHeaderBase64({
+          width: MAX_CAPABILITY_PROBE_PNG_DIMENSION,
+          height: 1_025
+        })
+      },
+      {
+        label: "zero width",
+        value: pngHeaderBase64({ width: 0, height: 1 })
+      },
+      {
+        label: "unsupported bit depth and color type combination",
+        value: pngHeaderBase64({ width: 1, height: 1, bitDepth: 4, colorType: 6 })
+      },
+      {
+        label: "unsupported compression method",
+        value: pngHeaderBase64({ width: 1, height: 1, compressionMethod: 1 })
+      },
+      {
+        label: "invalid IHDR length",
+        value: pngHeaderBase64({ width: 1, height: 1, chunkLength: 12 })
+      },
+      {
+        label: "invalid first chunk type",
+        value: pngHeaderBase64({ width: 1, height: 1, chunkType: "IDAT" })
+      },
+      {
+        label: "invalid IHDR CRC",
+        value: pngHeaderBase64({ width: 1, height: 1, corruptCrc: true })
+      },
+      {
+        label: "truncated IHDR",
+        value: pngHeaderBase64({ width: 1, height: 1, truncateAt: 28 })
+      }
+    ] as const;
+    const readSpy = vi.spyOn(PNG.sync, "read");
+
+    for (const testCase of cases) {
+      const { owner } = mockProbeOwner();
+      const fetchImpl = vi.fn<typeof fetch>(async () => probeImageResponse(testCase.value));
+      const result = await probeProviderCapability(owner, probeInput({
+        providerId: "provider-synthetic"
+      }), { fetch: fetchImpl, now: () => now });
+
+      expect(fetchImpl, testCase.label).toHaveBeenCalledTimes(1);
+      expect(owner.persistCapabilityProbe, testCase.label).toHaveBeenCalledTimes(1);
+      expect(result, testCase.label).toMatchObject({
+        status: "failed",
+        mayHaveBilled: true,
+        record: { state: "unknown" },
+        error: { code: "invalid_response", mayHaveBilled: true }
+      });
+      const persisted = owner.persistCapabilityProbe.mock.calls[0]?.[0];
+      expect(persisted?.record.state, testCase.label).toBe("unknown");
+      expect(
+        persisted?.record.evidence.some(
+          (item) => item.source === "successful-request" || item.source === "degraded-fallback"
+        ),
+        testCase.label
+      ).toBe(false);
+    }
+
+    expect(readSpy).not.toHaveBeenCalled();
   });
 
   it("sends deterministic primary plus image[] bytes for an Edits multi-image probe", async () => {
