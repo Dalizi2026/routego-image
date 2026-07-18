@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "8c75d8871f927e60866bcce27da3a57fc21bebe2f02df24a62f9c5f80ab07a98",
+  "capsuleSha256": "69a03c22a29020b4493fb9179ed8e11922823906d6077023b70502c6f5ff81a8",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -18,12 +18,12 @@
     "handoffParent": "d974cb0d16b7e14ca0766392c7d52356b4967d3c"
   },
   "successor": {
-    "threadId": null,
-    "worktree": null,
+    "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
     "plannedBranch": "codex/routego-integration-g3",
     "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "registrationStatus": "pending-after-pd008-policy-activation",
-    "registrationCommit": null,
+    "registrationStatus": "registered-awaiting-low-context-acceptance",
+    "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
     "registrationCommitSemantics": "The registration commit is recorded after a fresh successor task/worktree exists; a containing commit cannot self-reference its own SHA."
   },
   "currentState": {
@@ -58,7 +58,10 @@
       "Successor registration, low-context acceptance, G2 archival and explicit sole-owner activation are required before task 3.2."
     ],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
-    "externalStateAuthorized": false
+    "externalStateAuthorized": false,
+    "residualRisks": [
+      "Ignored node_modules were initialized from the local pnpm cache during registration verification; zero packages were downloaded, tracked files and lockfile are unchanged, and environment policy blocked cleanup."
+    ]
   },
   "context": {
     "sourceObservableCompactions": 5,

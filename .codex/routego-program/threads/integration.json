@@ -3,21 +3,32 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-2-frozen-sole-owner-generation-3-registration-authorized-task-3.2-locked",
+  "status": "generation-3-registered-awaiting-low-context-acceptance-generation-2-frozen-sole-owner-task-3.2-locked",
   "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
-  "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-  "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
-  "branch": "codex/routego-integration-g2",
-  "generation": 2,
-  "acceptedProductCommit": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
-  "handoffCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-  "gitClean": true,
-  "observableCompactions": 5,
-  "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-5-after-task-3.1-acceptance-during-generation-3-handoff-preparation",
-  "soleApplyOwner": true,
+  "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+  "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
+  "branch": "codex/routego-integration-g3",
+  "generation": 3,
+  "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+  "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
+  "gitCleanAtRegistration": true,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "soleApplyOwner": false,
   "frozen": true,
   "applyAuthorized": false,
   "externalStateAuthorized": false,
+  "sourceOwner": {
+    "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+    "generation": 2,
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
+    "branch": "codex/routego-integration-g2",
+    "acceptedProductCommit": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
+    "handoffCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "soleApplyOwner": true,
+    "frozen": true,
+    "gitClean": true
+  },
   "openspec": {
     "totalTasks": 29,
     "completedTasks": 11,
@@ -28,16 +39,14 @@
   "currentTask": {
     "id": "3.2",
     "capsule": ".codex/routego-program/tasks/integration-3.2.json",
-    "activationStatus": "locked-pending-successor-registration-acceptance-source-archive-and-sole-owner-activation"
+    "activationStatus": "locked-pending-low-context-acceptance-source-archive-and-sole-owner-activation"
   },
-  "successor": {
-    "generation": 3,
-    "threadId": null,
-    "worktree": null,
-    "plannedBranch": "codex/routego-integration-g3",
-    "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
-    "status": "not-registered"
+  "handoff": {
+    "capsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
+    "status": "registered-awaiting-successor-validation-and-acceptance",
+    "acceptanceCompactionLimit": 0,
+    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
+    "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
     "eventFingerprint": "integration|integrate-routego-image-plugin|3f1878bbe2e5dc2680b92422a43160bc1cac8802|3.1-accepted-and-generation-3-handoff-prepared|11/29",
@@ -49,28 +58,26 @@
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true
   },
-  "handoffRules": {
-    "lowContextLossless": true,
-    "startupMaxFiles": 12,
-    "startupMaxUtf8Bytes": 122880,
-    "acceptanceCompactionLimit": 0,
-    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
-    "auditFailure": "HANDOFF_AUDIT_FAILED",
-    "g2ArchiveBeforeAcceptance": false,
-    "task3_2BeforeSoleOwnerActivation": false
-  },
   "reportingContract": {
     "primary": "send_message_to_thread plus read_thread after every task/group/checkpoint/blocker/deviation/handoff/activation/delivery",
     "fallback": "routego-program-continuity every 30 minutes reads compact state, deduplicates and archives its own run",
-    "acknowledged": true
+    "acknowledgementRequiredBeforeAcceptance": true
   },
-  "pd008PolicyAcknowledgement": {
-    "messageType": "LOW_CONTEXT_HANDOFF_POLICY_ACK",
+  "lowContextPolicy": {
+    "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
     "governanceCommit": "5e7dee834f7e181f3f4e7f4075359d2b2e45c241",
-    "sourceOwnerHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "sourceOwnerGitClean": true,
-    "controllerReceived": true,
-    "controllerReadBackConfirmed": true
+    "startupMaxFiles": 12,
+    "startupMaxUtf8Bytes": 122880,
+    "fullHistoryDefaultReadForbidden": true,
+    "acknowledgementRequiredBeforeAcceptance": true
+  },
+  "registrationEnvironment": {
+    "localDependencyResidue": "ignored node_modules initialized from local pnpm cache by a Controller verification command",
+    "downloadedPackages": 0,
+    "trackedFilesChanged": false,
+    "lockfileChanged": false,
+    "cleanupAttempt": "blocked by execution environment",
+    "productState": false
   },
   "evidence": {
     "completedTasks": ".codex/routego-program/evidence/integration-generation-2-tasks.json",

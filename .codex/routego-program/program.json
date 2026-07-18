@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-008-active-integration-generation-3-registration-authorized-task-3.2-locked",
+  "status": "pd-008-active-integration-generation-3-registered-awaiting-low-context-acceptance-task-3.2-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -77,9 +77,9 @@
   "successor": {
     "lane": "integration",
     "generation": 3,
-    "status": "not-registered",
-    "threadId": null,
-    "worktree": null,
+    "status": "registered-inactive-awaiting-low-context-acceptance",
+    "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
     "plannedBranch": "codex/routego-integration-g3",
     "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
@@ -120,6 +120,9 @@
   "currentBlockers": [
     "Integration G3 registration, low-context acceptance, G2 archival and explicit sole-owner activation are required before task 3.2."
   ],
+  "currentRisks": [
+    "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence."
+  ],
   "externalApprovalGates": {
     "tasks": ["7.2", "8.2", "9.1"],
     "freshExplicitUserApprovalRequired": true
@@ -153,7 +156,17 @@
       "readBackConfirmed": true,
       "acknowledged": true
     },
-    "registeredInactiveSuccessors": [],
+    "registeredInactiveSuccessors": [
+      {
+        "lane": "integration",
+        "generation": 3,
+        "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+        "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
+        "branch": "codex/routego-integration-g3",
+        "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
+        "status": "awaiting-low-context-acceptance"
+      }
+    ],
     "otherUnfinishedLanes": []
   },
   "history": {

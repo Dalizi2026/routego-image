@@ -300,14 +300,32 @@ try {
 }
 
 if (program && lane) {
+  const registered = capsule.successor.registrationStatus.startsWith("registered");
+  const laneIdentityMatches = registered
+    ? lane.change === capsule.change &&
+      lane.generation === capsule.generation.successor &&
+      lane.threadId === capsule.successor.threadId &&
+      lane.worktree === capsule.successor.worktree &&
+      lane.branch === capsule.successor.plannedBranch &&
+      lane.sourceOwner?.threadId === capsule.source.threadId &&
+      lane.sourceOwner?.worktree === capsule.source.worktree &&
+      lane.sourceOwner?.branch === capsule.source.branch &&
+      lane.sourceOwner?.soleApplyOwner === true
+    : lane.change === capsule.change &&
+      lane.generation === capsule.generation.source &&
+      lane.threadId === capsule.source.threadId &&
+      lane.worktree === capsule.source.worktree &&
+      lane.branch === capsule.source.branch;
+  const successorMatches = registered
+    ? program.successor.threadId === capsule.successor.threadId &&
+      program.successor.worktree === capsule.successor.worktree &&
+      program.successor.plannedBranch === capsule.successor.plannedBranch
+    : program.successor.threadId === null && program.successor.worktree === null;
   if (
     program.currentChange.id !== capsule.change ||
     program.currentChange.openspec.nextTaskId !== capsule.currentState.nextTaskId ||
-    lane.change !== capsule.change ||
-    lane.generation !== capsule.generation.source ||
-    lane.threadId !== capsule.source.threadId ||
-    lane.worktree !== capsule.source.worktree ||
-    lane.branch !== capsule.source.branch
+    !laneIdentityMatches ||
+    !successorMatches
   ) {
     fail("program/lane/capsule current identity mismatch");
   } else {
@@ -335,7 +353,11 @@ if (program && lane) {
 
 try {
   const summaryBytes = readFileSync(resolve(root, capsule.authority.summaryPath));
-  if (sha256(summaryBytes) !== capsule.authority.summarySha256) {
+  const normalizedSummaryBytes = Buffer.from(
+    summaryBytes.toString("utf8").replace(/\r\n/g, "\n"),
+    "utf8",
+  );
+  if (sha256(normalizedSummaryBytes) !== capsule.authority.summarySha256) {
     fail("authority summary fingerprint mismatch");
   } else {
     pass("authority summary fingerprint");

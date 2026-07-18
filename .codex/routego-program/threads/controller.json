@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-authoritative-pd-008-integration-generation-3-registration-authorized-task-3.2-locked",
+  "status": "active-authoritative-pd-008-integration-generation-3-registered-awaiting-low-context-acceptance-task-3.2-locked",
   "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
   "branch": "codex/routego-controller-g5",
@@ -24,15 +24,17 @@
   },
   "currentOperation": {
     "id": "PD-008-low-context-lossless-handoff",
-    "state": "policy-active-all-current-owners-acknowledged-successor-registration-authorized",
-    "allowedNext": "Create/register a fresh Integration G3 with the validated low-context capsule.",
+    "state": "policy-active-integration-generation-3-registered-awaiting-low-context-acceptance",
+    "allowedNext": "Wait for G3 capsule validation and direct/read-back handoff acceptance.",
     "forbidden": ["Integration product/OpenSpec edits", "G2 archive before G3 acceptance", "task 3.2 activation before sole-owner governance"]
   },
   "successor": {
-    "threadId": null,
-    "generation": null,
-    "worktree": null,
-    "plannedBranch": null
+    "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+    "generation": 3,
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
+    "plannedBranch": "codex/routego-integration-g3",
+    "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
+    "status": "registered-inactive-awaiting-low-context-acceptance"
   },
   "reportingContractAcknowledged": true,
   "lowContextLosslessHandoffAcknowledged": true,
