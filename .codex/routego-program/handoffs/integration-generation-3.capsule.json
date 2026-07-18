@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "9ed6b1de55a827cff2f548f103e34655b3145bd71b8dadbf3a38a5f2350291bc",
+  "capsuleSha256": "69a03c22a29020b4493fb9179ed8e11922823906d6077023b70502c6f5ff81a8",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -23,7 +23,7 @@
     "plannedBranch": "codex/routego-integration-g3",
     "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
     "registrationStatus": "registered-awaiting-low-context-acceptance",
-    "registrationCommit": null,
+    "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
     "registrationCommitSemantics": "The registration commit is recorded after a fresh successor task/worktree exists; a containing commit cannot self-reference its own SHA."
   },
   "currentState": {

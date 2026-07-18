@@ -9,6 +9,7 @@
 - successor worktree：`C:\Users\MLTZ\.codex\worktrees\1b58\生图插件`
 - successor branch：`codex/routego-integration-g3`
 - source handoff：`3f1878bbe2e5dc2680b92422a43160bc1cac8802`
+- registration：`3741896e20154699eaec0417a5ef511b4e71c73b`
 - accepted product：`d974cb0d16b7e14ca0766392c7d52356b4967d3c`
 - OpenSpec：11/29，next `3.2`
 - G2 仍是冻结的唯一 apply owner；G3 已登记但未接受、未激活；3.2 锁定
