@@ -1,12 +1,14 @@
 import type { AddressInfo } from "node:net";
 import { fileURLToPath } from "node:url";
 
+import type { StudioImageOperationEvent } from "@routego-image/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import { createServer, type ViteDevServer } from "vite";
 
 import {
   HttpStudioGateway,
   InMemoryStudioSession,
+  STUDIO_CREATION_STREAM_PATH,
   STUDIO_SESSION_HEADER,
   type ObjectUrlApi
 } from "../src/api";
@@ -35,6 +37,41 @@ async function startBridge(): Promise<string> {
     throw new Error("mock bridge did not bind");
   }
   return `http://127.0.0.1:${address.port}`;
+}
+
+function gateway(baseUrl: string): HttpStudioGateway {
+  return new HttpStudioGateway({
+    baseUrl,
+    session: new InMemoryStudioSession(SESSION_TOKEN)
+  });
+}
+
+async function collectStream(
+  baseUrl: string,
+  fixture: string,
+  signal?: AbortSignal
+): Promise<StudioImageOperationEvent[]> {
+  const events: StudioImageOperationEvent[] = [];
+  for await (const event of gateway(baseUrl).streamImageOperation(
+    { kind: "generate", prompt: `mock-stream:${fixture}` },
+    signal === undefined ? {} : { signal }
+  )) {
+    events.push(event);
+  }
+  return events;
+}
+
+function streamFetch(baseUrl: string, fixture: string, signal?: AbortSignal): Promise<Response> {
+  return fetch(`${baseUrl}${STUDIO_CREATION_STREAM_PATH}`, {
+    method: "POST",
+    headers: {
+      accept: "text/event-stream; charset=utf-8",
+      "content-type": "application/json",
+      [STUDIO_SESSION_HEADER]: SESSION_TOKEN
+    },
+    body: JSON.stringify({ kind: "generate", prompt: `mock-stream:${fixture}` }),
+    ...(signal === undefined ? {} : { signal })
+  });
 }
 
 describe("explicit Vite deterministic mock bridge", () => {
@@ -235,5 +272,205 @@ describe("explicit Vite deterministic mock bridge", () => {
     expect(JSON.stringify({ imported, exported })).not.toMatch(
       /(?:C:\\|\/Users\/|data:image|base64|Authorization)/u
     );
+  });
+
+  it("streams genuinely chunked started, partial, and completed events through the production parser", async () => {
+    const baseUrl = await startBridge();
+    const response = await streamFetch(baseUrl, "completed");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("text/event-stream; charset=utf-8");
+    expect(response.headers.get("x-accel-buffering")).toBe("no");
+    if (response.body === null) throw new Error("expected a stream body");
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    while (true) {
+      const result = await reader.read();
+      if (result.done) break;
+      chunks.push(result.value);
+    }
+    expect(chunks.length).toBeGreaterThan(3);
+    const serialized = new TextDecoder().decode(
+      Uint8Array.from(chunks.flatMap((chunk) => [...chunk]))
+    );
+    expect(serialized).toContain("event: started");
+    expect(serialized).toContain("event: partial");
+    expect(serialized).toContain("event: completed");
+    expect(serialized).not.toContain(SESSION_TOKEN);
+    expect(serialized).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64|Authorization)/u);
+
+    const events = await collectStream(baseUrl, "completed");
+    expect(events.map((event) => event.type)).toEqual(["started", "partial", "completed"]);
+    expect(events.map((event) => event.sequence)).toEqual([0, 1, 2]);
+    expect(new Set(events.map((event) => event.requestId)).size).toBe(1);
+    const terminal = events[2];
+    expect(terminal?.type).toBe("completed");
+    if (terminal?.type !== "completed") throw new Error("expected completed event");
+    expect(terminal.result.status).toBe("succeeded");
+  });
+
+  it("authenticates the exact POST stream route before accepting JSON or invoking fixtures", async () => {
+    const baseUrl = await startBridge();
+    const unauthorized = await fetch(`${baseUrl}${STUDIO_CREATION_STREAM_PATH}`, {
+      method: "POST",
+      headers: {
+        accept: "text/event-stream; charset=utf-8",
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({ kind: "generate", prompt: "mock-stream:completed" })
+    });
+    expect(unauthorized.status).toBe(401);
+    expect(await unauthorized.text()).not.toContain("event:");
+
+    const wrongMethod = await fetch(`${baseUrl}${STUDIO_CREATION_STREAM_PATH}`, {
+      method: "GET",
+      headers: {
+        accept: "text/event-stream; charset=utf-8",
+        [STUDIO_SESSION_HEADER]: SESSION_TOKEN
+      }
+    });
+    expect(wrongMethod.status).toBe(405);
+
+    const wrongContentType = await fetch(`${baseUrl}${STUDIO_CREATION_STREAM_PATH}`, {
+      method: "POST",
+      headers: {
+        accept: "text/event-stream; charset=utf-8",
+        "content-type": "text/plain",
+        [STUDIO_SESSION_HEADER]: SESSION_TOKEN
+      },
+      body: JSON.stringify({ kind: "generate", prompt: "mock-stream:completed" })
+    });
+    expect(wrongContentType.status).toBe(415);
+
+    const wrongAccept = await fetch(`${baseUrl}${STUDIO_CREATION_STREAM_PATH}`, {
+      method: "POST",
+      headers: {
+        accept: "text/event-stream",
+        "content-type": "application/json",
+        [STUDIO_SESSION_HEADER]: SESSION_TOKEN
+      },
+      body: JSON.stringify({ kind: "generate", prompt: "mock-stream:completed" })
+    });
+    expect(wrongAccept.status).toBe(406);
+
+    const query = await fetch(`${baseUrl}${STUDIO_CREATION_STREAM_PATH}?token=forbidden`, {
+      method: "POST",
+      headers: {
+        accept: "text/event-stream; charset=utf-8",
+        "content-type": "application/json",
+        [STUDIO_SESSION_HEADER]: SESSION_TOKEN
+      },
+      body: JSON.stringify({ kind: "generate", prompt: "mock-stream:completed" })
+    });
+    expect(query.status).toBe(400);
+  });
+
+  it("preserves a validated partial artifact and billing risk in a failed terminal stream", async () => {
+    const baseUrl = await startBridge();
+    const events = await collectStream(baseUrl, "failed");
+    expect(events.map((event) => event.type)).toEqual(["started", "partial", "failed"]);
+    const partial = events[1];
+    const terminal = events[2];
+    if (partial?.type !== "partial" || terminal?.type !== "failed") {
+      throw new Error("expected partial then failed events");
+    }
+    expect(terminal).toMatchObject({ receivedAnyOutput: true, mayHaveBilled: true });
+    expect(terminal.error).toMatchObject({
+      retryDisposition: "never",
+      receivedAnyOutput: true,
+      mayHaveBilled: true
+    });
+    expect(terminal.error.partialArtifacts[0]?.artifactId).toBe(partial.artifact.artifactId);
+  });
+
+  it("provides deterministic full-five-minute and near-expiry descriptor fixtures", async () => {
+    const baseUrl = await startBridge();
+    const full = await collectStream(baseUrl, "full-expiry");
+    const near = await collectStream(baseUrl, "near-expiry");
+    const fullPartial = full.find((event) => event.type === "partial");
+    const nearPartial = near.find((event) => event.type === "partial");
+    const fullTerminal = full.find((event) => event.type === "completed");
+    const nearTerminal = near.find((event) => event.type === "completed");
+    expect(fullPartial?.type === "partial" ? fullPartial.artifact.resource.expiresAt : undefined).toBe(
+      "2026-01-01T00:05:00.000Z"
+    );
+    expect(nearPartial?.type === "partial" ? nearPartial.artifact.resource.expiresAt : undefined).toBe(
+      "2026-01-01T00:00:30.000Z"
+    );
+    expect(
+      fullTerminal?.type === "completed"
+        ? fullTerminal.result.finalArtifacts[0]?.resource.expiresAt
+        : undefined
+    ).toBe("2026-01-01T00:05:00.000Z");
+    expect(
+      nearTerminal?.type === "completed"
+        ? nearTerminal.result.finalArtifacts[0]?.resource.expiresAt
+        : undefined
+    ).toBe("2026-01-01T00:00:30.000Z");
+    expect(Date.parse("2026-01-01T00:05:00.000Z") - Date.parse("2026-01-01T00:00:00.000Z")).toBe(
+      300_000
+    );
+
+    const repeated = await collectStream(baseUrl, "full-expiry");
+    expect(repeated).toEqual(full);
+    const serialized = JSON.stringify({ full, near });
+    expect(serialized).not.toContain(SESSION_TOKEN);
+    expect(serialized).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64|Authorization)/u);
+  });
+
+  it("fails closed for every invalid deterministic stream fixture", async () => {
+    const baseUrl = await startBridge();
+    for (const fixture of [
+      "missing-started",
+      "duplicate-started",
+      "late-started",
+      "request-id-drift",
+      "invalid-sequence",
+      "invalid-schema",
+      "sentinel",
+      "missing-terminal",
+      "duplicate-terminal",
+      "post-terminal",
+      "eof-before-terminal",
+      "oversize"
+    ]) {
+      await expect(collectStream(baseUrl, fixture), fixture).rejects.toMatchObject({
+        code: "invalid_output"
+      });
+    }
+    await expect(collectStream(baseUrl, "completed")).resolves.toHaveLength(3);
+  });
+
+  it("cleans up aborted and disconnected streams without adding another route", async () => {
+    const baseUrl = await startBridge();
+    const controller = new AbortController();
+    const iterator = gateway(baseUrl)
+      .streamImageOperation(
+        { kind: "generate", prompt: "mock-stream:disconnect" },
+        { signal: controller.signal }
+      )
+      [Symbol.asyncIterator]();
+    await expect(iterator.next()).resolves.toMatchObject({ value: { type: "started" } });
+    await expect(iterator.next()).resolves.toMatchObject({ value: { type: "partial" } });
+    const pending = iterator.next();
+    controller.abort();
+    await expect(pending).rejects.toMatchObject({ code: "network_error" });
+
+    const disconnected = await streamFetch(baseUrl, "disconnect");
+    if (disconnected.body === null) throw new Error("expected disconnect fixture body");
+    const reader = disconnected.body.getReader();
+    await expect(reader.read()).resolves.toMatchObject({ done: false });
+    await reader.cancel();
+
+    const alternate = await fetch(`${baseUrl}/api/v1/studio/creation/events`, {
+      method: "POST",
+      headers: {
+        accept: "text/event-stream; charset=utf-8",
+        "content-type": "application/json",
+        [STUDIO_SESSION_HEADER]: SESSION_TOKEN
+      },
+      body: JSON.stringify({ kind: "generate", prompt: "mock-stream:completed" })
+    });
+    expect(alternate.status).toBe(404);
+    await expect(collectStream(baseUrl, "completed")).resolves.toHaveLength(3);
   });
 });
