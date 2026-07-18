@@ -15,7 +15,7 @@ import type {
 } from "@routego-image/contracts";
 
 import type { StudioGateway } from "../../api";
-import { ProtectedImage } from "../../components";
+import { ProtectedImage, ProtectedResourceBoundary } from "../../components";
 import { useI18n } from "../../i18n";
 import {
   combineCapabilityDecisions,
@@ -46,7 +46,13 @@ import {
   createEditHandoff,
   createInitialCreationDraft
 } from "./draft";
-import { describeCreationResult } from "./result";
+import {
+  describeCreationArtifactAvailability,
+  describeCreationArtifactCleanup,
+  describeCreationResult,
+  describeCreationStreamFailure
+} from "./result";
+import { consumeCreationStream } from "./stream";
 import {
   attachFinalizedMask,
   clearDraftMask,
@@ -171,6 +177,11 @@ const copy = {
     submit: "开始生成",
     submitEdit: "提交编辑",
     submitting: "正在提交受保护请求…",
+    streaming: "正在接收受保护的部分图像…",
+    cancelStream: "取消当前请求",
+    partialStream: "流式显影",
+    streamUnavailable: "受保护图像已过期或本地运行时不可用。",
+    protectedUntil: "服务端描述符截止",
     remove: "移除",
     retry: "重试上传",
     moveUp: "上移",
@@ -229,6 +240,11 @@ const copy = {
     submit: "Generate",
     submitEdit: "Submit edit",
     submitting: "Submitting a protected request…",
+    streaming: "Receiving protected partial images…",
+    cancelStream: "Cancel current request",
+    partialStream: "Streaming development",
+    streamUnavailable: "The protected image expired or the local runtime is unavailable.",
+    protectedUntil: "Server descriptor until",
     remove: "Remove",
     retry: "Retry upload",
     moveUp: "Move up",
@@ -618,6 +634,122 @@ function ResultPanel({
   );
 }
 
+function StreamResultPanel({
+  gateway,
+  state,
+  labels,
+  retryAcknowledged,
+  onRetry,
+  onRetryAcknowledged,
+  onCancel
+}: {
+  readonly gateway: StudioGateway;
+  readonly state: Extract<SubmissionState, { readonly status: "streaming" | "stream-failure" }>;
+  readonly labels: CreationLabels;
+  readonly retryAcknowledged: boolean;
+  readonly onRetry: () => void;
+  readonly onRetryAcknowledged: (value: boolean) => void;
+  readonly onCancel: () => void;
+}) {
+  const presentation =
+    state.status === "stream-failure"
+      ? describeCreationStreamFailure(state)
+      : {
+          tone: "partial" as const,
+          title: labels.streaming,
+          receivedAnyOutput: state.receivedAnyOutput,
+          mayHaveBilled: state.mayHaveBilled,
+          retryRequiresConfirmation: false
+        };
+  return (
+    <section
+      className={`creation-result creation-result--${presentation.tone}`}
+      data-stream-state={state.status}
+    >
+      <div className="creation-result__heading">
+        <p>{labels.partialStream}</p>
+        <h2>{presentation.title}</h2>
+      </div>
+      {state.status === "stream-failure" ? (
+        <p className="creation-result__error" role="alert">
+          {state.safeMessage}
+        </p>
+      ) : null}
+      <div className="creation-result__artifacts">
+        {state.partialArtifacts.map((artifact) => {
+          const availability = describeCreationArtifactAvailability(artifact.resource);
+          const cleanup = describeCreationArtifactCleanup(artifact.resource);
+          return (
+            <article
+              className="result-card"
+              key={artifact.artifactId}
+              data-resource-state={availability.status}
+              data-resource-id={artifact.resource.resourceId}
+              data-browser-object-url-cleanup={cleanup.revokeBrowserObjectUrlOnUnmount}
+              data-server-descriptor-revocation={cleanup.revokeServerDescriptorOnClientCleanup}
+            >
+              <ProtectedResourceBoundary
+                gateway={gateway}
+                descriptor={artifact.resource}
+                fallback={labels.streamUnavailable}
+              >
+                {(resource) => <img src={resource.url} alt="Streamed partial result" />}
+              </ProtectedResourceBoundary>
+              <div className="result-card__meta">
+                <span>{artifact.phase}</span>
+                <span>{artifact.resource.mimeType}</span>
+                <span>
+                  {artifact.resource.width} × {artifact.resource.height}
+                </span>
+                <time dateTime={availability.expiresAt}>
+                  {labels.protectedUntil}: {availability.expiresAt}
+                </time>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      <dl className="creation-result__facts">
+        <div>
+          <dt>{labels.output}</dt>
+          <dd>{presentation.receivedAnyOutput ? labels.yes : labels.no}</dd>
+        </div>
+        <div>
+          <dt>{labels.billing}</dt>
+          <dd>{presentation.mayHaveBilled ? labels.yes : labels.no}</dd>
+        </div>
+      </dl>
+      {state.status === "stream-failure" && presentation.manualRetryWarning ? (
+        <label className="creation-result__warning">
+          <span>{presentation.manualRetryWarning}</span>
+          <span>
+            <input
+              type="checkbox"
+              checked={retryAcknowledged}
+              onChange={(event) => onRetryAcknowledged(event.target.checked)}
+            />
+            {labels.retryAcknowledge}
+          </span>
+        </label>
+      ) : null}
+      {state.status === "streaming" ? (
+        <button className="studio-button" type="button" onClick={onCancel}>
+          {labels.cancelStream}
+        </button>
+      ) : (
+        <button
+          className="studio-button"
+          type="button"
+          disabled={presentation.retryRequiresConfirmation && !retryAcknowledged}
+          onClick={onRetry}
+        >
+          {labels.retryRequest}
+        </button>
+      )}
+    </section>
+  );
+}
+
 export function CreationWorkbench({
   gateway,
   defaults,
@@ -669,9 +801,29 @@ export function CreationWorkbench({
   const [maskEditorOpen, setMaskEditorOpen] = useState(false);
   const [maskTarget, setMaskTarget] = useState<MaskTargetState>({ status: "idle" });
   const draftRef = useRef(draft);
+  const activeStreamRef = useRef<AbortController | undefined>(undefined);
+  const mountedRef = useRef(true);
   const consumedExternalHandoffRef = useRef<string | undefined>(undefined);
   const maskSetupRef = useRef<HTMLDivElement>(null);
   const pendingMaskUploadRef = useRef<UploadLifecycleItem | undefined>(undefined);
+
+  const abandonActiveStream = useCallback(() => {
+    const active = activeStreamRef.current;
+    activeStreamRef.current = undefined;
+    active?.abort();
+  }, []);
+
+  const cancelActiveStream = useCallback(() => {
+    activeStreamRef.current?.abort();
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      abandonActiveStream();
+    };
+  }, [abandonActiveStream]);
 
   useEffect(() => {
     draftRef.current = draft;
@@ -762,6 +914,7 @@ export function CreationWorkbench({
       return;
     }
     consumedExternalHandoffRef.current = externalHandoff.id;
+    abandonActiveStream();
     if (!shouldConsumeCreationExternalHandoff(externalHandoff, undefined)) {
       setSubmission({
         status: "failure",
@@ -786,6 +939,7 @@ export function CreationWorkbench({
     setFieldErrors({});
   }, [
     discardReplacedDraftResources,
+    abandonActiveStream,
     externalHandoff,
     labels.handoffInvalid,
     resetMaskEditor,
@@ -1064,21 +1218,22 @@ export function CreationWorkbench({
       setSubmission({ status: "failure", safeMessage: "请求未通过本地契约验证。" });
       return;
     }
-    setSubmission({ status: "submitting" });
+    abandonActiveStream();
+    const controller = new AbortController();
+    activeStreamRef.current = controller;
     setRetryAcknowledged(false);
-    try {
-      const result =
-        request.kind === "generate"
-          ? await gateway.invoke("studioGenerate", request)
-          : await gateway.invoke("studioEdit", request);
-      setSubmission({ status: "result", result });
-    } catch (error) {
-      setSubmission({
-        status: "failure",
-        safeMessage: error instanceof Error ? error.message : "本地请求未完成。"
-      });
+    await consumeCreationStream(gateway, request, {
+      signal: controller.signal,
+      onState: (state) => {
+        if (mountedRef.current && activeStreamRef.current === controller) {
+          setSubmission(state);
+        }
+      }
+    });
+    if (activeStreamRef.current === controller) {
+      activeStreamRef.current = undefined;
     }
-  }, [draft, gateway, maskDecision, resolve]);
+  }, [abandonActiveStream, draft, gateway, maskDecision, resolve]);
 
   const selectBatchItem = useCallback((item: BatchDraftItem) => {
     setSelectedBatchId(item.id);
@@ -1151,6 +1306,7 @@ export function CreationWorkbench({
   const switchWorkflow = useCallback(
     (next: "single" | "batch") => {
       if (next === workflow) return;
+      abandonActiveStream();
       setWorkflow(next);
       setFieldErrors({});
       setSubmission({ status: "idle" });
@@ -1162,7 +1318,7 @@ export function CreationWorkbench({
         setDraft(cloneCreationDraft(singleDraft));
       }
     },
-    [batchItems, draft, selectedBatchId, singleDraft, workflow]
+    [abandonActiveStream, batchItems, draft, selectedBatchId, singleDraft, workflow]
   );
 
   const imageRows = useMemo(
@@ -1720,18 +1876,25 @@ export function CreationWorkbench({
             <span>{labels.save}</span>
           </label>
           {workflow === "single" ? (
-            <button
-              className="creation-submit"
-              type="button"
-              disabled={submission.status === "submitting"}
-              onClick={() => void submit()}
-            >
-              {submission.status === "submitting"
-                ? labels.submitting
-                : draft.mode === "edit"
-                  ? labels.submitEdit
-                  : labels.submit}
-            </button>
+            <>
+              <button
+                className="creation-submit"
+                type="button"
+                disabled={submission.status === "submitting" || submission.status === "streaming"}
+                onClick={() => void submit()}
+              >
+                {submission.status === "submitting" || submission.status === "streaming"
+                  ? labels.submitting
+                  : draft.mode === "edit"
+                    ? labels.submitEdit
+                    : labels.submit}
+              </button>
+              {submission.status === "submitting" ? (
+                <button className="studio-button" type="button" onClick={cancelActiveStream}>
+                  {labels.cancelStream}
+                </button>
+              ) : null}
+            </>
           ) : null}
           {submission.status === "failure" ? (
             <p className="creation-error" role="alert">
@@ -1765,6 +1928,18 @@ export function CreationWorkbench({
             setSubmission({ status: "idle" });
             setFieldErrors({});
           }}
+        />
+      ) : null}
+      {workflow === "single" &&
+      (submission.status === "streaming" || submission.status === "stream-failure") ? (
+        <StreamResultPanel
+          gateway={gateway}
+          state={submission}
+          labels={labels}
+          retryAcknowledged={retryAcknowledged}
+          onRetry={() => void submit()}
+          onRetryAcknowledged={setRetryAcknowledged}
+          onCancel={cancelActiveStream}
         />
       ) : null}
       {maskEditorOpen ? (

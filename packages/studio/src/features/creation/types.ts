@@ -2,6 +2,7 @@ import type {
   BrowserResourceDescriptor,
   ReadSettingsResult,
   StudioBatchResult,
+  StudioImageArtifact,
   StudioImageInputRef,
   StudioImageOperationResult,
   UploadResourceDescriptor,
@@ -110,7 +111,24 @@ export type BatchSubmissionState =
 export type SubmissionState =
   | { readonly status: "idle" }
   | { readonly status: "submitting" }
+  | {
+      readonly status: "streaming";
+      readonly requestId: string;
+      readonly partialArtifacts: readonly StudioImageArtifact[];
+      readonly receivedAnyOutput: boolean;
+      readonly mayHaveBilled: boolean;
+    }
   | { readonly status: "result"; readonly result: StudioImageOperationResult }
+  | {
+      readonly status: "stream-failure";
+      readonly requestId?: string | undefined;
+      readonly safeMessage: string;
+      readonly partialArtifacts: readonly StudioImageArtifact[];
+      readonly receivedAnyOutput: boolean;
+      readonly mayHaveBilled: boolean;
+      readonly failureKind: "terminal" | "invalid" | "transport" | "cancelled";
+      readonly automaticReplayAllowed: false;
+    }
   | { readonly status: "failure"; readonly safeMessage: string };
 
 export type CreationInputSlot = "reference" | "target" | "supporting";
