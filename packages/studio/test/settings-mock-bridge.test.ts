@@ -123,7 +123,34 @@ describe("Settings lifecycle through the deterministic Studio bridge", () => {
       outputDirectory: { configured: true }
     });
     expect(JSON.stringify(updated)).not.toContain(localCandidate);
-    expect(await gateway.invoke("readSettings", {})).toEqual(updated);
+
+    const unchangedOutput = await gateway.invoke("updateSettings", {
+      outputDirectory: { operation: "unchanged" }
+    });
+    expect(unchangedOutput.outputDirectory).toEqual(updated.outputDirectory);
+
+    const clearedOutput = await gateway.invoke("updateSettings", {
+      outputDirectory: { operation: "clear" }
+    });
+    expect(clearedOutput.outputDirectory).toEqual({ configured: false });
+
+    const defaultOutput = await gateway.invoke("updateSettings", {
+      outputDirectory: { operation: "default" }
+    });
+    expect(defaultOutput.outputDirectory).toEqual({
+      configured: true,
+      display: "Default Pictures/routego-image"
+    });
+
+    const restoredOutput = await gateway.invoke("updateSettings", {
+      outputDirectory: {
+        operation: "replace",
+        path: localCandidate,
+        confirmLocalPath: true
+      }
+    });
+    expect(JSON.stringify(restoredOutput)).not.toContain(localCandidate);
+    expect(await gateway.invoke("readSettings", {})).toEqual(restoredOutput);
 
     const removed = await gateway.invoke("removeProviderProfile", {
       profileId: "mock-provider"
@@ -133,7 +160,21 @@ describe("Settings lifecycle through the deterministic Studio bridge", () => {
     expect(finalSettings.profiles.map((profile) => profile.id)).toEqual([
       created.profile.id
     ]);
-    expect(JSON.stringify({ created, activated, cleared, refreshed, probed, updated, finalSettings }))
-      .not.toMatch(/(?:synthetic-settings-one-shot-secret|\/synthetic\/routego-settings-output|data:image|base64|Authorization)/u);
+    const serialized = JSON.stringify({
+      created,
+      activated,
+      cleared,
+      refreshed,
+      probed,
+      updated,
+      unchangedOutput,
+      clearedOutput,
+      defaultOutput,
+      restoredOutput,
+      finalSettings
+    });
+    expect(serialized).not.toContain(replacement);
+    expect(serialized).not.toContain(localCandidate);
+    expect(serialized).not.toMatch(/(?:data:image|base64,|Authorization)/u);
   });
 });

@@ -83,13 +83,17 @@ describe("secret-safe Settings workspace markup", () => {
   });
 
   it("keeps settings integration free of storage, logging, and remount shortcuts", () => {
+    const workspaceSource = readFileSync(
+      new URL("../src/features/settings/SettingsWorkspace.tsx", import.meta.url),
+      "utf8"
+    );
     const sources = [
-      "../src/features/settings/SettingsWorkspace.tsx",
       "../src/features/settings/state.ts",
       "../src/app/StudioApp.tsx",
       "../src/features/creation/CreationWorkbench.tsx"
     ]
       .map((relative) => readFileSync(new URL(relative, import.meta.url), "utf8"))
+      .concat(workspaceSource)
       .join("\n");
 
     expect(sources).not.toMatch(/localStorage|sessionStorage|indexedDB|document\.cookie/iu);
@@ -98,5 +102,23 @@ describe("secret-safe Settings workspace markup", () => {
     expect(sources).not.toMatch(/key=\{[^}]*defaults/iu);
     expect(sources).toContain('type="password"');
     expect(sources).toContain('autoComplete="off"');
+
+    const apiKeyClear = workspaceSource.indexOf(
+      "setProfileDraft((current) => clearApiKeyDraft(current));"
+    );
+    const profileDispatch = workspaceSource.indexOf(
+      'gateway.invoke("upsertProviderProfile", input)'
+    );
+    const outputPathClear = workspaceSource.indexOf(
+      "setOutputDraft((current) => clearOutputDirectorySensitiveDraft(current));"
+    );
+    const outputDispatch = workspaceSource.indexOf(
+      'gateway.invoke("updateSettings", input)',
+      outputPathClear
+    );
+    expect(apiKeyClear).toBeGreaterThan(-1);
+    expect(profileDispatch).toBeGreaterThan(apiKeyClear);
+    expect(outputPathClear).toBeGreaterThan(-1);
+    expect(outputDispatch).toBeGreaterThan(outputPathClear);
   });
 });

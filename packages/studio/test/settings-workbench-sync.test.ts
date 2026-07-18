@@ -181,7 +181,7 @@ describe("mounted workbench defaults synchronization", () => {
     expect(creationDefaultsFingerprint(originalDefaults)).toBe(
       creationDefaultsFingerprint({ ...originalDefaults })
     );
-    expect(creationDefaultsFingerprint(originalDefaults)).toBe(
+    expect(creationDefaultsFingerprint(originalDefaults)).not.toBe(
       creationDefaultsFingerprint({ ...originalDefaults, model: "another-model-only" })
     );
     expect(creationDefaultsFingerprint(originalDefaults)).not.toBe(

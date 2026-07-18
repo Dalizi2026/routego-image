@@ -81,6 +81,7 @@ export function creationDefaultsFingerprint(
   defaults: ReadSettingsResult["defaults"]
 ): string {
   return JSON.stringify([
+    defaults.model,
     defaults.size,
     defaults.aspectRatio,
     defaults.quality,

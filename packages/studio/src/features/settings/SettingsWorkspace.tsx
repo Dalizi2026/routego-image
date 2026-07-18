@@ -60,7 +60,7 @@ const copy = {
     responsesEndpoint: "Responses 端点（可选）",
     endpointReentry: "原端点含已隐藏查询参数，不能安全回填；保存前请重新输入完整端点。",
     defaultModel: "资料默认模型",
-    apiKey: "API Key 写入操作",
+    apiKeyOperation: "API Key 写入操作",
     apiUnchanged: "保持不变",
     apiReplace: "替换",
     apiClear: "清除",
@@ -144,7 +144,7 @@ const copy = {
     responsesEndpoint: "Responses endpoint (optional)",
     endpointReentry: "The saved endpoint has hidden query data and cannot be safely hydrated. Re-enter the complete endpoint before saving.",
     defaultModel: "Profile default model",
-    apiKey: "API key write operation",
+    apiKeyOperation: "API key write operation",
     apiUnchanged: "Keep unchanged",
     apiReplace: "Replace",
     apiClear: "Clear",
@@ -534,7 +534,7 @@ export function SettingsWorkspace({ gateway, settings, onSettingsChange }: Setti
                 return <label key={name} className="settings-form-grid__wide"><span>{label}</span><input value={profileDraft[name].value} onChange={(event) => setProfileDraft((current) => ({ ...current, [name]: { ...current[name], value: event.target.value, requiresReentry: false } }))} />{profileDraft[name].requiresReentry ? <small>{labels.endpointReentry}</small> : null}<FieldError value={profileErrors[`endpoints.${name}`]} /></label>;
               })}
             </div>
-            <fieldset className="settings-secret-control"><legend>{labels.apiKey}</legend>{(["unchanged", "replace", "clear"] as const).map((operation) => <label key={operation}><input type="radio" name="api-key-operation" checked={profileDraft.apiKeyOperation === operation} onChange={() => setProfileDraft((current) => ({ ...current, apiKeyOperation: operation, apiKeyReplacement: "" }))} />{operation === "unchanged" ? labels.apiUnchanged : operation === "replace" ? labels.apiReplace : labels.apiClear}</label>)}{profileDraft.apiKeyOperation === "replace" ? <label className="settings-secret-control__replacement"><span>{labels.apiReplacement}</span><input type="password" autoComplete="new-password" value={profileDraft.apiKeyReplacement} onChange={(event) => setProfileDraft((current) => ({ ...current, apiKeyReplacement: event.target.value }))} /><FieldError value={profileErrors["apiKey.value"]} /></label> : null}<p>{labels.apiSafe}</p></fieldset>
+            <fieldset className="settings-secret-control"><legend>{labels.apiKeyOperation}</legend>{(["unchanged", "replace", "clear"] as const).map((operation) => <label key={operation}><input type="radio" name="api-key-operation" checked={profileDraft.apiKeyOperation === operation} onChange={() => setProfileDraft((current) => ({ ...current, apiKeyOperation: operation, apiKeyReplacement: "" }))} />{operation === "unchanged" ? labels.apiUnchanged : operation === "replace" ? labels.apiReplace : labels.apiClear}</label>)}{profileDraft.apiKeyOperation === "replace" ? <label className="settings-secret-control__replacement"><span>{labels.apiReplacement}</span><input type="password" autoComplete="new-password" value={profileDraft.apiKeyReplacement} onChange={(event) => setProfileDraft((current) => ({ ...current, apiKeyReplacement: event.target.value }))} /><FieldError value={profileErrors["apiKey.value"]} /></label> : null}<p>{labels.apiSafe}</p></fieldset>
             <label className="settings-check"><input type="checkbox" checked={profileDraft.setActive} onChange={(event) => setProfileDraft((current) => ({ ...current, setActive: event.target.checked }))} />{labels.setActive}</label>
             <div className="settings-profile-editor__actions"><button type="submit">{labels.saveProfile}</button>{selectedProfile && !selectedProfile.isActive ? <button type="button" onClick={() => void activateProfile()}>{labels.activate}</button> : null}</div>
             {selectedProfile ? <div className="settings-profile-editor__remove"><label className="settings-check"><input type="checkbox" checked={removeConfirmed} onChange={(event) => setRemoveConfirmed(event.target.checked)} />{labels.confirmRemove}</label><button type="button" className="is-danger" disabled={!removeConfirmed} onClick={() => void removeProfile()}>{labels.remove}</button></div> : null}
