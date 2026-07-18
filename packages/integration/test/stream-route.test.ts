@@ -348,6 +348,15 @@ describe("authenticated Studio creation stream route", () => {
       "access-control-allow-origin": ORIGIN,
       "access-control-allow-methods": "POST, OPTIONS"
     });
+
+    const wrongPreflight = await routeDispatcher.dispatch(request(STUDIO_CREATION_STREAM_PATH, input, {
+      method: "OPTIONS",
+      headers: {
+        "access-control-request-method": "GET",
+        "access-control-request-headers": "x-routego-session"
+      }
+    }));
+    expect(wrongPreflight.status).toBe(405);
     expect(execute).not.toHaveBeenCalled();
   });
 
@@ -363,6 +372,13 @@ describe("authenticated Studio creation stream route", () => {
       { headers: { "content-type": "text/plain" } }
     ));
     expect(wrongContentType.status).toBe(415);
+
+    const wrongCharset = await routeDispatcher.dispatch(request(
+      STUDIO_CREATION_STREAM_PATH,
+      generateRequest(),
+      { headers: { "content-type": "application/json; charset=iso-8859-1" } }
+    ));
+    expect(wrongCharset.status).toBe(415);
 
     const malformed = await routeDispatcher.dispatch(request(
       STUDIO_CREATION_STREAM_PATH,
@@ -390,6 +406,13 @@ describe("authenticated Studio creation stream route", () => {
       { headers: { "content-length": "129" } }
     ));
     expect(oversized.status).toBe(413);
+
+    const mismatchedLength = await routeDispatcher.dispatch(request(
+      STUDIO_CREATION_STREAM_PATH,
+      {},
+      { headers: { "content-length": "2" }, body: chunks("{} ") }
+    ));
+    expect(mismatchedLength.status).toBe(400);
     expect(execute).not.toHaveBeenCalled();
   });
 
@@ -401,6 +424,10 @@ describe("authenticated Studio creation stream route", () => {
     {
       name: "duplicate started",
       source: (input: StudioImageOperationRequest) => values(started(input), started(input, "stream-request", 1), completed(input, "stream-request", 2))
+    },
+    {
+      name: "started input drift",
+      source: (input: StudioImageOperationRequest) => values(started(editRequest()), completed(input))
     },
     {
       name: "request ID drift",
@@ -451,6 +478,37 @@ describe("authenticated Studio creation stream route", () => {
     expect(dataEvents(consumed.chunks).map((event) => event["type"])).toEqual(["started"]);
   });
 
+  it("rejects a schema-valid terminal that contains credential or path diagnostics", async () => {
+    const input = generateRequest();
+    const unsafeError = studioServiceErrorSchema.parse({
+      code: "internal_contract",
+      category: "internal",
+      stage: "complete",
+      safeMessage: "Authorization: Bearer synthetic-secret C:\\Users\\Synthetic\\private.png",
+      retryDisposition: "never",
+      partialArtifacts: [],
+      receivedAnyOutput: false,
+      mayHaveBilled: false
+    });
+    const response = await dispatcher(async () => values(
+      started(input),
+      {
+        type: "failed",
+        requestId: "stream-request",
+        sequence: 1,
+        occurredAt: TIMESTAMP,
+        error: unsafeError,
+        receivedAnyOutput: false,
+        mayHaveBilled: false
+      }
+    )).dispatch(request(STUDIO_CREATION_STREAM_PATH, input));
+    const consumed = await consume(response);
+
+    expect(consumed.error).toBeInstanceOf(Error);
+    expect(dataEvents(consumed.chunks).map((event) => event["type"])).toEqual(["started"]);
+    expect(consumed.chunks.join("")).not.toMatch(/synthetic-secret|C:\\Users\\Synthetic/u);
+  });
+
   it("aborts the injected operation and closes its channel when the client disconnects", async () => {
     const input = generateRequest();
     let operationSignal: AbortSignal | undefined;
@@ -473,6 +531,44 @@ describe("authenticated Studio creation stream route", () => {
     await iterator.return?.();
     expect(operationSignal?.aborted).toBe(true);
     expect(channelClosed).toBe(true);
+  });
+
+  it("races a request abort against a blocked source and still returns the iterator", async () => {
+    const input = generateRequest();
+    const requestController = new AbortController();
+    let operationSignal: AbortSignal | undefined;
+    let returned = false;
+    let calls = 0;
+    const execute: StudioCreationStreamExecutor = async (_actual, context) => {
+      operationSignal = context.signal;
+      return {
+        [Symbol.asyncIterator]() {
+          return {
+            next: async () => {
+              calls += 1;
+              if (calls === 1) return { done: false as const, value: started(input) };
+              return await new Promise<IteratorResult<unknown>>(() => undefined);
+            },
+            return: async () => {
+              returned = true;
+              return { done: true as const, value: undefined };
+            }
+          };
+        }
+      };
+    };
+    const response = await dispatcher(execute).dispatch(request(
+      STUDIO_CREATION_STREAM_PATH,
+      input,
+      { signal: requestController.signal }
+    ));
+    const iterator = iterableBody(response)[Symbol.asyncIterator]();
+
+    await expect(iterator.next()).resolves.toMatchObject({ done: false });
+    requestController.abort();
+    await expect(iterator.next()).rejects.toMatchObject({ code: "cancelled" });
+    expect(operationSignal?.aborted).toBe(true);
+    expect(returned).toBe(true);
   });
 
   it("returns a safe JSON failure when the injected service cannot open a channel", async () => {
