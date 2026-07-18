@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "fc9a336c73f3eb654f4135073dfc8cafa006819ca81537d5d14eb6d74ab8a138",
+  "contentSha256": "ffc4829428195c9e8f12b9ff3e1855e614c74ce29fa4815d270f59040f896822",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.2",
-  "status": "paused-for-owner-openspec-update-then-proven-common-root-correction",
-  "sourceCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
+  "status": "authorized-phase-a-common-root-correction-phase-b-locked",
+  "sourceCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
-    "fileSha256": "e26665f7b358b92d18785ebaf93d62f744447a90e8ea883721f38cbbb487dc5c",
-    "lineSha256": "4bf2f84a055959eb367c2573c96b95b9523d66567803e218f710787891bccff3",
-    "lineBytes": 1542
+    "fileSha256": "1a0145ef1f4eae77376e14fdbff55b2e06b1d0722d171def3a5d5694b8a66250",
+    "lineSha256": "d6282a75ca648d510951505d9d1519ac7e71519b9d04fd7c6230c6f88097471e",
+    "lineBytes": 2861
   },
   "dependencies": ["2.1", "3.2", "3.5", "4.1"],
   "allowedFiles": [
@@ -103,7 +103,7 @@
     "acceptedPreviousTaskImplementationCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
     "acceptedPreviousTaskCheckpointCommit": "2379675079c39942061d3907fb63e045f069c75b",
     "acceptedPreviousTaskStateSyncCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
-    "acceptedHead": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
+    "acceptedHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "sourceOwnerArchived": true,
     "soleApplyOwner": true,
     "applyAuthorized": true,
@@ -113,7 +113,9 @@
     "decision": ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
     "decisionSha256": "9e11b7ae4369608e7d84f382da979f144b82ff7ffaa7a44b5d0efb1f566d49e2",
     "decisionSha256ByteCounting": "utf8-after-crlf-to-lf-normalization",
-    "status": "accepted-controller-locked-pending-owner-openspec-update",
+    "status": "planning-accepted-phase-a-authorized-phase-b-locked",
+    "planningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+    "planningParent": "c0f965dfe860174522dd9ce2ea50762c226ee6e1",
     "originalTaskId": "3.5",
     "reportedDuringTaskId": "4.2",
     "sourceCheckpointCommit": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
@@ -129,7 +131,9 @@
       "packages/integration/test/routes.test.ts",
       "packages/integration/test/stream-route.test.ts"
     ],
-    "implementationGate": "No product edit until G5 commits the coherent existing-artifact OpenSpec update and Controller accepts it; the two-file corrective checkpoint must then be accepted before the four-file task-4.2 phase resumes."
+    "implementationGate": "Phase A is authorized as one exact two-file corrective commit; Phase B remains locked until the Phase A corrective checkpoint passes focused/full verification and Controller acceptance.",
+    "phaseAAuthorized": true,
+    "phaseBLocked": true
   },
   "unresolvedIssues": [],
   "knownRisks": [

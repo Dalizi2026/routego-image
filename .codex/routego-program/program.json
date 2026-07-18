@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-009-controller-generation-6-active-integration-generation-5-task-4.2-paused-pending-owner-openspec-common-root-update",
+  "status": "pd-009-controller-generation-6-active-integration-generation-5-task-4.2-phase-a-common-root-correction-authorized-phase-b-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -72,7 +72,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "branch": "codex/routego-integration-g5",
     "acceptedProductCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
-    "currentHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+    "currentHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
@@ -83,14 +83,14 @@
   "successor": {
     "lane": "integration",
     "generation": 5,
-    "status": "activated-sole-apply-owner-task-4.2-paused-pending-owner-openspec-common-root-update",
+    "status": "activated-sole-apply-owner-task-4.2-phase-a-authorized-phase-b-locked",
     "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "plannedBranch": "codex/routego-integration-g5",
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "currentHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+    "currentHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
     "gitClean": true,
     "observableCompactions": 1,
@@ -108,17 +108,20 @@
     },
     "currentTask": {
       "capsule": ".codex/routego-program/tasks/integration-4.2.json",
-      "locked": true,
+      "locked": false,
       "activationAuthorized": true,
       "commonRootCorrectionAuthorized": true,
-      "pauseReason": "PD-009 requires an owner-only coherent OpenSpec update before the two-file task-3.5 common-root correction and before the original four-file task-4.2 implementation resumes."
+      "phaseAAuthorized": true,
+      "phaseBLocked": true,
+      "acceptedPlanningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+      "pauseReason": "Only the exact two-file PD-009 Phase A correction is authorized. The original four-file task 4.2 Phase B remains locked until Phase A checkpoint acceptance."
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|156eb59e063a6ff99ff7671883974d4b5cb18bba|context-compaction-1-paused-before-pd-009-authorization|16/29",
-    "messageType": "INTEGRATION_CONTEXT_HEALTH_CHECKPOINT",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|8353f3b5024ffcf96c5c71adaa93bac53d93da57|pd-009-openspec-planning-accepted-phase-a-authorized|16/29",
+    "messageType": "INTEGRATION_PD_009_OPENSPEC_UPDATED",
     "workerThreadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
-    "reportedHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
+    "reportedHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "completedTaskId": "4.1",
     "nextTaskId": "4.2",
     "openspecProgress": "16/29",
@@ -127,7 +130,7 @@
     "controllerAccepted": true,
     "handoffAccepted": true,
     "planDeviationAccepted": true,
-    "controllerIndependentVerification": "Controller reproduced the schema-bound mismatch: Studio results allow 12 partial artifacts, nested Studio service errors allow 4, service.ts passed the full list while results.ts already bounds the nested projection. The producer defect can suppress the required failed terminal event for valid 5-12 partial cases, so task 4.2 is paused for an owner-only OpenSpec update and an exact two-file task-3.5 common-root correction before the four-file route phase resumes."
+    "controllerIndependentVerification": "Controller independently verified exact design/spec/tasks scope, task 4.2 remains unchecked, strict OpenSpec 19/19 passed, fresh apply instructions report 16/29, Git is clean, and no product file changed. Phase A is authorized for exactly service.ts and service.test.ts; Phase B remains locked."
   },
   "controllerSuccessor": {
     "lane": "controller",
@@ -181,7 +184,7 @@
     "continuityFallbackIntervalMinutes": 30
   },
   "currentBlockers": [
-    "Integration G5 must commit and report the PD-009 owner-only OpenSpec update before any product edit; the exact two-file common-root corrective checkpoint must then be accepted before the original four-file task 4.2 phase resumes."
+    "PD-009 Phase A exact two-file common-root corrective checkpoint must pass focused/full Integration verification and Controller acceptance before the original four-file task 4.2 Phase B resumes."
   ],
   "currentRisks": [
     "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence.",
@@ -260,8 +263,8 @@
       "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
       "branch": "codex/routego-integration-g5",
-      "acceptedHead": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
-      "status": "sole-apply-owner-task-4.2-paused-pending-owner-openspec-common-root-update"
+      "acceptedHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+      "status": "sole-apply-owner-task-4.2-phase-a-authorized-phase-b-locked"
     },
     "otherUnfinishedLanes": []
   },
