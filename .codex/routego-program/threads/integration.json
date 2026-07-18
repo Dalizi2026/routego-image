@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "offline-apply-active",
+  "status": "handoff-ready-awaiting-successor-registration",
   "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "threadId": "019f72fd-fb6f-7b52-b383-03471f42f05a",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4687\\生图插件",
@@ -14,9 +14,9 @@
   "generation": 0,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "2026-07-18-compaction-2-task-1.1-checkpoint-at-5a7cfedbe6f44b402a9d253c475c46869bed6a0d",
-  "lastHealthAudit": "passed-task-1.1-contract-verification-and-separate-implementation-task-state-commits; generation-0-stop-before-1.2",
-  "successorThreadId": null,
-  "openspecState": "offline-apply-active",
+  "lastHealthAudit": "passed-task-1.1-and-generation-1-handoff-governance-audit; generation-0-paused-before-1.2",
+  "successorThreadId": "pending",
+  "openspecState": "offline-apply-paused-handoff-ready",
   "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 1/28 apply tasks executed; task 1.1 implementation and sole-owner task-state commits verified",
   "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
@@ -27,7 +27,24 @@
   "controllerApprovalCommit": "35ca516c66f3951a3286cf3f12617271d7fa76aa",
   "applyAuthorized": true,
   "externalStateAuthorized": false,
-  "nextTask": "Stop generation 0 after task 1.1; Controller must register and accept a fresh isolated Integration successor from the committed 1.1 checkpoint before any task 1.2 work.",
+  "nextTask": "Wait for Controller generation 3 to register the generation 1 Integration successor from this governance handoff commit; generation 0 must not start task 1.2.",
+  "handoff": {
+    "file": ".codex/routego-program/handoffs/integration-generation-1.md",
+    "sourceGeneration": 0,
+    "targetGeneration": 1,
+    "sourceCheckpoint": "737bd0789b228a29ab0c75251be97d07261b54a4",
+    "controllerGovernanceCheckpoint": "270e61afafd79e22ec1e9ec4917ae6820fcad304",
+    "plannedSuccessorBranch": "codex/routego-integration-g1",
+    "successorThreadId": "pending",
+    "successorWorktree": "pending",
+    "successorStartingPoint": "the governance-only commit containing this handoff file and thread-state update; full SHA is delivered in INTEGRATION_HANDOFF_READY",
+    "openspecProgress": "1/28",
+    "completedTask": "1.1",
+    "nextTask": "1.2",
+    "applyOwnerState": "generation 0 is paused; generation 1 is not active until registered, accepted, and explicitly made the sole apply owner",
+    "productEditsAuthorizedBeforeAcceptance": false,
+    "externalStateAuthorized": false
+  },
   "continuityCheckpoint": {
     "observableCompactions": 2,
     "completedTask": "1.1",
@@ -37,8 +54,8 @@
     "gitCleanBeforeGovernanceCommit": true,
     "stopReason": "Second observable compaction requires a safe checkpoint and task 1.2 is a large atomic Library task.",
     "successorRequiredBefore": "1.2",
-    "successorThreadId": null,
-    "requiredControllerAction": "Register a fresh Integration successor task/worktree from the committed task-1.1 checkpoint, obtain its real registration, and accept the handoff before any product edit."
+    "successorThreadId": "pending",
+    "requiredControllerAction": "Register a fresh Integration successor task/worktree from the governance handoff commit, obtain its real registration, and accept the handoff before any product edit."
   },
   "applyActivation": {
     "approvedPlanningArtifactCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
