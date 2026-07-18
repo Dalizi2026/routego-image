@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-3-active-sole-apply-owner-task-3.3-accepted-task-3.4-unlocked-not-started",
+  "status": "generation-3-active-sole-apply-owner-task-3.4-complete-awaiting-controller-review",
   "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
   "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
@@ -12,8 +12,8 @@
   "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
   "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
   "incorporationCommit": "12169d245d4f124f796ba137e1cb6410d5c7dff9",
-  "currentHead": "941a119db3f2054da2bca97d6e0ccaa0188da991",
-  "latestActivationIncorporationHead": "a9ffc747ae0e9bd62097a0f4a7489516a6500140",
+  "currentHead": "b41340603ddfb57fc83d1fc73c56c0728ddfd69b",
+  "latestActivationIncorporationHead": "c53821eec3a0a92fdc63de31ccddbc52c7370703",
   "gitCleanAtRegistration": true,
   "gitClean": true,
   "observableCompactions": 2,
@@ -37,15 +37,17 @@
   },
   "openspec": {
     "totalTasks": 29,
-    "completedTasks": 13,
-    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3"],
-    "nextTaskId": "3.4",
-    "nextTaskLocked": false
+    "completedTasks": 14,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4"],
+    "nextTaskId": "3.5",
+    "nextTaskLocked": true
   },
   "currentTask": {
     "id": "3.4",
     "capsule": ".codex/routego-program/tasks/integration-3.4.json",
-    "activationStatus": "unlocked-sole-owner-authorized-not-started"
+    "activationStatus": "completed-implementation-and-task-state-committed-awaiting-controller-review",
+    "implementationCommit": "17208da376f71790561ae87e3d59b77287765b3b",
+    "taskStateCommit": "b41340603ddfb57fc83d1fc73c56c0728ddfd69b"
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
@@ -55,29 +57,27 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|941a119db3f2054da2bca97d6e0ccaa0188da991|task-3.3-complete-controller-accepted|13/29",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|b41340603ddfb57fc83d1fc73c56c0728ddfd69b|task-3.4-complete-awaiting-controller-review|14/29",
     "messageType": "INTEGRATION_TASK_COMPLETED",
-    "completedTaskId": "3.3",
-    "nextTaskId": "3.4",
-    "reportedHead": "941a119db3f2054da2bca97d6e0ccaa0188da991",
-    "controllerReceived": true,
-    "controllerReadBackConfirmed": true,
-    "controllerAccepted": true,
+    "completedTaskId": "3.4",
+    "nextTaskId": "3.5",
+    "reportedHead": "b41340603ddfb57fc83d1fc73c56c0728ddfd69b",
+    "controllerReceived": false,
+    "controllerReadBackConfirmed": false,
+    "controllerAccepted": false,
     "handoffAccepted": true
   },
   "latestTaskCompletion": {
-    "taskId": "3.3",
-    "activationIncorporationHead": "a9ffc747ae0e9bd62097a0f4a7489516a6500140",
-    "implementationCommit": "a7b939cb75d5ec170b105f7fe8f5b94a24ec7bce",
-    "taskStateCommit": "537a0ffd4f3ba367d95dfa09282351808116b5db",
-    "checkpointCommit": "941a119db3f2054da2bca97d6e0ccaa0188da991",
-    "controllerAccepted": true,
+    "taskId": "3.4",
+    "activationIncorporationHead": "c53821eec3a0a92fdc63de31ccddbc52c7370703",
+    "implementationCommit": "17208da376f71790561ae87e3d59b77287765b3b",
+    "taskStateCommit": "b41340603ddfb57fc83d1fc73c56c0728ddfd69b",
+    "controllerAccepted": false,
     "files": [
-      "packages/integration/src/composition/inputs.ts",
-      "packages/integration/src/composition/graph.ts",
-      "packages/integration/test/inputs.test.ts"
+      "packages/integration/src/composition/results.ts",
+      "packages/integration/test/results.test.ts"
     ],
-    "verification": "Controller independently passed typecheck, 134/134 tests, build, strict OpenSpec 19/19, repository safety 429, exact scopes and clean Git.",
+    "verification": "Fresh apply instructions confirmed task 3.4 then 14/29 after task-state update; Integration typecheck passed; 151/151 tests passed; build passed; Library 164/164 tests passed; strict OpenSpec passed 19/19; repository safety passed for 432 tracked files; exact two-file implementation scope, offline/no-native, Git diff and clean implementation checks passed.",
     "externalStateTouched": false
   },
   "reportingContract": {
