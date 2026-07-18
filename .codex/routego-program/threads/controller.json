@@ -8,7 +8,7 @@
   "branch": "codex/routego-controller-g2",
   "startingCommit": "4be05e4d9c134363affb0ff02c50bb6ca7767a32",
   "registrationCommit": "fc882b94f68b3c5247e0251cd13f20f4777c0ee7",
-  "headCommit": "846794234ab21c36b8191851177dd0fdf29d2bc1",
+  "headCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
   "generation": 2,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "g2-compaction-2-library-complete-studio-7.1-2026-07-18",
@@ -89,6 +89,9 @@
     "Post-archive verification at 2477b3ed4abcd909c1d3a8a837c02c813427feea exposed a deterministic time-dependent folders.test.ts fixture failure: the folder store used an injected 01:00Z clock while the asset store used the real clock, allowing updatedAt to precede createdAt after current UTC crossed the fixture time. The archive was reverted at fcac5c2abb8684e8b3bb66f21409905a4e5aaa32 and Library generation 2 was reactivated for tasks 3.2 and 5.2.",
     "Final Library delivery 96fea3b5618808fd00daac274178512daf2a5ff2 fixed the shared-clock test fixture at 99fd61d8e707a159b2a78330e03a376c170b0d37, passed independent Controller verification at 3cd8007e40675e6e5c1e93d2d09a34cc078944dc with 330 tests and five repeated clock regressions, merged at c7ee16a6bca371e656ce11253c31636f7f05e9d1, retained the exact three-spec sync from a9875ed368324b03941893a1ab994b3ff039a499, and was moved back to the Library archive for final post-archive verification.",
     "Final Library archive baseline 50141def268015579febee067c311aa09aaf117f passed frozen install, strict validation for 13 main specifications, safety across 261 tracked files, all workspace typechecks/builds, 404 tests including Creation 74 and Library 147, all seven package exports, exact seven-operation freeze, archive integrity, archived-delta/main-spec equality, dependency/native, provider-boundary, secret/image/path, diff and Git-clean audits. Library is complete; Integration remains blocked only on Studio.",
-    "Controller generation 2 observed its second context compaction after final Library governance acceptance at 846794234ab21c36b8191851177dd0fdf29d2bc1 while Studio generation 3 was executing final task 7.1. A fresh authority, branch, lane-completion and Git-clean audit passed; this governance checkpoint is mandatory before Studio delivery review."
+    "Controller generation 2 observed its second context compaction after final Library governance acceptance at 846794234ab21c36b8191851177dd0fdf29d2bc1 while Studio generation 3 was executing final task 7.1. A fresh authority, branch, lane-completion and Git-clean audit passed; this governance checkpoint is mandatory before Studio delivery review.",
+    "Studio generation 3 delivered 11/11 at ef7dc14df9a1fd58566faa92334a1697d9ab2589. Controller independently verified the exact delivery in a fresh detached worktree, merged it at 987fd2207fde599be85b5dc64b039fb09f500e61, synchronized five Studio specifications at 93b8e92267e91edf16e33c7d36e77965f55724e4, and archived the change at 5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb.",
+    "The final functional-lane baseline passed frozen install, strict validation for 18 main specifications, safety across 367 tracked files, all workspace typechecks/builds, 493 tests, all seven package exports, Playwright 6/6 plus a repeated core journey, exact seven-operation/tool freeze, Creation/Library/Studio archive-main-spec equality, runtime dependency/native, browser, secret/path and Git-clean audits.",
+    "Creation, Library and Studio are all merged, synchronized and archived. The lane-continuity heartbeat was deleted after its completion condition was satisfied; Integration is now ready for a fresh top-level task and isolated worktree."
   ]
 }

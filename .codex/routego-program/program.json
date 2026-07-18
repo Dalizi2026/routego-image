@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "parallel-lanes-active",
+  "status": "integration-ready",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -127,10 +127,7 @@
       "archiveCommit": "d03389ec108bcfd9e79ed076048e50b430900028",
       "postArchiveVerification": "passed",
       "integrationNotified": false,
-      "waitingFor": [
-        "add-routego-image-library",
-        "add-routego-studio"
-      ]
+      "waitingFor": []
     },
     "library": {
       "status": "merged-synced-archived",
@@ -150,10 +147,32 @@
       "archiveRevertCommit": "fcac5c2abb8684e8b3bb66f21409905a4e5aaa32",
       "postArchiveVerification": "passed: frozen install, strict 13/13, safety 261 tracked files, typecheck, build, 404 tests, seven exports, seven-operation freeze, archive/spec/dependency/security/Git-clean audits",
       "integrationNotified": false,
-      "waitingFor": [
-        "add-routego-studio"
-      ]
+      "waitingFor": []
+    },
+    "studio": {
+      "status": "merged-synced-archived",
+      "sourceThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
+      "deliveryCommit": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
+      "verifiedHead": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
+      "openspecProgress": "11/11",
+      "mergeCommit": "987fd2207fde599be85b5dc64b039fb09f500e61",
+      "specSyncCommit": "93b8e92267e91edf16e33c7d36e77965f55724e4",
+      "archivePath": "openspec/changes/archive/2026-07-18-add-routego-studio",
+      "archiveCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
+      "postArchiveVerification": "passed: frozen install, strict 18/18, safety 367 tracked files, typecheck, build, 493 tests, seven exports, Playwright 6/6 plus core repeat, seven-operation freeze, three-lane archive/spec equality, dependency/native/browser/security/Git-clean audits",
+      "integrationNotified": false,
+      "waitingFor": []
     }
+  },
+  "integrationReadiness": {
+    "status": "ready-for-dispatch",
+    "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
+    "completedDependencies": [
+      "add-routego-image-creation",
+      "add-routego-image-library",
+      "add-routego-studio"
+    ],
+    "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits"
   },
   "automations": {
     "foundationAuditGate": {
@@ -168,7 +187,7 @@
       "id": "routego-lane-continuity-monitor",
       "kind": "heartbeat",
       "intervalMinutes": 15,
-      "status": "ACTIVE",
+      "status": "DELETED",
       "targetThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
       "lanes": [
         "creation",
@@ -176,7 +195,8 @@
         "studio"
       ],
       "behavior": "ignore active lanes; report incomplete idle lanes missing a structured checkpoint; prevent duplicate wakeups and concurrent apply owners",
-      "deleteWhen": "creation, library, and studio changes are all complete"
+      "deleteWhen": "creation, library, and studio changes are all complete",
+      "deletedAfter": "all three functional lanes merged, synchronized, archived, and passed frozen mainline verification"
     }
   }
 }
