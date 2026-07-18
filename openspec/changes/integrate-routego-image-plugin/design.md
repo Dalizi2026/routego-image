@@ -120,6 +120,8 @@ Integration will use Creation's validated JSON dispatcher and event serializer, 
 
 Readers, fetch bodies, event channels, and operation abort controllers close on terminal, disconnect, cancel, invalid input, or shutdown. Validated ephemeral image resources have an independent immutable expiry no later than the earlier of registration plus five minutes or owning-session expiry; they are not revoked merely because the stream closes or Studio revokes a browser object URL. Server resources are removed only on descriptor/session expiry or process shutdown. Sessions, listeners, transaction-owned temporary files, and all remaining resources close on their own expiry or shutdown boundaries.
 
+HTTP response backpressure is an HTTP-host lifecycle boundary, not a route-owned lease policy. Every wait after `target.write()` returns `false` races `drain` against response `close`/`error` and the request `AbortSignal`. The host owns the active response-body iterator while writing, so `writeResponse()` MUST explicitly return it from a `finally` path on normal completion, disconnect, abort, or error. This makes the producer route's `finally` run promptly and close its reader, event channel, file, or ephemeral lease exactly once; it does not buffer whole bodies, replay the request, duplicate route cleanup, or shorten immutable resource expiry.
+
 ### 12. Keep the Skill thin and the MCP surface exact
 
 The Skill reads status, maps user intent to the existing seven tools, supplies only necessary validated fields, distinguishes variants from batch, uses current-call paths/content only, explains unavailable/degraded capability, and never asks for or prints a complete key. It does not run provider scripts or hardcode a personal plugin path.

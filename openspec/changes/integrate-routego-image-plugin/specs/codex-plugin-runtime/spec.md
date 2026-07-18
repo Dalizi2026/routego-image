@@ -66,9 +66,15 @@ All non-static local routes SHALL require an active session header and exact mat
 ### Requirement: Runtime lifecycle releases every resource
 The plugin process SHALL keep stdout protocol-only, write only recursively redacted diagnostics to stderr, recover Library state before readiness, and release HTTP listeners, sessions, event channels, streams, abort controllers, readers, timers, browser resources, temporary files, and MCP framing state on their defined lifecycle boundaries. Every ephemeral descriptor expiry SHALL be fixed at registration no later than `min(registration time + 5 minutes, owning session expiry)`. Terminal, disconnect, cancellation, invalid input, or browser object-URL revocation SHALL close client/stream resources but SHALL NOT shorten that server descriptor expiry; descriptor/session expiry and process shutdown SHALL revoke server resources. The runtime MUST NOT force `process.exit()` as a business result protocol.
 
+When an HTTP response write applies backpressure, the loopback host SHALL race the pending `drain` against response close/error and request abort, stop writing after disconnect, and explicitly return the active response-body iterator from `finally` so producer cleanup runs promptly.
+
 #### Scenario: Session-capped descriptor expires
 - **WHEN** a resource is registered for a session with less than five minutes remaining
 - **THEN** its descriptor SHALL expire with the session, allow protected fetch only before that exact boundary, and reject access at or after expiry
+
+#### Scenario: Client disconnects during real loopback-host backpressure
+- **WHEN** `IntegrationLoopbackHttpHost` streams a large protected resource over a real loopback connection, actual response backpressure is active, and the client disconnects while the host is waiting for `drain`
+- **THEN** the host SHALL promptly resolve the wait, stop writing, return the active response-body iterator, and allow the producer `finally` to close its reader, channel, file, and ephemeral lease exactly once; the immutable descriptor expiry SHALL remain unchanged and the runtime SHALL NOT replay the request, duplicate cleanup, or disclose resource bytes, paths, session values, or credentials
 
 #### Scenario: Operation completes successfully
 - **WHEN** one MCP or HTTP operation returns
