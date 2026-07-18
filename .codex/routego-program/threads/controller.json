@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-integration-planning-revision",
+  "status": "active-integration-offline-apply",
   "threadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\0c1f\\生图插件",
   "branch": "codex/routego-controller-g3",
   "startingCommit": "5a8f8a21c23cc4292449da039f196c0ed604a82f",
   "registrationCommit": "72e72c6ec4f9809f0c7cf8919e1ddf15f350c872",
-  "headCommit": "4e13aa0dbb76220853caa9a33fbf7248f5e2a4d8",
+  "headCommit": "63516e2e3e3b6e7bbb93045f69d04849f773961e",
   "generation": 3,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "g3-compaction-1-integration-planning-active-2026-07-18",
-  "lastHealthAudit": "passed-integration-plan-review-revision-required",
+  "lastHealthAudit": "passed-final-integration-plan-review-offline-apply-authorized",
   "successorThreadId": null,
   "predecessorThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
   "predecessorGeneration": 2,
@@ -99,6 +99,7 @@
     "Integration was paused at clean tracked HEAD 4e0a31b192a4b51a56c90c6475b11d4d094a3013 with only untracked .openspec.yaml and proposal.md. Those files must remain uncommitted and unchanged until G3 independently reviews the reported Library relationship and Studio SSE deviations; no proposal continuation or apply authorization is implied.",
     "Controller generation 3 independently reproduced both Integration gaps and accepted PD-005 for planning only. The complete correction uses a Library-only source rendition phase with a 33-rendition bound, exact relationship artifact retry reconstruction, and authenticated Studio fetch-stream consumption with deterministic streaming tests. These are prerequisite groups inside the Integration change; apply remains prohibited until a strict INTEGRATION_PLAN_READY review.",
     "Controller generation 3 observed its first context compaction while Integration was actively producing proposal/design/delta-spec/task artifacts at tracked HEAD 149ca920feb6fc714db4e210e4a304f6540f3e57. A fresh authority, branch, worktree, planning-only scope, product-diff and Git-clean audit passed; Integration remains active and apply remains prohibited.",
-    "Integration planning delivery e6484be76e6fc2fa33fbe53d418991ea7fd549e1 passed structural OpenSpec 19/19, lineage, scope, dependency, capability and freeze checks, but Controller review found five planning defects: the fixed 33-rendition bound conflicts with durable chromakey original/processed pairs, the SSE state machine/route is ambiguous, partial-resource lifetime conflicts with terminal cleanup, offline release preparation depends unnecessarily on billable acceptance, and Integration delivery state is stale. A planning-only revision was required; apply remains prohibited."
+    "Integration planning delivery e6484be76e6fc2fa33fbe53d418991ea7fd549e1 passed structural OpenSpec 19/19, lineage, scope, dependency, capability and freeze checks, but Controller review found five planning defects: the fixed 33-rendition bound conflicts with durable chromakey original/processed pairs, the SSE state machine/route is ambiguous, partial-resource lifetime conflicts with terminal cleanup, offline release preparation depends unnecessarily on billable acceptance, and Integration delivery state is stale. A planning-only revision was required; apply remains prohibited.",
+    "Final Integration planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e resolved all review findings and the follow-up session-lifetime issue. Controller independently verified the exact lineage, planning-only scope, 28 tasks at 0 complete, OpenSpec status/apply instructions, strict 19/19, exact seven tools, public partial/final phase, 17+12+4=33 graph, one authenticated stream route/state machine, session-capped ephemeral expiry, offline release-preparation ordering and Git cleanliness. Offline tasks 1.1-7.1 and 8.1 are approved; real-relay task 7.2, release task 8.2 and final task 9.1 remain blocked on fresh explicit user approvals and actual prerequisite completion."
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "integration-planning-revision-required",
+  "status": "integration-offline-apply-authorized",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -165,7 +165,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "planning-delivery-reviewed-revision-required",
+    "status": "planning-approved-offline-apply-authorized",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -174,14 +174,15 @@
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
     "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
-    "planningHold": "Controller G3 reviewed planning commit e6484be76e6fc2fa33fbe53d418991ea7fd549e1 and required planning-only corrections for the 33-rendition/chromakey conflict, exact SSE state machine and route, partial-resource lifetime, offline release-preparation dependency, and stale Integration delivery state; apply remains prohibited",
+    "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
       "live partial Studio events require independent review of the frozen Studio SSE transport/workbench boundary"
     ],
     "deviationDecision": "PD-005 accepted both findings with a narrowed complete source-rendition/retry design and authenticated Studio fetch-stream design; corrections must be prerequisite task groups inside integrate-routego-image-plugin and do not authorize apply",
-    "planningCommitCandidate": "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
-    "planningReview": "revision-required-before-apply; structural OpenSpec validation passed 19/19, but five Controller findings remain"
+    "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
+    "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
+    "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified"
   },
   "automations": {
     "foundationAuditGate": {
