@@ -15,10 +15,10 @@
   "generation": 1,
   "observableCompactions": 3,
   "lastCompactionFingerprint": "2026-07-18-generation-1-compaction-3-before-task-1.5",
-  "lastHealthAudit": "passed-fresh-authority-open-spec-pd-006-pd-007-and-task-1.5-activation-audit; governance-checkpoint-required-before-small-task-1.5; task-2.1-wip-preserved-and-held",
+  "lastHealthAudit": "passed-task-1.5-verification-and-task-state-audit; task-1.5-complete; task-2.1-held-for-fresh-controller-review",
   "successorThreadId": null,
   "openspecState": "offline-apply-active",
-  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 4/29 apply tasks executed; tasks 1.1 through 1.4 implementation and sole-owner task-state commits verified; PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 accepted; task 1.5 activated",
+  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 5/29 apply tasks executed; tasks 1.1 through 1.5 implementation and sole-owner task-state commits verified; PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 accepted",
   "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
     "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
@@ -50,12 +50,12 @@
     "heldTask": "2.1",
     "externalStateAuthorized": false
   },
-  "nextTask": "1.5",
+  "nextTask": "2.1",
   "latestTaskCompletion": {
-    "taskId": "1.4",
-    "implementationCommit": "34956e46182d7df8d7b5a6af98659ab2bb68f658",
-    "taskStateCommit": "b54f8dcbc8f36fbb967e14b56b643ef9e25e590d",
-    "verification": "passed: fresh apply instructions, focused Studio Library handoff tests 18/18, Studio typecheck, Studio build, full Studio tests 103/103, repository safety 387 tracked files, OpenSpec strict 19/19, diff check and exact two-file scope audit",
+    "taskId": "1.5",
+    "implementationCommit": "5f76c2c24840ab01a73b0e02fda83f209613fec6",
+    "taskStateCommit": "2b86f3ac5f8f19a127ed3a864fabe9bfda9706d1",
+    "verification": "passed: fresh apply instructions, focused primary/schema identity test 1/1, mock-relay typecheck, full mock-relay tests 44/44, mock-relay build, Creation typecheck regression, root typecheck including preserved Integration WIP, repository safety 387 tracked files, OpenSpec strict 19/19, git diff --check, exact two-file implementation scope audit",
     "externalStateTouched": false
   },
   "handoff": {
