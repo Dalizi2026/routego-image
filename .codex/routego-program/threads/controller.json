@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-integration-task-2.2-accepted-generation-2-handoff-pending",
+  "status": "active-compaction-3-checkpoint-integration-generation-2-registration-pending",
   "threadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1756\\生图插件",
   "branch": "codex/routego-controller-g4",
   "startingCommit": "e8b96e3685b939843d9029657bd2108116a38b03",
   "registrationCommit": "c292c2d461ed33000d7f154edba04908f36eedce",
-  "headCommit": "8dc6c598f16f04ff72482be3564a0c263b3bfa73",
+  "headCommit": "e7f4b5e266356a54a9dc374154cb35b2dfcd9939",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 4,
-  "observableCompactions": 2,
-  "lastCompactionFingerprint": "g4-compaction-2-integration-task-1.5-complete-awaiting-checkpoint-2026-07-18",
-  "lastHealthAudit": "passed-generation-4-compaction-2-and-integration-task-2.2-correction-independent-review; generation-2-handoff-pending",
+  "observableCompactions": 3,
+  "lastCompactionFingerprint": "g4-compaction-3-integration-g2-handoff-preparation-after-task-2.2-2026-07-18",
+  "lastHealthAudit": "passed-generation-4-compaction-3-git-checkpoint-and-integration-generation-2-handoff-commit-audit; successor-registration-pending",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -120,6 +120,7 @@
     "Integration task 2.1 direct checkpoint 38acc116e63ef8231041e2edec099bd31fcdd568 was independently accepted after direct implementation/task-state/thread-state ancestry, exact eleven-file scope, frozen install for eight workspaces, stream-route 15/15, Integration and root typechecks/builds, seven-package exports, contracts 96/96, exact pngjs dependency/license/native audit, repository safety 395, strict OpenSpec 19/19, diff checks and clean Git. At Integration compaction 3, only bounded five-file task 2.2 in the same streaming gate is activated; task 2.3 remains locked.",
     "Integration task 2.2 checkpoint e3e74c2847886b00b3f4b5d0e102075cd97f1c7c has correct commit ancestry and exact five-file scope but is not accepted. Controller reproduced that StrictSseDecoder undercounts each CRLF delimiter by one byte: a raw 398-byte terminal record passes maximumEventBytes=394. Only a task-2.2 root correction and raw-byte CRLF regression are authorized; task 2.3 remains locked.",
     "Integration generation 1 compaction-4 checkpoint 8bcf49953342485baee142ebe6457383bcd06b5a was independently confirmed as a clean governance-only integration.json commit directly after e3e74c2. PD-006 pre-handoff was active: Integration was allowed only to finish the current task-2.2 correction and prepare handoff.",
-    "Integration task 2.2 corrected checkpoint 8de8eab3d0b433440c7a29142d76f2d5117b0a84 was independently accepted. Corrective implementation acc4a4cb56ce99ed1a854a95c1286daecba3be33 changes only sse.ts and sse.test.ts; the original 398-byte CRLF event is rejected at maximumEventBytes=394, exact LF/CRLF boundaries pass, Studio 28/28 focused and 125/125 full tests pass, typecheck/build/safety 397/strict 19/19/diff/Git are clean. Generation-2 handoff and sole-owner activation are now required before task 2.3."
+    "Integration task 2.2 corrected checkpoint 8de8eab3d0b433440c7a29142d76f2d5117b0a84 was independently accepted. Corrective implementation acc4a4cb56ce99ed1a854a95c1286daecba3be33 changes only sse.ts and sse.test.ts; the original 398-byte CRLF event is rejected at maximumEventBytes=394, exact LF/CRLF boundaries pass, Studio 28/28 focused and 125/125 full tests pass, typecheck/build/safety 397/strict 19/19/diff/Git are clean. Generation-2 handoff and sole-owner activation are now required before task 2.3.",
+    "Controller generation 4 observable compaction 3 established the mandatory PD-006 Git checkpoint from clean HEAD e7f4b5e266356a54a9dc374154cb35b2dfcd9939. Integration generation-1 handoff commit 776ac00e053404a997f458f21aaecdcd373233e2 was independently verified as a direct child of corrected clean checkpoint 8de8eab3d0b433440c7a29142d76f2d5117b0a84 with exactly integration-generation-2.md and integration.json, OpenSpec 7/29 and task 2.3 held. Only the already-started generation-2 registration/acceptance/activation handoff may continue; no new large governance or product task is authorized."
   ]
 }
