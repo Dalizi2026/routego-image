@@ -8,7 +8,7 @@
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\ec66\\生图插件",
   "branch": "codex/routego-studio-g2",
   "startingCommit": "649e4fe1da0bacdeb0eca9c3d20378a209303fdd",
-  "headCommit": "ede29e1116f976bc358650c0822cb6736336392a",
+  "headCommit": "75f49bd3df28d7bdd6b1ae09ab258d3d1e6cd890",
   "generation": 2,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "context-checkpoint-2026-07-18-studio-g2-task-5.1-settings-wip",
@@ -22,9 +22,9 @@
   "controllerRegistrationCommit": "9a8d5d90180a5cdfa5c5945b95b57bfc0ff9f701",
   "controllerActivationCommit": "fe58fff02ac6f64248262ac57f90f5f40f18717e",
   "handoffFile": ".codex/routego-program/handoffs/studio-generation-2.md",
-  "openspecProgress": "8/11",
-  "lastCompletedTask": "4.2",
-  "nextTask": "5.1",
+  "openspecProgress": "9/11",
+  "lastCompletedTask": "5.1",
+  "nextTask": "6.1",
   "recentValidation": {
     "studioTypecheck": "passed",
     "studioTests": "22 files, 76 tests passed",
@@ -35,7 +35,7 @@
     "maskIntegration": "supported/degraded/unknown gates, target resolution, PNG finalize/slot-zero binding, upload failure recovery, saved/unsaved close, and resource discard regressions passed",
     "libraryTask41": "path-free search/filter/sort/cursor pages, protected cards/detail/resources/download, comparison bounds, Trash retention, and identifier-only one-shot retry/edit handoff passed focused and browser regression checks",
     "libraryTask42": "folder create/rename/reorder, multi-selection and multi-folder changes, guarded Trash mutations, exact confirmations, per-item partial results, protected ZIP export, single-consume ZIP import, restricted manageLibrary bridging, and conflict/failure recovery passed focused gateway/mock and full Studio gates",
-    "settingsTask51Wip": "Studio typecheck and 13 focused settings/default-synchronization tests passed before the compaction-2 checkpoint"
+    "settingsTask51": "provider profile create/update/remove/activate, write-only secret and output-path clearing, non-billable refresh, confirmed probe/four-state evidence, complete defaults, redacted output operations, and mounted single/preserved/batch synchronization passed focused and full Studio gates"
   },
   "sharedRepositorySafetyFix": {
     "status": "resolved-by-controller",
@@ -64,7 +64,8 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-active-task-5.1-compaction-2-checkpoint"
+    "controllerContinuityCommit": "874b627dfb4125e6b01e307fa4231a7f1a7b3daa",
+    "status": "generation-2-task-5.1-complete-awaiting-successor"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
