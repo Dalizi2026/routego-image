@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "controller-generation-4-active-integration-task-2.2",
+  "status": "controller-generation-4-active-integration-task-2.2-correction",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -191,7 +191,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-task-2.1-accepted-task-2.2-bounded-continuation-active",
+    "status": "offline-apply-task-2.2-correction-required-task-2.3-locked",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -199,7 +199,7 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "38acc116e63ef8231041e2edec099bd31fcdd568",
+    "integrationHead": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
     "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
@@ -209,23 +209,25 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 2 remains healthy. Integration generation 1 remains at compaction 3 after its Git checkpoint; task 2.1 is independently accepted, and only bounded five-file task 2.2 in the same streaming gate is activated as the next atomic boundary. Task 2.3 and every later task remain locked pending a fresh direct checkpoint and Controller review. No external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 2 remains healthy. Integration generation 1 remains at compaction 3 after its Git checkpoint. Task 2.2 checkpoint e3e74c2847886b00b3f4b5d0e102075cd97f1c7c was received but failed independent CRLF event-byte-bound verification, so only a narrow task-2.2 correction is authorized. Task 2.3 and every later task remain locked. No external authority is added.",
     "lastDirectCheckpoint": {
       "messageType": "INTEGRATION_TASK_CHECKPOINT",
       "workerThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
-      "completedTask": "2.1",
-      "nextTask": "2.2",
-      "reportedHead": "38acc116e63ef8231041e2edec099bd31fcdd568",
-      "checkpointCommit": "38acc116e63ef8231041e2edec099bd31fcdd568",
+      "completedTask": "2.2-reported-correction-required",
+      "nextTask": "2.2-correction",
+      "reportedHead": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
+      "checkpointCommit": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
       "planningCommit": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
-      "implementationCommit": "8aebff8bb61cf3f07fbeefb129b615e751387bb0",
-      "taskStateCommit": "5ba8ebc2ea0efb89fc0bd39d4dec04ac1084d494",
-      "threadStateCommit": "38acc116e63ef8231041e2edec099bd31fcdd568",
-      "openspecProgress": "6/29",
+      "implementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
+      "taskStateCommit": "722c183fed4efdf62d7f678feacc30a9bd64c961",
+      "threadStateCommit": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
+      "openspecProgress": "7/29-reported-not-accepted",
       "gitState": "clean; no staged or untracked files",
       "controllerReceived": true,
       "controllerReadBackConfirmed": true,
-      "acceptedByControllerMessage": "INTEGRATION_TASK_2_1_ACCEPTED_TASK_2_2_ACTIVATED"
+      "controllerAccepted": false,
+      "reviewFinding": "CRLF event records undercount each two-byte line ending as one byte, allowing a raw 398-byte terminal record through maximumEventBytes=394.",
+      "acceptedByControllerMessage": "INTEGRATION_TASK_2_2_REVIEW_CORRECTION_REQUIRED"
     },
     "activePlanDeviation": {
       "messageType": "PLAN_DEVIATION",
@@ -235,7 +237,7 @@
       "committedHead": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
       "openspecProgress": "4/28",
       "finding": "Frozen deterministic mock detail omits required primaryArtifactId; mock-relay, Creation, and root typecheck fail at the same source.",
-      "disposition": "Resolved by planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 and task-1.5 implementation 5f76c2c24840ab01a73b0e02fda83f209613fec6. Task 2.1 is now independently accepted at 38acc116e63ef8231041e2edec099bd31fcdd568 after exact eleven-file scope, frozen install, Integration 15/15, Integration/root typechecks and builds, seven-package exports, contracts 96/96, dependency/native/license audit, safety 395, strict 19/19, diff and Git-clean checks. Only bounded task 2.2 is activated; task 2.3 remains locked.",
+      "disposition": "PD-007 remains resolved. Task 2.1 is independently accepted at 38acc116e63ef8231041e2edec099bd31fcdd568. Task 2.2 checkpoint e3e74c2847886b00b3f4b5d0e102075cd97f1c7c is not accepted because StrictSseDecoder counts every completed CRLF line as content bytes plus one instead of the raw two-byte CRLF delimiter. Controller reproduced a 398-byte terminal record passing maximumEventBytes=394. Correct task 2.2 within its original five files, add a raw-byte CRLF boundary regression, rerun all declared gates, and keep task 2.3 locked.",
       "productFilesChanged": false,
       "externalStateTouched": false,
       "controllerReceived": true,
@@ -245,8 +247,9 @@
       "task1_5Complete": true,
       "task2_1HeldUntil1_5": false,
       "task2_1ContinuationAuthorized": true,
-      "task2_2Locked": false,
-      "task2_2ContinuationAuthorized": true,
+      "task2_2Locked": true,
+      "task2_2ContinuationAuthorized": false,
+      "task2_2CorrectionAuthorized": true,
       "task2_3Locked": true
     }
   },
