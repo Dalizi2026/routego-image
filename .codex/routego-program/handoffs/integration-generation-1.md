@@ -4,16 +4,16 @@
 
 - 泳道/change：`integration` / `integrate-routego-image-plugin`
 - 来源任务：`019f72fd-fb6f-7b52-b383-03471f42f05a`，generation 0
-- 继任任务：`pending`，generation 1；由 Controller 创建并回填真实 thread ID
+- 继任任务：`019f737f-80f3-7cd2-a6c7-aaec1f017d8d`，generation 1
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\4687\生图插件`
 - 来源分支：`codex/routego-integration`
 - 来源安全 checkpoint：`737bd0789b228a29ab0c75251be97d07261b54a4`
 - 计划继任分支：`codex/routego-integration-g1`
-- 继任 worktree：`pending`；必须是 Controller 从本治理交接提交创建的全新隔离 worktree
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\5b94\生图插件`；由 Controller 从本治理交接提交创建的全新隔离 worktree
 - Controller 任务：`019f7309-d473-74a2-934b-e81726d90a31`
 - Controller 分支：`codex/routego-controller-g3`
 - Controller 治理 checkpoint：`270e61afafd79e22ec1e9ec4917ae6820fcad304`
-- 本交接治理提交：由当前文件与 `threads/integration.json` 的唯一治理提交形成；完整 SHA 通过 `[INTEGRATION_HANDOFF_READY]` 和 successor registration 传递，不在提交内自引用。
+- successor registration 提交：由当前文件与 `threads/integration.json` 的唯一治理提交形成；完整 SHA 通过 `[INTEGRATION_SUCCESSOR_REGISTERED]` 传递，不在提交内自引用。
 
 ## OpenSpec 与提交状态
 
@@ -105,7 +105,7 @@
 
 ## 阻塞、残余风险与建议
 
-- 当前治理阻塞：successor 真实 thread/worktree 尚未登记；generation 1 尚未接受交接并成为唯一 apply-owner。
+- 当前治理阻塞：successor 真实 thread/worktree 已登记；generation 1 尚未纳入 registration commit、接受交接并成为唯一 apply-owner。
 - 技术阻塞：无；1.1 已验证完成。
 - 残余风险：1.1 扩展了共享 Library detail contract，现有 Library persistence/read seams 仍需由 1.2 在同一原子任务内完成适配，不能在交接期间零散修改。
-- 推荐下一步：Controller 从本治理交接提交创建并登记 generation 1 独立 worktree，发送 registration；generation 0 保持停止，直到收到 successor 接管确认。
+- 推荐下一步：Controller 向 generation 0 与 generation 1 发送真实 registration；generation 1 纳入登记提交并接受交接，generation 0 保持停止，直到 Controller 完成唯一 apply-owner 切换。
