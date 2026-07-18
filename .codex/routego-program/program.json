@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "controller-generation-4-active-integration-task-2.1",
+  "status": "controller-generation-4-active-integration-task-2.1-paused-plan-deviation",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -191,7 +191,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-task-2.1-active",
+    "status": "offline-apply-task-2.1-paused-for-pd-007-plan-update",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -209,7 +209,7 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. Integration generation 1 checkpoint 94a7870e2d9eb0bda14062b52e6f8a31bc520248 at observable compaction 2 was independently accepted and does not require a successor; only task 2.1 remains authorized. No external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 1 audit passed. Integration generation 1 checkpoint 94a7870e2d9eb0bda14062b52e6f8a31bc520248 remains the committed baseline; task 2.1 is paused for PD-007 planning revision and no external authority is added.",
     "lastDirectCheckpoint": {
       "messageType": "INTEGRATION_HEALTH_CHECKPOINT",
       "workerThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
@@ -223,6 +223,19 @@
       "controllerReceived": true,
       "controllerReadBackConfirmed": true,
       "acceptedByControllerMessage": "INTEGRATION_HEALTH_CHECKPOINT_ACCEPTED_PD_006_TASK_2_1_CONTINUE"
+    },
+    "activePlanDeviation": {
+      "messageType": "PLAN_DEVIATION",
+      "record": ".codex/routego-program/deviations/PD-007-integration-mock-primary-artifact-baseline.md",
+      "workerThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
+      "currentTask": "2.1",
+      "committedHead": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
+      "openspecProgress": "4/28",
+      "finding": "Frozen deterministic mock detail omits required primaryArtifactId; mock-relay, Creation, and root typecheck fail at the same source.",
+      "disposition": "Planning-only amendment: add task 1.5 with exact mock source/test files, make 2.1 depend on 1.5, then Controller review before implementation unlock.",
+      "productFilesChanged": false,
+      "externalStateTouched": false,
+      "controllerReceived": true
     }
   },
   "automations": {
