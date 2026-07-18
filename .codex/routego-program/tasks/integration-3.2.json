@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "eb835dcff13e2e858f176cbde848ae416012400719a3ee218ea6767384c8b038",
+  "contentSha256": "6db330720645620330f8f5f4f4cce278420b08807b0ae11eb760e711590e8b15",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "3.2",
@@ -48,7 +48,7 @@
     "normal and near-expiry descriptors, immutable expiry/ETag, exact pre/post-expiry fetch and shutdown revocation",
     "chromakey alpha, same artifact identity, one persisted byte stream, complex-content refusal and processing-failure original fallback",
     "synthetic-only/no-native audit",
-    "pnpm safety",
+    "node scripts/check-repository-safety.mjs",
     "git diff --check",
     "exact four-file scope review"
   ],

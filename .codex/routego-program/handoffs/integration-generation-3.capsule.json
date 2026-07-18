@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "935fd8af5b53d8f7484c0e09e5b110c7e5b72d081cd7323ca2f8dbaae1e8253d",
+  "capsuleSha256": "753becebd47b3d3080bd1f39f4f4b42bed0a03763eb1c9ffeb58861491cfda78",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -33,7 +33,7 @@
     "nextTaskId": "3.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-3.2.json",
-      "sha256": "eb835dcff13e2e858f176cbde848ae416012400719a3ee218ea6767384c8b038"
+      "sha256": "6db330720645620330f8f5f4f4cce278420b08807b0ae11eb760e711590e8b15"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
@@ -97,7 +97,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 91424,
+    "expectedNormalizedUtf8Bytes": 91453,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
