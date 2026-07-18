@@ -1,11 +1,13 @@
 # Program Controller generation 4 交接清单
 
 - 来源 Controller task：`019f7309-d473-74a2-934b-e81726d90a31`，generation 3。
-- 继任 Controller task：`pending`，generation 4。
+- 继任 Controller task：`019f73d0-1bf4-73c2-8ca9-e28370d34595`，generation 4。
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\1756\生图插件`。
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\0c1f\生图插件`。
 - 来源分支：`codex/routego-controller-g3`。
 - 计划继任分支：`codex/routego-controller-g4`。
-- 权威交接提交：包含本文件、`program.json` 与 `controller.json` 更新的提交；完整 SHA 在 `[CONTROLLER_SUCCESSOR_REGISTERED]` 中传递。
+- 权威交接提交：`e8b96e3685b939843d9029657bd2108116a38b03`。
+- Registration 提交：包含真实 successor task/worktree 登记的后续治理提交；完整 SHA 在 `[CONTROLLER_SUCCESSOR_REGISTERED]` 中传递。
 - 交接原因：Controller G3 在收到 Integration 任务 1.4 后出现新的明确模型上下文摘要，达到第 3 次可观测压缩。按健康协议，必须在授权大型任务 2.1 前交给全新顶层任务和新 worktree。
 
 ## Integration 当前权威状态
