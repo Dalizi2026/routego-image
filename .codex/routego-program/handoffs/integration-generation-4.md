@@ -9,7 +9,8 @@
 - source branch：`codex/routego-integration-g3`
 - source handoff：`fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc`
 - accepted task 3.4 implementation：`17208da376f71790561ae87e3d59b77287765b3b`
-- successor：Integration G4 task/worktree `pending`
+- successor：Integration G4 task `019f7633-a831-7b62-a00a-d4b6fba5515e`
+- successor worktree：`C:\Users\MLTZ\.codex\worktrees\a818\生图插件`
 - planned branch：`codex/routego-integration-g4`
 - OpenSpec：14/29，next `3.5` locked
 - 当前 task capsule：`.codex/routego-program/tasks/integration-3.5.json`

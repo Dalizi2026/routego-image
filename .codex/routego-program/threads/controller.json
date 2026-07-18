@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-authoritative-pd-008-integration-generation-3-frozen-generation-4-registration-pending-task-3.5-locked",
+  "status": "active-authoritative-pd-008-integration-generation-3-frozen-generation-4-registered-awaiting-low-context-acceptance-task-3.5-locked",
   "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
   "branch": "codex/routego-controller-g5",
@@ -35,8 +35,8 @@
   },
   "currentOperation": {
     "id": "PD-008-integration-generation-4-handoff",
-    "state": "task-3.4-accepted-generation-3-frozen-generation-4-registration-pending-task-3.5-locked",
-    "allowedNext": "Controller may register a new Integration G4 task/worktree from the clean G3 handoff baseline. G4 must complete low-context acceptance before any sole-owner activation.",
+    "state": "task-3.4-accepted-generation-3-frozen-generation-4-registered-awaiting-low-context-acceptance-task-3.5-locked",
+    "allowedNext": "Integration G4 may incorporate the Controller registration governance and complete only the PD-008 low-context acceptance. G3 remains frozen owner until acceptance.",
     "forbidden": ["Controller product/OpenSpec edits", "Integration G3 task 3.5 implementation", "G3 archival before G4 acceptance", "G4 self-activation", "external approval gates 7.2, 8.2 or 9.1 without fresh user approval"]
   },
   "successor": {
@@ -70,11 +70,11 @@
     },
     "pendingSuccessor": {
       "generation": 4,
-      "threadId": "pending",
-      "worktree": "pending",
+      "threadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
+      "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a818\\生图插件",
       "plannedBranch": "codex/routego-integration-g4",
       "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
-      "status": "controller-registration-pending-task-3.5-locked"
+      "status": "registered-awaiting-low-context-acceptance-task-3.5-locked"
     }
   },
   "reportingContractAcknowledged": true,

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "7a38812ab22866515fd3b543e13976c6ef9a6edb085401726fb200fd2bc6c5dd",
+  "capsuleSha256": "ff0662074febbb8ab071d7c2eb61e5a08d39471d3951623a7598e587672c6928",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -18,11 +18,11 @@
     "handoffParent": "b41340603ddfb57fc83d1fc73c56c0728ddfd69b"
   },
   "successor": {
-    "threadId": "pending",
-    "worktree": "pending",
+    "threadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a818\\生图插件",
     "plannedBranch": "codex/routego-integration-g4",
     "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
-    "registrationStatus": "pending-controller-registration-task-3.5-locked",
+    "registrationStatus": "registered-awaiting-low-context-acceptance-task-3.5-locked",
     "registrationCommit": null,
     "registrationCommitSemantics": "The registration commit is recorded only after a fresh successor task and worktree exist; pending identity is a legal pre-registration state."
   },
@@ -33,7 +33,7 @@
     "nextTaskId": "3.5",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-3.5.json",
-      "sha256": "5da1428931aeb4e01f648964ce3d3ea3095512c5ab2f0c0cc9ed9940ab28c812"
+      "sha256": "9ccc7eaebcc42b0d0a1abb4d6532c6b09fca4af3ac5eaeb1a925d5f95d6f79b1"
     },
     "taskLocked": true,
     "sourceIsSoleApplyOwner": true,
@@ -59,7 +59,7 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": ["Integration G4 task/worktree registration, low-context acceptance and explicit sole-owner activation are pending."],
+    "blockers": ["Integration G4 low-context acceptance and explicit sole-owner activation are pending."],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "residualRisks": [
@@ -103,7 +103,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 98225,
+    "expectedNormalizedUtf8Bytes": 98064,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
