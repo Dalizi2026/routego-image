@@ -8,7 +8,7 @@
   "branch": "codex/routego-controller-g2",
   "startingCommit": "4be05e4d9c134363affb0ff02c50bb6ca7767a32",
   "registrationCommit": "fc882b94f68b3c5247e0251cd13f20f4777c0ee7",
-  "headCommit": "fc882b94f68b3c5247e0251cd13f20f4777c0ee7",
+  "headCommit": "8dbe4fdcb9c9ad32d1a2c31f808133b50067e989",
   "generation": 2,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -78,6 +78,8 @@
     "Studio generation 2 established its mandatory compaction-2 checkpoint at ec5ce6992bc22477ffda96d12762e4e23a010ec6 while task 5.1 was in progress; it may finish only 5.1 and must hand off to a fresh task/worktree before task 6.1.",
     "Library generation 2 delivered 10/10 at fd62a90dc1899ab9d0c993b7192da910e2fa4914 with a clean verified head 341a2fe7d2cfe82ca4a9ac315423071c6911701d and full conformance; independent Controller review, merge, spec sync and archive remain pending.",
     "Controller generation 1 reached observable compaction 3 after receiving the Library delivery, so the mandatory generation-2 Controller handoff was initiated before any Library merge.",
-    "Program Controller generation 2 accepted the handoff in task 019f728e-0b4d-7552-b03a-7ca53eb9c0ae at clean branch codex/routego-controller-g2 HEAD fc882b94f68b3c5247e0251cd13f20f4777c0ee7 after the complete authority and registration audit."
+    "Program Controller generation 2 accepted the handoff in task 019f728e-0b4d-7552-b03a-7ca53eb9c0ae at clean branch codex/routego-controller-g2 HEAD fc882b94f68b3c5247e0251cd13f20f4777c0ee7 after the complete authority and registration audit.",
+    "Studio generation 2 completed task 5.1 at e6845138d88b8225a552b55aa0241e78b1bcee1e and OpenSpec checkpoint 75f49bd3df28d7bdd6b1ae09ab258d3d1e6cd890, then stopped at 9/11 and observable compaction 2 before task 6.1.",
+    "A fresh pinned Studio generation 3 task 019f7296-ee8d-7bd1-aa0f-376914e35408 and isolated worktree C:\\Users\\MLTZ\\.codex\\worktrees\\3cf3\\生图插件 were created from exact handoff commit 6cc3640849a0d4a89481e25d4234f7f7b5a4ec52; Studio registration commit dfcb6f85fedd3b2da8853ef37a0ce97f238741dc must be accepted before sole-owner activation."
   ]
 }

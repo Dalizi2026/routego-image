@@ -1,0 +1,29 @@
+# Studio generation 3 交接清单
+
+- 泳道/change：`studio` / `add-routego-studio`
+- 来源任务：`019f7245-f614-7911-9ea1-c974cd82fa35`，generation 2
+- 继任任务：`019f7296-ee8d-7bd1-aa0f-376914e35408`，generation 3
+- 计划分支：`codex/routego-studio-g3`
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\3cf3\生图插件`
+- 交接治理起始提交：`6cc3640849a0d4a89481e25d4234f7f7b5a4ec52`
+- 来源分支：`codex/routego-studio-g2`
+- 交接前治理 HEAD：`dd5bcdfe5071deffc513a60e478c05df28a99f52`
+- 本交接文件所在提交：`6cc3640849a0d4a89481e25d4234f7f7b5a4ec52`
+- 产品/OpenSpec checkpoint：`75f49bd3df28d7bdd6b1ae09ab258d3d1e6cd890`
+- 5.1 安全 WIP 检查点：`ec5ce6992bc22477ffda96d12762e4e23a010ec6`
+- 5.1 最终实现：`e6845138d88b8225a552b55aa0241e78b1bcee1e`
+- OpenSpec 状态提交：`75f49bd3df28d7bdd6b1ae09ab258d3d1e6cd890`
+- OpenSpec：`9/11`
+- 已完成：`1.1,1.2,2.1,2.2,3.1,3.2,4.1,4.2,5.1`
+- 下一任务：`6.1`
+- 剩余：`6.1,7.1`
+- 可观察压缩：`2`
+- Git：交接提交形成后必须保持干净。
+- 5.1 交付：真实 Settings 页面、资料增删改/激活、端点重录、API Key `unchanged/replace/clear` 与 dispatch 前清空、非计费模型刷新、逐次确认的潜在计费探测、四态/瞬时失败证据、完整默认值与输出目录四态、脱敏结果，以及 mounted single/preserved/batch 草稿默认同步。
+- 5.1 验证：Studio typecheck；26 文件/89 测试；tsup 与 Vite 构建；`pnpm safety` 255 跟踪文件；strict OpenSpec；DOM/storage/log/secret/path/build-output 扫描；`git diff --check`；精确范围与规划一致性审计。
+- 未执行：6.1 Playwright 浏览器旅程、7.1 最终全仓门禁；未使用真实凭证、图片、图库、中转、部署或发布。
+- G3 启动时必须完整读取计划、AGENTS、program、studio 线程状态、本文件、PD-004、Studio proposal/design/五份 specs/tasks、六份冻结主规格和适用 OpenSpec 技能。
+- G3 在任何写入或建分支前运行 `openspec status --change add-routego-studio --json` 与 `openspec instructions apply --change add-routego-studio --json`，核对 9/11、下一任务 6.1、handoff commit 和 Git clean。
+- G3 首轮只读并等待真实 successor 登记；登记后创建/切换 `codex/routego-studio-g3`、发送 `[STUDIO_HANDOFF_ACCEPTED]`，且必须等 Controller 归档 G2 并激活唯一 apply-owner 后才开始 6.1。
+- 6.1 的 OpenSpec owner 是 `browser-test subagent`；G3 主代理只能在激活后提供明确任务 ID、允许/禁止文件并派发，自己不得提前修改 `tests/browser/**` 或开始 7.1。
+- 不修改七个公共 MCP 工具、共享契约、mock service、根依赖/锁文件、Creation/Library 后端、插件 manifest 或发布文件；不接触真实凭证、图片、图库或中转。
