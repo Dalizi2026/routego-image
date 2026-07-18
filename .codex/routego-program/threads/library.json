@@ -3,7 +3,7 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "lane-complete-awaiting-controller-successor-review",
+  "status": "independent-review-failed-task-5.1-reopened",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
@@ -21,9 +21,9 @@
   "registrationCommit": "b4b98f1124a07b66334fc33cf5d7516d1eba100d",
   "controllerRegistrationCommit": "9189b7a4f8155b5e62def6f786e5d7723eb8a3f0",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
-  "openspecProgress": "10/10",
-  "lastCompletedTask": "5.2",
-  "nextTask": null,
+  "openspecProgress": "10/10 reported; tasks 5.1 and 5.2 require reopen",
+  "lastCompletedTask": "4.2 accepted; 5.1 fix required",
+  "nextTask": "5.1 partial-write defect fix, then 5.2 full revalidation",
   "lastImplementationCommit": "8feb9dc2d4f53336d1190fc069b2774ddf4c241b",
   "lastOpenSpecCommit": "514db95441d389999bd6341f335aeaaca1cba226",
   "deliveryCommit": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
@@ -44,9 +44,18 @@
     "planningConsistency": "proposal, design, three delta specs, six main specs, tasks, plan and PD-002/003/004 passed",
     "scope": "61 changed files against the frozen baseline, all within Library/OpenSpec/governance ownership"
   },
+  "independentReview": {
+    "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
+    "reviewedDelivery": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
+    "status": "failed",
+    "finding": "Public ZIP export can return outputPath with no warning while producing a truncated invalid ZIP when FileHandle.write performs a legal partial write.",
+    "rootCause": "packages/library/src/service.ts #copyExportToPublicPath awaits FileHandle.write(chunk) once and ignores bytesWritten instead of looping until the full chunk is written.",
+    "reproduction": "Controlled FileHandle prototype forced one half-chunk write; manageLibrary export returned outputPath=true and warnings=[], but decodeZipArchive rejected the 542-byte output.",
+    "requiredOwnerTask": "Reopen task 5.1 within its existing service.ts/conformance-test scope, add a write-all root fix and regression test, then rerun task 5.2 clean conformance and issue a new delivery SHA."
+  },
   "applyOwnership": {
-    "state": "complete-awaiting-controller",
-    "activeOwnerThreadId": null,
+    "state": "active-single-owner",
+    "activeOwnerThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
     "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "successorThreadId": "019f7261-2c57-7a01-b519-e1de521819fe"
   },
@@ -61,10 +70,10 @@
     "worktreeRemoved": true
   },
   "continuityGovernance": {
-    "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
+    "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-lane-complete-pending-controller-successor-review"
+    "status": "generation-2-reactivated-for-task-5.1-defect-fix"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
@@ -107,7 +116,7 @@
     ]
   },
   "completion": {
-    "tasks": "10/10",
+    "tasks": "10/10 reported; 5.1 and 5.2 reopen required after independent review",
     "deliveryCommit": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
     "verifiedHead": "341a2fe7d2cfe82ca4a9ac315423071c6911701d",
     "taskStateCommit": "514db95441d389999bd6341f335aeaaca1cba226",
@@ -126,7 +135,9 @@
       "planningConsistency": "passed",
       "gitClean": true
     },
-    "blockers": [],
+    "blockers": [
+      "Controller reproduction confirmed public ZIP export false success on legal partial FileHandle writes."
+    ],
     "residualRisks": [
       "Provider execution, HTTP/MCP transport, session/origin enforcement and resolver/executor composition remain Creation/Integration responsibilities.",
       "Studio UI/browser journeys, real relay acceptance and deployment/release remain downstream responsibilities.",

@@ -133,7 +133,7 @@
       ]
     },
     "library": {
-      "status": "delivery-received-pending-controller-successor-review",
+      "status": "independent-review-failed-task-5.1-reopened",
       "sourceThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
       "deliveryCommit": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
       "taskStateCommit": "514db95441d389999bd6341f335aeaaca1cba226",
@@ -146,7 +146,7 @@
       "postArchiveVerification": null,
       "integrationNotified": false,
       "waitingFor": [
-        "controller-generation-2-independent-review",
+        "library-task-5.1-partial-write-fix-and-5.2-reverification",
         "add-routego-studio"
       ]
     }
