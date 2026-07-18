@@ -5,6 +5,8 @@
 - 计划分支：`codex/routego-controller-g2`。
 - 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\5b80\生图插件`。
 - 起始交接提交：`4be05e4d9c134363affb0ff02c50bb6ca7767a32`。
+- 登记提交：`fc882b94f68b3c5247e0251cd13f20f4777c0ee7`。
+- 接管状态：已接受；G2 在 `codex/routego-controller-g2` 的 `fc882b94f68b3c5247e0251cd13f20f4777c0ee7` 完成权威与登记核验，Git clean。
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\d46b\生图插件`。
 - 来源可观察压缩：`3`。
 - 交接原因：Controller 已达到第 3 次可观察压缩，必须交给全新任务和新 worktree；下一个原子工作是 Library 独立复验、合并、规格同步、归档和主线全量验证。
