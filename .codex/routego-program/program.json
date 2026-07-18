@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "integration-offline-apply-authorized",
+  "status": "integration-offline-apply-generation-1-activation-authorized",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -114,7 +114,8 @@
     "libraryPredecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "studioThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
     "studioPredecessorThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
-    "integrationThreadId": "019f72fd-fb6f-7b52-b383-03471f42f05a"
+    "integrationThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
+    "integrationPredecessorThreadId": "019f72fd-fb6f-7b52-b383-03471f42f05a"
   },
   "laneCompletions": {
     "creation": {
@@ -165,7 +166,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "planning-approved-offline-apply-authorized",
+    "status": "offline-apply-generation-1-activation-authorized",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -173,7 +174,7 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
+    "integrationHead": "c2d04ab968348bda5b99506d814eaae6aeddfa42",
     "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
