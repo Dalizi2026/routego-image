@@ -45,7 +45,7 @@ The runtime SHALL maintain a bounded set of cryptographically random expiring se
 - **THEN** the request SHALL fail before service/resource invocation and the token SHALL be removed from active state
 
 ### Requirement: Protected JSON, upload, resource, and stream routes share policy
-All non-static local routes SHALL require an active session header and exact matching loopback origin, reject cookies and wildcard CORS, validate bounded inputs/outputs, and redact returned/logged failures. Upload and resource bytes SHALL travel only through their protected binary routes; stream routes SHALL emit only validated path-free events.
+All non-static local routes SHALL require an active session header and exact matching loopback origin, reject cookies and wildcard CORS, validate bounded inputs/outputs, and redact returned/logged failures. Upload and resource bytes SHALL travel only through their protected binary routes. Streaming generate/edit SHALL use only `POST /api/v1/studio/creation/stream`, and that route SHALL emit only frozen path-free events in the exact first-started/partials/one-terminal state machine.
 
 #### Scenario: Upload content is accepted
 - **WHEN** a PUT matches a live reservation, session, origin, purpose, MIME, declared size, actual bounded size, and expiry
@@ -59,8 +59,12 @@ All non-static local routes SHALL require an active session header and exact mat
 - **WHEN** a generate/edit fetch-stream request lacks the current session or matching origin
 - **THEN** it SHALL fail before creation execution and SHALL emit no SSE body
 
+#### Scenario: Stream route or sentinel differs from the contract
+- **WHEN** a client requests another streaming path or a producer emits `[DONE]` or another non-schema sentinel
+- **THEN** the runtime SHALL reject it without routing a second stream surface or treating the sentinel as completion
+
 ### Requirement: Runtime lifecycle releases every resource
-The plugin process SHALL keep stdout protocol-only, write only recursively redacted diagnostics to stderr, recover Library state before readiness, and release HTTP listeners, sessions, event channels, streams, abort controllers, readers, timers, browser resources, temporary files, and MCP framing state on shutdown or failure. It MUST NOT force `process.exit()` as a business result protocol.
+The plugin process SHALL keep stdout protocol-only, write only recursively redacted diagnostics to stderr, recover Library state before readiness, and release HTTP listeners, sessions, event channels, streams, abort controllers, readers, timers, browser resources, temporary files, and MCP framing state on their defined lifecycle boundaries. Terminal, disconnect, cancellation, or invalid input SHALL close readers/channels but SHALL NOT revoke a validated ephemeral partial before its fixed five-minute descriptor expiry or explicit safe release; process shutdown SHALL revoke all ephemeral resources. It MUST NOT force `process.exit()` as a business result protocol.
 
 #### Scenario: Operation completes successfully
 - **WHEN** one MCP or HTTP operation returns

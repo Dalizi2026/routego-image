@@ -31,7 +31,11 @@ Subject to approval, acceptance SHALL cover text generation, two ordered referen
 
 #### Scenario: Transparency uses chromakey degradation
 - **WHEN** native transparency is unavailable and the approved simple subject uses chromakey
-- **THEN** acceptance SHALL verify original/processed relationship, PNG alpha edges, degraded/effective reporting, and no claim of native support
+- **THEN** acceptance SHALL verify PNG alpha edges, degraded/effective reporting, exactly one persisted/projected output artifact per slot under its existing identity, no added rendition/relationship role, conformance to the 33-item bound, and no claim of native support
+
+#### Scenario: Chromakey processing fails after provider output
+- **WHEN** the approved provider output is valid but local chromakey processing fails
+- **THEN** acceptance SHALL verify that the provider original remains available under the same output identity, transparent success is not claimed, and no second durable original artifact is created
 
 ### Requirement: Capability evidence follows four-state rules
 Acceptance SHALL transition scoped evidence to supported/unsupported/degraded only on conclusive allowed evidence. Authentication, timeout, 429, 5xx, moderation, and isolated model failures MUST remain transient and MUST NOT erase prior evidence or become unsupported.

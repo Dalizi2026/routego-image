@@ -75,11 +75,15 @@ When `saveToLibrary=true`, Integration SHALL preallocate one operation asset ID,
 - **THEN** Integration SHALL not report a saved Library asset and SHALL preserve truthful provider output/billing facts as partial or failed
 
 ### Requirement: Unsaved and project-copy results remain honest
-Studio operations with `saveToLibrary=false` SHALL use bounded expiring Integration resources without creating Library records. Public operations with `saveToLibrary=false` MUST have an approved output directory and SHALL use safe exclusive output placement. Project copies after Library ingestion SHALL use Library's contained non-overwriting copy behavior.
+Studio operations with `saveToLibrary=false` SHALL use bounded expiring Integration resources without creating Library records. Each ephemeral image descriptor SHALL remain fetchable through its fixed five-minute TTL unless explicitly released after all client references are removed; stream terminal, disconnect, cancel, or unmount MUST NOT shorten that TTL, while process shutdown SHALL revoke it. Public operations with `saveToLibrary=false` MUST have an approved output directory and SHALL use safe exclusive output placement. Project copies after Library ingestion SHALL use Library's contained non-overwriting copy behavior.
 
 #### Scenario: Studio result is not saved
 - **WHEN** Studio disables Library saving
-- **THEN** the result SHALL use protected expiring resources, no durable asset ID, and cleanup after expiry/shutdown
+- **THEN** the result SHALL use protected resources with a five-minute descriptor expiry, no durable asset ID, and cleanup only after expiry, explicit safe release, or shutdown
+
+#### Scenario: Failed stream retains a partial resource
+- **WHEN** a validated partial descriptor is followed by failure, disconnect, cancellation, or workbench unmount
+- **THEN** the reader/channel SHALL close while the protected partial remains fetchable until its original expiry unless the client explicitly releases it after removing every reference
 
 #### Scenario: Public unsaved request lacks output directory
 - **WHEN** a public operation disables Library saving and supplies no approved destination
@@ -90,11 +94,11 @@ Studio operations with `saveToLibrary=false` SHALL use bounded expiring Integrat
 - **THEN** a versioned exclusive filename SHALL be returned and the existing file SHALL remain unchanged
 
 ### Requirement: Transparency processing is explicit and non-destructive
-Integration SHALL use native transparency only with supported evidence and SHALL use bounded PNG chromakey processing only for `chromakey` or an explicitly eligible `auto` request. It SHALL preserve the provider original, record effective/degraded behavior and relationships, and MUST NOT claim successful complex transparency when edge semantics are unsafe or unconfirmed.
+Integration SHALL use native transparency only with supported evidence and SHALL use bounded PNG chromakey processing only for `chromakey` or an explicitly eligible `auto` request. It SHALL retain provider-original bytes only inside the request transaction until chromakey validation finishes, SHALL persist/project no more than one output artifact per slot under the existing output identity, SHALL record effective/degraded behavior and warnings without adding a rendition or relationship role, and MUST NOT claim successful complex transparency when edge semantics are unsafe or unconfirmed.
 
 #### Scenario: Simple chromakey succeeds
 - **WHEN** a PNG result uses the approved key background and passes bounded pixel processing
-- **THEN** Integration SHALL return the processed PNG, retain the original relationship, and record chromakey as the effective/degraded transparency path
+- **THEN** Integration SHALL atomically use the processed PNG as the sole bytes for the existing output artifact identity, discard the transaction-local original after commit, and record chromakey as the effective/degraded transparency path without a second durable artifact
 
 #### Scenario: Complex transparent subject is requested
 - **WHEN** hair, fur, glass, smoke, liquid, or uncertain edges require a different model/parameter
@@ -102,4 +106,8 @@ Integration SHALL use native transparency only with supported evidence and SHALL
 
 #### Scenario: Post-processing fails after provider output
 - **WHEN** PNG decode/encode or chromakey validation fails
-- **THEN** the provider original SHALL remain an honest partial/output fact and the operation SHALL not report transparent success
+- **THEN** the validated provider original SHALL be persisted/projected under the same output artifact identity with a structured post-processing failure, and the operation SHALL not report transparent success
+
+#### Scenario: Maximum-size chromakey operation is persisted
+- **WHEN** an operation has 17 exact source inputs, 12 partial outputs, and four final provider outputs that require chromakey
+- **THEN** it SHALL still persist at most 33 renditions and only frozen relationship roles because each processed result replaces transaction-local bytes under its existing output identity

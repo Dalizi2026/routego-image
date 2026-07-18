@@ -3,6 +3,10 @@
 ### Requirement: Release requires a separate explicit approval
 Installation replacement, marketplace modification, deployment, publication, and final release SHALL remain prohibited until the user explicitly approves the exact staged artifact, target installation, marketplace action, downtime/atomic switch, and rollback plan after offline and real-relay acceptance have passed.
 
+#### Scenario: Release workflow is prepared offline
+- **WHEN** the offline conformance gate and real-relay harness are complete but real-relay execution is not approved
+- **THEN** the workflow SHALL allow release/rollback scripts and temporary-directory dry runs to be prepared without reading credentials or changing installation, marketplace, deployment, or publication state
+
 #### Scenario: Apply or real-relay acceptance completes
 - **WHEN** no final release approval has been given
 - **THEN** the current installed plugin and marketplace SHALL remain unchanged

@@ -23,7 +23,7 @@ Integration verification SHALL use isolated temporary roots, deterministic clock
 - **THEN** offline verification SHALL neither read it nor change its outcomes
 
 ### Requirement: PD-005 corrective gates have dedicated regressions
-Verification SHALL prove the Library-only source phase and 33 bound, public phase/tool freeze, mixed source/output MIME, output-only primary, exact relationship ownership, ZIP round-trip/remapping, fail-closed retry reconstruction, authenticated streaming, framing/schema/sequence/terminal validation, failure-after-partial preservation, abort cleanup, and genuine mock chunking.
+Verification SHALL prove the Library-only source phase and exact 17+12+4=33 bound, public phase/tool freeze, mixed source/output MIME, output-only primary, exact relationship ownership, no extra chromakey rendition/role, ZIP round-trip/remapping, fail-closed retry reconstruction, the exact authenticated `POST /api/v1/studio/creation/stream` route, first/unique started and request-ID consistency, framing/schema/sequence/terminal-before-EOF/sentinel validation, failure-after-partial five-minute resource preservation, reader/channel cleanup, expiry/explicit-release/shutdown revocation, and genuine mock chunking.
 
 #### Scenario: Public surface drifts
 - **WHEN** `source` becomes a public image artifact phase or an eighth tool appears
