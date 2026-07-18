@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "capsuleType": "controller-successor-handoff",
+  "capsuleSha256": "fda6b361649faedeffddf0d6765ea5447f13a9f1bec79b14ac58d67bdce40922",
+  "lane": "controller",
+  "role": "program-controller",
+  "program": "routego-image-1.0",
+  "generation": {
+    "source": 5,
+    "successor": 6
+  },
+  "source": {
+    "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
+    "branch": "codex/routego-controller-g5",
+    "handoffCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
+    "handoffParent": "e38ede29a7bb2802ca874c099f7a11e6aff11524",
+    "observableCompactions": 4,
+    "lastCompactionFingerprint": "g5-compaction-4-during-integration-g4-sole-owner-activation-2026-07-19",
+    "wasAuthoritativeAtHandoff": true,
+    "authorityRevoked": true,
+    "preHandoffComplete": true
+  },
+  "successor": {
+    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
+    "plannedBranch": "codex/routego-controller-g6",
+    "startingCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
+    "registrationStatus": "activated-authoritative-controller-generation-6",
+    "registrationCommit": "84698588f8693bf1392a786089427f43605a2914",
+    "acceptedHead": "84698588f8693bf1392a786089427f43605a2914",
+    "registrationCommitSemantics": "The accepted registration commit is recorded after the clean zero-compaction successor audit; the containing authority activation commit cannot self-reference its own SHA."
+  },
+  "currentIntegration": {
+    "threadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
+    "generation": 4,
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a818\\生图插件",
+    "branch": "codex/routego-integration-g4",
+    "activationGovernanceCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
+    "activationIncorporationHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "openspecProgress": "14/29",
+    "currentTaskId": "3.5",
+    "currentTaskState": "active",
+    "taskCapsule": {
+      "path": ".codex/routego-program/tasks/integration-3.5.json",
+      "sha256": "851d745d91eea3e8d772190a305c43bccfb0695e45496a6d8a897bb84cb859f2"
+    },
+    "handoffCapsule": {
+      "path": ".codex/routego-program/handoffs/integration-generation-4.capsule.json",
+      "sha256": "5a5449396d0261b6d4affe3c9a42cfec7a5fad11811e0fd5ff571146e163c670"
+    }
+  },
+  "completedEvidence": [
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-2-tasks.json",
+      "sha256": "1c43569d3422f8bb1e25c1f8c77ec7c2339deda9615f2b1e21156e7b3ccacfb7"
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-3-tasks.json",
+      "sha256": "b896c776082284a397c7a656f7e7d49d18a21dbb2b12b866ecb1f5ff66d7a786"
+    }
+  ],
+  "authority": {
+    "summaryPath": ".codex/routego-program/authority-summary.md",
+    "summarySha256": "6387478ec031eb7aeddb0fa6ec90674114bf855113828f6305ad6d061c70e910",
+    "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+    "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
+  },
+  "gates": {
+    "blockers": [],
+    "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
+    "externalStateAuthorized": false,
+    "integrationTaskBeyond3_5Locked": true
+  },
+  "context": {
+    "sourceObservableCompactions": 4,
+    "sourceCompactionFingerprint": "g5-compaction-4-during-integration-g4-sole-owner-activation-2026-07-19",
+    "successorObservableCompactions": 0,
+    "handoffAcceptanceCompactionLimit": 0,
+    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
+    "auditFailure": "HANDOFF_AUDIT_FAILED"
+  },
+  "reportingContract": {
+    "primary": "After every governance task, task group, safe checkpoint, blocker, deviation, handoff, activation or delivery, call real send_message_to_thread to the current Controller from program.json and then call read_thread to confirm receipt.",
+    "fallback": "routego-program-continuity reads compact current state every 30 minutes, deduplicates with latestDirectCheckpoint and archives its own run task; it is missed-message fallback only.",
+    "fallbackIntervalMinutes": 30,
+    "finalAnswerAloneIsInsufficient": true,
+    "heartbeatInheritanceAssumed": false
+  },
+  "startup": {
+    "mandatoryFiles": [
+      "AGENTS.md",
+      ".codex/routego-program/authority-summary.md",
+      ".codex/routego-program/program.json",
+      ".codex/routego-program/threads/controller.json",
+      ".codex/routego-program/handoffs/controller-generation-6.capsule.json",
+      ".codex/routego-program/threads/integration.json",
+      ".codex/routego-program/tasks/integration-3.5.json",
+      ".codex/routego-program/handoffs/integration-generation-4.capsule.json",
+      ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+      ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
+    ],
+    "maxFiles": 12,
+    "maxUtf8Bytes": 122880,
+    "byteCounting": "utf8-after-crlf-to-lf-normalization",
+    "expectedNormalizedUtf8Bytes": 71990,
+    "authoritySummaryMaxBytes": 16384,
+    "handoffCapsuleMaxBytes": 24576,
+    "directGovernanceMessageMaxBytes": 12288,
+    "programStateMaxBytes": 49152,
+    "laneStateMaxBytes": 32768,
+    "targetedEscalationOnly": true,
+    "fullAuditDefaultForbidden": true
+  },
+  "validator": {
+    "path": ".codex/routego-program/scripts/validate-controller-handoff-capsule.mjs",
+    "command": "node .codex/routego-program/scripts/validate-controller-handoff-capsule.mjs .codex/routego-program/handoffs/controller-generation-6.capsule.json"
+  },
+  "safety": {
+    "controllerGovernanceOnly": true,
+    "noProductOrOpenSpecEdits": true,
+    "noCredentialsAuthorizationValuesUserImagesRealLibraryRelayOrBillableRequests": true,
+    "noInstallMarketplaceDeployPublishMigrateDeleteOrRelease": true,
+    "sevenPublicToolsAndPublicPhaseFrozen": true
+  }
+}

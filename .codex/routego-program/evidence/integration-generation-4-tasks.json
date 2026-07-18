@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "649ddf87b214c6f5a07916ee42a1080b1b561f71020483a075118004241b73ee",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "generation": 4,
+  "sourceActivationHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
+  "handoffCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
+  "openspecProgress": "16/29",
+  "gitClean": true,
+  "observableCompactions": 3,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|cc49c06406a8526f1bdd43e4ab158421b367ee6c|context-compaction-3-after-task-4.1-before-task-4.2-implementation|16/29",
+  "externalStateAuthorized": false,
+  "tasks": [
+    {
+      "taskId": "3.5",
+      "implementationCommit": "5e970a7f08536e07cccac581a0c7d7ca56ba2d66",
+      "taskStateCommit": "f919880f782e411a141711e9370aa1b8fed49780",
+      "checkpointCommit": "2f425859d64eeb1b347749a05ffc9a13261a0746",
+      "postAcceptanceStateSyncCommit": "f4132d279e97019ca2316ab6523d7245b8a540ab",
+      "files": [
+        "packages/integration/src/composition/service.ts",
+        "packages/integration/src/index.ts",
+        "packages/integration/test/service.test.ts"
+      ],
+      "verification": "Controller independently passed Integration typecheck, 162/162 tests and build, root build/typecheck and 728 total tests, seven-package exports, strict OpenSpec 19/19, repository safety 437, exact implementation/task-state/checkpoint scopes and clean Git.",
+      "governanceCorrection": "The first direct checkpoint reported the registration incorporation head instead of the actual activation merge parent and arrived after task-state creation. Controller verified the real topology, accepted the non-rewritten commits, corrected test/tracked-file evidence, and required a post-acceptance state sync.",
+      "blockers": [],
+      "residualRisk": "Protected resource HTTP streaming remained intentionally deferred to task 4.2."
+    },
+    {
+      "taskId": "4.1",
+      "implementationCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
+      "taskStateCommit": "19662a9b449364df76557e884cb9256742e60762",
+      "checkpointCommit": "2379675079c39942061d3907fb63e045f069c75b",
+      "postAcceptanceStateSyncCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
+      "files": [
+        "packages/integration/src/runtime/sessions.ts",
+        "packages/integration/src/runtime/static.ts",
+        "packages/integration/src/runtime/http-host.ts",
+        "packages/integration/src/runtime/lifecycle.ts",
+        "packages/integration/test/http-host.test.ts"
+      ],
+      "verification": "Controller independently passed Integration typecheck, 169/169 tests and build, root build/typecheck and 735 total tests, seven-package exports, strict OpenSpec 19/19, repository safety 442, exact implementation/task-state/checkpoint scopes and clean Git.",
+      "blockers": [],
+      "residualRisk": "Protected upload/resource/stream routing remains task 4.2; MCP process and CLI remain task 4.3."
+    }
+  ],
+  "relatedDecisions": [
+    ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+    ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+    ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
+  ]
+}

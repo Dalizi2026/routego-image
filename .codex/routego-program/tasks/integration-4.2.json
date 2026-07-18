@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "1a1f193755564f662ec9e384e8e4274c54ab62d4b8b24656ad126f15b6188621",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "4.2",
+  "status": "locked-for-integration-generation-5-pending-handoff-acceptance-and-activation",
+  "sourceCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "e26665f7b358b92d18785ebaf93d62f744447a90e8ea883721f38cbbb487dc5c",
+    "lineSha256": "4bf2f84a055959eb367c2573c96b95b9523d66567803e218f710787891bccff3",
+    "lineBytes": 1542
+  },
+  "dependencies": ["2.1", "3.2", "3.5", "4.1"],
+  "allowedFiles": [
+    "packages/integration/src/runtime/routes.ts",
+    "packages/integration/src/runtime/stream-route.ts",
+    "packages/integration/test/routes.test.ts",
+    "packages/integration/test/stream-route.test.ts"
+  ],
+  "allowedFileMode": "create-or-modify exactly the four allowed files; all parent directories exist at the source commit",
+  "forbiddenFileGlobs": [
+    "packages/library/**",
+    "packages/studio/**",
+    "packages/creation/**",
+    "packages/contracts/**",
+    "packages/integration/src/runtime/sessions.ts",
+    "packages/integration/src/runtime/static.ts",
+    "packages/integration/src/runtime/http-host.ts",
+    "packages/integration/src/runtime/lifecycle.ts",
+    "packages/integration/src/runtime/mcp-process.ts",
+    "packages/integration/src/cli.ts",
+    "openspec/**",
+    ".codex-plugin/**",
+    "skills/**",
+    "scripts/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "**/binding.gyp"
+  ],
+  "requiredBehavior": [
+    "Implement protected upload reserve/PUT/finalize/status/discard routing through the existing Library-owned upload lifecycle with exact session, origin, MIME, size, checksum and expiry enforcement.",
+    "Stream durable images, ephemeral partial/final resources and ZIP exports with no-store protection, exact MIME/content length/ETag, immutable descriptor expiry and immediate session/shutdown revocation.",
+    "Wire generate/edit only at POST /api/v1/studio/creation/stream through the production LocalRoutegoService while preserving the frozen StudioImageOperationEvent state, request ID, sequence, terminal and EOF contract.",
+    "Cancel provider work and close readers/channels on disconnect or abort without shortening valid partial-resource expiry and without replaying uncertain or billable work.",
+    "Fail closed on malformed input/output, expired or cross-session resources, invalid origin, traversal, MIME/checksum drift and state-machine violations without leaking paths, credentials, bytes, Base64 or diagnostics.",
+    "Do not add alternate stream routes, public MCP tools, Library/Studio/Creation implementation changes, session/static redesign or task 4.3 process behavior."
+  ],
+  "verification": [
+    "openspec instructions apply --change integrate-routego-image-plugin --json",
+    "pnpm --filter @routego-image/integration typecheck",
+    "pnpm --filter @routego-image/integration test",
+    "pnpm --filter @routego-image/integration build",
+    "reserve/PUT/finalize/status/discard success and invalid size/MIME/checksum/expiry/session/origin cases",
+    "durable, ephemeral partial/final and ZIP resource content-length/MIME/ETag/expiry/revocation cases",
+    "exact SSE started/partial/completed|failed request-ID/sequence/terminal/EOF/no-sentinel cases",
+    "disconnect, abort, cancellation, reader/channel cleanup and no-replay cases",
+    "normal full-five-minute and near-expiry descriptor boundary cases",
+    "Studio gateway integration regressions",
+    "pnpm typecheck",
+    "pnpm build",
+    "pnpm test",
+    "node scripts/check-package-exports.mjs",
+    "node scripts/check-repository-safety.mjs",
+    "openspec validate --all --strict --no-interactive",
+    "git diff --check",
+    "exact four-file implementation scope"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
+      "sha256": "a8ab61153ee8137dcad782b41bfbaff0700569a27867a69b1761a4dd5153035e",
+      "bytes": 7039,
+      "reason": "Protected loopback HTTP route, resource, upload, session and process-boundary requirements."
+    },
+    {
+      "path": "openspec/specs/local-service-boundaries/spec.md",
+      "sha256": "b594eb13b4b0f771859dfcda5eb6b748dc9c30c459ebd714287d5ee72af7fa42",
+      "bytes": 10007,
+      "reason": "Frozen LocalRoutegoService delegation, validation, upload, resource and cross-filesystem boundaries."
+    },
+    {
+      "path": "openspec/specs/shared-image-contracts/spec.md",
+      "sha256": "ee211f7caff8be45fadc1717fca141baf306d0d3953fd0cd34fef037ac0c2e39",
+      "bytes": 21363,
+      "reason": "Frozen browser-safe Studio operation events, resources, uploads, errors and public seven-tool schemas."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "activation": {
+    "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+    "controllerGeneration": 6,
+    "integrationThreadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
+    "integrationGeneration": 5,
+    "acceptedPreviousTaskImplementationCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
+    "acceptedPreviousTaskCheckpointCommit": "2379675079c39942061d3907fb63e045f069c75b",
+    "acceptedPreviousTaskStateSyncCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
+    "acceptedHead": null,
+    "sourceOwnerArchived": false,
+    "soleApplyOwner": false,
+    "applyAuthorized": false,
+    "started": false
+  },
+  "unresolvedIssues": [],
+  "knownRisks": [
+    "Disconnect/cancellation must close active execution channels without shortening already-issued immutable partial-resource descriptors.",
+    "Task 4.2 must reuse task 4.1 session/static lifecycle and must not implement task 4.3 MCP process or CLI behavior.",
+    "All tests must remain synthetic and offline; external credentials, real images, real relay and billable requests remain prohibited."
+  ],
+  "externalStateAuthorized": false
+}
