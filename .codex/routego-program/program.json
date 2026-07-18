@@ -215,7 +215,22 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 3 Git checkpoint remains effective. Integration generation 2 is the sole owner at compaction 1 and completed task 2.4 at clean HEAD 855afc11b1d8778d2cde1e8629ac49cd6581def6. Only one-file browser task 2.5 is activated after fresh apply instructions; task 3.1 and later remain locked pending the Studio streaming task-group consistency audit. No external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 3 Git checkpoint remains effective. Integration generation 2 is the sole owner at compaction 2 with a passed health audit on clean HEAD 855afc11b1d8778d2cde1e8629ac49cd6581def6. Only one-file browser task 2.5 is activated after fresh apply instructions; task 3.1 and later remain locked pending the Studio streaming task-group consistency audit. No external authority is added.",
+    "currentTaskActivation": {
+      "messageType": "INTEGRATION_TASK_2_5_ACTIVATION_CONFIRMED",
+      "taskId": "2.5",
+      "workerThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+      "controllerGovernanceCommit": "fd13a734f4387d8ea194246b361b5c1a1623b3b0",
+      "reportedHead": "855afc11b1d8778d2cde1e8629ac49cd6581def6",
+      "openspecProgress": "9/29",
+      "allowedFile": "tests/browser/studio.spec.ts",
+      "observableCompactions": 2,
+      "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-2-before-task-2.5-implementation",
+      "gitClean": true,
+      "task3_1Locked": true,
+      "reportingFallbackMinutes": 15,
+      "externalStateAuthorized": false
+    },
     "lastDirectCheckpoint": {
       "messageType": "INTEGRATION_TASK_CHECKPOINT",
       "workerThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",

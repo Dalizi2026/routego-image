@@ -8,12 +8,12 @@
   "branch": "codex/routego-controller-g4",
   "startingCommit": "e8b96e3685b939843d9029657bd2108116a38b03",
   "registrationCommit": "c292c2d461ed33000d7f154edba04908f36eedce",
-  "headCommit": "3cbc2850577d1f367e246355c55512252a67632b",
+  "headCommit": "fd13a734f4387d8ea194246b361b5c1a1623b3b0",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 4,
   "observableCompactions": 3,
   "lastCompactionFingerprint": "g4-compaction-3-integration-g2-handoff-preparation-after-task-2.2-2026-07-18",
-  "lastHealthAudit": "passed-generation-4-compaction-3-checkpoint-integration-generation-2-task-2.4-independent-review-and-one-file-task-2.5-continuation-audit",
+  "lastHealthAudit": "passed-generation-4-compaction-3-checkpoint-and-integration-generation-2-compaction-2-health-audit-before-task-2.5",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -126,6 +126,7 @@
     "Integration generation 2 recorded its local sole-owner activation at clean HEAD 96edee64b45c5700615ec8a8e5ef1d153512c059, a direct child of registration 2935972129c581fc653b3f27878fd6ba5f5fa6c0 changing only integration.json. Identity, generation 2, Controller activation e010f9a1bf07fd890fba7f77d8f66a13cbe9dd1d, observableCompactions 0, direct reporting, task 2.3 authorization, task 2.4 lock and external safety fields were verified.",
     "The user changed routego-program-continuity from every 10 minutes to every 15 minutes. The automation remains ACTIVE, dynamically resolves the current Controller, deduplicates through integrationReadiness.lastDirectCheckpoint, and archives each completed automation-run task. Direct send_message_to_thread plus read_thread reporting remains the primary path; older 10-minute notes and handoffs remain historical facts.",
     "Integration generation 2 task 2.3 checkpoint 63c4e60e7e9e5ca769f900c66b8d46c175967fe7 was independently accepted after exact implementation/task-state/thread-state ancestry, exact three-file implementation scope, code review, Studio 131/131 twice, typecheck, library and Vite builds, repository safety 398, strict OpenSpec 19/19, diff checks and clean Git. At G2 compaction 1 and G4 compaction 3, only bounded five-file task 2.4 in the same Studio streaming work group is activated; task 2.5 remains locked.",
-    "Integration generation 2 task 2.4 checkpoint 855afc11b1d8778d2cde1e8629ac49cd6581def6 was independently accepted after exact five-file scope and ancestry, stream-state/resource-lifecycle code review, Studio 140/140, typecheck, library and Vite builds, repository safety 400, strict OpenSpec 19/19, diff checks and clean Git. The 506.19 kB Vite advisory is non-failing and outside this task's configuration scope. Only one-file browser task 2.5 is activated; task 3.1 remains locked pending task-group review."
+    "Integration generation 2 task 2.4 checkpoint 855afc11b1d8778d2cde1e8629ac49cd6581def6 was independently accepted after exact five-file scope and ancestry, stream-state/resource-lifecycle code review, Studio 140/140, typecheck, library and Vite builds, repository safety 400, strict OpenSpec 19/19, diff checks and clean Git. The 506.19 kB Vite advisory is non-failing and outside this task's configuration scope. Only one-file browser task 2.5 is activated; task 3.1 remains locked pending task-group review.",
+    "Integration generation 2 completed its compaction-2 health audit before task 2.5 at clean HEAD 855afc11b1d8778d2cde1e8629ac49cd6581def6. Full authority, OpenSpec 9/29, task-2.5 one-file ownership, 15-minute fallback contract and external safety boundaries remain clear; PD-006 permits the same sole owner to execute only task 2.5 while task 3.1 stays locked."
   ]
 }
