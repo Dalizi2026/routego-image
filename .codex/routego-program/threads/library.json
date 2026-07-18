@@ -3,12 +3,12 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "applying-independent-review-fix",
+  "status": "checkpoint-task-5.1-review-fix-complete",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
-  "headCommit": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
+  "headCommit": "858e4e8b7886a53d904d24485f880af588b15f46",
   "generation": 2,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "library-g2-compaction-1-task-5.2-head-937c5ca1-2026-07-18",
@@ -23,11 +23,11 @@
   "controllerActivationCommit": "c9ac706321500b01dabbf92ed81ba39cd566127e",
   "controllerReviewGovernanceCommit": "0b32e8d5ce7fd00128cdd8c6b07d26830ce118c8",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
-  "openspecProgress": "8/10",
-  "lastCompletedTask": "4.2",
-  "nextTask": "5.1",
-  "lastImplementationCommit": "8feb9dc2d4f53336d1190fc069b2774ddf4c241b",
-  "lastOpenSpecCommit": "514db95441d389999bd6341f335aeaaca1cba226",
+  "openspecProgress": "9/10",
+  "lastCompletedTask": "5.1",
+  "nextTask": "5.2",
+  "lastImplementationCommit": "634712d5c4233f1a58ff1a33d94420fcb3504367",
+  "lastOpenSpecCommit": "858e4e8b7886a53d904d24485f880af588b15f46",
   "recentValidation": {
     "frozenInstall": "passed in detached clean verification copy at 341a2fe7d2cfe82ca4a9ac315423071c6911701d",
     "openspec": "strict validation 7/7 passed; apply state all_done at 10/10",
@@ -43,7 +43,11 @@
     "planningConsistency": "proposal, design, three delta specs, six frozen main specs, tasks, PD-002/003/004, plan, commits, and thread state passed",
     "gitClean": "verification copy and primary worktree were clean before independent review",
     "independentReview": "failed: public ZIP export ignored partial FileHandle.write results and allowed symlink/junction traversal into protected legacy roots",
-    "currentState": "tasks 5.1 and 5.2 reopened for root-cause correction and full reverification"
+    "currentState": "corrected task 5.1 committed and verified; task 5.2 remains for clean-copy reverification",
+    "correctiveRegression": "partial FileHandle writes produce a complete decodable/importable ZIP; Windows junction/POSIX symlink traversal into protected roots is rejected without modifying existing output",
+    "correctedLibraryTests": "19 files, 146 tests passed",
+    "correctedRootTests": "329 tests passed: contracts 92, foundation 48, library 146, mock-relay 43",
+    "correctedImplementationScope": "packages/library/src/service.ts and packages/library/test/conformance/service.test.ts only"
   },
   "applyOwnership": {
     "state": "active-single-owner",
@@ -65,7 +69,7 @@
     "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-independent-review-fix-task-5.1"
+    "status": "generation-2-checkpoint-before-review-rerun-task-5.2"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
@@ -119,6 +123,9 @@
       "copyExportToPublicPath performed one FileHandle.write per stream chunk and ignored bytesWritten.",
       "assertPublicOutputAllowed checked only lexical paths, while publication followed existing link/junction components without canonical parent revalidation."
     ],
+    "correctiveImplementationCommit": "634712d5c4233f1a58ff1a33d94420fcb3504367",
+    "correctiveTaskStateCommit": "858e4e8b7886a53d904d24485f880af588b15f46",
+    "status": "task-5.1-corrected-task-5.2-pending",
     "reopenedTasks": ["5.1", "5.2"],
     "blockers": []
   },
