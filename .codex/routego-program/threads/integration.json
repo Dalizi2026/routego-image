@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-5-active-sole-apply-owner-task-4.2-phase-b-wip-checkpoint-pd-010-planning-authorized-host-correction-locked",
+  "status": "generation-5-active-sole-apply-owner-task-4.2-pd-010-planning-accepted-host-correction-authorized-phase-b-locked",
   "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
   "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
@@ -12,7 +12,7 @@
   "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
   "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
   "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-  "currentHead": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+  "currentHead": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
   "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
   "gitCleanAtRegistration": true,
   "gitClean": true,
@@ -47,7 +47,7 @@
   "currentTask": {
     "id": "4.2",
     "capsule": ".codex/routego-program/tasks/integration-4.2.json",
-    "activationStatus": "pd-010-planning-authorized-host-correction-locked-phase-b-wip-preserved",
+    "activationStatus": "pd-010-planning-accepted-host-correction-authorized-phase-b-wip-locked",
     "started": true,
     "completionStatus": "not-complete-known-backpressure-regression",
     "wipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd"
@@ -60,18 +60,18 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|60df6b9a6fdb7587171b893e2a658d25ade17bdd|task-4.2-phase-b-non-completion-wip-checkpoint-pd-010-planning-authorized|16/29",
-    "messageType": "INTEGRATION_TASK_4_2_PHASE_B_WIP_CHECKPOINT_COMMITTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|1f476a3c34bb8ae7eaaf460957e6192c2a031567|pd-010-openspec-planning-accepted-host-correction-authorized|16/29",
+    "messageType": "INTEGRATION_PD_010_OPENSPEC_UPDATED",
     "completedTaskId": "4.1",
     "nextTaskId": "4.2",
-    "reportedHead": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "reportedHead": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
     "sourceFrozen": true,
     "planDeviationAccepted": true,
-    "checkpointSemantics": "non-completion WIP safety checkpoint; task unchecked; known real-host backpressure regression intentionally failing"
+    "checkpointSemantics": "owner-only PD-010 planning accepted; exact two-file host correction authorized; task unchecked; Phase B WIP locked"
   },
   "latestTaskCompletion": {
     "taskId": "4.1",
@@ -106,9 +106,20 @@
     "taskChecked": false,
     "controllerAccepted": true
   },
+  "latestPlanningCheckpoint": {
+    "taskId": "4.2",
+    "commit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
+    "parent": "ea3227112ed66f36e24a69a486cc2f61531225de",
+    "files": [
+      "openspec/changes/integrate-routego-image-plugin/design.md",
+      "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
+      "openspec/changes/integrate-routego-image-plugin/tasks.md"
+    ],
+    "controllerAccepted": true
+  },
   "planDeviation": {
     "decision": ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md",
-    "status": "owner-only-openspec-planning-authorized-host-correction-locked-phase-b-wip-preserved",
+    "status": "owner-only-openspec-planning-accepted-host-correction-authorized-phase-b-wip-preserved",
     "finding": "IntegrationLoopbackHttpHost awaits drain without racing client close or request abort and does not promptly return the active response-body iterator, delaying route finally and ephemeral lease cleanup.",
     "requiredPlanningArtifacts": [
       "openspec/changes/integrate-routego-image-plugin/design.md",
@@ -128,8 +139,12 @@
     "phaseBWipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "phaseBWipCheckpointParent": "12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d",
     "planningAuthorized": true,
-    "hostCorrectionLocked": true,
-    "nextGate": "exact-three-file-owner-only-openspec-planning-commit-controller-acceptance",
+    "planningCommit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
+    "planningParent": "ea3227112ed66f36e24a69a486cc2f61531225de",
+    "planningAccepted": true,
+    "hostCorrectionLocked": false,
+    "hostCorrectionAuthorized": true,
+    "nextGate": "exact-two-file-http-host-corrective-implementation-commit-controller-acceptance",
     "priorDecision": {
       "decision": ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
       "planningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
