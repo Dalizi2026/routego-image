@@ -3,12 +3,12 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "lane-complete-after-independent-review",
+  "status": "applying-post-archive-verification-fix",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
-  "headCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
+  "headCommit": "f92a835990d422da5f4f5e3008383f24aabdcc7b",
   "generation": 2,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "library-g2-compaction-1-task-5.2-head-937c5ca1-2026-07-18",
@@ -22,10 +22,11 @@
   "controllerRegistrationCommit": "9189b7a4f8155b5e62def6f786e5d7723eb8a3f0",
   "controllerActivationCommit": "c9ac706321500b01dabbf92ed81ba39cd566127e",
   "controllerReviewGovernanceCommit": "0b32e8d5ce7fd00128cdd8c6b07d26830ce118c8",
+  "controllerPostArchiveGovernanceCommit": "32e50fd5be832093b09522bfc9f091b55e8db1da",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
-  "openspecProgress": "10/10",
-  "lastCompletedTask": "5.2",
-  "nextTask": null,
+  "openspecProgress": "8/10",
+  "lastCompletedTask": "5.1",
+  "nextTask": "3.2",
   "lastImplementationCommit": "634712d5c4233f1a58ff1a33d94420fcb3504367",
   "lastOpenSpecCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
   "recentValidation": {
@@ -43,14 +44,15 @@
     "planningConsistency": "proposal, design, three delta specs, six frozen main specs, tasks, PD-002/003/004, plan, commits, and thread state passed",
     "gitClean": "corrected verification copy and primary worktree clean",
     "independentReview": "both findings corrected: public ZIP export writes all bytes and rejects canonical protected-root traversal",
-    "currentState": "corrected tasks 5.1 and 5.2 complete; OpenSpec all_done",
+    "currentState": "tasks 3.2 and 5.2 reopened after post-archive deterministic fixture failure",
+    "postArchiveVerification": "failed: folders.test.ts used a monotonic clock for folders but the real wall clock for asset creation",
     "correctiveRegression": "partial FileHandle writes produce a complete decodable/importable ZIP; Windows junction/POSIX symlink traversal into protected roots is rejected without modifying existing output",
     "correctedLibraryTests": "19 files, 146 tests passed",
     "correctedRootTests": "329 tests passed: contracts 92, foundation 48, library 146, mock-relay 43",
     "correctedImplementationScope": "packages/library/src/service.ts and packages/library/test/conformance/service.test.ts only"
   },
   "applyOwnership": {
-    "state": "complete-awaiting-controller",
+    "state": "active-single-owner",
     "activeOwnerThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
     "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "successorThreadId": "019f7261-2c57-7a01-b519-e1de521819fe"
@@ -69,7 +71,7 @@
     "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-lane-complete-after-independent-review"
+    "status": "generation-2-post-archive-fix-task-3.2"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
@@ -159,7 +161,20 @@
       "This clean-copy run used Windows with Node.js 24.15.0; Node.js 20.19 and macOS/Linux acceptance remain for the cross-platform Integration/CI gate."
     ]
   },
-  "correctedCompletion": {
+  "postArchiveReactivation": {
+    "reviewedDelivery": "f92a835990d422da5f4f5e3008383f24aabdcc7b",
+    "mergeCommit": "220d340f8c9cf7ab6891d8ee5191e97b3bc5e11a",
+    "specSyncCommit": "a9875ed368324b03941893a1ab994b3ff039a499",
+    "failedArchiveCommit": "2477b3ed4abcd909c1d3a8a837c02c813427feea",
+    "archiveRevertCommit": "fcac5c2abb8684e8b3bb66f21409905a4e5aaa32",
+    "controllerGovernanceCommit": "32e50fd5be832093b09522bfc9f091b55e8db1da",
+    "finding": "The folder test harness did not share one injected monotonic clock across LibraryAssetStore and LibraryFolderStore.",
+    "rootCause": "Asset creation used the real wall clock while later folder mutations used a fixed fixture clock, so the fixture could write updatedAt earlier than createdAt.",
+    "reopenedTasks": ["3.2", "5.2"],
+    "blockers": []
+  },
+  "supersededCorrectedCompletion": {
+    "supersededByPostArchiveVerification": true,
     "tasks": "10/10",
     "validatedAt": "2026-07-18T08:53:34.8754346+08:00",
     "verifiedHead": "0bd93dea9d7035426b34600a6bae13277b3f08bd",
