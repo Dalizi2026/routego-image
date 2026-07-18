@@ -14,8 +14,9 @@
 - Controller governance acceptance: `e7f4b5e266356a54a9dc374154cb35b2dfcd9939`
 - planned successor generation: `2`
 - planned successor branch: `codex/routego-integration-g2`
-- successorThreadId: `pending`
-- successorWorktree: `pending`
+- successorThreadId: `019f743d-a9e1-7752-b797-c0af436183ab`
+- successorWorktree: `C:\Users\MLTZ\.codex\worktrees\83b9\生图插件`
+- successor starting state: clean detached HEAD `776ac00e053404a997f458f21aaecdcd373233e2`
 
 ## OpenSpec and completed work
 
