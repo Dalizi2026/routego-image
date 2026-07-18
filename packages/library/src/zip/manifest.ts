@@ -1,6 +1,7 @@
 import { isDeepStrictEqual, TextDecoder } from "node:util";
 
 import {
+  MAX_LIBRARY_ASSET_RENDITIONS,
   timestampSchema,
   type LibraryOperationParameters,
   type RoutegoServiceError
@@ -21,6 +22,8 @@ export const PORTABLE_LIBRARY_MANIFEST_SCHEMA_VERSION = 1 as const;
 export const PORTABLE_LIBRARY_MANIFEST_KIND = "routego-image-library-portability" as const;
 export const PORTABLE_LIBRARY_MANIFEST_ENTRY = "routego-image-library-manifest.json";
 export const MAX_PORTABLE_MANIFEST_BYTES = 8 * 1024 * 1024;
+export const MAX_PORTABLE_ASSETS = 200;
+export const MAX_PORTABLE_BLOBS = MAX_PORTABLE_ASSETS * MAX_LIBRARY_ASSET_RENDITIONS;
 
 const UTF8_DECODER = new TextDecoder("utf-8", { fatal: true });
 const PORTABLE_REDACTED_PATH = "[REDACTED_PATH]";
@@ -234,9 +237,13 @@ export function portableAssetDependencyIds(asset: StoredLibraryAsset): ReadonlyS
 export function collectPortableAssetClosure(
   index: ImageLibraryIndex,
   rootAssetId: string,
-  maximumAssets = 200
+  maximumAssets = MAX_PORTABLE_ASSETS
 ): PortableAssetClosure {
-  if (!Number.isSafeInteger(maximumAssets) || maximumAssets < 1 || maximumAssets > 200) {
+  if (
+    !Number.isSafeInteger(maximumAssets) ||
+    maximumAssets < 1 ||
+    maximumAssets > MAX_PORTABLE_ASSETS
+  ) {
     throw new LibraryError("invalid_input", "The portable asset closure limit is invalid.");
   }
   const assetById = new Map(index.assets.map((asset) => [asset.id, asset]));
@@ -300,9 +307,9 @@ export function parsePortableLibraryManifest(value: unknown): PortableLibraryMan
     !Array.isArray(record["assets"]) ||
     !Array.isArray(record["folders"]) ||
     record["assets"].length < 1 ||
-    record["assets"].length > 200 ||
+    record["assets"].length > MAX_PORTABLE_ASSETS ||
     record["blobs"].length < 1 ||
-    record["blobs"].length > 3_200 ||
+    record["blobs"].length > MAX_PORTABLE_BLOBS ||
     record["folders"].length > 1_000
   ) {
     manifestError();
@@ -393,7 +400,7 @@ export function createPortableLibraryManifest(
 ): PortableLibraryManifest {
   if (
     selectedAssetIds.length < 1 ||
-    selectedAssetIds.length > 200 ||
+    selectedAssetIds.length > MAX_PORTABLE_ASSETS ||
     new Set(selectedAssetIds).size !== selectedAssetIds.length
   ) {
     throw new LibraryError("invalid_input", "Portable export asset identities are invalid.");
@@ -407,11 +414,11 @@ export function createPortableLibraryManifest(
   const folderIds = new Set<string>();
   const blobSha256s = new Set<string>();
   for (const selectedAssetId of selectedAssetIds) {
-    const closure = collectPortableAssetClosure(index, selectedAssetId, 200);
+    const closure = collectPortableAssetClosure(index, selectedAssetId, MAX_PORTABLE_ASSETS);
     for (const assetId of closure.assetIds) assetIds.add(assetId);
     for (const folderId of closure.folderIds) folderIds.add(folderId);
     for (const sha256 of closure.blobSha256s) blobSha256s.add(sha256);
-    if (assetIds.size > 200) {
+    if (assetIds.size > MAX_PORTABLE_ASSETS) {
       throw new LibraryError("upload_oversize", "The portable export contains too many assets.");
     }
   }

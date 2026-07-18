@@ -16,6 +16,7 @@ import { listTransactionJournals } from "../../src/fs/journal";
 import { UploadStore } from "../../src/upload/store";
 import { decodeZipArchive, encodeZipArchive, type ZipSourceEntry } from "../../src/zip/codec";
 import {
+  MAX_PORTABLE_BLOBS,
   PORTABLE_LIBRARY_MANIFEST_ENTRY,
   parsePortableLibraryManifestBytes
 } from "../../src/zip/manifest";
@@ -58,6 +59,38 @@ function png(fill: number): Buffer {
     chunk("IDAT", deflateSync(Buffer.from([0, fill, fill, fill, 0xff, fill, fill, fill, 0xff]))),
     chunk("IEND", Buffer.alloc(0))
   ]);
+}
+
+function jpeg(width = 4, height = 3): Buffer {
+  return Buffer.from([
+    0xff, 0xd8,
+    0xff, 0xc0, 0x00, 0x0b, 0x08,
+    (height >>> 8) & 0xff, height & 0xff,
+    (width >>> 8) & 0xff, width & 0xff,
+    0x01, 0x01, 0x11, 0x00,
+    0xff, 0xda, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00, 0x3f, 0x00,
+    0x12, 0x34, 0xff, 0x00, 0x56,
+    0xff, 0xd9
+  ]);
+}
+
+function webp(width = 5, height = 4): Buffer {
+  const payload = Buffer.alloc(6);
+  payload[0] = 0x2f;
+  const encodedWidth = width - 1;
+  const encodedHeight = height - 1;
+  payload[1] = encodedWidth & 0xff;
+  payload[2] = ((encodedWidth >>> 8) & 0x3f) | ((encodedHeight & 0x03) << 6);
+  payload[3] = (encodedHeight >>> 2) & 0xff;
+  payload[4] = (encodedHeight >>> 10) & 0x0f;
+  const bytes = Buffer.alloc(26);
+  bytes.write("RIFF", 0, "ascii");
+  bytes.writeUInt32LE(18, 4);
+  bytes.write("WEBP", 8, "ascii");
+  bytes.write("VP8L", 12, "ascii");
+  bytes.writeUInt32LE(payload.byteLength, 16);
+  payload.copy(bytes, 20);
+  return bytes;
 }
 
 function parameters(prompt: string): LibraryOperationParameters {
@@ -212,6 +245,119 @@ async function seedRelatedAssets(
     }
   ]);
   return { sourceId, outputId, sourceArtifactId, outputArtifactId, folderId };
+}
+
+async function seedSourceGraph(
+  harness: Awaited<ReturnType<typeof createHarness>>,
+  options: {
+    readonly assetId?: string;
+    readonly folderId?: string;
+  } = {}
+) {
+  const assetId = options.assetId ?? "asset-source-graph";
+  const folderId = options.folderId ?? "folder-source-graph";
+  const sourceRoot = path.join(harness.root, `source-graph-${assetId}`);
+  const target = jpeg(7, 5);
+  const reference = webp(6, 4);
+  const partial = png(0x31);
+  const final = png(0x32);
+  await mkdir(sourceRoot, { recursive: true });
+  await Promise.all([
+    writeFile(path.join(sourceRoot, "目标 图像.jpg"), target),
+    writeFile(path.join(sourceRoot, "参考 图像.webp"), reference),
+    writeFile(path.join(sourceRoot, "部分 输出.png"), partial),
+    writeFile(path.join(sourceRoot, "最终 输出.png"), final)
+  ]);
+  const folders = new LibraryFolderStore({
+    indexStore: harness.indexStore,
+    now: () => new Date("2026-07-18T07:00:00.000Z"),
+    idFactory: () => folderId
+  });
+  await folders.createFolder("来源 图谱 🙂");
+  const prompt = "保留来源、关系与 Unicode 🚀";
+  await harness.assetStore.ingestAsset({
+    assetId,
+    primaryArtifactId: "artifact-final-source-graph",
+    prompt,
+    model: "portable-model",
+    requestedParams: parameters(prompt),
+    effectiveParams: parameters(prompt),
+    execution,
+    renditions: [
+      {
+        artifactId: "artifact-target-source-graph",
+        phase: "source",
+        sourceRoot,
+        sourceRelativePath: "目标 图像.jpg"
+      },
+      {
+        artifactId: "artifact-reference-source-graph",
+        phase: "source",
+        sourceRoot,
+        sourceRelativePath: "参考 图像.webp"
+      },
+      {
+        artifactId: "artifact-partial-source-graph",
+        phase: "partial",
+        sourceRoot,
+        sourceRelativePath: "部分 输出.png"
+      },
+      {
+        artifactId: "artifact-final-source-graph",
+        phase: "final",
+        sourceRoot,
+        sourceRelativePath: "最终 输出.png"
+      }
+    ],
+    relationships: [
+      {
+        id: "relationship-target-source-graph",
+        role: "target",
+        relatedAssetId: assetId,
+        artifactId: "artifact-target-source-graph",
+        order: 0,
+        label: "目标 🙂"
+      },
+      {
+        id: "relationship-reference-source-graph",
+        role: "reference",
+        relatedAssetId: assetId,
+        artifactId: "artifact-reference-source-graph",
+        order: 1,
+        label: "参考 🚀"
+      },
+      {
+        id: "relationship-partial-source-graph",
+        role: "output",
+        relatedAssetId: assetId,
+        artifactId: "artifact-partial-source-graph",
+        order: 2
+      },
+      {
+        id: "relationship-final-source-graph",
+        role: "output",
+        relatedAssetId: assetId,
+        artifactId: "artifact-final-source-graph",
+        order: 3
+      }
+    ],
+    folderIds: [folderId],
+    createdAt: "2026-07-18T07:20:00.000Z",
+    updatedAt: "2026-07-18T07:20:00.000Z"
+  });
+  return {
+    assetId,
+    folderId,
+    artifactIds: [
+      "artifact-target-source-graph",
+      "artifact-reference-source-graph",
+      "artifact-partial-source-graph",
+      "artifact-final-source-graph"
+    ],
+    blobSha256s: [target, reference, partial, final].map((bytes) =>
+      createHash("sha256").update(bytes).digest("hex")
+    )
+  };
 }
 
 async function finalizeZipUpload(store: UploadStore, bytes: Buffer): Promise<string> {
@@ -420,6 +566,169 @@ describe("portable Library ZIP export and import", () => {
     expect(manifest.assets[1]?.error).not.toHaveProperty("details");
   });
 
+  it("round-trips mixed-MIME source/output graphs with exact ownership, checksums and Unicode", async () => {
+    const source = await createHarness("routego-portable-source-graph-");
+    const ids = await seedSourceGraph(source);
+    const exported = await exportedArchive(source, [ids.assetId]);
+    const archive = decodeZipArchive(exported.bytes);
+    const manifest = parsePortableLibraryManifestBytes(
+      archive.entries.find((entry) => entry.name === PORTABLE_LIBRARY_MANIFEST_ENTRY)!.data
+    );
+    const portableAsset = manifest.assets[0]!;
+    expect(portableAsset).toMatchObject({
+      id: ids.assetId,
+      primaryArtifactId: "artifact-final-source-graph",
+      prompt: "保留来源、关系与 Unicode 🚀"
+    });
+    expect(portableAsset.renditions.map(({ artifactId, phase, blobSha256 }) => ({ artifactId, phase, blobSha256 }))).toEqual([
+      { artifactId: ids.artifactIds[0], phase: "source", blobSha256: ids.blobSha256s[0] },
+      { artifactId: ids.artifactIds[1], phase: "source", blobSha256: ids.blobSha256s[1] },
+      { artifactId: ids.artifactIds[2], phase: "partial", blobSha256: ids.blobSha256s[2] },
+      { artifactId: ids.artifactIds[3], phase: "final", blobSha256: ids.blobSha256s[3] }
+    ]);
+    expect(portableAsset.relationships.map(({ role, relatedAssetId, artifactId, label }) => ({
+      role,
+      relatedAssetId,
+      artifactId,
+      label
+    }))).toEqual([
+      { role: "target", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[0], label: "目标 🙂" },
+      { role: "reference", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[1], label: "参考 🚀" },
+      { role: "output", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[2], label: undefined },
+      { role: "output", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[3], label: undefined }
+    ]);
+    expect(manifest.folders).toMatchObject([{ id: ids.folderId, name: "来源 图谱 🙂" }]);
+
+    const target = await createHarness("routego-portable-source-graph-target-");
+    const uploadResourceId = await finalizeZipUpload(target.uploadStore, exported.bytes);
+    const imported = await target.service.importUpload({
+      preflightId: "preflight-import-source-graph",
+      uploadResourceId
+    });
+    expect(imported).toMatchObject({ status: "succeeded", importedCount: 1, skippedCount: 0 });
+    const index = await target.indexStore.read();
+    const importedAsset = index.assets[0]!;
+    const ownerByArtifact = new Map(
+      index.assets.flatMap((asset) => asset.renditions.map((rendition) => [rendition.artifactId, asset.id] as const))
+    );
+    expect(importedAsset.renditions.map(({ artifactId, phase, blobSha256 }) => ({ artifactId, phase, blobSha256 }))).toEqual(
+      portableAsset.renditions.map(({ artifactId, phase, blobSha256 }) => ({ artifactId, phase, blobSha256 }))
+    );
+    expect(importedAsset.primaryArtifactId).toBe("artifact-final-source-graph");
+    expect(importedAsset.relationships.every((relationship) =>
+      relationship.artifactId === undefined ||
+      ownerByArtifact.get(relationship.artifactId) === relationship.relatedAssetId
+    )).toBe(true);
+    expect(await target.uploadStore.getUploadResourceStatus({ uploadResourceId })).toMatchObject({
+      status: "failed",
+      error: { code: "upload_consumed" }
+    });
+  });
+
+  it("remaps colliding source graph identities without changing phases or relationship owners", async () => {
+    const source = await createHarness("routego-portable-source-remap-");
+    const ids = await seedSourceGraph(source);
+    const exported = await exportedArchive(source, [ids.assetId]);
+    const target = await createHarness("routego-portable-source-remap-target-");
+    await seedIndependentAssets(target, [
+      { assetId: ids.assetId, artifactId: ids.artifactIds[0]!, fill: 0x7f }
+    ]);
+    const uploadResourceId = await finalizeZipUpload(target.uploadStore, exported.bytes);
+    const imported = await target.service.importUpload({
+      preflightId: "preflight-import-source-remap",
+      uploadResourceId
+    });
+    expect(imported.status).toBe("succeeded");
+    const importedItem = imported.items[0]!;
+    expect(importedItem.affectedAssetId).not.toBe(ids.assetId);
+    expect(importedItem.warnings.join(" ")).toContain("remapped");
+    const index = await target.indexStore.read();
+    const importedAsset = index.assets.find((asset) => asset.id === importedItem.affectedAssetId)!;
+    const ownerByArtifact = new Map(
+      index.assets.flatMap((asset) => asset.renditions.map((rendition) => [rendition.artifactId, asset.id] as const))
+    );
+    expect(importedAsset.renditions.map((rendition) => rendition.phase)).toEqual([
+      "source",
+      "source",
+      "partial",
+      "final"
+    ]);
+    expect(importedAsset.renditions.find((rendition) => rendition.artifactId === importedAsset.primaryArtifactId)?.phase).toBe("final");
+    expect(importedAsset.relationships.every((relationship) =>
+      relationship.artifactId === undefined ||
+      ownerByArtifact.get(relationship.artifactId) === relationship.relatedAssetId
+    )).toBe(true);
+    expect(importedAsset.relationships[0]).toMatchObject({
+      relatedAssetId: importedAsset.id,
+      role: "target"
+    });
+    expect(importedAsset.relationships[0]?.artifactId).not.toBe(ids.artifactIds[0]);
+  });
+
+  it("round-trips the exact 33-rendition bound and rejects a thirty-fourth manifest rendition", async () => {
+    expect(MAX_PORTABLE_BLOBS).toBe(6_600);
+    const source = await createHarness("routego-portable-bound-");
+    const sourceRoot = path.join(source.root, "bounded-source-graph");
+    await mkdir(sourceRoot, { recursive: true });
+    await Promise.all([
+      writeFile(path.join(sourceRoot, "source.jpg"), jpeg()),
+      writeFile(path.join(sourceRoot, "partial.png"), png(0x51)),
+      writeFile(path.join(sourceRoot, "final.png"), png(0x52))
+    ]);
+    const sourceRenditions = Array.from({ length: 17 }, (_, index) => ({
+      artifactId: `artifact-bound-source-${index + 1}`,
+      phase: "source" as const,
+      sourceRoot,
+      sourceRelativePath: "source.jpg"
+    }));
+    const partialRenditions = Array.from({ length: 12 }, (_, index) => ({
+      artifactId: `artifact-bound-partial-${index + 1}`,
+      phase: "partial" as const,
+      sourceRoot,
+      sourceRelativePath: "partial.png"
+    }));
+    const finalRenditions = Array.from({ length: 4 }, (_, index) => ({
+      artifactId: `artifact-bound-final-${index + 1}`,
+      phase: "final" as const,
+      sourceRoot,
+      sourceRelativePath: "final.png"
+    }));
+    await source.assetStore.ingestAsset({
+      assetId: "asset-bound-source-graph",
+      primaryArtifactId: "artifact-bound-final-4",
+      prompt: "Bounded source graph",
+      model: "portable-model",
+      requestedParams: parameters("Bounded source graph"),
+      effectiveParams: parameters("Bounded source graph"),
+      execution,
+      renditions: [...sourceRenditions, ...partialRenditions, ...finalRenditions]
+    });
+    const exported = await exportedArchive(source, ["asset-bound-source-graph"]);
+    const validTarget = await createHarness("routego-portable-bound-valid-");
+    const validUpload = await finalizeZipUpload(validTarget.uploadStore, exported.bytes);
+    await expect(validTarget.service.importUpload({
+      preflightId: "preflight-import-bound-valid",
+      uploadResourceId: validUpload
+    })).resolves.toMatchObject({ status: "succeeded", importedCount: 1 });
+    expect((await validTarget.indexStore.read()).assets[0]?.renditions).toHaveLength(33);
+
+    const overflow = rewritePortableArchive(exported.bytes, (manifest) => {
+      const renditions = manifest.assets[0]!["renditions"] as Array<Record<string, unknown>>;
+      renditions.push({ ...structuredClone(renditions[0]!), artifactId: "artifact-bound-overflow-34" });
+    });
+    const rejectedTarget = await createHarness("routego-portable-bound-invalid-");
+    const rejectedUpload = await finalizeZipUpload(rejectedTarget.uploadStore, overflow);
+    const rejected = await rejectedTarget.service.importUpload({
+      preflightId: "preflight-import-bound-invalid",
+      uploadResourceId: rejectedUpload
+    });
+    expect(rejected.status).toBe("failed");
+    expect((await rejectedTarget.indexStore.read()).assets).toEqual([]);
+    await expect(
+      rejectedTarget.uploadStore.resolveUploadResource(rejectedUpload, ["zip-import"])
+    ).resolves.toBeDefined();
+  });
+
   it("imports validated assets, folders, relationships and blobs, then consumes the ZIP", async () => {
     const source = await createHarness("routego-portable-source-");
     const ids = await seedRelatedAssets(source);
@@ -621,6 +930,12 @@ describe("portable Library ZIP export and import", () => {
       }
     ],
     [
+      "byte-length mismatch",
+      (manifest: { blobs: Array<Record<string, unknown>> }) => {
+        manifest.blobs[0]!["byteLength"] = (manifest.blobs[0]!["byteLength"] as number) + 1;
+      }
+    ],
+    [
       "MIME mismatch",
       (manifest: { blobs: Array<Record<string, unknown>> }, entries: ZipSourceEntry[]) => {
         const blob = manifest.blobs[0]!;
@@ -636,6 +951,12 @@ describe("portable Library ZIP export and import", () => {
       "duplicate manifest blob",
       (manifest: { blobs: Array<Record<string, unknown>> }) => {
         manifest.blobs.push(structuredClone(manifest.blobs[0]!));
+      }
+    ],
+    [
+      "portable blob traversal metadata",
+      (manifest: { blobs: Array<Record<string, unknown>> }) => {
+        manifest.blobs[0]!["entryName"] = "../outside.png";
       }
     ],
     [
@@ -666,6 +987,54 @@ describe("portable Library ZIP export and import", () => {
     ).resolves.toMatchObject({ uploadResourceId });
   });
 
+  it.each([
+    [
+      "source primary",
+      (asset: Record<string, unknown>) => {
+        asset["primaryArtifactId"] = "artifact-target-source-graph";
+      }
+    ],
+    [
+      "succeeded asset without a final output",
+      (asset: Record<string, unknown>) => {
+        const renditions = asset["renditions"] as Array<Record<string, unknown>>;
+        renditions.find((rendition) => rendition["artifactId"] === "artifact-final-source-graph")!["phase"] = "partial";
+      }
+    ],
+    [
+      "source-backed output relationship",
+      (asset: Record<string, unknown>) => {
+        const relationships = asset["relationships"] as Array<Record<string, unknown>>;
+        relationships.find((relationship) => relationship["role"] === "output")!["artifactId"] = "artifact-target-source-graph";
+      }
+    ],
+    [
+      "relationship ownership outside the portable graph",
+      (asset: Record<string, unknown>) => {
+        const relationships = asset["relationships"] as Array<Record<string, unknown>>;
+        relationships[0]!["relatedAssetId"] = "asset-missing-owner";
+      }
+    ]
+  ])("rejects a %s source graph before durable mutation", async (_label, mutate) => {
+    const source = await createHarness("routego-portable-source-invalid-");
+    const ids = await seedSourceGraph(source);
+    const exported = await exportedArchive(source, [ids.assetId]);
+    const changed = rewritePortableArchive(exported.bytes, (manifest) => {
+      mutate(manifest.assets[0]!);
+    });
+    const target = await createHarness("routego-portable-source-invalid-target-");
+    const uploadResourceId = await finalizeZipUpload(target.uploadStore, changed);
+    const result = await target.service.importUpload({
+      preflightId: "preflight-import-source-invalid",
+      uploadResourceId
+    });
+    expect(result.status).toBe("failed");
+    expect((await target.indexStore.read()).assets).toEqual([]);
+    await expect(
+      target.uploadStore.resolveUploadResource(uploadResourceId, ["zip-import"])
+    ).resolves.toBeDefined();
+  });
+
   it("rejects a CRC mismatch before index mutation or ZIP consumption", async () => {
     const source = await createHarness("routego-portable-crc-source-");
     const ids = await seedRelatedAssets(source);
@@ -684,6 +1053,40 @@ describe("portable Library ZIP export and import", () => {
     await expect(
       target.uploadStore.resolveUploadResource(uploadResourceId, ["zip-import"])
     ).resolves.toMatchObject({ uploadResourceId });
+  });
+
+  it("keeps a source graph atomic when failure occurs after blob publication but before index commit", async () => {
+    const source = await createHarness("routego-portable-atomic-source-");
+    const ids = await seedSourceGraph(source);
+    const exported = await exportedArchive(source, [ids.assetId]);
+    const target = await createHarness("routego-portable-atomic-target-");
+    const uploadResourceId = await finalizeZipUpload(target.uploadStore, exported.bytes);
+    const failing = createServiceForHarness(target, {
+      hooks: {
+        beforeImportIndexCommit: async () => {
+          throw new Error("synthetic failure before source graph index commit");
+        }
+      }
+    });
+    await expect(
+      failing.importUpload({
+        preflightId: "preflight-import-source-atomic",
+        uploadResourceId
+      })
+    ).rejects.toThrow("synthetic failure before source graph index commit");
+    await expect(
+      target.uploadStore.resolveUploadResource(uploadResourceId, ["zip-import"])
+    ).resolves.toBeDefined();
+    expect(await listTransactionJournals(target.libraryRoot)).not.toEqual([]);
+
+    await failing.recover();
+    expect(await listTransactionJournals(target.libraryRoot)).toEqual([]);
+    expect(await target.indexStore.read()).toMatchObject({ assets: [], blobs: [] });
+    const retried = await createServiceForHarness(target).importUpload({
+      preflightId: "preflight-import-source-atomic-retry",
+      uploadResourceId
+    });
+    expect(retried).toMatchObject({ status: "succeeded", importedCount: 1 });
   });
 
   it("recovers a crash before index commit without deleting unknown files, then retries", async () => {
