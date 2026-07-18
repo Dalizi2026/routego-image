@@ -23,6 +23,10 @@ function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
 
+function normalizeUtf8LineEndings(bytes) {
+  return Buffer.from(bytes.toString("utf8").replace(/\r\n/g, "\n"), "utf8");
+}
+
 function sortValue(value) {
   if (Array.isArray(value)) {
     return value.map(sortValue);
@@ -408,21 +412,40 @@ if (capsule.startup.mandatoryFiles.length > budgets.startupFiles) {
   fail("startup file count budget exceeded");
 }
 
+if (capsule.startup.byteCounting !== "utf8-after-crlf-to-lf-normalization") {
+  fail("startup byte-count normalization policy mismatch");
+}
+if (!Number.isInteger(capsule.startup.expectedNormalizedUtf8Bytes)) {
+  fail("startup expected normalized byte count is missing");
+}
+
 let startupBytes = 0;
 for (const startupFile of capsule.startup.mandatoryFiles) {
   try {
-    startupBytes += readRepositoryPath(
-      startupFile,
-      capsule.successor.startingCommit,
+    startupBytes += normalizeUtf8LineEndings(
+      readRepositoryPath(startupFile, capsule.successor.startingCommit),
     ).length;
   } catch (error) {
     fail("startup file unavailable: " + startupFile + " (" + error.message + ")");
   }
 }
-if (startupBytes > budgets.startup) {
+if (startupBytes !== capsule.startup.expectedNormalizedUtf8Bytes) {
+  fail(
+    "startup normalized byte invariant mismatch: " +
+      startupBytes +
+      " != " +
+      capsule.startup.expectedNormalizedUtf8Bytes,
+  );
+} else if (startupBytes > budgets.startup) {
   fail("startup byte budget exceeded: " + startupBytes + " > " + budgets.startup);
 } else {
-  pass("startup budget " + capsule.startup.mandatoryFiles.length + " files / " + startupBytes + " bytes");
+  pass(
+    "startup budget " +
+      capsule.startup.mandatoryFiles.length +
+      " files / " +
+      startupBytes +
+      " normalized UTF-8 bytes",
+  );
 }
 
 const scanFiles = [

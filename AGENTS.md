@@ -13,7 +13,7 @@ PD-008 默认使用低上下文、无损细节启动。每个顶层任务或 suc
 7. capsule 指定的直接相关 delta/main specs；
 8. capsule 指定的当前有效 PD。
 
-默认启动最多 12 个文件、120 KiB UTF-8。不得在启动时完整读取全部 18 份 main specs、全部 archived changes、其他 lane 的完整工件、无关 evidence、predecessor 线程历史或旧状态 notes。
+默认启动最多 12 个文件、120 KiB UTF-8。字节数统一先把 CRLF 规范化为 LF 再计算，避免不同 Git 工作树的换行策略产生虚假差异。不得在启动时完整读取全部 18 份 main specs、全部 archived changes、其他 lane 的完整工件、无关 evidence、predecessor 线程历史或旧状态 notes。
 
 只有 capsule/Git/OpenSpec/状态不一致、公共 Schema/架构/所有权/依赖边界、当前任务直接修改能力、验收失败追查根因、`PLAN_DEVIATION` 或健康审计无法确认权威时，才定向读取受影响资料。全量审计只允许用于项目初建、最终 Integration conformance、main spec 同步/archive、release/rollback 门禁、定向恢复失败或用户明确要求。
 
