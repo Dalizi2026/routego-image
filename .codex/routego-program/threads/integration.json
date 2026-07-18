@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-4-active-sole-apply-owner-task-3.5-unlocked-not-started",
+  "status": "generation-4-active-sole-apply-owner-task-3.5-in-progress",
   "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
   "threadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a818\\生图插件",
@@ -12,7 +12,8 @@
   "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
   "registrationCommit": "e38ede29a7bb2802ca874c099f7a11e6aff11524",
   "incorporationCommit": "ec97b7f97b9768ca586480d4c7e99be81015196c",
-  "currentHead": "ec97b7f97b9768ca586480d4c7e99be81015196c",
+  "currentHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
+  "latestActivationIncorporationHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
   "gitCleanAtRegistration": true,
   "gitClean": true,
   "observableCompactions": 0,
@@ -46,7 +47,8 @@
   "currentTask": {
     "id": "3.5",
     "capsule": ".codex/routego-program/tasks/integration-3.5.json",
-    "activationStatus": "unlocked-sole-owner-authorized-not-started"
+    "activationStatus": "active-sole-owner-started",
+    "started": true
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-4.capsule.json",
@@ -56,11 +58,11 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|ec97b7f97b9768ca586480d4c7e99be81015196c|generation-4-handoff-accepted|14/29",
-    "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|a452f2c66689555db0c5d8a5bb47e86ca3cd82cb|sole-owner-activated-task-3.5-unlocked|14/29",
+    "messageType": "INTEGRATION_SOLE_OWNER_ACTIVATED",
     "completedTaskId": "3.4",
     "nextTaskId": "3.5",
-    "reportedHead": "ec97b7f97b9768ca586480d4c7e99be81015196c",
+    "reportedHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,

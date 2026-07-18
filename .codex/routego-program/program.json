@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-008-active-integration-generation-4-sole-owner-task-3.5-unlocked-not-started-controller-generation-5-pre-handoff",
+  "status": "pd-008-active-integration-generation-4-task-3.5-active-controller-generation-6-registered-awaiting-low-context-acceptance",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -58,8 +58,8 @@
     "role": "program-controller",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
     "branch": "codex/routego-controller-g5",
-    "verifiedHeadBeforeContainingCommit": "e38ede29a7bb2802ca874c099f7a11e6aff11524",
-    "status": "authoritative-pre-handoff",
+    "verifiedHeadBeforeContainingCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
+    "status": "authoritative-pre-handoff-controller-generation-6-registered",
     "observableCompactions": 4,
     "lastCompactionFingerprint": "g5-compaction-4-during-integration-g4-sole-owner-activation-2026-07-19"
   },
@@ -70,7 +70,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a818\\生图插件",
     "branch": "codex/routego-integration-g4",
     "acceptedProductCommit": "17208da376f71790561ae87e3d59b77287765b3b",
-    "currentHead": "ec97b7f97b9768ca586480d4c7e99be81015196c",
+    "currentHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
@@ -86,7 +86,8 @@
     "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
     "registrationCommit": "e38ede29a7bb2802ca874c099f7a11e6aff11524",
     "incorporationCommit": "ec97b7f97b9768ca586480d4c7e99be81015196c",
-    "currentHead": "ec97b7f97b9768ca586480d4c7e99be81015196c",
+    "currentHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
+    "latestActivationIncorporationHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
     "gitClean": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null,
@@ -108,10 +109,10 @@
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|ec97b7f97b9768ca586480d4c7e99be81015196c|generation-4-handoff-accepted|14/29",
-    "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|a452f2c66689555db0c5d8a5bb47e86ca3cd82cb|sole-owner-activated-task-3.5-unlocked|14/29",
+    "messageType": "INTEGRATION_SOLE_OWNER_ACTIVATED",
     "workerThreadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
-    "reportedHead": "ec97b7f97b9768ca586480d4c7e99be81015196c",
+    "reportedHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
     "completedTaskId": "3.4",
     "nextTaskId": "3.5",
     "openspecProgress": "14/29",
@@ -119,7 +120,23 @@
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
-    "controllerIndependentVerification": "Integration G4 incorporated registration as governance-only merge ec97b7f97b9768ca586480d4c7e99be81015196c, read exactly 12 mandatory files at 98064 normalized UTF-8 bytes, passed the capsule validator with zero observable compactions and clean Git, and directly reported acceptance with Controller read-back."
+    "controllerIndependentVerification": "Integration G4 incorporated sole-owner activation as exact governance-only merge a452f2c66689555db0c5d8a5bb47e86ca3cd82cb with parents ec97b7f97b9768ca586480d4c7e99be81015196c and d871bbfc5827e7abe6404a42d4b0bceff63d550c, passed the activated capsule validator at 12 files/98903 normalized UTF-8 bytes and clean Git, and directly reported activation with Controller read-back."
+  },
+  "controllerSuccessor": {
+    "lane": "controller",
+    "role": "program-controller",
+    "generation": 6,
+    "status": "registered-awaiting-low-context-acceptance",
+    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
+    "plannedBranch": "codex/routego-controller-g6",
+    "startingCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
+    "registrationCommit": null,
+    "currentHead": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
+    "gitClean": true,
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null,
+    "handoffCapsule": ".codex/routego-program/handoffs/controller-generation-6.capsule.json"
   },
   "currentBlockers": [],
   "currentRisks": [
