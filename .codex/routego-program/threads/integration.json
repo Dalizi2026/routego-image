@@ -15,10 +15,10 @@
   "generation": 1,
   "observableCompactions": 4,
   "lastCompactionFingerprint": "2026-07-18-generation-1-compaction-4-before-task-2.2-review-correction",
-  "lastHealthAudit": "passed-controller-task-2.2-review-correction-authority-audit; pre-handoff; task-2.2-correction-only; task-2.3-held",
+  "lastHealthAudit": "passed-task-2.2-CRLF-review-correction-verification; corrective implementation and task-state committed; pre-handoff; task-2.3-held",
   "successorThreadId": null,
   "openspecState": "offline-apply-active",
-  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; repository task state is 7/29 but Controller accepts 6/29 until task 2.2 review correction passes; tasks 1.1 through 2.1 and task 1.5 accepted; PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 accepted",
+  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; repository task state is 7/29 with corrected task 2.2 implementation acc4a4cb56ce99ed1a854a95c1286daecba3be33 and task-state 63bd63543410b6794c3691d82082001f431efa39; Controller independent correction acceptance pending; task 2.3 held",
   "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
     "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
@@ -50,7 +50,7 @@
     "heldTask": "2.3",
     "externalStateAuthorized": false
   },
-  "nextTask": "2.2-review-correction",
+  "nextTask": "2.3",
   "taskReviewCorrection": {
     "taskId": "2.2",
     "reviewedCheckpoint": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
@@ -61,14 +61,19 @@
       "packages/studio/src/api/sse.ts",
       "packages/studio/test/sse.test.ts"
     ],
+    "correctiveImplementationCommit": "acc4a4cb56ce99ed1a854a95c1286daecba3be33",
+    "correctiveTaskStateCommit": "63bd63543410b6794c3691d82082001f431efa39",
+    "status": "completed-awaiting-controller-review",
     "heldTask": "2.3",
     "externalStateAuthorized": false
   },
   "latestTaskCompletion": {
     "taskId": "2.2",
-    "implementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
-    "taskStateCommit": "722c183fed4efdf62d7f678feacc30a9bd64c961",
-    "verification": "passed: fresh apply instructions with task 2.1 complete; focused Studio SSE/Gateway tests 26/26; full Studio tests 123/123; Studio typecheck and build; LF/CRLF/multiline/fragmented framing; strict MIME/UTF-8/line/event/body bounds; exact first started/request ID/sequence/terminal/EOF rules; DONE/sentinel/post-terminal rejection; abort/reader cancellation/lock release; in-memory session-only POST route; redaction/no-path/Base64 tests; repository safety 397 tracked files including staged SSE files; git diff --check; exact five-file implementation scope audit; OpenSpec strict 19/19",
+    "implementationCommit": "acc4a4cb56ce99ed1a854a95c1286daecba3be33",
+    "taskStateCommit": "63bd63543410b6794c3691d82082001f431efa39",
+    "supersedesImplementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
+    "supersedesTaskStateCommit": "722c183fed4efdf62d7f678feacc30a9bd64c961",
+    "verification": "passed correction: exact raw UTF-8 event-byte accounting includes full LF or CRLF delimiters while preserving logical line and body limits; focused LF/CRLF exact-boundary and one-byte-over line/event/body regressions; focused Studio SSE/Gateway 28/28; full Studio 125/125; Studio typecheck and build; repository safety 397 tracked files; OpenSpec strict 19/19; git diff --check; exact two-file correction scope",
     "externalStateTouched": false
   },
   "handoff": {
