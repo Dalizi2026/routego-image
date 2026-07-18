@@ -8,11 +8,11 @@
   "branch": "codex/routego-controller-g3",
   "startingCommit": "5a8f8a21c23cc4292449da039f196c0ed604a82f",
   "registrationCommit": "72e72c6ec4f9809f0c7cf8919e1ddf15f350c872",
-  "headCommit": "72e72c6ec4f9809f0c7cf8919e1ddf15f350c872",
+  "headCommit": "149ca920feb6fc714db4e210e4a304f6540f3e57",
   "generation": 3,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed-pd-005-independent-contract-and-ownership-review",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "g3-compaction-1-integration-planning-active-2026-07-18",
+  "lastHealthAudit": "passed-after-g3-compaction-1-integration-planning-audit",
   "successorThreadId": null,
   "predecessorThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
   "predecessorGeneration": 2,
@@ -97,6 +97,7 @@
     "Controller generation 2 reached observable compaction 3 after incorporating the Integration handoff acceptance, so the mandatory generation-3 Controller handoff was initiated before activating Integration planning or beginning any new large governance task.",
     "Program Controller generation 3 accepted the handoff in task 019f7309-d473-74a2-934b-e81726d90a31 at clean branch codex/routego-controller-g3 HEAD 72e72c6ec4f9809f0c7cf8919e1ddf15f350c872 after the complete authority, registration and Integration-state audit.",
     "Integration was paused at clean tracked HEAD 4e0a31b192a4b51a56c90c6475b11d4d094a3013 with only untracked .openspec.yaml and proposal.md. Those files must remain uncommitted and unchanged until G3 independently reviews the reported Library relationship and Studio SSE deviations; no proposal continuation or apply authorization is implied.",
-    "Controller generation 3 independently reproduced both Integration gaps and accepted PD-005 for planning only. The complete correction uses a Library-only source rendition phase with a 33-rendition bound, exact relationship artifact retry reconstruction, and authenticated Studio fetch-stream consumption with deterministic streaming tests. These are prerequisite groups inside the Integration change; apply remains prohibited until a strict INTEGRATION_PLAN_READY review."
+    "Controller generation 3 independently reproduced both Integration gaps and accepted PD-005 for planning only. The complete correction uses a Library-only source rendition phase with a 33-rendition bound, exact relationship artifact retry reconstruction, and authenticated Studio fetch-stream consumption with deterministic streaming tests. These are prerequisite groups inside the Integration change; apply remains prohibited until a strict INTEGRATION_PLAN_READY review.",
+    "Controller generation 3 observed its first context compaction while Integration was actively producing proposal/design/delta-spec/task artifacts at tracked HEAD 149ca920feb6fc714db4e210e4a304f6540f3e57. A fresh authority, branch, worktree, planning-only scope, product-diff and Git-clean audit passed; Integration remains active and apply remains prohibited."
   ]
 }
