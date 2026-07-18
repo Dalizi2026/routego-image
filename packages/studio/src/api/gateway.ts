@@ -1,11 +1,15 @@
 import {
   browserResourceDescriptorSchema,
   routegoOperationDefinitions,
+  studioImageOperationRequestSchema,
   studioOperationDefinitions,
   uploadResourceDescriptorSchema,
   type BrowserResourceDescriptor,
   type LocalRoutegoService,
   type RoutegoManageLibraryInput,
+  type StudioEditInput,
+  type StudioGenerateInput,
+  type StudioImageOperationEvent,
   type StudioOperation,
   type UploadResourceDescriptor
 } from "@routego-image/contracts";
@@ -17,6 +21,12 @@ import {
   type ProtectedObjectUrl
 } from "./resources";
 import type { StudioSession } from "./session";
+import {
+  STUDIO_CREATION_STREAM_PATH,
+  assertStudioEventStreamContentType,
+  parseStudioImageOperationEventStream,
+  type StudioSseParserLimits
+} from "./sse";
 
 export type StudioManageLibraryInput = Extract<
   RoutegoManageLibraryInput,
@@ -46,6 +56,15 @@ export interface StudioGateway {
     resource: BrowserResourceDescriptor,
     objectUrlApi?: ObjectUrlApi
   ): Promise<ProtectedObjectUrl>;
+  streamImageOperation(
+    input: StudioGenerateInput | StudioEditInput,
+    options?: StudioImageOperationStreamOptions
+  ): AsyncIterable<StudioImageOperationEvent>;
+}
+
+export interface StudioImageOperationStreamOptions {
+  readonly signal?: AbortSignal;
+  readonly limits?: StudioSseParserLimits;
 }
 
 export interface HttpStudioGatewayOptions {
@@ -136,7 +155,13 @@ async function safeHttpMessage(response: Response): Promise<string> {
           ? (record["error"] as Record<string, unknown>)
           : undefined;
       const message = record["safeMessage"] ?? nested?.["safeMessage"];
-      if (typeof message === "string" && message.trim() !== "") {
+      if (
+        typeof message === "string" &&
+        message.trim() !== "" &&
+        !/(?:[A-Za-z]:\\|\/Users\/|\/home\/|data:image|base64|authorization|bearer\s|x-routego-session)/iu.test(
+          message
+        )
+      ) {
         return message.slice(0, 1_000);
       }
     }
@@ -341,5 +366,73 @@ export class HttpStudioGateway implements StudioGateway {
     objectUrlApi?: ObjectUrlApi
   ): Promise<ProtectedObjectUrl> {
     return createProtectedObjectUrl(await this.fetchProtectedBlob(resource), objectUrlApi);
+  }
+
+  streamImageOperation(
+    input: StudioGenerateInput | StudioEditInput,
+    options: StudioImageOperationStreamOptions = {}
+  ): AsyncIterable<StudioImageOperationEvent> {
+    const gateway = this;
+    return (async function* stream(): AsyncGenerator<StudioImageOperationEvent> {
+      let parsedInput: ReturnType<typeof studioImageOperationRequestSchema.parse>;
+      try {
+        parsedInput = studioImageOperationRequestSchema.parse(input);
+      } catch {
+        throw new StudioGatewayError(
+          "invalid_input",
+          "Studio blocked an image stream request outside the frozen local contract."
+        );
+      }
+
+      const url = protectedUrl(gateway.#baseUrl, STUDIO_CREATION_STREAM_PATH);
+      const headers = gateway.#session.apply({
+        accept: "text/event-stream; charset=utf-8",
+        "content-type": "application/json"
+      });
+      let response: Response;
+      try {
+        response = await gateway.#fetch(url, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(parsedInput),
+          ...(options.signal === undefined ? {} : { signal: options.signal }),
+          cache: "no-store",
+          credentials: "omit",
+          redirect: "error"
+        });
+      } catch {
+        if (options.signal?.aborted === true) {
+          throw new StudioGatewayError("network_error", "The Studio image stream was cancelled.");
+        }
+        throw new StudioGatewayError(
+          "network_error",
+          "Studio could not reach the local image event stream."
+        );
+      }
+      if (!response.ok) {
+        throw new StudioGatewayError(
+          "http_error",
+          await safeHttpMessage(response),
+          response.status
+        );
+      }
+      try {
+        assertStudioEventStreamContentType(response.headers.get("content-type"));
+      } catch (error) {
+        try {
+          await response.body?.cancel();
+        } catch {
+          // Invalid response cleanup must not replace the content-type error.
+        }
+        throw error;
+      }
+      if (response.body === null) {
+        throw new StudioGatewayError(
+          "invalid_output",
+          "The local service returned an empty Studio image event stream."
+        );
+      }
+      yield* parseStudioImageOperationEventStream(response.body, options);
+    })();
   }
 }
