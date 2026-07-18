@@ -1,8 +1,8 @@
 # Routego Image 1.0：Codex 原生生图插件重构计划
 
 > 文档状态：默认决策已确认、进入执行阶段  
-> 最后更新：2026-07-17  
-> 权威性：本文件是产品目标、技术边界、开发流程和验收标准的主文档。后续 Codex 任务必须先读取本文件、根目录 `AGENTS.md`、对应 OpenSpec change 和线程交接清单，不得仅依赖对话记忆。
+> 最后更新：2026-07-18
+> 权威性：本文件是产品目标、技术边界、开发流程和验收标准的主文档。新任务按 PD-008 先读取 AGENTS.md、紧凑权威摘要、当前状态和任务胶囊；本计划只在最小启动清单、定向展开或全量审计触发时读取，不得依赖对话记忆。
 
 ## 1. 项目目标
 
@@ -282,6 +282,7 @@ integrate-routego-image-plugin
 7. Codex 线程完成一轮并进入 `idle` 后不会自行轮询其他独立线程；任何“等待其他任务后自动继续”都必须配置显式唤醒。
 8. 前置任务完成后必须使用 `send_message_to_thread` 向依赖方发送结构化 `AUDIT_COMPLETE`/`DEPENDENCY_COMPLETE` follow-up；该消息负责触发依赖线程的新一轮。
 9. 关键依赖门禁可以附加临时 heartbeat 作为漏发兜底，但不得用高频轮询代替直接完成事件；门禁满足后必须删除或暂停 heartbeat。
+10. successor 创建、登记、接受和激活必须使用 PD-008 的低上下文无损胶囊；默认启动最多 12 个文件、120 KiB，不再要求完整读取全部主规格和归档 change。
 
 ## 9. 上下文压缩检测与自动交接
 
@@ -291,7 +292,8 @@ Codex 没有公开精确的 `compactionCount`，因此使用“可观测压缩�
 
 - 对话出现明确的压缩、checkpoint 或历史摘要标记时，记录事件指纹并加一；同一指纹不得重复计数。
 - 每次压缩后、开始新 OpenSpec 任务前、完成一个原子任务后，都执行上下文健康审计。
-- 审计必须重新读取本计划、`AGENTS.md`、线程状态、change 工件和 `tasks.md`，不得依靠记忆回答。
+- 审计默认读取 AGENTS.md、authority-summary.md、紧凑 program、自己 lane 当前状态、handoff/task capsule、直接相关规格和当前有效 PD；不得依靠记忆回答。
+- 只有 capsule/Git/OpenSpec/状态不一致、公共边界、验收根因、PLAN_DEVIATION 或权威无法确认时才定向展开。完整 18 份主规格和归档 change 只在 PD-008 规定的全量审计节点读取。
 
 审计至少确认：当前 change/分支/worktree/HEAD、完成和待办任务 ID、共享契约、目录所有权、禁止修改范围、最近测试和残余风险。
 
@@ -307,12 +309,13 @@ Codex 没有公开精确的 `compactionCount`，因此使用“可观测压缩�
 
 1. 停在最近的安全原子边界；未完成任务保持未勾选。
 2. 运行相关测试、OpenSpec strict validation 和 Git 状态检查。
-3. 提交合法工作，生成不可变交接清单。
-4. 清单记录 change、线程、worktree、分支、HEAD、已完成/待办任务、决策、测试、阻塞、风险和压缩次数。
+3. 提交合法工作，生成 JSON handoff capsule、当前 task capsule 和简短 Markdown 入口。
+4. capsule 记录完整 SHA/parent/starting 关系、current change/任务、allowed/forbidden 文件、验证、evidence 指纹、公共契约/所有权指纹、门禁、压缩次数、Git clean、双路径回报、最小读取清单和升级触发条件。
 5. 使用 `create_thread` 从最新 commit 创建全新 Codex 任务和新 worktree；禁止使用继承完整历史的普通 fork。
-6. 继任任务在写代码前验证 commit，并运行 `openspec status --change <id> --json` 和 `openspec instructions apply --change <id> --json`。
-7. 继任任务确认接管后更新线程状态，旧任务才归档。
-8. 创建失败时旧任务保持只读并通知 Program Controller，不继续高风险开发，也不循环创建多个继任任务。
+6. 继任任务按 capsule 的最多 12 文件/120 KiB 最小清单完成接管；在 acceptance 前发生一次压缩即 HANDOFF_CONTEXT_BUDGET_FAILED，不得激活。
+7. 机器验证器必须检查字段、SHA/parent、OpenSpec task、scope、evidence/spec 指纹、program/lane/capsule 一致性、公共契约、预算、敏感 payload、Git clean 和双路径回报；失败即 HANDOFF_AUDIT_FAILED。
+8. 继任任务确认接管后更新线程状态，旧任务才归档。
+9. 创建失败时旧任务保持只读并通知 Program Controller，不继续高风险开发，也不循环创建多个继任任务。
 
 此协议同样适用于 Program Controller 和最终集成任务。
 

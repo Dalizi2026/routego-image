@@ -1,166 +1,22 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "lane": "studio",
   "change": "add-routego-studio",
   "role": "openspec-apply-owner",
-  "status": "completed-archived",
+  "status": "completed-merged-synced-archived",
   "threadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\3cf3\\生图插件",
   "branch": "codex/routego-studio-g3",
-  "startingCommit": "6cc3640849a0d4a89481e25d4234f7f7b5a4ec52",
-  "headCommit": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
-  "deliveryCommit": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
-  "verifiedHead": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
-  "mergeCommit": "987fd2207fde599be85b5dc64b039fb09f500e61",
-  "specSyncCommit": "93b8e92267e91edf16e33c7d36e77965f55724e4",
-  "archivePath": "openspec/changes/archive/2026-07-18-add-routego-studio",
-  "archiveCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
-  "postArchiveVerificationBaseline": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
   "generation": 3,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed",
-  "successorThreadId": null,
-  "predecessorThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
-  "predecessorGeneration": 2,
-  "productCheckpointCommit": "75f49bd3df28d7bdd6b1ae09ab258d3d1e6cd890",
-  "handoffCommit": "6cc3640849a0d4a89481e25d4234f7f7b5a4ec52",
-  "registrationCommit": "dfcb6f85fedd3b2da8853ef37a0ce97f238741dc",
-  "controllerRegistrationCommit": "9d075a959d763a5cd7beae328a8456e022d83fa6",
-  "controllerActivationCommit": "4acee9e26a5046799da3bea42c38db6bfe0e4d2d",
-  "handoffFile": ".codex/routego-program/handoffs/studio-generation-3.md",
-  "openspecProgress": "11/11",
-  "lastCompletedTask": "7.1",
-  "nextTask": null,
-  "recentValidation": {
-    "studioTypecheck": "passed",
-    "studioTests": "26 files, 89 tests passed",
-    "studioBuild": "library and Vite application builds passed",
-    "repositorySafety": "post-archive frozen mainline passed for 367 tracked files",
-    "openspec": "Studio all_done 11/11 before archive; post-archive strict validation passed 18/18 main specifications with no active changes",
-    "browser": "6 serial Playwright journeys passed against the deterministic mock: missing/rejected/valid session boot, localization, desktop/mobile, reduced motion, four result states, confirmed probes, reference upload, edit/mask slot zero, ordered batch, Library/folders/Trash/ZIP, settings redaction, and loopback-only request/console security audits",
-    "rootTypecheck": "root tooling and all six buildable workspace packages passed",
-    "rootBuild": "contracts, foundation, creation, library, mock relay, Studio library, and Studio Vite application builds passed",
-    "rootTests": "493 tests passed: contracts 92, foundation 48, Creation 74, Library 147, Studio 89, mock relay 43",
-    "packageExports": "all seven workspace package exports passed",
-    "browserSafe": "contracts source/declarations/emitted JavaScript contain no Node built-in import; Studio uses no browser storage or cookies, fetch is isolated to the gateway, protected object URLs are revoked, and emitted Studio code contains no local path, file URL, authorization literal, or synthetic session token",
-    "publicOperations": "exact seven public operations and MCP tool names remained frozen",
-    "scopeAudit": "against Browser Boundary baseline 4b0efaffc55773cc5218c1acee858742f8ae0f46, no root manifest/lockfile, contracts, Foundation, mock, Creation, or Library implementation changed; only Studio/OpenSpec/governance plus the Controller-approved safety exception are present",
-    "crossPlatformVerificationFix": "settings workbench source seam audit now normalizes CRLF/LF before preserving the original structural assertions",
-    "controllerIndependentVerification": "passed in a fresh detached worktree at exact delivery ef7dc14df9a1fd58566faa92334a1697d9ab2589: frozen install, strict 7/7, safety 257, Studio 89 tests/build/typecheck, root typecheck/build/tests/exports, Playwright 6/6 plus core repeat, public-operation/browser-safe/scope/secret/path/Git-clean audits",
-    "postArchiveVerification": "passed in a fresh detached worktree at 5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb: frozen install, strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, exact seven operations/tools, three functional archive/main-spec equality, runtime dependency/native, browser, secret/path and final Git-clean audits",
-    "maskIntegration": "supported/degraded/unknown gates, target resolution, PNG finalize/slot-zero binding, upload failure recovery, saved/unsaved close, and resource discard regressions passed",
-    "libraryTask41": "path-free search/filter/sort/cursor pages, protected cards/detail/resources/download, comparison bounds, Trash retention, and identifier-only one-shot retry/edit handoff passed focused and browser regression checks",
-    "libraryTask42": "folder create/rename/reorder, multi-selection and multi-folder changes, guarded Trash mutations, exact confirmations, per-item partial results, protected ZIP export, single-consume ZIP import, restricted manageLibrary bridging, and conflict/failure recovery passed focused gateway/mock and full Studio gates",
-    "settingsTask51": "provider profile create/update/remove/activate, write-only secret and output-path clearing, non-billable refresh, confirmed probe/four-state evidence, complete defaults, redacted output operations, and mounted single/preserved/batch synchronization passed focused and full Studio gates"
+  "completion": {
+    "openspecProgress": "11/11",
+    "deliveryCommit": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
+    "mergeCommit": "987fd2207fde599be85b5dc64b039fb09f500e61",
+    "archiveCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
+    "archivePath": "openspec/changes/archive/2026-07-18-add-routego-studio"
   },
-  "sharedRepositorySafetyFix": {
-    "status": "resolved-by-controller",
-    "sourceCommit": "a229e823c1c83812e3f4caf0b4626b3861be63f6",
-    "incorporatedCommit": "d0c9c41148c3d964ee6078c50d37b34d090c5cd7",
-    "allowedPath": "packages/studio/src/features/library/**",
-    "scope": "Exact source-code exception only; runtime Library data remains forbidden."
-  },
-  "planDeviation": {
-    "task": "4.2",
-    "status": "approved-tasks-only-scope-correction",
-    "reviewedHead": "09f95785a3281699e0c9d4fc5d262a2c1aa7104b",
-    "authorizedFiles": [
-      "packages/studio/src/api/gateway.ts",
-      "packages/studio/src/dev/mock-handler.ts",
-      "packages/studio/test/gateway.test.ts",
-      "packages/studio/test/mock-bridge.test.ts"
-    ],
-    "reason": "The frozen design requires folder create/rename through public manageLibrary, while both the Studio HTTP gateway and deterministic mock bridge exclude that operation.",
-    "safetyInvariant": "Only create-folder and rename-folder may use manageLibrary from Studio; all other public operations remain excluded and ZIP/destructive workflows continue through path-free preflight/execute and upload contracts."
-  },
-  "task51PlanDeviation": {
-    "task": "5.1",
-    "status": "approved-tasks-only-scope-correction",
-    "reviewedHead": "90fe3c3b0362939f8827529eadf921cd59ca3254",
-    "authorizedFile": "packages/studio/src/features/creation/CreationWorkbench.tsx",
-    "focusedTest": "packages/studio/test/settings-workbench-sync.test.ts",
-    "reason": "The frozen settings requirement and task require workbench-default synchronization, while CreationWorkbench reads defaults only during state initialization and exposes no safe update seam.",
-    "safetyInvariant": "Synchronize only default-derived control fields across active, preserved, and batch drafts; preserve prompts, identifiers, uploads, targets, masks, invariants, results and workflow, and never remount, discard resources or dispatch provider calls."
-  },
-  "applyOwnership": {
-    "state": "completed-archived",
-    "activeOwnerThreadId": null,
-    "predecessorThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
-    "successorThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408"
-  },
-  "predecessor": {
-    "threadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\ec66\\生图插件",
-    "branch": "codex/routego-studio-g2",
-    "headCommit": "6cc3640849a0d4a89481e25d4234f7f7b5a4ec52",
-    "productCheckpointCommit": "75f49bd3df28d7bdd6b1ae09ab258d3d1e6cd890",
-    "observableCompactions": 2,
-    "status": "archived",
-    "worktreeRemoved": true
-  },
-  "continuityGovernance": {
-    "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
-    "checkpointBeforeIncompleteIdle": true,
-    "monitorId": "routego-lane-continuity-monitor",
-    "controllerContinuityCommit": "8dbe4fdcb9c9ad32d1a2c31f808133b50067e989",
-    "status": "generation-3-lane-complete-archived",
-    "monitorStatus": "deleted-after-all-functional-lanes-complete"
-  },
-  "dependsOn": [
-    "establish-routego-image-foundation",
-    "extend-routego-image-foundation-contracts",
-    "complete-routego-browser-boundaries"
-  ],
-  "foundationExtension": {
-    "branch": "codex/routego-foundation-extension",
-    "commit": "c64c727f6dd449d41dd38cfb60a4bf849e719672",
-    "mergeCommit": "710eb61",
-    "baselineCommit": "52f9e6e8653a3452a0e3175fa86ad7f208d2c912",
-    "releaseCommit": "23dd083e1b9cad43aafc6564f247a6025913c749",
-    "resumeMergeCommit": "eefaca7"
-  },
-  "browserBoundary": {
-    "branch": "codex/routego-browser-boundary",
-    "commit": "bf09ca71db2791457f10ca6a92dd63bcc319c01a",
-    "mergeCommit": "526acaa4ae1a877d231a556ad10ad2b5f355a78b",
-    "baselineCommit": "4b0efaffc55773cc5218c1acee858742f8ae0f46",
-    "archivePath": "openspec/changes/archive/2026-07-18-complete-routego-browser-boundaries"
-  },
-  "nonProductCleanupResidues": [
-    {
-      "path": "C:\\Users\\MLTZ\\.codex\\verification\\routego-studio-controller-019f728e",
-      "registeredWorktree": false,
-      "fileCount": 0,
-      "directoryCount": 457,
-      "disposition": "Git worktree registration removed; environment policy blocked recursive removal of file-free pnpm directories; non-product and non-blocking"
-    },
-    {
-      "path": "C:\\Users\\MLTZ\\.codex\\verification\\routego-mainline-post-studio-019f728e",
-      "registeredWorktree": false,
-      "fileCount": 0,
-      "directoryCount": 457,
-      "disposition": "Git worktree registration removed; file-free pnpm directories remain outside product worktrees; no recursive cleanup retried"
-    }
-  ],
-  "ownership": {
-    "owned": [
-      "Routego Studio React pages and components",
-      "generation, editing, library, and settings user interfaces",
-      "mask editor and image comparison interactions",
-      "Studio browser tests and responsive visual verification"
-    ],
-    "readOnly": [
-      "packages/contracts/**",
-      "packages/foundation/**",
-      "packages/mock-relay/**",
-      "openspec/specs/**"
-    ],
-    "forbiddenWithoutDeviation": [
-      "root dependency and lock files",
-      "shared schemas and Foundation public contracts",
-      "Creation and Library backend implementation areas",
-      "plugin manifest and release workflow"
-    ]
-  }
+  "applyOwner": false,
+  "successor": null,
+  "externalStateAuthorized": false,
+  "history": { "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243", "sourceSha256": "12c26d576a51c3df6044fecd5e4a25ef8cc2cd944c8ac9a341e75393295986b1", "index": ".codex/routego-program/history/pre-pd008-state-index.json" }
 }

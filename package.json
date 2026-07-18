@@ -11,6 +11,7 @@
   "scripts": {
     "build": "pnpm -r --if-present build",
     "check:exports": "node scripts/check-package-exports.mjs",
+    "governance:validate-handoff": "node .codex/routego-program/scripts/validate-handoff-capsule.mjs",
     "safety": "node scripts/check-repository-safety.mjs",
     "typecheck": "tsc --project tsconfig.tooling.json --noEmit && pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",

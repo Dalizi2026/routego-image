@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "e70ed6765c8ebf7aef8ccb2b3a065e0004f01acb94ce7d7fd6f111b1e9179415",
+  "purpose": "Lossless index of authority/current-state files before PD-008 compaction. The complete bytes remain immutable at sourceCommit and are retrievable with git show.",
+  "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",
+  "files": [
+    { "path": "routego-image-1.0-plan.md", "gitBlobSha1": "17fd528fa545660f7f3576bb802fb4669717f6fe", "sha256": "c58a0d4d18886d269da80dd157171f78934cc193eac48226246afb999e8a8740", "bytes": 24589 },
+    { "path": "AGENTS.md", "gitBlobSha1": "f8689ec2e9d5bb1969cda43e6ebf054196e162a4", "sha256": "4b9b7b1d6148989d2bcacb90bd5ddfd5148d4b88e917f9a90eae9246440a5797", "bytes": 6784 },
+    { "path": ".codex/routego-program/program.json", "gitBlobSha1": "fbb9b87b5183ed35320bb7625ff4e68f21d9480c", "sha256": "4c9e95094d44717d07b2b6bbc0358166fdb44b9472f09f67c66898d4fea67183", "bytes": 22287 },
+    { "path": ".codex/routego-program/threads/browser-boundary.json", "gitBlobSha1": "20759194d771fbd245a1914fe9d5780a544fcf81", "sha256": "7f79e79657f820a93f220581a9febe3960b33a640be8df994891b63d8e0c380d", "bytes": 3650 },
+    { "path": ".codex/routego-program/threads/controller.json", "gitBlobSha1": "c7c0c707d5224375dbd086621f832f8567feaa3a", "sha256": "a74638df25569e15caefb3c24b7deda3c97e32e4721453aacb8972c4a2c3d49d", "bytes": 40425 },
+    { "path": ".codex/routego-program/threads/creation.json", "gitBlobSha1": "b997d9af2e91b647101036602ce9e0a22fabd34c", "sha256": "dead475e8c4a920a90a43d7619da72ec4e8a8932cf5ff9feb8ae4ba4b90d615a", "bytes": 3907 },
+    { "path": ".codex/routego-program/threads/foundation-extension.json", "gitBlobSha1": "ba7c3a4511d2cd9f8785e389d181ceff4eeeb3d7", "sha256": "761ee21cc2f503190a88632d256fee2026a09266dcc2efeea342764e13840146", "bytes": 3115 },
+    { "path": ".codex/routego-program/threads/foundation.json", "gitBlobSha1": "9e8e3f2c40ea9608f80cb0bcd27f1015a7b3161d", "sha256": "dcc192cbc9fe6aa9eaf72fceec6d98c9d4a00d51ac3b57922300ee666b98b65c", "bytes": 3660 },
+    { "path": ".codex/routego-program/threads/integration.json", "gitBlobSha1": "ea36ff4aa5d72a0a71c1e7b17da1cef72b4fa6a8", "sha256": "31bd389f9b92110b10ff006acb3555b8e8c593c36641d4ce0c7b416f3c47daaa", "bytes": 23857 },
+    { "path": ".codex/routego-program/threads/legacy-audit.json", "gitBlobSha1": "0d28bf4ff2bd7fd3715b46dd45453d325d6c0a71", "sha256": "d0acc56d798537f714daea55a85eee3d829da39ba018de9038505f4bc3a85802", "bytes": 736 },
+    { "path": ".codex/routego-program/threads/library.json", "gitBlobSha1": "d7801939c9d20a78ba8a1b35471ff1289ccf3aa6", "sha256": "428d3b610dbebfdc0a2935e365d826cdbac2646034df46083712d3f67110992d", "bytes": 17332 },
+    { "path": ".codex/routego-program/threads/studio.json", "gitBlobSha1": "9a5b540eaf2d3b64ac7c7efaf4d82c869a3fd0ff", "sha256": "12c26d576a51c3df6044fecd5e4a25ef8cc2cd944c8ac9a341e75393295986b1", "bytes": 10756 },
+    { "path": ".codex/routego-program/threads/upstream-audit.json", "gitBlobSha1": "ded46859147013b6a885c25434ff56ab9f0a5dd6", "sha256": "d91c302f350345cb5d1f5769e1637d23c7c03210af176d054aae2378f8fe5f40", "bytes": 813 },
+    { "path": ".codex/routego-program/handoffs/integration-generation-3.md", "gitBlobSha1": "89cf57c9c77808841abeb11500e36e6a04befa3f", "sha256": "ca13ad7277ab712e3b1f0d889b9b3f0e50d2aa6b1dd66e52875336acc452bfbb", "bytes": 6499 }
+  ]
+}

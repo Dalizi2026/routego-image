@@ -1,95 +1,22 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "lane": "creation",
   "change": "add-routego-image-creation",
   "role": "openspec-apply-owner",
-  "status": "completed-archived",
+  "status": "completed-merged-synced-archived",
   "threadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\da45\\生图插件",
   "branch": "codex/routego-creation-g1",
-  "startingCommit": "18490fd01258cab55939f829673ba67f96963bef",
-  "headCommit": "624e7390b902814620d3eeb583ed43a57fd8243a",
   "generation": 1,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed",
-  "successorThreadId": null,
-  "predecessorThreadId": "019f7084-17c4-7442-94e5-458f59b20086",
-  "predecessorGeneration": 0,
-  "productCheckpointCommit": "2efb2465fa92fc51b4f6bf5f744a29a320b62a63",
-  "handoffCommit": "18490fd01258cab55939f829673ba67f96963bef",
-  "registrationCommit": "ca173854e51c221b751c2761164599245244f04f",
-  "activationCommit": "0cf3af53c56f17e18228bccb705054a7c2fb8933",
-  "planningCommit": "c517b823cb4724367553f039769bd43643e78fe1",
-  "finalImplementationCommit": "be67086dcb9caf9a1cd86c4e214b6f55bdcc6143",
-  "deliveryCommit": "624e7390b902814620d3eeb583ed43a57fd8243a",
-  "mergeCommit": "ebe5b564c3990fa89f5616b636aab0ce053b144a",
-  "specSyncCommit": "86214f666e10e080f6f4ac419d99402f282ef46e",
-  "archivePath": "openspec/changes/archive/2026-07-17-add-routego-image-creation",
-  "archiveCommit": "d03389ec108bcfd9e79ed076048e50b430900028",
-  "postArchiveVerification": "passed",
-  "handoffFile": ".codex/routego-program/handoffs/creation-generation-1.md",
-  "openspecProgress": "8/8",
-  "nextTask": null,
-  "applyOwnership": {
-    "state": "completed-archived",
-    "activeOwnerThreadId": null,
-    "predecessorThreadId": "019f7084-17c4-7442-94e5-458f59b20086",
-    "successorThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27"
+  "completion": {
+    "openspecProgress": "8/8",
+    "deliveryCommit": "624e7390b902814620d3eeb583ed43a57fd8243a",
+    "mergeCommit": "ebe5b564c3990fa89f5616b636aab0ce053b144a",
+    "archiveCommit": "d03389ec108bcfd9e79ed076048e50b430900028",
+    "archivePath": "openspec/changes/archive/2026-07-17-add-routego-image-creation"
   },
-  "predecessor": {
-    "threadId": "019f7084-17c4-7442-94e5-458f59b20086",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\76ae\\生图插件",
-    "branch": "codex/routego-creation",
-    "headCommit": "ca173854e51c221b751c2761164599245244f04f",
-    "productCheckpointCommit": "2efb2465fa92fc51b4f6bf5f744a29a320b62a63",
-    "observableCompactions": 2,
-    "status": "archived"
-  },
-  "continuityGovernance": {
-    "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
-    "checkpointBeforeIncompleteIdle": true,
-    "monitorId": "routego-lane-continuity-monitor",
-    "status": "lane-complete-archived"
-  },
-  "dependsOn": [
-    "establish-routego-image-foundation",
-    "extend-routego-image-foundation-contracts",
-    "complete-routego-browser-boundaries"
-  ],
-  "foundationExtension": {
-    "branch": "codex/routego-foundation-extension",
-    "commit": "c64c727f6dd449d41dd38cfb60a4bf849e719672",
-    "mergeCommit": "710eb61",
-    "baselineCommit": "52f9e6e8653a3452a0e3175fa86ad7f208d2c912",
-    "releaseCommit": "23dd083e1b9cad43aafc6564f247a6025913c749",
-    "resumeMergeCommit": "00daeae"
-  },
-  "browserBoundary": {
-    "branch": "codex/routego-browser-boundary",
-    "commit": "bf09ca71db2791457f10ca6a92dd63bcc319c01a",
-    "mergeCommit": "526acaa4ae1a877d231a556ad10ad2b5f355a78b",
-    "baselineCommit": "4b0efaffc55773cc5218c1acee858742f8ae0f46",
-    "archivePath": "openspec/changes/archive/2026-07-18-complete-routego-browser-boundaries"
-  },
-  "ownership": {
-    "owned": [
-      "generation and edit provider adapters",
-      "image job execution and batch orchestration",
-      "stream parsing and retry decisions",
-      "MCP and loopback HTTP runtime adapters"
-    ],
-    "readOnly": [
-      "packages/contracts/**",
-      "packages/foundation/**",
-      "packages/mock-relay/**",
-      "openspec/specs/**"
-    ],
-    "forbiddenWithoutDeviation": [
-      "root dependency and lock files",
-      "shared schemas and Foundation public contracts",
-      "Library and Studio implementation areas",
-      "plugin manifest and release workflow"
-    ]
-  }
+  "applyOwner": false,
+  "successor": null,
+  "externalStateAuthorized": false,
+  "history": { "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243", "sourceSha256": "dead475e8c4a920a90a43d7619da72ec4e8a8932cf5ff9feb8ae4ba4b90d615a", "index": ".codex/routego-program/history/pre-pd008-state-index.json" }
 }

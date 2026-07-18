@@ -24,6 +24,7 @@
 - 全局计划、AGENTS、program 状态和项目级连续性自动化必须使用第 3 次检查点、第 4 次预交接、第 5 次强制交接。
 - 每个 successor 的创建提示、registration、handoff acceptance 和 sole-owner/controller activation 继续继承双路径回报契约。
 - 验证覆盖从“模拟三次压缩”更新为“模拟五次压缩”，并覆盖第 3、4、5 次门禁行为。
+- PD-008 生效后，健康审计和 successor 启动使用紧凑权威摘要、当前状态、capsule 和定向 evidence；不再默认全量读取全部主规格与归档 change。压缩阈值本身不变。
 
 ## Non-goals
 

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "lane": "upstream-audit",
   "change": null,
   "role": "independent-auditor",
@@ -7,17 +7,9 @@
   "threadId": "019f6fe8-6fd4-73f0-b83b-1805925c5301",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\68bd\\生图插件",
   "branch": "codex/routego-upstream-audit",
-  "startingCommit": "9875bdc6d63dcd300a7c00397f5952005f128cac",
-  "headCommit": "4b7909579f382cc1fec5ac79172a0aeeb3d70923",
   "generation": 0,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed",
-  "successorThreadId": null,
-  "handoff": {
-    "targetThreadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
-    "document": "docs/audits/gpt-image-playground-reuse.md",
-    "upstreamCommit": "a10477581b3d43ac98d39777e4445625a9db113d",
-    "delivered": true
-  }
+  "completion": { "headCommit": "4b7909579f382cc1fec5ac79172a0aeeb3d70923", "document": "docs/audits/gpt-image-playground-reuse.md", "upstreamCommit": "a10477581b3d43ac98d39777e4445625a9db113d" },
+  "applyOwner": false,
+  "externalStateAuthorized": false,
+  "history": { "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243", "sourceSha256": "d91c302f350345cb5d1f5769e1637d23c7c03210af176d054aae2378f8fe5f40", "index": ".codex/routego-program/history/pre-pd008-state-index.json" }
 }
