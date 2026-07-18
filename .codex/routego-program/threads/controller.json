@@ -8,7 +8,7 @@
   "branch": "codex/routego-controller-g2",
   "startingCommit": "4be05e4d9c134363affb0ff02c50bb6ca7767a32",
   "registrationCommit": "fc882b94f68b3c5247e0251cd13f20f4777c0ee7",
-  "headCommit": "c7ee16a6bca371e656ce11253c31636f7f05e9d1",
+  "headCommit": "50141def268015579febee067c311aa09aaf117f",
   "generation": 2,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "g2-compaction-1-library-corrected-5.2-studio-6.1-2026-07-18",
@@ -87,6 +87,7 @@
     "Controller generation 2 observed its first context compaction while Library had committed corrected task 5.1 at 0bd93dea9d7035426b34600a6bae13277b3f08bd and was running task 5.2, while Studio generation 3 was executing task 6.1 in tests/browser only. A fresh authority, branch, worktree, lane-owner and Git-clean audit passed before governance resumed.",
     "Corrected Library delivery f92a835990d422da5f4f5e3008383f24aabdcc7b passed the initial independent clean-copy gate, merged at 220d340f8c9cf7ab6891d8ee5191e97b3bc5e11a, and synchronized three main specifications at a9875ed368324b03941893a1ab994b3ff039a499.",
     "Post-archive verification at 2477b3ed4abcd909c1d3a8a837c02c813427feea exposed a deterministic time-dependent folders.test.ts fixture failure: the folder store used an injected 01:00Z clock while the asset store used the real clock, allowing updatedAt to precede createdAt after current UTC crossed the fixture time. The archive was reverted at fcac5c2abb8684e8b3bb66f21409905a4e5aaa32 and Library generation 2 was reactivated for tasks 3.2 and 5.2.",
-    "Final Library delivery 96fea3b5618808fd00daac274178512daf2a5ff2 fixed the shared-clock test fixture at 99fd61d8e707a159b2a78330e03a376c170b0d37, passed independent Controller verification at 3cd8007e40675e6e5c1e93d2d09a34cc078944dc with 330 tests and five repeated clock regressions, merged at c7ee16a6bca371e656ce11253c31636f7f05e9d1, retained the exact three-spec sync from a9875ed368324b03941893a1ab994b3ff039a499, and was moved back to the Library archive for final post-archive verification."
+    "Final Library delivery 96fea3b5618808fd00daac274178512daf2a5ff2 fixed the shared-clock test fixture at 99fd61d8e707a159b2a78330e03a376c170b0d37, passed independent Controller verification at 3cd8007e40675e6e5c1e93d2d09a34cc078944dc with 330 tests and five repeated clock regressions, merged at c7ee16a6bca371e656ce11253c31636f7f05e9d1, retained the exact three-spec sync from a9875ed368324b03941893a1ab994b3ff039a499, and was moved back to the Library archive for final post-archive verification.",
+    "Final Library archive baseline 50141def268015579febee067c311aa09aaf117f passed frozen install, strict validation for 13 main specifications, safety across 261 tracked files, all workspace typechecks/builds, 404 tests including Creation 74 and Library 147, all seven package exports, exact seven-operation freeze, archive integrity, archived-delta/main-spec equality, dependency/native, provider-boundary, secret/image/path, diff and Git-clean audits. Library is complete; Integration remains blocked only on Studio."
   ]
 }

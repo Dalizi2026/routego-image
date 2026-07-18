@@ -36,7 +36,8 @@
   "mergeCommit": "c7ee16a6bca371e656ce11253c31636f7f05e9d1",
   "specSyncCommit": "a9875ed368324b03941893a1ab994b3ff039a499",
   "archivePath": "openspec/changes/archive/2026-07-18-add-routego-image-library",
-  "archiveCommit": null,
+  "archiveCommit": "50141def268015579febee067c311aa09aaf117f",
+  "postArchiveVerification": "passed at final mainline archive baseline 50141def268015579febee067c311aa09aaf117f with strict 13/13, safety 261 tracked files, typecheck, build, 404 tests, seven exports, seven-operation freeze, archive/spec/dependency/security/Git-clean audits",
   "recentValidation": {
     "frozenInstall": "passed in post-archive detached clean verification copy at 3cd8007e40675e6e5c1e93d2d09a34cc078944dc",
     "openspec": "strict validation 7/7 passed; apply state all_done at 10/10",
