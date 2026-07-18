@@ -3,12 +3,12 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "checkpoint-task-5.1-complete",
+  "status": "lane-complete",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
-  "headCommit": "478e674e3c1d4d80db6d96821c156511012b96fc",
+  "headCommit": "514db95441d389999bd6341f335aeaaca1cba226",
   "generation": 2,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "library-g2-compaction-1-task-5.2-head-937c5ca1-2026-07-18",
@@ -22,25 +22,28 @@
   "controllerRegistrationCommit": "9189b7a4f8155b5e62def6f786e5d7723eb8a3f0",
   "controllerActivationCommit": "c9ac706321500b01dabbf92ed81ba39cd566127e",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
-  "openspecProgress": "9/10",
-  "lastCompletedTask": "5.1",
-  "nextTask": "5.2",
+  "openspecProgress": "10/10",
+  "lastCompletedTask": "5.2",
+  "nextTask": null,
   "lastImplementationCommit": "8feb9dc2d4f53336d1190fc069b2774ddf4c241b",
-  "lastOpenSpecCommit": "478e674e3c1d4d80db6d96821c156511012b96fc",
+  "lastOpenSpecCommit": "514db95441d389999bd6341f335aeaaca1cba226",
   "recentValidation": {
-    "focusedPortability": "16/16 passed in task 4.2",
-    "libraryTests": "19 files, 144 tests passed",
-    "libraryTypecheck": "passed",
-    "libraryBuild": "passed",
-    "repositorySafety": "passed",
-    "rootTypecheckBuildTest": "passed",
-    "packageExports": "all seven packages and Library smoke passed",
-    "runtimeDependencies": "workspace contracts/foundation plus pure-JS zod; no native runtime dependency",
-    "openspec": "9/10, next task 5.2",
-    "scope": "task 5.1 allowed-file and diff checks passed"
+    "frozenInstall": "passed in detached clean verification copy at 341a2fe7d2cfe82ca4a9ac315423071c6911701d",
+    "openspec": "strict validation 7/7 passed; apply state all_done at 10/10",
+    "repositorySafety": "passed for 211 tracked files",
+    "rootTypecheck": "passed for all six buildable workspace packages",
+    "rootBuild": "passed for all six buildable workspace packages",
+    "rootTests": "327 tests passed: contracts 92, foundation 48, library 144, mock-relay 43",
+    "packageExports": "passed for all seven workspace packages",
+    "runtimeDependencies": "workspace packages plus pure-JS zod, react, react-dom, and scheduler; no install scripts or native markers",
+    "platformCoverage": "Windows/POSIX path, ACL, mode, symlink, Unicode, ZIP, and portability coverage audited",
+    "repositoryAudit": "no tracked secret, user image, local config, path leak, or generated/cache artifact",
+    "scope": "61 changed files against f6e1b309213bb87d741199377c2bebdaa9cbcad0, all within Library/OpenSpec/governance ownership",
+    "planningConsistency": "proposal, design, three delta specs, six frozen main specs, tasks, PD-002/003/004, plan, commits, and thread state passed",
+    "gitClean": "verification copy and primary worktree clean"
   },
   "applyOwnership": {
-    "state": "active-single-owner",
+    "state": "complete-awaiting-controller",
     "activeOwnerThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
     "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "successorThreadId": "019f7261-2c57-7a01-b519-e1de521819fe"
@@ -59,7 +62,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-task-5.2-validation-after-compaction-1"
+    "status": "generation-2-lane-complete"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
@@ -99,6 +102,33 @@
       "shared schemas and Foundation public contracts",
       "Creation and Studio implementation areas",
       "plugin manifest and release workflow"
+    ]
+  },
+  "completion": {
+    "tasks": "10/10",
+    "validatedAt": "2026-07-18T08:02:11.5533413+08:00",
+    "verifiedHead": "341a2fe7d2cfe82ca4a9ac315423071c6911701d",
+    "taskStateCommit": "514db95441d389999bd6341f335aeaaca1cba226",
+    "validation": {
+      "frozenInstall": "passed",
+      "openspecStrict": "7/7 passed",
+      "safety": "passed",
+      "typecheck": "passed",
+      "build": "passed",
+      "tests": "327 passed",
+      "packageExports": "seven of seven passed",
+      "runtimeNativeAudit": "passed",
+      "windowsPosixCoverage": "passed",
+      "secretImagePathAudit": "passed",
+      "diffScope": "passed",
+      "planningConsistency": "passed",
+      "gitClean": true
+    },
+    "blockers": [],
+    "residualRisks": [
+      "Provider execution, HTTP/MCP transport, session/origin enforcement, and resolver/executor composition remain Creation and Integration responsibilities.",
+      "Studio UI/browser journeys, real relay acceptance, and deployment/release remain downstream responsibilities.",
+      "This clean-copy run used Windows with Node.js 24.15.0; Node.js 20.19 and macOS/Linux acceptance remain for the cross-platform Integration/CI gate."
     ]
   }
 }
