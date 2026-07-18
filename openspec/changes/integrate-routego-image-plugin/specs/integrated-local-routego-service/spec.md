@@ -63,6 +63,10 @@ Integration SHALL decode Creation display data into a request-owned staging dire
 - **WHEN** decoded bytes violate the claimed image metadata or bounded format policy
 - **THEN** that output SHALL fail validation and SHALL not become a Library artifact, browser resource, or successful path
 
+#### Scenario: Failure or cancellation follows five to twelve valid partials
+- **WHEN** a Studio generate or edit operation accumulates between five and twelve schema-valid ordered partial artifacts and is then terminated by provider failure, cancellation, materialization failure, or another service failure
+- **THEN** the service SHALL emit exactly one schema-valid `failed` terminal before EOF, retain the complete ordered partial list on `StudioImageOperationResult`, independently bound the nested `StudioServiceError.partialArtifacts` to the first four, preserve truthful `receivedAnyOutput` and `mayHaveBilled` flags, and expose no image bytes, Base64 payloads, filesystem paths, credentials, or authorization data
+
 ### Requirement: Saved operations commit one durable source/output graph
 When `saveToLibrary=true`, Integration SHALL preallocate one operation asset ID, retain exact upload-origin sources as Library source renditions, relate existing Library inputs to their original owners, ingest source/partial/final outputs atomically, and return artifact/asset identities that match the committed graph.
 
