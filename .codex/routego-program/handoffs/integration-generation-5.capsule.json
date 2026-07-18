@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "d1825f52f662876a12f86a496a1ffd9415a637ec3fafaaf1c41939eba8ce530f",
+  "capsuleSha256": "1e1cedfd2e6ecc1e39fbf5b26f1211cf054e53adbf7a0f826be2363428752bb6",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,9 +22,10 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "plannedBranch": "codex/routego-integration-g5",
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
-    "registrationStatus": "registered-awaiting-low-context-acceptance",
-    "registrationCommit": null,
-    "registrationCommitSemantics": "The containing Controller registration governance commit cannot self-reference its own SHA; the direct registration message supplies the exact full commit after creation."
+    "registrationStatus": "activated-sole-owner-task-4.2-unlocked-not-started",
+    "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
+    "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
+    "registrationCommitSemantics": "The Controller registration governance commit and successor incorporation commit are exact; the containing activation commit cannot self-reference its own SHA."
   },
   "currentState": {
     "openspecTotal": 29,
@@ -33,11 +34,11 @@
     "nextTaskId": "4.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.2.json",
-      "sha256": "1a1f193755564f662ec9e384e8e4274c54ab62d4b8b24656ad126f15b6188621"
+      "sha256": "896284be4a50bfde0a20ee0097192ba31811e63ca8660321be8c935e7ba30a05"
     },
-    "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
-    "successorApplyAuthorized": false
+    "taskLocked": false,
+    "sourceIsSoleApplyOwner": false,
+    "successorApplyAuthorized": true
   },
   "completedEvidence": [
     {
@@ -64,7 +65,7 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": ["Integration G5 low-context acceptance and explicit sole-owner activation are pending."],
+    "blockers": [],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "taskBeyond4_2Locked": true,
@@ -87,7 +88,7 @@
   },
   "reportingContract": {
     "primary": "After every OpenSpec task, task group, safe checkpoint, blocker, deviation, handoff, activation or delivery, call real send_message_to_thread to the current Controller from program.json and then call read_thread to confirm receipt.",
-    "fallback": "routego-program-continuity reads compact current state every 30 minutes, deduplicates with latestDirectCheckpoint and archives its own run task; it is missed-message fallback only.",
+    "fallback": "routego-program-continuity archives its own run task as its first action every 30 minutes, then reads compact current state and deduplicates with latestDirectCheckpoint; it is missed-message fallback only.",
     "fallbackIntervalMinutes": 30,
     "finalAnswerAloneIsInsufficient": true,
     "heartbeatInheritanceAssumed": false
@@ -110,7 +111,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 98370,
+    "expectedNormalizedUtf8Bytes": 98274,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
