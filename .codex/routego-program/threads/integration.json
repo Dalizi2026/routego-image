@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "proposal-continuation-authorized-corrective-gates-required",
+  "status": "planning-complete-awaiting-controller-apply-review",
   "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "threadId": "019f72fd-fb6f-7b52-b383-03471f42f05a",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4687\\生图插件",
@@ -12,13 +12,13 @@
   "registrationCommit": "5afdec25e3c8b318d46e11ca73517bd2b21f924b",
   "controllerRegistrationCommit": "dd3a601e00e320399d65ccc71fd3932fda0107e1",
   "generation": 0,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed-controller-g3-pd-005-independent-review",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "2026-07-18-summary-checkpoint-uncommitted-integration-plan-at-149ca920feb6fc714db4e210e4a304f6540f3e57",
+  "lastHealthAudit": "passed-after-first-observable-compaction-full-planning-consistency-and-strict-validation",
   "successorThreadId": null,
-  "openspecState": "proposal-draft-untracked-authorized-for-pd-005-revision",
-  "openspecProgress": "proposal-draft-only-no-validation",
-  "nextTask": "After Controller G3 sends the structured proposal-only activation, revise proposal.md for PD-005, then create coherent design, modified/new delta specs, and exact tasks; validate strictly and send INTEGRATION_PLAN_READY without product edits.",
+  "openspecState": "planning-complete-apply-ready-controller-review-required",
+  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 0/28 apply tasks executed",
+  "nextTask": "Commit the complete planning artifacts, send INTEGRATION_PLAN_READY with the full planning SHA, then wait for explicit Controller apply authorization without product edits.",
   "governanceHold": {
     "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
     "dirtyPaths": [
@@ -27,9 +27,17 @@
     ],
     "trackedDiff": "none",
     "productFilesChanged": false,
-    "planningArtifacts": "proposal draft only; no design, delta specs, tasks, validation, or commit",
-    "planDeviation": "reported and forwarded; not approved",
-    "disposition": "PD-005 review completed; preserve the files until the structured proposal-only activation, then revise planning only. No apply or product edit is authorized."
+    "planningArtifacts": "proposal/design/11 delta specs/tasks complete; strict validation and planning consistency audit passed",
+    "planDeviation": "PD-005 accepted for Integration planning only; apply remains prohibited",
+    "disposition": "Superseded by the structured proposal-only activation. The preserved draft was revised and completed without product edits; Controller review is required before apply."
+  },
+  "planningActivation": {
+    "controllerGovernanceHead": "149ca920feb6fc714db4e210e4a304f6540f3e57",
+    "activationGovernanceCommit": "997268b070ea6b23e513b342bc6f1aef28944050",
+    "deviationDecisionCommit": "a101b44faedb8259bb898e5d890774497d805d27",
+    "proposalOnly": true,
+    "applyAuthorized": false,
+    "externalStateAuthorized": false
   },
   "deviationReview": {
     "decision": "accepted-for-integration-planning-only",
@@ -55,7 +63,8 @@
     "studioDelivery": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
     "studioArchive": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "frozenMainlineVerification": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
-    "controllerGovernance": "81a84ac6d69e278ff014ec271e66f13e2cfb73df"
+    "controllerGovernancePreActivation": "81a84ac6d69e278ff014ec271e66f13e2cfb73df",
+    "controllerGovernance": "149ca920feb6fc714db4e210e4a304f6540f3e57"
   },
   "startupException": {
     "reason": "This is the initial proposal owner for the final Integration change, so openspec/changes/integrate-routego-image-plugin is intentionally absent at task creation.",
