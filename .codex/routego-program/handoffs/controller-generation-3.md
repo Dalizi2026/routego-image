@@ -1,8 +1,10 @@
 # Program Controller generation 3 交接清单
 
 - 来源 Controller：`019f728e-0b4d-7552-b03a-7ca53eb9c0ae`，generation 2。
-- 继任 Controller：`pending`，generation 3。
+- 继任 Controller：`019f7309-d473-74a2-934b-e81726d90a31`，generation 3。
 - 计划分支：`codex/routego-controller-g3`。
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\0c1f\生图插件`。
+- 起始交接提交：`5a8f8a21c23cc4292449da039f196c0ed604a82f`。
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\5b80\生图插件`。
 - 来源分支：`codex/routego-controller-g2`。
 - 来源可观察压缩：`3`。
