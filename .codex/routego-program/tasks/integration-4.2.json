@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "612977d99188ddfa1494abed9b893bf503b17b0f4ab12c3a006e1558fadc5cae",
+  "contentSha256": "5f044459af71eec02149a28dc615931e0d6b8b5fef391b506a865d253eab2ec8",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.2",
-  "status": "phase-a-correction-accepted-phase-b-authorized",
+  "status": "phase-b-wip-checkpoint-pd-010-owner-only-planning-authorized-host-correction-locked",
   "sourceCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -16,12 +16,14 @@
   "allowedFiles": [
     "packages/integration/src/composition/service.ts",
     "packages/integration/test/service.test.ts",
+    "packages/integration/src/runtime/http-host.ts",
+    "packages/integration/test/http-host.test.ts",
     "packages/integration/src/runtime/routes.ts",
     "packages/integration/src/runtime/stream-route.ts",
     "packages/integration/test/routes.test.ts",
     "packages/integration/test/stream-route.test.ts"
   ],
-  "allowedFileMode": "two-phase exact scope: first one corrective commit containing exactly the two task-3.5 common-root files, then after Controller acceptance one task-4.2 implementation commit containing exactly the four runtime/test files",
+  "allowedFileMode": "gated exact scope: accepted two-file task-3.5 correction; preserved non-completion four-file Phase B WIP checkpoint; after PD-010 planning acceptance one exact two-file task-4.1 HTTP-host correction; after that correction acceptance resume and separately validate the four-file Phase B implementation",
   "forbiddenFileGlobs": [
     "packages/library/**",
     "packages/studio/**",
@@ -29,7 +31,6 @@
     "packages/contracts/**",
     "packages/integration/src/runtime/sessions.ts",
     "packages/integration/src/runtime/static.ts",
-    "packages/integration/src/runtime/http-host.ts",
     "packages/integration/src/runtime/lifecycle.ts",
     "packages/integration/src/runtime/mcp-process.ts",
     "packages/integration/src/cli.ts",
@@ -43,6 +44,7 @@
   ],
   "requiredBehavior": [
     "Before route implementation, correct the proven task-3.5 producer root so Studio failed results retain all schema-valid partialArtifacts up to 12 while each nested StudioServiceError.partialArtifacts projection is independently bounded to the first 4 and cannot suppress the unique failed terminal event.",
+    "Before resuming the preserved Phase B WIP, correct the proven task-4.1 HTTP-host root so drain waits race client close/request abort, the active response-body iterator is explicitly returned in finally, and route reader/channel/file/lease cleanup runs promptly without shortening immutable descriptor expiry.",
     "Implement protected upload reserve/PUT/finalize/status/discard routing through the existing Library-owned upload lifecycle with exact session, origin, MIME, size, checksum and expiry enforcement.",
     "Stream durable images, ephemeral partial/final resources and ZIP exports with no-store protection, exact MIME/content length/ETag, immutable descriptor expiry and immediate session/shutdown revocation.",
     "Wire generate/edit only at POST /api/v1/studio/creation/stream through the production LocalRoutegoService while preserving the frozen StudioImageOperationEvent state, request ID, sequence, terminal and EOF contract.",
@@ -54,6 +56,9 @@
     "owner-only OpenSpec update commit accepted by Controller before any product edit",
     "focused 5-12 partial artifacts followed by provider failure and cancellation: exactly one schema-valid failed terminal before EOF, complete result partial list, nested error partial list maximum 4, truthful receivedAnyOutput/mayHaveBilled, no extra event or leakage",
     "exact two-file task-3.5 common-root corrective commit accepted before continuing the exact four-file task-4.2 phase",
+    "owner-only PD-010 OpenSpec update commit containing exactly design.md, codex-plugin-runtime/spec.md and tasks.md accepted before any HTTP-host edit",
+    "exact two-file task-4.1 HTTP-host corrective commit accepted before resuming the preserved four-file Phase B WIP",
+    "real loopback-host large protected resource under backpressure: client disconnect races drain, active iterator is returned, route finally closes the reader/channel and ephemeral lease promptly, descriptor expiry is unchanged, no replay or leakage",
     "openspec instructions apply --change integrate-routego-image-plugin --json",
     "pnpm --filter @routego-image/integration typecheck",
     "pnpm --filter @routego-image/integration test",
@@ -104,26 +109,29 @@
     "acceptedPreviousTaskCheckpointCommit": "2379675079c39942061d3907fb63e045f069c75b",
     "acceptedPreviousTaskStateSyncCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
     "acceptedHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+    "phaseBWipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "phaseBWipCheckpointParent": "12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d",
     "sourceOwnerArchived": true,
     "soleApplyOwner": true,
     "applyAuthorized": true,
-    "started": false
+    "started": true,
+    "taskComplete": false
   },
   "planDeviation": {
-    "decision": ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
-    "decisionSha256": "9e11b7ae4369608e7d84f382da979f144b82ff7ffaa7a44b5d0efb1f566d49e2",
+    "decision": ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md",
+    "decisionSha256": "dd6cbdb7abf19652363a1e4f4ab6660bfe4208ae441a0ee05746291635d06650",
     "decisionSha256ByteCounting": "utf8-after-crlf-to-lf-normalization",
-    "status": "phase-a-implementation-accepted-phase-b-authorized",
-    "planningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
-    "planningParent": "c0f965dfe860174522dd9ce2ea50762c226ee6e1",
-    "originalTaskId": "3.5",
+    "status": "owner-only-openspec-planning-authorized-host-correction-locked-phase-b-wip-preserved",
+    "planningCommit": null,
+    "planningParent": null,
+    "originalTaskId": "4.1",
     "reportedDuringTaskId": "4.2",
-    "sourceCheckpointCommit": "156eb59e063a6ff99ff7671883974d4b5cb18bba",
-    "sourceObservableCompactions": 1,
-    "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29",
+    "sourceCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "sourceObservableCompactions": 2,
+    "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d|context-compaction-2-during-task-4.2-phase-b-wip-checkpoint-before-PD-010|16/29",
     "correctiveAllowedFiles": [
-      "packages/integration/src/composition/service.ts",
-      "packages/integration/test/service.test.ts"
+      "packages/integration/src/runtime/http-host.ts",
+      "packages/integration/test/http-host.test.ts"
     ],
     "originalTaskAllowedFiles": [
       "packages/integration/src/runtime/routes.ts",
@@ -131,17 +139,24 @@
       "packages/integration/test/routes.test.ts",
       "packages/integration/test/stream-route.test.ts"
     ],
-    "implementationGate": "Phase A is authorized as one exact two-file corrective commit; Phase B remains locked until the Phase A corrective checkpoint passes focused/full verification and Controller acceptance.",
-    "phaseAAuthorized": true,
-    "phaseAImplementationCommit": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
-    "phaseAImplementationParent": "4bd2271e0c137d55050d84ae5ae4aac0be9d9388",
-    "phaseAAccepted": true,
-    "phaseBLocked": false,
-    "phaseBAuthorized": true
+    "implementationGate": "Only the exact three-file owner-only PD-010 OpenSpec update is authorized. The two-file HTTP-host correction remains locked until planning acceptance; the preserved four-file Phase B WIP remains locked until host-correction acceptance.",
+    "planningAuthorized": true,
+    "hostCorrectionLocked": true,
+    "phaseBWipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "phaseBLocked": true,
+    "phaseBAuthorized": false,
+    "priorDecision": {
+      "decision": ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
+      "decisionSha256": "9e11b7ae4369608e7d84f382da979f144b82ff7ffaa7a44b5d0efb1f566d49e2",
+      "planningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+      "phaseAImplementationCommit": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+      "status": "accepted"
+    }
   },
   "unresolvedIssues": [],
   "knownRisks": [
     "Without the accepted common-root correction, a fifth-or-later Studio partial followed by failure or cancellation can close the stream before the required terminal event.",
+    "The Phase B WIP checkpoint is not a passing task implementation: its real-host backpressure regression intentionally fails until the PD-010 HTTP-host correction is accepted.",
     "Disconnect/cancellation must close active execution channels without shortening already-issued immutable partial-resource descriptors.",
     "Task 4.2 must reuse task 4.1 session/static lifecycle and must not implement task 4.3 MCP process or CLI behavior.",
     "All tests must remain synthetic and offline; external credentials, real images, real relay and billable requests remain prohibited."

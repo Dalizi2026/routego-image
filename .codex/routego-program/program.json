@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-009-controller-generation-6-active-integration-generation-5-task-4.2-phase-a-accepted-phase-b-authorized",
+  "status": "pd-010-controller-generation-6-active-integration-generation-5-task-4.2-phase-b-wip-checkpoint-planning-authorized-host-correction-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -14,7 +14,8 @@
       ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
       ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
       ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
-      ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md"
+      ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
+      ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md"
     ],
     "contextPolicy": {
       "observableOnly": true,
@@ -59,11 +60,11 @@
     "role": "program-controller",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
     "branch": "codex/routego-controller-g6",
-    "verifiedHeadBeforeContainingCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
+    "verifiedHeadBeforeContainingCommit": "e8d7beeb0624dd9231931d9fc4ad41db123a131c",
     "status": "authoritative",
     "authoritative": true,
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "controller|routego-image-1.0|6aaa1510a29e4cd520d6a44d1d096160091488c1|context-compaction-1-during-integration-g5-activation-preparation|16/29"
+    "observableCompactions": 2,
+    "lastCompactionFingerprint": "controller|routego-image-1.0|e8d7beeb0624dd9231931d9fc4ad41db123a131c|context-compaction-2-during-task-4.2-phase-b-backpressure-plan-deviation|16/29"
   },
   "applyOwner": {
     "lane": "integration",
@@ -72,29 +73,29 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "branch": "codex/routego-integration-g5",
     "acceptedProductCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
-    "currentHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+    "currentHead": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
     "gitClean": true,
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29"
+    "observableCompactions": 2,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d|context-compaction-2-during-task-4.2-phase-b-wip-checkpoint-before-PD-010|16/29"
   },
   "successor": {
     "lane": "integration",
     "generation": 5,
-    "status": "activated-sole-apply-owner-task-4.2-phase-a-accepted-phase-b-authorized",
+    "status": "activated-sole-apply-owner-task-4.2-phase-b-wip-checkpoint-pd-010-planning-authorized-host-correction-locked",
     "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "plannedBranch": "codex/routego-integration-g5",
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "currentHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+    "currentHead": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
     "gitClean": true,
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fb35d1261dd6da5116e0bed36d936adbd01082a5|context-compaction-1-during-task-4.2-before-PD-009-scope-authorization|16/29",
+    "observableCompactions": 2,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d|context-compaction-2-during-task-4.2-phase-b-wip-checkpoint-before-PD-010|16/29",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-5.capsule.json"
   },
   "currentChange": {
@@ -114,17 +115,20 @@
       "phaseAAuthorized": true,
       "phaseAAccepted": true,
       "phaseBLocked": false,
-      "phaseBAuthorized": true,
+      "phaseBAuthorized": false,
+      "phaseBWipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+      "pd010PlanningAuthorized": true,
+      "hostCorrectionLocked": true,
       "acceptedPhaseAImplementationCommit": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
       "acceptedPlanningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
-      "pauseReason": null
+      "pauseReason": "PD-010 owner-only OpenSpec planning update required before the exact two-file HTTP host correction; Phase B WIP is preserved and not complete"
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|6da30fb3d0a7920120c8f565697370d79a02e2d9|pd-009-phase-a-accepted-phase-b-authorized|16/29",
-    "messageType": "INTEGRATION_PD_009_PHASE_A_IMPLEMENTATION_COMMITTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|60df6b9a6fdb7587171b893e2a658d25ade17bdd|task-4.2-phase-b-non-completion-wip-checkpoint-pd-010-planning-authorized|16/29",
+    "messageType": "INTEGRATION_TASK_4_2_PHASE_B_WIP_CHECKPOINT_COMMITTED",
     "workerThreadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
-    "reportedHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+    "reportedHead": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "completedTaskId": "4.1",
     "nextTaskId": "4.2",
     "openspecProgress": "16/29",
@@ -133,7 +137,8 @@
     "controllerAccepted": true,
     "handoffAccepted": true,
     "planDeviationAccepted": true,
-    "controllerIndependentVerification": "Controller independently reviewed the one-line nested partialArtifacts slice(0,4) root fix and focused 12-partial failure/5-partial cancellation regressions; Integration typecheck, 171/171 tests, build, repository safety 450, diff check, exact two-file scope and Git clean passed. Phase A is accepted and Phase B is authorized."
+    "checkpointSemantics": "non-completion WIP safety checkpoint only; task 4.2 remains unchecked and the real-host backpressure regression intentionally fails",
+    "controllerIndependentVerification": "Controller verified commit 60df6b9a6fdb7587171b893e2a658d25ade17bdd is the direct child of 12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d, has exactly the four authorized Phase B files and leaves Git clean. Focused routes/stream 23/23, Integration 179/179 and root 745 passed before the added real-host regression; that regression intentionally demonstrates the accepted PD-010 host defect."
   },
   "controllerSuccessor": {
     "lane": "controller",
@@ -145,11 +150,11 @@
     "plannedBranch": "codex/routego-controller-g6",
     "startingCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
     "registrationCommit": "84698588f8693bf1392a786089427f43605a2914",
-    "currentHead": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
+    "currentHead": "e8d7beeb0624dd9231931d9fc4ad41db123a131c",
     "acceptedHead": "0a687150fc4f4460a6ddddb803d0f0bd99fa47cc",
     "gitClean": true,
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "controller|routego-image-1.0|6aaa1510a29e4cd520d6a44d1d096160091488c1|context-compaction-1-during-integration-g5-activation-preparation|16/29",
+    "observableCompactions": 2,
+    "lastCompactionFingerprint": "controller|routego-image-1.0|e8d7beeb0624dd9231931d9fc4ad41db123a131c|context-compaction-2-during-task-4.2-phase-b-backpressure-plan-deviation|16/29",
     "handoffCapsule": ".codex/routego-program/handoffs/controller-generation-6.capsule.json"
   },
   "controllerPredecessor": {
@@ -191,7 +196,8 @@
     "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence.",
     "Task 3.2 orphan-accounting regressions cover the reproduced same-path replacement schedule; not every theoretical scheduler permutation is exhaustively enumerated.",
     "Task 3.3 relies on RoutegoLibraryService for filesystem containment; upload discard or expiry after preparation remains a task 3.4 composition-lifecycle concern.",
-    "Task 4.2 must preserve immutable partial-resource expiry after disconnect/cancel while closing active execution channels and must not implement task 4.3 MCP process/CLI behavior."
+    "Task 4.2 must preserve immutable partial-resource expiry after disconnect/cancel while closing active execution channels and must not implement task 4.3 MCP process/CLI behavior.",
+    "Task 4.2 Phase B is preserved only as non-completion WIP at 60df6b9a6fdb7587171b893e2a658d25ade17bdd. The accepted PD-010 common-root host correction and its OpenSpec planning gate must complete before Phase B resumes."
   ],
   "externalApprovalGates": {
     "tasks": ["7.2", "8.2", "9.1"],
@@ -205,7 +211,12 @@
     "fallbackOnly": true,
     "deduplicateWith": "latestDirectCheckpoint",
     "archiveOwnRuns": true,
-    "authoritativeWorktreeResolution": "Locate active Controller thread, verify it matches this record, then read that Controller worktree; do not trust a stale dirty main checkout."
+    "promptVersion": "ARCHIVE_ON_COMPLETION_V4",
+    "controllerSeedThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+    "controllerSeedWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
+    "normalListThreadsForbidden": true,
+    "cleanupFinding": "V3 runs spent 90-120 seconds in task-list discovery and subsequent self-archive calls timed out; two residual run tasks were explicitly archived by Controller G6 and V4 now validates the exact Controller seed without normal task-list enumeration.",
+    "authoritativeWorktreeResolution": "Read the exact seeded Controller thread and verify authoritative identity/worktree against compact state. Do not scan task lists during normal runs and do not trust a stale dirty main checkout."
   },
   "policyActivation": {
     "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
@@ -265,7 +276,7 @@
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
       "branch": "codex/routego-integration-g5",
       "acceptedHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
-      "status": "sole-apply-owner-task-4.2-phase-a-accepted-phase-b-authorized"
+      "status": "sole-apply-owner-task-4.2-phase-b-wip-checkpoint-pd-010-planning-authorized-host-correction-locked"
     },
     "otherUnfinishedLanes": []
   },

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "c55648e67ce7b8eb658c91920d94ea63aafcd988f0ac7259801718f993b9e349",
+  "capsuleSha256": "cd2d215a0a5c2830b0ad8f2a9c6ece40138e612ad623af228c75befa9d4b6520",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,7 +22,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "plannedBranch": "codex/routego-integration-g5",
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
-    "registrationStatus": "activated-sole-owner-task-4.2-unlocked-not-started",
+    "registrationStatus": "activated-sole-owner-task-4.2-pd-010-planning-authorized-host-correction-locked",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
     "registrationCommitSemantics": "The Controller registration governance commit and successor incorporation commit are exact; the containing activation commit cannot self-reference its own SHA."
@@ -34,11 +34,17 @@
     "nextTaskId": "4.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.2.json",
-      "sha256": "612977d99188ddfa1494abed9b893bf503b17b0f4ab12c3a006e1558fadc5cae"
+      "sha256": "5f044459af71eec02149a28dc615931e0d6b8b5fef391b506a865d253eab2ec8"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
-    "successorApplyAuthorized": true
+    "successorApplyAuthorized": true,
+    "phaseBWipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "phaseBWipCheckpointParent": "12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d",
+    "taskComplete": false,
+    "pd010PlanningAuthorized": true,
+    "hostCorrectionLocked": true,
+    "phaseBResumeLocked": true
   },
   "completedEvidence": [
     {
@@ -72,13 +78,15 @@
     "residualRisks": [
       "Task 4.2 must preserve immutable partial-resource expiry after disconnect/cancel while closing active execution channels.",
       "Task 4.2 must first repair the task-3.5 nested service-error partialArtifacts bound so valid 5-12 partial failures can emit one failed terminal before EOF.",
+      "Task 4.2 Phase B is preserved only as a non-completion WIP checkpoint. The proven HTTP-host drain/disconnect defect requires an owner-only OpenSpec update and an accepted exact two-file host correction before Phase B resumes.",
       "Task 4.2 must not implement task 4.3 MCP process/CLI behavior or any alternate stream route."
     ]
   },
   "context": {
     "sourceObservableCompactions": 3,
     "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|cc49c06406a8526f1bdd43e4ab158421b367ee6c|context-compaction-3-after-task-4.1-before-task-4.2-implementation|16/29",
-    "successorObservableCompactions": 0,
+    "successorObservableCompactions": 2,
+    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d|context-compaction-2-during-task-4.2-phase-b-wip-checkpoint-before-PD-010|16/29",
     "handoffAcceptanceCompactionLimit": 0,
     "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
     "auditFailure": "HANDOFF_AUDIT_FAILED"
@@ -89,7 +97,7 @@
   },
   "reportingContract": {
     "primary": "After every OpenSpec task, task group, safe checkpoint, blocker, deviation, handoff, activation or delivery, call real send_message_to_thread to the current Controller from program.json and then call read_thread to confirm receipt.",
-    "fallback": "routego-program-continuity records exact CODEX_THREAD_ID, reads compact current state and deduplicates with latestDirectCheckpoint, then archives its own run by explicit ID as the final tool action; it is missed-message fallback only.",
+    "fallback": "routego-program-continuity V4 records exact CODEX_THREAD_ID, verifies the exact Controller seed without normal list_threads enumeration, reads compact current state and deduplicates with latestDirectCheckpoint, then archives its own run by explicit ID as the final tool action; it is missed-message fallback only.",
     "fallbackIntervalMinutes": 30,
     "finalAnswerAloneIsInsufficient": true,
     "heartbeatInheritanceAssumed": false
@@ -106,13 +114,13 @@
       "openspec/specs/local-service-boundaries/spec.md",
       "openspec/specs/shared-image-contracts/spec.md",
       ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
-      ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+      ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md",
       ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
     ],
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 103998,
+    "expectedNormalizedUtf8Bytes": 112623,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
@@ -122,7 +130,8 @@
     "fullAuditDefaultForbidden": true
   },
   "safety": {
-    "noProductOrOpenSpecEditsBeforeActivation": true,
+    "noProductEditsBeforeExplicitCurrentPhaseGate": true,
+    "ownerOnlyOpenSpecPlanningScope": true,
     "noCredentialsAuthorizationValuesUserImagesRealLibraryRelayOrBillableRequests": true,
     "noInstallMarketplaceDeployPublishMigrateDeleteOrRelease": true,
     "sevenPublicToolsAndPublicPhaseFrozen": true
