@@ -131,6 +131,24 @@
         "add-routego-image-library",
         "add-routego-studio"
       ]
+    },
+    "library": {
+      "status": "delivery-received-pending-controller-successor-review",
+      "sourceThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
+      "deliveryCommit": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
+      "taskStateCommit": "514db95441d389999bd6341f335aeaaca1cba226",
+      "verifiedHead": "341a2fe7d2cfe82ca4a9ac315423071c6911701d",
+      "openspecProgress": "10/10",
+      "mergeCommit": null,
+      "specSyncCommit": null,
+      "archivePath": null,
+      "archiveCommit": null,
+      "postArchiveVerification": null,
+      "integrationNotified": false,
+      "waitingFor": [
+        "controller-generation-2-independent-review",
+        "add-routego-studio"
+      ]
     }
   },
   "automations": {
