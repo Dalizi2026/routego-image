@@ -160,6 +160,14 @@ function dataOnly(value: unknown): string {
   return `data: ${JSON.stringify(value)}\n\n`;
 }
 
+function utf8ByteLength(value: string): number {
+  return new TextEncoder().encode(value).byteLength;
+}
+
+function maximumLogicalLineBytes(text: string, lineEnding: "\n" | "\r\n"): number {
+  return Math.max(...text.split(lineEnding).map((line) => utf8ByteLength(line)));
+}
+
 function streamFromChunks(chunks: readonly Uint8Array[], onCancel?: () => void): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
     start(controller) {
@@ -268,6 +276,65 @@ describe("strict browser-safe Studio SSE parser", () => {
       ))
     ).rejects.toMatchObject({ code: "invalid_output" });
   });
+
+  it.each(["\n", "\r\n"] as const)(
+    "enforces exact raw-byte line, event, and body boundaries for %j records",
+    async (lineEnding) => {
+      const input = request();
+      const startedRecord = record(started(input), { lineEnding });
+      const failedRecord = record(failed("request-1", 1, true), { lineEnding });
+      const text = startedRecord + failedRecord;
+      const maximumLineBytes = maximumLogicalLineBytes(text, lineEnding);
+      const maximumEventBytes = Math.max(
+        utf8ByteLength(startedRecord),
+        utf8ByteLength(failedRecord)
+      );
+      const maximumBodyBytes = utf8ByteLength(text);
+      const exactLimits = {
+        maximumLineBytes,
+        maximumEventBytes,
+        maximumBodyBytes
+      };
+
+      await expect(collect(parseStudioImageOperationEventStream(
+        chunkText(text, [1, 2, 3, 5, 8, 13]),
+        { limits: exactLimits }
+      ))).resolves.toMatchObject([
+        { type: "started" },
+        { type: "failed" }
+      ]);
+
+      await expect(collect(parseStudioImageOperationEventStream(
+        streamFromChunks([new TextEncoder().encode(text)]),
+        {
+          limits: {
+            ...exactLimits,
+            maximumLineBytes: maximumLineBytes - 1
+          }
+        }
+      ))).rejects.toMatchObject({ code: "invalid_output" });
+
+      await expect(collect(parseStudioImageOperationEventStream(
+        streamFromChunks([new TextEncoder().encode(text)]),
+        {
+          limits: {
+            ...exactLimits,
+            maximumEventBytes: maximumEventBytes - 1
+          }
+        }
+      ))).rejects.toMatchObject({ code: "invalid_output" });
+
+      await expect(collect(parseStudioImageOperationEventStream(
+        streamFromChunks([new TextEncoder().encode(text)]),
+        {
+          limits: {
+            ...exactLimits,
+            maximumBodyBytes: maximumBodyBytes - 1
+          }
+        }
+      ))).rejects.toMatchObject({ code: "invalid_output" });
+    }
+  );
 
   it.each([
     {

@@ -137,7 +137,7 @@ class StrictSseDecoder {
       if (lineBytes > this.#limits.maximumLineBytes) {
         throw invalidOutput("The local service returned an oversized Studio event line.");
       }
-      this.#eventBytes += lineBytes + 1;
+      this.#eventBytes += utf8Length(rawLine) + 1;
       if (this.#eventBytes > this.#limits.maximumEventBytes) {
         throw invalidOutput("The local service returned an oversized Studio event record.");
       }
