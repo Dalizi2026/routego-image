@@ -10,6 +10,7 @@
 - Registration 提交：`c292c2d461ed33000d7f154edba04908f36eedce`。
 - 接管状态：G4 已在 clean `codex/routego-controller-g4` HEAD `c292c2d461ed33000d7f154edba04908f36eedce` 完成全部权威、Integration、自动化与 Git 审计，并通过真实消息向 G3 回传 `[CONTROLLER_HANDOFF_ACCEPTED]`；G3 已用 `read_thread` 回读确认。
 - 双路径确认：G4 明确承诺直接 `send_message_to_thread` + `read_thread` 是主链，`routego-program-continuity` 是 10 分钟项目级漏报兜底，后续任何 Controller/Integration successor 都必须在创建、登记、接受和激活时继承此契约。
+- 压缩阈值更新：依据 PD-006，所有角色从现在起采用第 1～2 次审计、第 3 次 Git 检查点、第 4 次预交接、第 5 次强制新线程/新 worktree；本文件中 G3 因第 3 次交接的描述保留为历史事实。
 - 交接原因：Controller G3 在收到 Integration 任务 1.4 后出现新的明确模型上下文摘要，达到第 3 次可观测压缩。按健康协议，必须在授权大型任务 2.1 前交给全新顶层任务和新 worktree。
 
 ## Integration 当前权威状态

@@ -7,9 +7,12 @@
   "productPlan": "routego-image-1.0-plan.md",
   "contextPolicy": {
     "observableOnly": true,
-    "checkpointAt": 2,
-    "mandatoryHandoffAt": 3,
+    "checkpointAt": 3,
+    "preHandoffAt": 4,
+    "mandatoryHandoffAt": 5,
     "earlyHandoffOnFailedAudit": true,
+    "appliesToAllRoles": true,
+    "policyDecision": ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
     "successorMode": "new-thread-new-worktree",
     "successorMustInheritCompletionReporting": true,
     "successorAcceptanceRequiresReportingAcknowledgement": true
@@ -35,8 +38,10 @@
       "stopReason",
       "recommendedAction"
     ],
-    "secondCompactionAction": "commit a safe checkpoint; if the next task is a large atomic task, request a new-thread/new-worktree successor before idle",
-    "thirdCompactionAction": "mandatory new-thread/new-worktree successor handoff",
+    "secondCompactionAction": "complete health audit; continue only if authority remains clear",
+    "thirdCompactionAction": "commit a safe Git checkpoint; finish only the current small/atomic boundary and do not start a new large task",
+    "fourthCompactionAction": "enter pre-handoff; finish the current atomic task and handoff preparation only, with no new large task",
+    "fifthCompactionAction": "mandatory new-thread/new-worktree successor handoff",
     "controllerRequiredActions": [
       "send follow-up for allowed small work",
       "create successor for large work",
@@ -46,7 +51,7 @@
     "dualPathCompletionReporting": {
       "primary": "The active Integration apply owner must immediately call send_message_to_thread after every completed OpenSpec task, task group, clean checkpoint, blocker, deviation, handoff, activation, or delivery event, then call read_thread to confirm receipt by the authoritative Controller task.",
       "fallback": "The project-level continuity automation checks every 10 minutes for progress or HEAD changes lacking a matching direct Controller message and requests an immediate catch-up report.",
-      "successorInheritance": "Every successor created after the third observable compaction or an early health handoff must receive this full reporting contract in its creation prompt, registration, acceptance, and sole-owner activation. Acceptance is invalid until the successor acknowledges the contract.",
+      "successorInheritance": "Every successor created after the fifth observable compaction or an early health handoff must receive this full reporting contract in its creation prompt, registration, acceptance, and sole-owner activation. Acceptance is invalid until the successor acknowledges the contract.",
       "finalAnswerAloneIsInsufficient": true,
       "automationIsFallbackOnly": true,
       "requiredCompletionFields": [
