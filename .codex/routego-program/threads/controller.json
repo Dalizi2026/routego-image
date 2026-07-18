@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-integration-generation-2-task-2.4-only",
+  "status": "active-integration-generation-2-task-2.5-only",
   "threadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1756\\生图插件",
   "branch": "codex/routego-controller-g4",
   "startingCommit": "e8b96e3685b939843d9029657bd2108116a38b03",
   "registrationCommit": "c292c2d461ed33000d7f154edba04908f36eedce",
-  "headCommit": "c3e063c266487204199bde9f7bf2911fefd883f1",
+  "headCommit": "3cbc2850577d1f367e246355c55512252a67632b",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 4,
   "observableCompactions": 3,
   "lastCompactionFingerprint": "g4-compaction-3-integration-g2-handoff-preparation-after-task-2.2-2026-07-18",
-  "lastHealthAudit": "passed-generation-4-compaction-3-checkpoint-integration-generation-2-task-2.3-independent-review-and-bounded-task-2.4-continuation-audit",
+  "lastHealthAudit": "passed-generation-4-compaction-3-checkpoint-integration-generation-2-task-2.4-independent-review-and-one-file-task-2.5-continuation-audit",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -125,6 +125,7 @@
     "Integration generation 2 task 019f743d-a9e1-7752-b797-c0af436183ab accepted the handoff at clean branch codex/routego-integration-g2 HEAD 2935972129c581fc653b3f27878fd6ba5f5fa6c0 after the complete authority, 2.2 correction lineage, exact governance scope, OpenSpec 7/29 and task-2.3 three-file audit. Generation 1 was archived before this sole-owner activation. G2 explicitly acknowledged direct send_message_to_thread plus read_thread as the primary reporting path, routego-program-continuity as fallback only, and mandatory inheritance by every future successor. Only task 2.3 is activated; task 2.4 remains locked.",
     "Integration generation 2 recorded its local sole-owner activation at clean HEAD 96edee64b45c5700615ec8a8e5ef1d153512c059, a direct child of registration 2935972129c581fc653b3f27878fd6ba5f5fa6c0 changing only integration.json. Identity, generation 2, Controller activation e010f9a1bf07fd890fba7f77d8f66a13cbe9dd1d, observableCompactions 0, direct reporting, task 2.3 authorization, task 2.4 lock and external safety fields were verified.",
     "The user changed routego-program-continuity from every 10 minutes to every 15 minutes. The automation remains ACTIVE, dynamically resolves the current Controller, deduplicates through integrationReadiness.lastDirectCheckpoint, and archives each completed automation-run task. Direct send_message_to_thread plus read_thread reporting remains the primary path; older 10-minute notes and handoffs remain historical facts.",
-    "Integration generation 2 task 2.3 checkpoint 63c4e60e7e9e5ca769f900c66b8d46c175967fe7 was independently accepted after exact implementation/task-state/thread-state ancestry, exact three-file implementation scope, code review, Studio 131/131 twice, typecheck, library and Vite builds, repository safety 398, strict OpenSpec 19/19, diff checks and clean Git. At G2 compaction 1 and G4 compaction 3, only bounded five-file task 2.4 in the same Studio streaming work group is activated; task 2.5 remains locked."
+    "Integration generation 2 task 2.3 checkpoint 63c4e60e7e9e5ca769f900c66b8d46c175967fe7 was independently accepted after exact implementation/task-state/thread-state ancestry, exact three-file implementation scope, code review, Studio 131/131 twice, typecheck, library and Vite builds, repository safety 398, strict OpenSpec 19/19, diff checks and clean Git. At G2 compaction 1 and G4 compaction 3, only bounded five-file task 2.4 in the same Studio streaming work group is activated; task 2.5 remains locked.",
+    "Integration generation 2 task 2.4 checkpoint 855afc11b1d8778d2cde1e8629ac49cd6581def6 was independently accepted after exact five-file scope and ancestry, stream-state/resource-lifecycle code review, Studio 140/140, typecheck, library and Vite builds, repository safety 400, strict OpenSpec 19/19, diff checks and clean Git. The 506.19 kB Vite advisory is non-failing and outside this task's configuration scope. Only one-file browser task 2.5 is activated; task 3.1 remains locked pending task-group review."
   ]
 }

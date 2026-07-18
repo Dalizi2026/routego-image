@@ -192,7 +192,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-generation-2-sole-owner-active-task-2.4-only",
+    "status": "offline-apply-generation-2-sole-owner-active-task-2.5-only",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -200,7 +200,7 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "63c4e60e7e9e5ca769f900c66b8d46c175967fe7",
+    "integrationHead": "855afc11b1d8778d2cde1e8629ac49cd6581def6",
     "integrationThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
     "integrationGeneration": 2,
     "integrationWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
@@ -215,33 +215,35 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 3 Git checkpoint remains effective. Integration generation 2 is the sole owner at compaction 1 and completed task 2.3 at clean HEAD 63c4e60e7e9e5ca769f900c66b8d46c175967fe7. Only bounded task 2.4 in the same Studio streaming work group is activated after fresh apply instructions; task 2.5 and later remain locked. No external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 3 Git checkpoint remains effective. Integration generation 2 is the sole owner at compaction 1 and completed task 2.4 at clean HEAD 855afc11b1d8778d2cde1e8629ac49cd6581def6. Only one-file browser task 2.5 is activated after fresh apply instructions; task 3.1 and later remain locked pending the Studio streaming task-group consistency audit. No external authority is added.",
     "lastDirectCheckpoint": {
       "messageType": "INTEGRATION_TASK_CHECKPOINT",
       "workerThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-      "completedTask": "2.3",
-      "nextTask": "2.4",
-      "reportedHead": "63c4e60e7e9e5ca769f900c66b8d46c175967fe7",
-      "checkpointCommit": "63c4e60e7e9e5ca769f900c66b8d46c175967fe7",
+      "completedTask": "2.4",
+      "nextTask": "2.5",
+      "reportedHead": "855afc11b1d8778d2cde1e8629ac49cd6581def6",
+      "checkpointCommit": "855afc11b1d8778d2cde1e8629ac49cd6581def6",
       "registrationCommit": "2935972129c581fc653b3f27878fd6ba5f5fa6c0",
       "planningCommit": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
-      "implementationCommit": "523214c12cc60900cfd57d51706756e579f342d8",
+      "implementationCommit": "f9937d9f00a766af24e988b28187720cba6b5885",
       "originalImplementationCommit": null,
-      "taskStateCommit": "ce3cef79a5a1b8a82af53ac86a0f117dbdfc69bd",
-      "threadStateCommit": "63c4e60e7e9e5ca769f900c66b8d46c175967fe7",
-      "openspecProgress": "8/29",
+      "taskStateCommit": "21c308d09f5fc9ea76f561ec2e076132e25878b6",
+      "threadStateCommit": "855afc11b1d8778d2cde1e8629ac49cd6581def6",
+      "openspecProgress": "9/29",
       "gitState": "clean; no staged or untracked files",
       "observableCompactions": 1,
-      "stopReason": "Task 2.3 independently accepted; only bounded task 2.4 is activated and task 2.5 remains locked",
+      "stopReason": "Task 2.4 independently accepted; only one-file browser task 2.5 is activated and task 3.1 remains locked",
       "controllerReceived": true,
       "controllerReadBackConfirmed": true,
       "controllerAccepted": true,
-      "reviewFinding": "Exact three-file genuinely chunked deterministic mock stream implementation passed independent code review, Studio 131/131 twice, typecheck/build, safety 398, strict OpenSpec 19/19 and clean Git.",
-      "acceptedByControllerMessage": "INTEGRATION_TASK_2_3_ACCEPTED_TASK_2_4_ACTIVATED",
+      "reviewFinding": "Exact five-file workbench stream state/resource lifecycle implementation passed independent code review, Studio 140/140, typecheck/build, safety 400, strict OpenSpec 19/19 and clean Git; Vite emitted only a non-failing 506.19 kB advisory.",
+      "acceptedByControllerMessage": "INTEGRATION_TASK_2_4_ACCEPTED_TASK_2_5_ACTIVATED",
       "exactImplementationFiles": [
-        "packages/studio/src/dev/mock-handler.ts",
-        "packages/studio/src/dev/vite-mock-bridge.ts",
-        "packages/studio/test/mock-bridge.test.ts"
+        "packages/studio/src/features/creation/stream.ts",
+        "packages/studio/src/features/creation/types.ts",
+        "packages/studio/src/features/creation/result.ts",
+        "packages/studio/src/features/creation/CreationWorkbench.tsx",
+        "packages/studio/test/creation-stream.test.ts"
       ],
       "handoffFile": ".codex/routego-program/handoffs/integration-generation-2.md",
       "handoffParent": "8de8eab3d0b433440c7a29142d76f2d5117b0a84",
@@ -282,8 +284,11 @@
       "task2_3OnlyAuthorized": false,
       "task2_3Complete": true,
       "task2_4Locked": false,
-      "task2_4OnlyAuthorized": true,
-      "task2_5Locked": true
+      "task2_4OnlyAuthorized": false,
+      "task2_4Complete": true,
+      "task2_5Locked": false,
+      "task2_5OnlyAuthorized": true,
+      "task3_1Locked": true
     }
   },
   "automations": {
