@@ -4,6 +4,8 @@ The frozen mainline contains working Creation, Library, and Studio packages, but
 
 PD-005 identified two prerequisite gaps that must be corrected before composition. Library can store only `partial | final` renditions and relationships to existing assets, so upload-origin target/reference/supporting/mask inputs cannot be retained honestly. Studio has no authenticated fetch-stream consumer, so Creation's validated partial events cannot reach the workbench. Controller G3 authorized both corrections inside this change for planning only, with the seven public MCP tools and public `ImageArtifact.phase` frozen.
 
+After task 1.1 made `primaryArtifactId` mandatory on browser-safe Library detail, verification exposed one frozen-baseline mismatch: the deterministic mock detail still returns the correct output rendition and relationship but omits the required primary identifier. That single source breaks mock-relay, Creation, and root typecheck. It must be corrected before task 2.1 without changing runtime product behavior or widening the public contract.
+
 Integration owns the final shared-schema correction, exact PD-005 Library/Studio seams, root workspace/dependency/CI changes, new Integration package, plugin manifest/Skill, packaging, installation, acceptance, and release workflow. Creation provider/executor internals, unrelated Library/Studio behavior, Foundation security/provider policy, and all other frozen requirements remain read-only.
 
 The default provider assumption remains one explicitly configured generation endpoint and one API key. Image input, multiple images, Edits, Responses, streaming, variants, controls, and transparency remain scoped `unknown | supported | unsupported | degraded`; endpoint strings never prove capability. No real credential, billable request, installation replacement, deployment, publication, marketplace change, migration, deletion, or release is authorized by this planning change.
@@ -13,6 +15,7 @@ The default provider assumption remains one explicitly configured generation end
 **Goals:**
 
 - Complete PD-005 source-rendition and Studio streaming gates before any cross-lane composition.
+- Restore the deterministic mock baseline to the frozen Library detail contract before Integration package verification.
 - Implement one production `LocalRoutegoService` that composes Library-owned settings/resources with Creation-owned execution and preserves truthful public and browser-safe results.
 - Materialize, validate, optionally post-process, persist, copy, and project outputs without overwrite, orphan files, fabricated relationships, or hidden billing risk.
 - Expose exactly the seven frozen MCP tools and a thin Routego Image Skill from a long-running, relocatable plugin runtime.
@@ -31,9 +34,11 @@ The default provider assumption remains one explicitly configured generation end
 
 ## Decisions
 
-### 1. Treat PD-005 corrections as blocking gates inside the Integration change
+### 1. Treat prerequisite corrections as blocking gates inside the Integration change
 
-Tasks are ordered `contracts -> Library source/ZIP -> Studio retry -> Studio stream -> Integration composition -> runtime -> packaging`. No composition, manifest, packaging, or smoke task may start while either corrective group is incomplete. The apply owner remains this Integration thread; no second top-level change or concurrent Library/Studio owner is introduced.
+Tasks are ordered `contracts -> Library source/ZIP -> Studio retry -> deterministic mock primary repair -> Studio stream -> Integration composition -> runtime -> packaging`. No Integration package verification, composition, manifest, packaging, or smoke task may pass while its preceding corrective gate is incomplete. The apply owner remains this Integration thread; no second top-level change or concurrent Library/Studio owner is introduced.
+
+The deterministic mock repair is intentionally separate task 1.5. It may only set `primaryArtifactId` to the output identity already represented by `seed.artifactId` and assert that the returned detail remains valid under `getAssetDetailResultSchema`. It may not create another artifact, change primary-selection rules, alter public schemas/tools, or revise mock product behavior. Task 2.1 depends on this repair so its required mock-relay, Creation, and root typechecks start from a valid frozen baseline.
 
 Alternative considered: implement partial workarounds only inside Integration. Rejected because transient upload inputs would disappear from durable detail/retry, and a server-only SSE route would remain unused by Studio.
 
@@ -145,7 +150,7 @@ Release execution is a separate explicit gate after real-relay acceptance. The o
 
 ## Migration Plan
 
-1. Complete and verify PD-005 contracts, Library ingestion/detail/ZIP behavior, Studio retry, and Studio streaming in isolated commits before composition.
+1. Complete and verify PD-005 contracts, Library ingestion/detail/ZIP behavior, Studio retry, the deterministic mock primary-artifact baseline repair, and Studio streaming in isolated commits before composition.
 2. Add the Integration package and offline production composition/runtime tests without reading real user state.
 3. Add Skill, canonical manifest, self-contained packaging, temporary-`CODEX_HOME` installation, and fresh-task smoke verification.
 4. Add and pass Windows/Ubuntu/macOS Node.js 20.19+ CI and the final offline conformance gate.

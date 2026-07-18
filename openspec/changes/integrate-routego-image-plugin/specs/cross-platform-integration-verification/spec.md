@@ -22,6 +22,17 @@ Integration verification SHALL use isolated temporary roots, deterministic clock
 - **WHEN** CI/developer environment variables or home files contain unrelated real state
 - **THEN** offline verification SHALL neither read it nor change its outcomes
 
+### Requirement: Deterministic mock Library detail remains schema-valid
+The deterministic mock service SHALL return Library detail that satisfies the frozen browser-safe contract, including a `primaryArtifactId` that identifies the existing output rendition represented by the mock operation. Verification SHALL cover the mock-relay package, Creation's deterministic consumer boundary, and the root workspace typecheck without changing product behavior or public contracts.
+
+#### Scenario: Mock asset detail is requested
+- **WHEN** the deterministic mock returns an asset with its seeded output rendition
+- **THEN** `primaryArtifactId` SHALL equal that existing output artifact identifier and the complete result SHALL pass `getAssetDetailResultSchema`
+
+#### Scenario: Frozen detail contract changes incompatibly
+- **WHEN** the mock omits or misidentifies the primary output required by the frozen detail schema
+- **THEN** focused mock-relay validation, Creation typecheck, or root typecheck SHALL fail before Integration task verification can pass
+
 ### Requirement: PD-005 corrective gates have dedicated regressions
 Verification SHALL prove the Library-only source phase and exact 17+12+4=33 bound, public phase/tool freeze, mixed source/output MIME, output-only primary, exact relationship ownership, no extra chromakey rendition/role, ZIP round-trip/remapping, fail-closed retry reconstruction, the exact authenticated `POST /api/v1/studio/creation/stream` route, first/unique started and request-ID consistency, framing/schema/sequence/terminal-before-EOF/sentinel validation, failure-after-partial preservation through immutable `min(registration + 5 minutes, session expiry)` descriptors, independent reader/channel and browser object-URL cleanup, normal five-minute-capable and near-expiry sessions, exact pre/post-expiry fetch behavior, immediate shutdown revocation, and genuine mock chunking.
 
