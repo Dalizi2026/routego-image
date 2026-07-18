@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "planning-revised-awaiting-controller-review",
+  "status": "planning-lifecycle-revised-awaiting-controller-review",
   "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "threadId": "019f72fd-fb6f-7b52-b383-03471f42f05a",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4687\\生图插件",
@@ -14,14 +14,15 @@
   "generation": 0,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "2026-07-18-summary-checkpoint-uncommitted-integration-plan-at-149ca920feb6fc714db4e210e4a304f6540f3e57",
-  "lastHealthAudit": "passed-after-controller-g3-findings-1-through-5-planning-revision-and-strict-validation",
+  "lastHealthAudit": "passed-after-controller-g3-final-lifecycle-planning-revision-and-strict-validation",
   "successorThreadId": null,
   "openspecState": "revised-planning-complete-apply-ready-controller-review-required",
   "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 0/28 apply tasks executed",
-  "planningCommit": "3ae25501f1f47b98c212fd9d47d89837ea75cd96",
+  "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
     "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
-    "3ae25501f1f47b98c212fd9d47d89837ea75cd96"
+    "3ae25501f1f47b98c212fd9d47d89837ea75cd96",
+    "dd02ccfb03b53034afb9314de4fa8441a3846441"
   ],
   "nextTask": "Wait for Controller G3 review of the revised INTEGRATION_PLAN_READY delivery; do not edit product files, start apply, or execute external actions without explicit follow-up authorization.",
   "governanceHold": {
@@ -50,10 +51,17 @@
     "resolvedFindings": [
       "chromakey uses one existing output identity and no extra rendition or relationship role within the 17+12+4=33 bound",
       "SSE uses POST /api/v1/studio/creation/stream with exactly one first started event, requestId consistency, one terminal, terminal-before-EOF, and no sentinels",
-      "reader and channel cleanup is separate from the five-minute protected partial-resource lifetime",
+      "reader/channel and browser object-URL cleanup is separate from immutable partial-resource expiry capped by the earlier of registration plus five minutes or owning-session expiry",
       "offline release preparation task 8.1 depends on 7.1 while external release task 8.2 depends on both 7.2 and 8.1",
       "planning lineage and Controller-review wait state are recorded"
     ],
+    "applyAuthorized": false,
+    "externalStateAuthorized": false
+  },
+  "finalLifecycleReview": {
+    "reviewedDeliveryHead": "5ff9d767e5b8fdf547634c551a7f1a908f297d12",
+    "revisedPlanningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
+    "resolution": "No server-side client release operation is planned. Studio only revokes browser object URLs. Each server descriptor receives immutable expiresAt=min(registration+5 minutes, owning session expiry); stream termination does not shorten it, while descriptor/session expiry or process shutdown revokes access.",
     "applyAuthorized": false,
     "externalStateAuthorized": false
   },
