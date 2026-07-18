@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "integration-offline-apply-generation-1-activation-authorized",
+  "status": "integration-offline-apply-active-generation-1",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -166,7 +166,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-generation-1-activation-authorized",
+    "status": "offline-apply-active-generation-1",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -174,7 +174,7 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "c2d04ab968348bda5b99506d814eaae6aeddfa42",
+    "integrationHead": "1b8d38fbfc33b9b92b93f167170afe215e5cc0f0",
     "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
