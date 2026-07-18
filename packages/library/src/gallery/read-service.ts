@@ -166,6 +166,7 @@ function detailFromIndex(index: ImageLibraryIndex, asset: StoredLibraryAsset): L
     model: asset.model,
     kind: asset.kind,
     status: asset.status,
+    primaryArtifactId: asset.primaryArtifactId,
     mimeType: blob.mimeType,
     width: blob.width,
     height: blob.height,

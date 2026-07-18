@@ -1,6 +1,7 @@
 import {
   identifierSchema,
-  imageArtifactPhaseSchema,
+  libraryAssetRenditionPhaseSchema,
+  MAX_LIBRARY_ASSET_RENDITIONS,
   libraryAssetRelationshipSchema,
   libraryAssetStatusSchema,
   libraryFolderStateSchema,
@@ -34,7 +35,7 @@ export interface StoredImageBlob {
 
 export interface StoredAssetRendition {
   readonly artifactId: string;
-  readonly phase: "partial" | "final";
+  readonly phase: "source" | "partial" | "final";
   readonly blobSha256: string;
   readonly createdAt: string;
 }
@@ -170,9 +171,9 @@ function parseBlob(value: unknown): StoredImageBlob {
 function parseRendition(value: unknown): StoredAssetRendition {
   const record = asRecord(value, "Asset rendition");
   exact(record, ["artifactId", "phase", "blobSha256", "createdAt"], "Asset rendition");
-  let phase: "partial" | "final";
+  let phase: StoredAssetRendition["phase"];
   try {
-    phase = imageArtifactPhaseSchema.parse(record["phase"]);
+    phase = libraryAssetRenditionPhaseSchema.parse(record["phase"]);
   } catch {
     throw new LibraryError("config_corrupt", "Asset rendition phase is invalid.");
   }
@@ -279,7 +280,11 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   if (requestedParams.kind !== effectiveParams.kind || requestedParams.kind !== record["kind"]) {
     throw new LibraryError("config_corrupt", "Library asset operation kinds disagree.");
   }
-  if (!Array.isArray(record["renditions"]) || record["renditions"].length < 1 || record["renditions"].length > 16) {
+  if (
+    !Array.isArray(record["renditions"]) ||
+    record["renditions"].length < 1 ||
+    record["renditions"].length > MAX_LIBRARY_ASSET_RENDITIONS
+  ) {
     throw new LibraryError("config_corrupt", "Library asset renditions are invalid.");
   }
   const renditions = record["renditions"].map(parseRendition);
@@ -288,8 +293,14 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   if (!primaryRendition) {
     throw new LibraryError("config_corrupt", "Primary artifact is missing from the asset renditions.");
   }
-  if (status === "succeeded" && primaryRendition.phase !== "final") {
-    throw new LibraryError("config_corrupt", "Succeeded Library assets require a final rendition.");
+  if (primaryRendition.phase === "source") {
+    throw new LibraryError("config_corrupt", "Primary Library artifacts must be output renditions.");
+  }
+  if (
+    status === "succeeded" &&
+    (primaryRendition.phase !== "final" || !renditions.some((item) => item.phase === "final"))
+  ) {
+    throw new LibraryError("config_corrupt", "Succeeded Library assets require a final primary rendition.");
   }
   if (!Array.isArray(record["relationships"]) || record["relationships"].length > 128) {
     throw new LibraryError("config_corrupt", "Library asset relationships are invalid.");
@@ -299,6 +310,19 @@ function parseAsset(value: unknown): StoredLibraryAsset {
     relationships = record["relationships"].map((item) => libraryAssetRelationshipSchema.parse(item));
   } catch {
     throw new LibraryError("config_corrupt", "Library asset relationships are invalid.");
+  }
+  const assetId = parseId(record["id"], "Asset identity");
+  for (const relationship of relationships) {
+    if (relationship.role !== "output") continue;
+    if (relationship.relatedAssetId !== assetId || relationship.artifactId === undefined) {
+      throw new LibraryError("config_corrupt", "Library output relationships must identify exact local artifacts.");
+    }
+    const outputRendition = renditions.find(
+      (rendition) => rendition.artifactId === relationship.artifactId
+    );
+    if (!outputRendition || outputRendition.phase === "source") {
+      throw new LibraryError("config_corrupt", "Library output relationships must reference output renditions.");
+    }
   }
   if (!Array.isArray(record["folderIds"]) || record["folderIds"].length > 100) {
     throw new LibraryError("config_corrupt", "Library folder memberships are invalid.");
@@ -362,7 +386,7 @@ function parseAsset(value: unknown): StoredLibraryAsset {
     throw new LibraryError("config_corrupt", "Library rendition timestamps are inconsistent.");
   }
   return {
-    id: parseId(record["id"], "Asset identity"),
+    id: assetId,
     prompt: record["prompt"],
     model: record["model"].trim(),
     kind: requestedParams.kind,

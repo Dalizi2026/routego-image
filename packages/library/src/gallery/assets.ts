@@ -14,10 +14,11 @@ import { inflateSync } from "node:zlib";
 
 import {
   identifierSchema,
-  imageArtifactPhaseSchema,
+  libraryAssetRenditionPhaseSchema,
   libraryAssetRelationshipSchema,
   libraryAssetStatusSchema,
   libraryOperationParametersSchema,
+  MAX_LIBRARY_ASSET_RENDITIONS,
   operationExecutionMetadataSchema,
   routegoServiceErrorSchema,
   type LibraryOperationParameters,
@@ -70,7 +71,7 @@ export interface ValidatedLibraryImage {
 
 export interface LibraryAssetRenditionInput {
   readonly artifactId?: string;
-  readonly phase: "partial" | "final";
+  readonly phase: "source" | "partial" | "final";
   readonly sourceRoot: string;
   readonly sourceRelativePath: string;
   readonly requestedBaseName?: string;
@@ -151,7 +152,7 @@ interface PreparedAssetIngestion {
   readonly updatedAt: string;
   readonly renditions: readonly {
     readonly artifactId: string;
-    readonly phase: "partial" | "final";
+    readonly phase: "source" | "partial" | "final";
     readonly requestedBaseName: string;
     readonly image: ValidatedLibraryImage;
   }[];
@@ -819,8 +820,14 @@ export class LibraryAssetStore {
   }
 
   async #prepareAsset(input: IngestLibraryAssetInput): Promise<PreparedAssetIngestion> {
-    if (input.renditions.length < 1 || input.renditions.length > 16) {
-      throw new LibraryError("invalid_input", "A Library asset requires one to sixteen renditions.");
+    if (
+      input.renditions.length < 1 ||
+      input.renditions.length > MAX_LIBRARY_ASSET_RENDITIONS
+    ) {
+      throw new LibraryError(
+        "invalid_input",
+        `A Library asset requires one to ${MAX_LIBRARY_ASSET_RENDITIONS} renditions.`
+      );
     }
     const assetId = input.assetId === undefined ? this.#newId("asset") : identifierSchema.parse(input.assetId);
     const requestedParams = libraryOperationParametersSchema.parse(input.requestedParams);
@@ -857,12 +864,12 @@ export class LibraryAssetStore {
     }
     const renditions = [] as Array<{
       readonly artifactId: string;
-      readonly phase: "partial" | "final";
+      readonly phase: "source" | "partial" | "final";
       readonly requestedBaseName: string;
       readonly image: ValidatedLibraryImage;
     }>;
     for (const rendition of input.renditions) {
-      const phase = imageArtifactPhaseSchema.parse(rendition.phase);
+      const phase = libraryAssetRenditionPhaseSchema.parse(rendition.phase);
       const artifactId =
         rendition.artifactId === undefined
           ? this.#newId("artifact")
@@ -886,16 +893,46 @@ export class LibraryAssetStore {
         ? undefined
         : identifierSchema.parse(input.primaryArtifactId)) ??
       renditions.findLast((item) => item.phase === "final")?.artifactId ??
+      renditions.findLast((item) => item.phase === "partial")?.artifactId ??
       renditions.at(-1)!.artifactId;
-    if (!renditions.some((item) => item.artifactId === primaryArtifactId)) {
+    const primaryRendition = renditions.find((item) => item.artifactId === primaryArtifactId);
+    if (!primaryRendition) {
       throw new LibraryError("invalid_input", "The primary artifact is not part of the asset.");
     }
-    if (status === "succeeded" && !renditions.some((item) => item.phase === "final")) {
-      throw new LibraryError("invalid_input", "A succeeded asset requires a final rendition.");
+    if (primaryRendition.phase === "source") {
+      throw new LibraryError("invalid_input", "The primary artifact must be an output rendition.");
+    }
+    if (
+      status === "succeeded" &&
+      (primaryRendition.phase !== "final" || !renditions.some((item) => item.phase === "final"))
+    ) {
+      throw new LibraryError("invalid_input", "A succeeded asset requires a final primary rendition.");
     }
     const effectiveMimeType = mimeForFormat(effectiveParams.format);
-    if (renditions.some((item) => item.image.mimeType !== effectiveMimeType)) {
+    if (
+      renditions.some(
+        (item) => item.phase !== "source" && item.image.mimeType !== effectiveMimeType
+      )
+    ) {
       throw new LibraryError("invalid_input", "The image type disagrees with effective parameters.");
+    }
+    for (const relationship of relationships) {
+      if (relationship.role !== "output") continue;
+      if (relationship.relatedAssetId !== assetId || relationship.artifactId === undefined) {
+        throw new LibraryError(
+          "invalid_input",
+          "Output relationships must identify exact artifacts on the ingested asset."
+        );
+      }
+      const outputRendition = renditions.find(
+        (rendition) => rendition.artifactId === relationship.artifactId
+      );
+      if (!outputRendition || outputRendition.phase === "source") {
+        throw new LibraryError(
+          "invalid_input",
+          "Output relationships must reference partial or final renditions."
+        );
+      }
     }
 
     return {
