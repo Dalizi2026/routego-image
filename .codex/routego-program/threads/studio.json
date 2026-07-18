@@ -3,12 +3,12 @@
   "lane": "studio",
   "change": "add-routego-studio",
   "role": "openspec-apply-owner",
-  "status": "handoff-awaiting-acceptance",
+  "status": "applying",
   "threadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\3cf3\\生图插件",
   "branch": "codex/routego-studio-g3",
   "startingCommit": "6cc3640849a0d4a89481e25d4234f7f7b5a4ec52",
-  "headCommit": "6cc3640849a0d4a89481e25d4234f7f7b5a4ec52",
+  "headCommit": "dfcb6f85fedd3b2da8853ef37a0ce97f238741dc",
   "generation": 3,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -19,6 +19,7 @@
   "productCheckpointCommit": "75f49bd3df28d7bdd6b1ae09ab258d3d1e6cd890",
   "handoffCommit": "6cc3640849a0d4a89481e25d4234f7f7b5a4ec52",
   "registrationCommit": "dfcb6f85fedd3b2da8853ef37a0ce97f238741dc",
+  "controllerRegistrationCommit": "9d075a959d763a5cd7beae328a8456e022d83fa6",
   "handoffFile": ".codex/routego-program/handoffs/studio-generation-3.md",
   "openspecProgress": "9/11",
   "lastCompletedTask": "5.1",
@@ -65,8 +66,8 @@
     "safetyInvariant": "Synchronize only default-derived control fields across active, preserved, and batch drafts; preserve prompts, identifiers, uploads, targets, masks, invariants, results and workflow, and never remount, discard resources or dispatch provider calls."
   },
   "applyOwnership": {
-    "state": "awaiting-successor-acceptance",
-    "activeOwnerThreadId": null,
+    "state": "active-single-owner",
+    "activeOwnerThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
     "predecessorThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
     "successorThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408"
   },
@@ -77,13 +78,14 @@
     "headCommit": "6cc3640849a0d4a89481e25d4234f7f7b5a4ec52",
     "productCheckpointCommit": "75f49bd3df28d7bdd6b1ae09ab258d3d1e6cd890",
     "observableCompactions": 2,
-    "status": "handoff-suspended"
+    "status": "archived",
+    "worktreeRemoved": false
   },
   "continuityGovernance": {
     "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-3-handoff-awaiting-acceptance"
+    "status": "generation-3-active-task-6.1"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
