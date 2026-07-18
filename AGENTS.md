@@ -61,6 +61,9 @@
 - 交接前不得开始新的大型任务；在安全边界提交工作，并在 `.codex/routego-program/handoffs/` 写清单。
 - 继任任务必须从提交后的 branch/commit 创建，不使用携带完整旧历史的 fork。
 - 继任任务确认 commit、OpenSpec 状态和下一任务后，旧任务才允许归档。
+- 第 3 次可观测压缩或提前健康交接所创建的每一个继任任务，必须完整继承“直接回传主链 + 定时自动化兜底链”约束。Controller 必须在 task 创建提示、registration、handoff acceptance 和 sole-owner activation 中重复写明该约束。
+- 继任任务的接管确认只有在其明确承诺：每个 OpenSpec 任务、任务组、安全检查点、阻塞、偏差、交接和交付完成后立即调用真实 `send_message_to_thread` 回传 Controller，并调用 `read_thread` 确认送达后才有效；仅输出 final 标签或等待自动化不算完成。
+- 若继任任务未确认上述回传契约，旧任务不得归档，继任任务不得成为唯一 apply-owner，也不得开始下一项产品任务。
 
 ## 安全与 Git
 
