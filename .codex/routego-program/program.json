@@ -215,13 +215,13 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 3 Git checkpoint remains effective. Integration generation 2 is the sole owner at compaction 2 and completed the independently accepted tasks 2.1-2.5 streaming gate at clean HEAD 794595578a13a32770e999c351a647596aebbd0c. Only task 3.1 is activated after fresh apply instructions; task 3.2 and later remain locked. No real network, credentials, billable probe or other external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 3 Git checkpoint remains effective. Integration generation 2 reached compaction 3 after task 3.1 activation and established clean accepted HEAD 794595578a13a32770e999c351a647596aebbd0c as its safe checkpoint. The same sole owner may finish only task 3.1 and must stop before task 3.2. No real network, credentials, billable probe or other external authority is added.",
     "currentTaskActivation": {
       "messageType": "INTEGRATION_TASK_3_1_ACTIVATED",
       "taskId": "3.1",
       "workerThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-      "controllerGovernanceCommit": null,
-      "controllerGovernanceCommitSemantics": "The Git commit containing this record activates task 3.1; its full SHA is delivered in INTEGRATION_TASK_2_5_AND_GROUP_ACCEPTED_TASK_3_1_ACTIVATED.",
+      "controllerGovernanceCommit": "88b419296f5ba781b7d1c8aea7609f90c40985c3",
+      "controllerGovernanceCommitSemantics": "Task 3.1 activation was delivered by this exact Controller governance commit.",
       "reportedHead": "794595578a13a32770e999c351a647596aebbd0c",
       "openspecProgress": "10/29",
       "allowedFiles": [
@@ -231,8 +231,9 @@
         "packages/integration/src/image/png.ts",
         "packages/integration/test/provider.test.ts"
       ],
-      "observableCompactions": 2,
-      "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-2-before-task-2.5-implementation",
+      "observableCompactions": 3,
+      "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-3-after-task-3.1-activation-before-implementation",
+      "healthAudit": "passed full authority, branch, clean HEAD, OpenSpec 10/29, task-3.1 scope, reporting-contract and external-safety audit; finish task 3.1 only",
       "gitClean": true,
       "task3_1Locked": false,
       "task3_2Locked": true,
