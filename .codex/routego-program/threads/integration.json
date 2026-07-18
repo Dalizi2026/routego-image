@@ -13,12 +13,12 @@
   "controllerRegistrationCommit": "c2d04ab968348bda5b99506d814eaae6aeddfa42",
   "controllerActivationCommit": "a19506003e6ff61c03fae80950fa2427df1b1ac7",
   "generation": 1,
-  "observableCompactions": 2,
-  "lastCompactionFingerprint": "2026-07-18-generation-1-compaction-2-before-task-2.1",
-  "lastHealthAudit": "passed-fresh-authority-read-and-task-2.1-activation-audit; task-2.1-not-started",
+  "observableCompactions": 3,
+  "lastCompactionFingerprint": "2026-07-18-generation-1-compaction-3-before-task-1.5",
+  "lastHealthAudit": "passed-fresh-authority-open-spec-pd-006-pd-007-and-task-1.5-activation-audit; governance-checkpoint-required-before-small-task-1.5; task-2.1-wip-preserved-and-held",
   "successorThreadId": null,
   "openspecState": "offline-apply-active",
-  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 4/28 apply tasks executed; tasks 1.1 through 1.4 implementation and sole-owner task-state commits verified",
+  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 4/29 apply tasks executed; tasks 1.1 through 1.4 implementation and sole-owner task-state commits verified; PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 accepted; task 1.5 activated",
   "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
     "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
@@ -36,7 +36,21 @@
     "requiredSuccessorAcknowledgement": "Every task/checkpoint completion uses direct send_message_to_thread plus read_thread confirmation before the next task starts.",
     "controllerGovernanceCommit": "8ccbde337875326531771abcd1eb5101fcf05d2d"
   },
-  "nextTask": "2.1",
+  "contextPolicy": {
+    "decision": "PD-006",
+    "thirdCompactionAction": "mandatory Git checkpoint; finish only current small atomic work; do not start a new large task",
+    "fourthCompactionAction": "pre-handoff; finish current atomic work and prepare handoff only",
+    "fifthCompactionAction": "mandatory new task and new worktree while work remains"
+  },
+  "currentTaskActivation": {
+    "decision": "PD-007",
+    "controllerGovernanceCommit": "a3cb5a0ad86f7113c348b0714cfba1b2435e6665",
+    "planningCommit": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
+    "authorizedTask": "1.5",
+    "heldTask": "2.1",
+    "externalStateAuthorized": false
+  },
+  "nextTask": "1.5",
   "latestTaskCompletion": {
     "taskId": "1.4",
     "implementationCommit": "34956e46182d7df8d7b5a6af98659ab2bb68f658",
