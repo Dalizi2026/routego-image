@@ -5,6 +5,7 @@ import path from "node:path";
 import {
   capabilityProbeInputSchema,
   type CapabilityProbeInput,
+  type CapabilityProbeResult,
   type ProviderCapability,
   type ProviderEndpointSet
 } from "@routego-image/contracts";
@@ -15,7 +16,11 @@ import {
   LibrarySettingsStore,
   type RuntimeProviderProfile
 } from "@routego-image/library";
-import { fingerprintProviderEndpoint, PROVIDER_REQUEST_SHAPES } from "@routego-image/foundation";
+import {
+  fingerprintProviderEndpoint,
+  normalizeProviderEndpoints,
+  PROVIDER_REQUEST_SHAPES
+} from "@routego-image/foundation";
 
 import {
   ProviderIntegrationError,
@@ -28,7 +33,12 @@ import {
   parseBoundedModelPayload,
   refreshProviderModels
 } from "../src/provider/models";
-import { probeProviderCapability } from "../src/provider/probes";
+import {
+  CAPABILITY_PROBE_PAIRS,
+  probeProviderCapability,
+  type CapabilityProbeOwner,
+  type CapabilityProbePair
+} from "../src/provider/probes";
 import {
   createDeterministicSyntheticPng,
   createDeterministicSyntheticPngInputs
@@ -107,6 +117,159 @@ function probeInput(input: {
     requestShape: input.requestShape ?? PROVIDER_REQUEST_SHAPES.singleEndpointImage,
     confirmBillableProbe: true
   });
+}
+
+function pngBase64(options: {
+  readonly width?: number;
+  readonly height?: number;
+  readonly transparent?: boolean;
+} = {}): string {
+  const width = options.width ?? 4;
+  const height = options.height ?? 4;
+  const png = new PNG({ width, height });
+  for (let offset = 0; offset < png.data.length; offset += 4) {
+    png.data[offset] = 32;
+    png.data[offset + 1] = 96;
+    png.data[offset + 2] = 224;
+    png.data[offset + 3] = options.transparent === true && offset === 0 ? 0 : 255;
+  }
+  return PNG.sync.write(png).toString("base64");
+}
+
+function jpegBase64(): string {
+  return Buffer.from([
+    0xff, 0xd8,
+    0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0x03,
+    0x01, 0x11, 0x00, 0x02, 0x11, 0x00, 0x03, 0x11, 0x00,
+    0xff, 0xda, 0x00, 0x0c, 0x03, 0x01, 0x00, 0x02, 0x11, 0x03, 0x11,
+    0x00, 0x3f, 0x00,
+    0x00,
+    0xff, 0xd9
+  ]).toString("base64");
+}
+
+function successfulProbeResponse(
+  input: Pick<CapabilityProbeInput, "capability" | "transport">,
+  headers: Readonly<Record<string, string>> = {}
+): Response {
+  const image = input.capability === "custom-size"
+    ? pngBase64({ width: 256, height: 256 })
+    : input.capability === "native-transparency"
+      ? pngBase64({ transparent: true })
+      : input.capability === "output-format"
+        ? jpegBase64()
+        : pngBase64();
+  const body = input.transport === "openai-responses"
+    ? {
+        id: "response-synthetic",
+        status: "completed",
+        output: [{
+          id: "image-call-synthetic",
+          type: "image_generation_call",
+          status: "completed",
+          result: image
+        }]
+      }
+    : {
+        data: Array.from(
+          { length: input.capability === "native-variants" ? 2 : 1 },
+          () => ({ b64_json: image })
+        )
+      };
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { "content-type": "application/json", ...headers }
+  });
+}
+
+function mockProbeOwner(): {
+  readonly owner: CapabilityProbeOwner & {
+    getRuntimeProviderProfile: ReturnType<typeof vi.fn<() => Promise<RuntimeProviderProfile>>>;
+    persistCapabilityProbe: ReturnType<
+      typeof vi.fn<(result: CapabilityProbeResult) => Promise<void>>
+    >;
+  };
+  readonly profile: RuntimeProviderProfile;
+} {
+  const endpoints: ProviderEndpointSet = {
+    generation: {
+      mode: "exact-generation-endpoint",
+      value: "https://relay.example/generate"
+    },
+    edits: "https://relay.example/edits",
+    responses: "https://relay.example/responses"
+  };
+  let profile: RuntimeProviderProfile = {
+    id: "provider-synthetic",
+    name: "Synthetic provider",
+    endpoints,
+    normalizedEndpoints: normalizeProviderEndpoints(endpoints),
+    defaultModel: "synthetic-image-model",
+    models: ["synthetic-image-model"],
+    capabilities: [],
+    credential
+  };
+  const owner: CapabilityProbeOwner & {
+    getRuntimeProviderProfile: ReturnType<typeof vi.fn<() => Promise<RuntimeProviderProfile>>>;
+    persistCapabilityProbe: ReturnType<
+      typeof vi.fn<(result: CapabilityProbeResult) => Promise<void>>
+    >;
+  } = {
+    getRuntimeProviderProfile: vi.fn(async () => profile),
+    persistCapabilityProbe: vi.fn<(result: CapabilityProbeResult) => Promise<void>>(async (result) => {
+      profile = { ...profile, capabilities: [result.record] };
+    })
+  };
+  return { owner, get profile() { return profile; } };
+}
+
+async function assertProbeRequestSemantics(
+  pair: CapabilityProbePair,
+  init: RequestInit | undefined
+): Promise<void> {
+  expect(init?.method).toBe("POST");
+  expect(new Headers(init?.headers).get("authorization")).toBe(`Bearer ${credential}`);
+  if (pair.requestShape === PROVIDER_REQUEST_SHAPES.imagesEditsMultipart) {
+    expect(init?.body).toBeInstanceOf(FormData);
+    const form = init?.body as FormData;
+    expect(form.get("image")).toBeInstanceOf(File);
+    expect(form.getAll("image[]")).toHaveLength(pair.capability === "multi-image-input" ? 1 : 0);
+    if (pair.capability === "mask-edit") {
+      expect(form.get("mask")).toBeInstanceOf(File);
+    } else {
+      expect(form.get("mask")).toBeNull();
+    }
+    return;
+  }
+  const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+  if (pair.requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointImage) {
+    expect(body["image"]).toMatch(/^data:image\/png;base64,/u);
+  }
+  if (pair.requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointImages) {
+    expect(body["images"]).toEqual([
+      expect.stringMatching(/^data:image\/png;base64,/u),
+      expect.stringMatching(/^data:image\/png;base64,/u)
+    ]);
+  }
+  if (pair.requestShape === PROVIDER_REQUEST_SHAPES.responsesImageGeneration) {
+    const input = body["input"] as Array<{ content: Array<Record<string, unknown>> }>;
+    const images = input[0]?.content.filter((item) => item["type"] === "input_image") ?? [];
+    expect(images).toHaveLength(pair.capability === "multi-image-input" ? 2 :
+      ["single-image-input", "target-edit", "data-url-input"].includes(pair.capability) ? 1 : 0);
+    for (const image of images) {
+      expect(image["image_url"]).toMatch(/^data:image\/png;base64,/u);
+    }
+    const tools = body["tools"] as Array<Record<string, unknown>>;
+    expect(tools[0]?.["action"]).toBe(pair.capability === "target-edit"
+      ? "edit"
+      : pair.capability === "text-generation"
+        ? "generate"
+        : "auto");
+  }
+  if (pair.capability === "native-variants") expect(body["n"]).toBe(2);
+  if (pair.capability === "custom-size") expect(body["size"]).toBe("256x256");
+  if (pair.capability === "output-format") expect(body["output_format"]).toBe("jpeg");
+  if (pair.capability === "native-transparency") expect(body["background"]).toBe("transparent");
 }
 
 describe("deterministic synthetic PNG fixtures", () => {
@@ -390,6 +553,238 @@ describe("exact confirmed capability probes", () => {
     expect(owner.getRuntimeProviderProfile).not.toHaveBeenCalled();
   });
 
+  it.each(CAPABILITY_PROBE_PAIRS.map((pair) => [
+    `${pair.transport} ${pair.requestShape} ${pair.capability}`,
+    pair
+  ] as const))("materially exercises and proves allowed pair %s", async (_label, pair) => {
+    const { owner } = mockProbeOwner();
+    const fetchImpl = vi.fn<typeof fetch>(async (_input, init) => {
+      await assertProbeRequestSemantics(pair, init);
+      return successfulProbeResponse(pair);
+    });
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: pair.capability,
+      transport: pair.transport,
+      requestShape: pair.requestShape
+    }), { fetch: fetchImpl, now: () => now });
+
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(owner.getRuntimeProviderProfile).toHaveBeenCalledTimes(1);
+    expect(owner.persistCapabilityProbe).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({
+      status: "completed",
+      mayHaveBilled: true,
+      record: {
+        capability: pair.capability,
+        state: "supported",
+        scope: {
+          transport: pair.transport,
+          requestShape: pair.requestShape
+        }
+      }
+    });
+  });
+
+  it("rejects every unprovable or representation-mismatched pair before profile, network, or persistence", async () => {
+    const rejectedPairs: readonly CapabilityProbePair[] = [
+      ...[PROVIDER_REQUEST_SHAPES.singleEndpointText, PROVIDER_REQUEST_SHAPES.imagesGenerationsJson]
+        .flatMap((requestShape): CapabilityProbePair[] => {
+          const transport = requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointText
+            ? "single-endpoint-json" as const
+            : "openai-images" as const;
+          return ["quality-control", "compression", "moderation"].map((capability) => ({
+            transport,
+            requestShape,
+            capability: capability as ProviderCapability
+          }));
+        }),
+      ...[PROVIDER_REQUEST_SHAPES.singleEndpointImage, PROVIDER_REQUEST_SHAPES.singleEndpointImages]
+        .flatMap((requestShape): CapabilityProbePair[] => [
+          {
+            transport: "single-endpoint-json",
+            requestShape,
+            capability: "image-url-input"
+          },
+          {
+            transport: "single-endpoint-json",
+            requestShape,
+            capability: "base64-input"
+          }
+        ]),
+      {
+        transport: "single-endpoint-json",
+        requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+        capability: "canvas-expansion"
+      },
+      {
+        transport: "openai-images",
+        requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart,
+        capability: "canvas-expansion"
+      },
+      ...[
+        "streaming",
+        "partial-images",
+        "responses-state",
+        "image-url-input",
+        "base64-input",
+        "file-id-input",
+        "image-id-input"
+      ].map((capability): CapabilityProbePair => ({
+        transport: "openai-responses",
+        requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration,
+        capability: capability as ProviderCapability
+      }))
+    ];
+
+    for (const pair of rejectedPairs) {
+      const { owner } = mockProbeOwner();
+      const fetchImpl = vi.fn<typeof fetch>();
+      await expect(probeProviderCapability(owner, probeInput({
+        providerId: "provider-synthetic",
+        capability: pair.capability,
+        transport: pair.transport,
+        requestShape: pair.requestShape
+      }), { fetch: fetchImpl })).rejects.toMatchObject({
+        serviceError: { code: "invalid_request", mayHaveBilled: false }
+      });
+      expect(owner.getRuntimeProviderProfile).not.toHaveBeenCalled();
+      expect(fetchImpl).not.toHaveBeenCalled();
+      expect(owner.persistCapabilityProbe).not.toHaveBeenCalled();
+    }
+  });
+
+  it("keeps a generic successful HTTP response inconclusive instead of promoting support", async () => {
+    const { owner } = mockProbeOwner();
+    const fetchImpl = vi.fn<typeof fetch>(async () => new Response("{}", {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    }));
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic"
+    }), { fetch: fetchImpl, now: () => now });
+
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(owner.persistCapabilityProbe).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({
+      status: "failed",
+      mayHaveBilled: true,
+      record: { state: "unknown" },
+      error: { code: "invalid_response", mayHaveBilled: true }
+    });
+  });
+
+  it.each([
+    {
+      label: "variants without two outputs",
+      capability: "native-variants" as const,
+      transport: "single-endpoint-json" as const,
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText,
+      body: { data: [{ b64_json: pngBase64() }] }
+    },
+    {
+      label: "custom size with wrong dimensions",
+      capability: "custom-size" as const,
+      transport: "single-endpoint-json" as const,
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText,
+      body: { data: [{ b64_json: pngBase64() }] }
+    },
+    {
+      label: "JPEG format request with PNG output",
+      capability: "output-format" as const,
+      transport: "openai-images" as const,
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesGenerationsJson,
+      body: { data: [{ b64_json: pngBase64() }] }
+    },
+    {
+      label: "transparent background request with opaque output",
+      capability: "native-transparency" as const,
+      transport: "openai-images" as const,
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesGenerationsJson,
+      body: { data: [{ b64_json: pngBase64() }] }
+    },
+    {
+      label: "Responses success without completed image_generation_call output",
+      capability: "target-edit" as const,
+      transport: "openai-responses" as const,
+      requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration,
+      body: { status: "completed", output: [{ type: "message", status: "completed" }] }
+    }
+  ])("keeps $label inconclusive", async ({ capability, transport, requestShape, body }) => {
+    const { owner } = mockProbeOwner();
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability,
+      transport,
+      requestShape
+    }), {
+      fetch: async () => new Response(JSON.stringify(body), {
+        status: 200,
+        headers: {
+          "content-type": "application/json",
+          "x-routego-capability-state": "degraded"
+        }
+      }),
+      now: () => now
+    });
+    expect(result).toMatchObject({
+      status: "failed",
+      record: { state: "unknown" },
+      error: { code: "invalid_response" }
+    });
+  });
+
+  it("sends deterministic primary plus image[] bytes for an Edits multi-image probe", async () => {
+    const { owner } = mockProbeOwner();
+    const synthetic = createDeterministicSyntheticPngInputs();
+    const fetchImpl = vi.fn<typeof fetch>(async (_input, init) => {
+      const form = init?.body as FormData;
+      const primary = form.get("image") as File;
+      const additional = form.getAll("image[]") as File[];
+      expect(Buffer.from(await primary.arrayBuffer())).toEqual(Buffer.from(synthetic.image.bytes));
+      expect(additional).toHaveLength(1);
+      expect(Buffer.from(await additional[0]!.arrayBuffer())).toEqual(Buffer.from(synthetic.mask.bytes));
+      expect(form.get("mask")).toBeNull();
+      return successfulProbeResponse({
+        capability: "multi-image-input",
+        transport: "openai-images"
+      });
+    });
+    await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "multi-image-input",
+      transport: "openai-images",
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
+    }), { fetch: fetchImpl, now: () => now });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends exactly two deterministic input_image entries for a Responses multi-image probe", async () => {
+    const { owner } = mockProbeOwner();
+    const synthetic = createDeterministicSyntheticPngInputs();
+    const fetchImpl = vi.fn<typeof fetch>(async (_input, init) => {
+      const body = JSON.parse(String(init?.body)) as {
+        input: Array<{ content: Array<Record<string, unknown>> }>;
+      };
+      const images = body.input[0]!.content.filter((item) => item["type"] === "input_image");
+      expect(images).toEqual([
+        { type: "input_image", image_url: synthetic.image.dataUrl },
+        { type: "input_image", image_url: synthetic.mask.dataUrl }
+      ]);
+      return successfulProbeResponse({
+        capability: "multi-image-input",
+        transport: "openai-responses"
+      });
+    });
+    await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "multi-image-input",
+      transport: "openai-responses",
+      requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration
+    }), { fetch: fetchImpl, now: () => now });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
   it("sends exactly one authorized deterministic PNG request and persists supported evidence", async () => {
     const { store, profileId } = await createStore();
     const expected = createDeterministicSyntheticPngInputs().image.dataUrl;
@@ -399,9 +794,9 @@ describe("exact confirmed capability probes", () => {
       expect(new Headers(init?.headers).get("authorization")).toBe(`Bearer ${credential}`);
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
       expect(body["image"]).toBe(expected);
-      return new Response(JSON.stringify({ data: [{ b64_json: "discarded-provider-image" }] }), {
-        status: 200,
-        headers: { "content-type": "application/json" }
+      return successfulProbeResponse({
+        capability: "single-image-input",
+        transport: "single-endpoint-json"
       });
     });
     const result = await probeProviderCapability(store, probeInput({ providerId: profileId! }), {
@@ -418,7 +813,7 @@ describe("exact confirmed capability probes", () => {
     const persisted = await store.getRuntimeProviderProfile(profileId);
     expect(persisted.capabilities).toHaveLength(1);
     expect(persisted.capabilities[0]).toMatchObject({ state: "supported" });
-    expect(JSON.stringify(result)).not.toContain("discarded-provider-image");
+    expect(JSON.stringify(result)).not.toContain(pngBase64());
     expect(JSON.stringify(result)).not.toContain(credential);
   });
 
@@ -431,21 +826,20 @@ describe("exact confirmed capability probes", () => {
     });
     const fetchImpl = vi.fn<typeof fetch>();
     fetchImpl
-      .mockResolvedValueOnce(new Response("{}", {
-        status: 200,
-        headers: { "content-type": "application/json" }
+      .mockResolvedValueOnce(successfulProbeResponse({
+        capability: "single-image-input",
+        transport: "single-endpoint-json"
       }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ error: { code: "unsupported_feature", message: credential } }), {
         status: 415,
         headers: { "content-type": "application/json" }
       }))
-      .mockResolvedValueOnce(new Response("{}", {
-        status: 200,
-        headers: {
-          "content-type": "application/json",
+      .mockResolvedValueOnce(successfulProbeResponse({
+        capability: "target-edit",
+        transport: "openai-responses"
+      }, {
           "x-routego-capability-state": "degraded",
           "x-routego-degraded-reason": `Previous output must be uploaded again. Authorization: Bearer ${credential} C:\\Users\\Synthetic\\probe.png`
-        }
       }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ error: { code: "rate_limited", message: credential } }), {
         status: 429,
@@ -461,7 +855,7 @@ describe("exact confirmed capability probes", () => {
     }), { fetch: fetchImpl, now: () => now });
     const degraded = await probeProviderCapability(store, probeInput({
       providerId: profileId!,
-      capability: "responses-state",
+      capability: "target-edit",
       transport: "openai-responses",
       requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration
     }), { fetch: fetchImpl, now: () => now });
@@ -509,9 +903,9 @@ describe("exact confirmed capability probes", () => {
       expect((mask as File).type).toBe("image/png");
       expect(Buffer.from(await (image as File).arrayBuffer())).toEqual(Buffer.from(synthetic.image.bytes));
       expect(Buffer.from(await (mask as File).arrayBuffer())).toEqual(Buffer.from(synthetic.mask.bytes));
-      return new Response("{}", {
-        status: 200,
-        headers: { "content-type": "application/json" }
+      return successfulProbeResponse({
+        capability: "mask-edit",
+        transport: "openai-images"
       });
     });
     const result = await probeProviderCapability(store, probeInput({

@@ -17,6 +17,7 @@ import {
   transitionCapability
 } from "@routego-image/foundation";
 import type { RuntimeProviderProfile } from "@routego-image/library";
+import { PNG } from "pngjs";
 
 import { createDeterministicSyntheticPngInputs } from "../image/png";
 import {
@@ -31,6 +32,7 @@ import { readBoundedResponseBytes } from "./models";
 
 export const DEFAULT_CAPABILITY_PROBE_TIMEOUT_MS = 120_000;
 export const MAX_CAPABILITY_PROBE_ERROR_BYTES = 32 * 1024;
+export const MAX_CAPABILITY_PROBE_SUCCESS_BYTES = 8 * 1024 * 1024;
 
 export interface CapabilityProbeOwner extends ProviderProfileReader {
   persistCapabilityProbe(result: CapabilityProbeResult): Promise<void>;
@@ -55,79 +57,112 @@ export interface ProbeProviderCapabilityOptions {
   readonly fetch?: typeof fetch;
   readonly now?: () => Date;
   readonly timeoutMs?: number;
-  readonly interpretResponse?: (
-    response: Response,
-    context: {
-      readonly input: CapabilityProbeInput;
-      readonly responseShape: string;
-    }
-  ) => CapabilityProbeOutcome | Promise<CapabilityProbeOutcome>;
 }
 
-const SHAPE_CAPABILITIES: Readonly<Record<string, ReadonlySet<ProviderCapability>>> = {
-  [PROVIDER_REQUEST_SHAPES.singleEndpointText]: new Set([
-    "text-generation",
-    "native-variants",
-    "custom-size",
-    "quality-control",
-    "output-format",
-    "compression",
-    "moderation"
-  ]),
-  [PROVIDER_REQUEST_SHAPES.singleEndpointImage]: new Set([
-    "single-image-input",
-    "target-edit",
-    "canvas-expansion",
-    "native-transparency",
-    "image-url-input",
-    "base64-input",
-    "data-url-input"
-  ]),
-  [PROVIDER_REQUEST_SHAPES.singleEndpointImages]: new Set([
-    "multi-image-input",
-    "target-edit",
-    "image-url-input",
-    "base64-input",
-    "data-url-input"
-  ]),
-  [PROVIDER_REQUEST_SHAPES.imagesGenerationsJson]: new Set([
-    "text-generation",
-    "native-variants",
-    "custom-size",
-    "quality-control",
-    "output-format",
-    "compression",
-    "native-transparency",
-    "moderation"
-  ]),
-  [PROVIDER_REQUEST_SHAPES.imagesEditsMultipart]: new Set([
+type ProbeResponseProof =
+  | "images-output"
+  | "images-two-outputs"
+  | "images-custom-size"
+  | "images-jpeg-output"
+  | "images-alpha-output"
+  | "responses-completed-output";
+
+export interface CapabilityProbePair {
+  readonly transport: ProviderTransport;
+  readonly requestShape: string;
+  readonly capability: ProviderCapability;
+}
+
+interface CapabilityProbeDefinition extends CapabilityProbePair {
+  readonly responseProof: ProbeResponseProof;
+}
+
+const CAPABILITY_PROBE_DEFINITIONS: readonly CapabilityProbeDefinition[] = [
+  ...[
+    PROVIDER_REQUEST_SHAPES.singleEndpointText,
+    PROVIDER_REQUEST_SHAPES.imagesGenerationsJson
+  ].flatMap((requestShape): CapabilityProbeDefinition[] => {
+    const transport = requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointText
+      ? "single-endpoint-json" as const
+      : "openai-images" as const;
+    return [
+      { transport, requestShape, capability: "text-generation", responseProof: "images-output" },
+      { transport, requestShape, capability: "native-variants", responseProof: "images-two-outputs" },
+      { transport, requestShape, capability: "custom-size", responseProof: "images-custom-size" },
+      { transport, requestShape, capability: "output-format", responseProof: "images-jpeg-output" },
+      { transport, requestShape, capability: "native-transparency", responseProof: "images-alpha-output" }
+    ];
+  }),
+  {
+    transport: "single-endpoint-json",
+    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+    capability: "single-image-input",
+    responseProof: "images-output"
+  },
+  {
+    transport: "single-endpoint-json",
+    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+    capability: "target-edit",
+    responseProof: "images-output"
+  },
+  {
+    transport: "single-endpoint-json",
+    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+    capability: "native-transparency",
+    responseProof: "images-alpha-output"
+  },
+  {
+    transport: "single-endpoint-json",
+    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+    capability: "data-url-input",
+    responseProof: "images-output"
+  },
+  {
+    transport: "single-endpoint-json",
+    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImages,
+    capability: "multi-image-input",
+    responseProof: "images-output"
+  },
+  {
+    transport: "single-endpoint-json",
+    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImages,
+    capability: "target-edit",
+    responseProof: "images-output"
+  },
+  {
+    transport: "single-endpoint-json",
+    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImages,
+    capability: "data-url-input",
+    responseProof: "images-output"
+  },
+  ...[
     "single-image-input",
     "multi-image-input",
     "target-edit",
     "mask-edit",
-    "canvas-expansion",
     "multipart-input"
-  ]),
-  [PROVIDER_REQUEST_SHAPES.responsesImageGeneration]: new Set([
+  ].map((capability): CapabilityProbeDefinition => ({
+    transport: "openai-images",
+    requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart,
+    capability: capability as ProviderCapability,
+    responseProof: "images-output"
+  })),
+  ...[
     "text-generation",
     "single-image-input",
     "multi-image-input",
     "target-edit",
-    "streaming",
-    "partial-images",
-    "responses-state",
-    "image-url-input",
-    "base64-input",
     "data-url-input"
-  ])
-};
+  ].map((capability): CapabilityProbeDefinition => ({
+    transport: "openai-responses",
+    requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration,
+    capability: capability as ProviderCapability,
+    responseProof: "responses-completed-output"
+  }))
+];
 
-function expectedTransport(requestShape: string): ProviderTransport | undefined {
-  if (requestShape.startsWith("single-endpoint-json:")) return "single-endpoint-json";
-  if (requestShape.startsWith("openai-images:")) return "openai-images";
-  if (requestShape.startsWith("openai-responses:")) return "openai-responses";
-  return undefined;
-}
+export const CAPABILITY_PROBE_PAIRS: readonly CapabilityProbePair[] =
+  CAPABILITY_PROBE_DEFINITIONS.map(({ responseProof: _responseProof, ...pair }) => pair);
 
 function safeTimeout(value: number | undefined): number {
   const timeout = value ?? DEFAULT_CAPABILITY_PROBE_TIMEOUT_MS;
@@ -174,15 +209,19 @@ function exactEndpoint(profile: RuntimeProviderProfile, input: CapabilityProbeIn
   return profile.normalizedEndpoints.generationEndpoint;
 }
 
-function validateProbeShape(input: CapabilityProbeInput): void {
-  const transport = expectedTransport(input.requestShape);
-  const capabilities = SHAPE_CAPABILITIES[input.requestShape];
-  if (transport !== input.transport || !capabilities?.has(input.capability)) {
+function validateProbeShape(input: CapabilityProbeInput): CapabilityProbeDefinition {
+  const definition = CAPABILITY_PROBE_DEFINITIONS.find(
+    (candidate) =>
+      candidate.transport === input.transport &&
+      candidate.requestShape === input.requestShape &&
+      candidate.capability === input.capability
+  );
+  if (definition === undefined) {
     throw new ProviderIntegrationError(
       createProviderServiceError({
         code: "invalid_request",
         stage: "validate",
-        safeMessage: "The confirmed capability probe does not match one exact transport and request shape.",
+        safeMessage: "This capability cannot be conclusively proven by one exact confirmed request.",
         capability: input.capability,
         details: {
           transport: input.transport,
@@ -192,27 +231,22 @@ function validateProbeShape(input: CapabilityProbeInput): void {
       })
     );
   }
+  return definition;
 }
 
 function jsonProbeBody(input: CapabilityProbeInput): string {
   const synthetic = createDeterministicSyntheticPngInputs();
   const common = {
     model: input.model,
-    prompt: "Routego capability probe: preserve the synthetic blue checkerboard exactly.",
-    n: 1,
-    size: "256x256",
-    response_format: "b64_json"
+    prompt: input.capability === "target-edit"
+      ? "Routego capability probe: edit the synthetic checkerboard while preserving its layout."
+      : "Routego capability probe: generate one synthetic checkerboard image."
   };
   const controls = {
     ...(input.capability === "native-variants" ? { n: 2 } : {}),
     ...(input.capability === "custom-size" ? { size: "256x256" } : {}),
-    ...(input.capability === "quality-control" ? { quality: "low" } : {}),
-    ...(input.capability === "output-format" ? { output_format: "png" } : {}),
-    ...(input.capability === "compression" ? { output_compression: 80 } : {}),
-    ...(input.capability === "native-transparency" ? { background: "transparent" } : {}),
-    ...(input.capability === "moderation" ? { moderation: "low" } : {}),
-    ...(input.capability === "streaming" ? { stream: true } : {}),
-    ...(input.capability === "partial-images" ? { partial_images: 1, stream: true } : {})
+    ...(input.capability === "output-format" ? { output_format: "jpeg" } : {}),
+    ...(input.capability === "native-transparency" ? { background: "transparent" } : {})
   };
   if (input.requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointImage) {
     return JSON.stringify({ ...common, ...controls, image: synthetic.image.dataUrl });
@@ -225,26 +259,35 @@ function jsonProbeBody(input: CapabilityProbeInput): string {
     });
   }
   if (input.requestShape === PROVIDER_REQUEST_SHAPES.responsesImageGeneration) {
-    const needsImage = new Set<ProviderCapability>([
-      "single-image-input",
-      "multi-image-input",
-      "target-edit",
-      "image-url-input",
-      "base64-input",
-      "data-url-input"
-    ]).has(input.capability);
+    const imageCount = input.capability === "multi-image-input"
+      ? 2
+      : new Set<ProviderCapability>([
+          "single-image-input",
+          "target-edit",
+          "data-url-input"
+        ]).has(input.capability)
+        ? 1
+        : 0;
+    const content = [
+      { type: "input_text", text: common.prompt },
+      ...(imageCount >= 1
+        ? [{ type: "input_image", image_url: synthetic.image.dataUrl }]
+        : []),
+      ...(imageCount >= 2
+        ? [{ type: "input_image", image_url: synthetic.mask.dataUrl }]
+        : [])
+    ];
     return JSON.stringify({
       model: input.model,
-      input: needsImage
-        ? [{
-            role: "user",
-            content: [
-              { type: "input_text", text: common.prompt },
-              { type: "input_image", image_url: synthetic.image.dataUrl }
-            ]
-          }]
-        : common.prompt,
-      tools: [{ type: "image_generation", ...controls }]
+      input: [{ role: "user", content }],
+      tools: [{
+        type: "image_generation",
+        action: input.capability === "target-edit"
+          ? "edit"
+          : input.capability === "text-generation"
+            ? "generate"
+            : "auto"
+      }]
     });
   }
   return JSON.stringify({ ...common, ...controls });
@@ -268,6 +311,15 @@ function requestDescriptor(
       }),
       "routego-probe.png"
     );
+    if (input.capability === "multi-image-input") {
+      body.append(
+        "image[]",
+        new Blob([Uint8Array.from(synthetic.mask.bytes).buffer], {
+          type: synthetic.mask.mimeType
+        }),
+        "routego-probe-additional.png"
+      );
+    }
     if (input.capability === "mask-edit") {
       body.append(
         "mask",
@@ -326,13 +378,255 @@ function moderationProviderCode(code: string | undefined): boolean {
   return code !== undefined && /moderation|content[_-]?policy|safety/iu.test(code);
 }
 
-async function defaultInterpretResponse(response: Response): Promise<CapabilityProbeOutcome> {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+interface ProbeImageOutput {
+  readonly kind: "inline" | "url";
+  readonly mimeType?: "image/png" | "image/jpeg" | "image/webp";
+  readonly width?: number;
+  readonly height?: number;
+  readonly hasTransparency?: boolean;
+}
+
+const JPEG_START_OF_FRAME_MARKERS = new Set([
+  0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf
+]);
+
+function jpegDimensions(bytes: Buffer): { readonly width: number; readonly height: number } | undefined {
+  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) return undefined;
+  let position = 2;
+  let width: number | undefined;
+  let height: number | undefined;
+  let sawScan = false;
+  while (position < bytes.length) {
+    if (bytes[position] !== 0xff) return undefined;
+    while (position < bytes.length && bytes[position] === 0xff) position += 1;
+    const marker = bytes[position];
+    if (marker === undefined) return undefined;
+    position += 1;
+    if (marker === 0xd9) {
+      return sawScan && width !== undefined && height !== undefined && position === bytes.length
+        ? { width, height }
+        : undefined;
+    }
+    if (marker === 0x00 || marker === 0xd8 || (marker >= 0xd0 && marker <= 0xd7) || marker === 0x01) {
+      return undefined;
+    }
+    if (position + 2 > bytes.length) return undefined;
+    const segmentLength = bytes.readUInt16BE(position);
+    if (segmentLength < 2 || position + segmentLength > bytes.length) return undefined;
+    const dataStart = position + 2;
+    const segmentEnd = position + segmentLength;
+    if (JPEG_START_OF_FRAME_MARKERS.has(marker)) {
+      if (segmentLength < 8) return undefined;
+      height = bytes.readUInt16BE(dataStart + 1);
+      width = bytes.readUInt16BE(dataStart + 3);
+      if (width < 1 || height < 1 || width > 65_535 || height > 65_535) return undefined;
+    }
+    position = segmentEnd;
+    if (marker !== 0xda) continue;
+    if (width === undefined || height === undefined) return undefined;
+    sawScan = true;
+    while (position < bytes.length) {
+      if (bytes[position] !== 0xff) {
+        position += 1;
+        continue;
+      }
+      let next = position + 1;
+      while (next < bytes.length && bytes[next] === 0xff) next += 1;
+      const scanMarker = bytes[next];
+      if (scanMarker === undefined) return undefined;
+      if (scanMarker === 0x00 || (scanMarker >= 0xd0 && scanMarker <= 0xd7)) {
+        position = next + 1;
+        continue;
+      }
+      break;
+    }
+  }
+  return undefined;
+}
+
+function strictBase64Bytes(value: string): Uint8Array | undefined {
+  const encoded = value.startsWith("data:")
+    ? /^data:image\/(?:png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})$/u.exec(value)?.[1]
+    : value;
+  if (
+    encoded === undefined ||
+    encoded.length === 0 ||
+    encoded.length > Math.ceil(MAX_CAPABILITY_PROBE_SUCCESS_BYTES / 3) * 4 ||
+    encoded.length % 4 !== 0 ||
+    !/^[A-Za-z0-9+/]+={0,2}$/u.test(encoded)
+  ) {
+    return undefined;
+  }
+  const bytes = Buffer.from(encoded, "base64");
+  if (bytes.byteLength === 0 || bytes.byteLength > MAX_CAPABILITY_PROBE_SUCCESS_BYTES) {
+    return undefined;
+  }
+  const normalizedInput = encoded.replace(/=+$/u, "");
+  const normalizedOutput = bytes.toString("base64").replace(/=+$/u, "");
+  return normalizedInput === normalizedOutput ? new Uint8Array(bytes) : undefined;
+}
+
+function inspectInlineImage(value: string): ProbeImageOutput | undefined {
+  const bytes = strictBase64Bytes(value);
+  if (bytes === undefined) return undefined;
+  if (
+    bytes.byteLength >= 8 &&
+    Buffer.from(bytes.subarray(0, 8)).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+  ) {
+    try {
+      const decoded = PNG.sync.read(Buffer.from(bytes));
+      let hasTransparency = false;
+      for (let offset = 3; offset < decoded.data.length; offset += 4) {
+        if (decoded.data[offset] !== 255) {
+          hasTransparency = true;
+          break;
+        }
+      }
+      return {
+        kind: "inline",
+        mimeType: "image/png",
+        width: decoded.width,
+        height: decoded.height,
+        hasTransparency
+      };
+    } catch {
+      return undefined;
+    }
+  }
+  const jpeg = jpegDimensions(Buffer.from(bytes));
+  if (jpeg !== undefined) {
+    return { kind: "inline", mimeType: "image/jpeg", ...jpeg };
+  }
+  return undefined;
+}
+
+function inspectOutputUrl(value: string): ProbeImageOutput | undefined {
+  if (value.length === 0 || value.length > 4_096) return undefined;
+  try {
+    const parsed = new URL(value);
+    if (
+      (parsed.protocol !== "https:" && parsed.protocol !== "http:") ||
+      parsed.username ||
+      parsed.password ||
+      parsed.hash
+    ) {
+      return undefined;
+    }
+    return { kind: "url" };
+  } catch {
+    return undefined;
+  }
+}
+
+function imagesOutputs(body: unknown): readonly ProbeImageOutput[] | undefined {
+  if (!isRecord(body) || !Array.isArray(body["data"])) return undefined;
+  const data = body["data"];
+  if (data.length < 1 || data.length > 4) return undefined;
+  const outputs: ProbeImageOutput[] = [];
+  for (const item of data) {
+    if (!isRecord(item)) return undefined;
+    const base64 = typeof item["b64_json"] === "string" ? item["b64_json"] : undefined;
+    const url = typeof item["url"] === "string" ? item["url"] : undefined;
+    if ((base64 === undefined) === (url === undefined)) return undefined;
+    const output = base64 === undefined ? inspectOutputUrl(url!) : inspectInlineImage(base64);
+    if (output === undefined) return undefined;
+    outputs.push(output);
+  }
+  return outputs;
+}
+
+function responsesOutputs(body: unknown): readonly ProbeImageOutput[] | undefined {
+  if (
+    !isRecord(body) ||
+    body["status"] !== "completed" ||
+    !Array.isArray(body["output"])
+  ) {
+    return undefined;
+  }
+  const outputs: ProbeImageOutput[] = [];
+  for (const item of body["output"]) {
+    if (
+      !isRecord(item) ||
+      item["type"] !== "image_generation_call" ||
+      item["status"] !== "completed" ||
+      typeof item["result"] !== "string"
+    ) {
+      continue;
+    }
+    const output = inspectInlineImage(item["result"]);
+    if (output !== undefined) outputs.push(output);
+  }
+  return outputs.length > 0 && outputs.length <= 4 ? outputs : undefined;
+}
+
+function responseProvesCapability(body: unknown, proof: ProbeResponseProof): boolean {
+  const outputs = proof === "responses-completed-output"
+    ? responsesOutputs(body)
+    : imagesOutputs(body);
+  if (outputs === undefined) return false;
+  switch (proof) {
+    case "images-output":
+    case "responses-completed-output":
+      return outputs.length >= 1;
+    case "images-two-outputs":
+      return outputs.length >= 2;
+    case "images-custom-size":
+      return outputs.every((output) => output.width === 256 && output.height === 256);
+    case "images-jpeg-output":
+      return outputs.every((output) => output.mimeType === "image/jpeg");
+    case "images-alpha-output":
+      return outputs.every(
+        (output) => output.mimeType === "image/png" && output.hasTransparency === true
+      );
+  }
+}
+
+function inconclusiveSuccess(response: Response, reason: string): CapabilityProbeOutcome {
+  return {
+    outcome: "transient",
+    error: createProviderServiceError({
+      code: "invalid_response",
+      stage: "complete",
+      safeMessage: "The confirmed capability probe returned no conclusive capability evidence.",
+      httpStatus: response.status,
+      mayHaveBilled: true,
+      details: {
+        responseShape: responseShape(response),
+        reason
+      }
+    })
+  };
+}
+
+async function defaultInterpretResponse(
+  response: Response,
+  definition: CapabilityProbeDefinition
+): Promise<CapabilityProbeOutcome> {
   const shape = responseShape(response);
   if (response.ok) {
+    const contentType = response.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+    if (contentType !== "application/json") {
+      await response.body?.cancel("inconclusive-probe-response").catch(() => undefined);
+      return inconclusiveSuccess(response, "success-content-type-not-json");
+    }
+    let body: unknown;
+    try {
+      const bytes = await readBoundedResponseBytes(response, MAX_CAPABILITY_PROBE_SUCCESS_BYTES);
+      if (bytes.byteLength === 0) return inconclusiveSuccess(response, "empty-success-body");
+      body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) as unknown;
+    } catch {
+      return inconclusiveSuccess(response, "invalid-or-oversized-success-body");
+    }
+    if (!responseProvesCapability(body, definition.responseProof)) {
+      return inconclusiveSuccess(response, "capability-specific-proof-missing");
+    }
     const declaredState = response.headers.get("x-routego-capability-state")?.trim().toLowerCase();
     if (declaredState === "degraded") {
       const reason = response.headers.get("x-routego-degraded-reason")?.trim();
-      await response.body?.cancel("probe-evidence-recorded").catch(() => undefined);
       return {
         outcome: "degraded",
         degradedReason: reason && reason.length <= 500
@@ -340,7 +634,6 @@ async function defaultInterpretResponse(response: Response): Promise<CapabilityP
           : "The provider completed only a weaker confirmed fallback."
       };
     }
-    await response.body?.cancel("probe-evidence-recorded").catch(() => undefined);
     return { outcome: "supported" };
   }
   let providerCode: string | undefined;
@@ -480,7 +773,7 @@ export async function probeProviderCapability(
       })
     );
   }
-  validateProbeShape(parsed);
+  const definition = validateProbeShape(parsed);
   let profile: RuntimeProviderProfile;
   try {
     profile = await owner.getRuntimeProviderProfile(parsed.providerId);
@@ -555,11 +848,7 @@ export async function probeProviderCapability(
       };
     }
     if (response) {
-      const shape = responseShape(response);
-      outcome = await (options.interpretResponse ?? defaultInterpretResponse)(response, {
-        input: parsed,
-        responseShape: shape
-      });
+      outcome = await defaultInterpretResponse(response, definition);
     }
   } finally {
     clearTimeout(timeout);
