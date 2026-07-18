@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "offline-apply-active-generation-1",
+  "status": "offline-apply-pre-handoff-generation-1",
   "controllerThreadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "threadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5b94\\生图插件",
@@ -13,12 +13,12 @@
   "controllerRegistrationCommit": "c2d04ab968348bda5b99506d814eaae6aeddfa42",
   "controllerActivationCommit": "a19506003e6ff61c03fae80950fa2427df1b1ac7",
   "generation": 1,
-  "observableCompactions": 3,
-  "lastCompactionFingerprint": "2026-07-18-generation-1-compaction-3-before-task-1.5",
-  "lastHealthAudit": "passed-task-2.2-verification-and-task-state-audit; task-2.2-complete; task-2.3-held-for-fresh-controller-activation",
+  "observableCompactions": 4,
+  "lastCompactionFingerprint": "2026-07-18-generation-1-compaction-4-before-task-2.2-review-correction",
+  "lastHealthAudit": "passed-controller-task-2.2-review-correction-authority-audit; pre-handoff; task-2.2-correction-only; task-2.3-held",
   "successorThreadId": null,
   "openspecState": "offline-apply-active",
-  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 7/29 apply tasks executed; tasks 1.1 through 2.2 implementation and sole-owner task-state commits verified; PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 accepted",
+  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; repository task state is 7/29 but Controller accepts 6/29 until task 2.2 review correction passes; tasks 1.1 through 2.1 and task 1.5 accepted; PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 accepted",
   "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
     "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
@@ -44,13 +44,26 @@
   },
   "currentTaskActivation": {
     "decision": "PD-007",
-    "controllerGovernanceCommit": "56c2670b3ddb2b1a12804347f833d9196604d001",
+    "controllerGovernanceCommit": "8dc6c598f16f04ff72482be3564a0c263b3bfa73",
     "planningCommit": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
-    "authorizedTask": "2.2",
+    "authorizedTask": "2.2-review-correction",
     "heldTask": "2.3",
     "externalStateAuthorized": false
   },
-  "nextTask": "2.3",
+  "nextTask": "2.2-review-correction",
+  "taskReviewCorrection": {
+    "taskId": "2.2",
+    "reviewedCheckpoint": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
+    "reviewedImplementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
+    "reviewedTaskStateCommit": "722c183fed4efdf62d7f678feacc30a9bd64c961",
+    "finding": "CRLF event records undercount raw UTF-8 bytes by one byte per line before maximumEventBytes enforcement",
+    "allowedFiles": [
+      "packages/studio/src/api/sse.ts",
+      "packages/studio/test/sse.test.ts"
+    ],
+    "heldTask": "2.3",
+    "externalStateAuthorized": false
+  },
   "latestTaskCompletion": {
     "taskId": "2.2",
     "implementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
