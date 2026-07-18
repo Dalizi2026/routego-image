@@ -3,12 +3,12 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "checkpoint-task-5.1-review-fix-complete",
+  "status": "lane-complete-after-independent-review",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
-  "headCommit": "858e4e8b7886a53d904d24485f880af588b15f46",
+  "headCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
   "generation": 2,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "library-g2-compaction-1-task-5.2-head-937c5ca1-2026-07-18",
@@ -23,34 +23,34 @@
   "controllerActivationCommit": "c9ac706321500b01dabbf92ed81ba39cd566127e",
   "controllerReviewGovernanceCommit": "0b32e8d5ce7fd00128cdd8c6b07d26830ce118c8",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
-  "openspecProgress": "9/10",
-  "lastCompletedTask": "5.1",
-  "nextTask": "5.2",
+  "openspecProgress": "10/10",
+  "lastCompletedTask": "5.2",
+  "nextTask": null,
   "lastImplementationCommit": "634712d5c4233f1a58ff1a33d94420fcb3504367",
-  "lastOpenSpecCommit": "858e4e8b7886a53d904d24485f880af588b15f46",
+  "lastOpenSpecCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
   "recentValidation": {
-    "frozenInstall": "passed in detached clean verification copy at 341a2fe7d2cfe82ca4a9ac315423071c6911701d",
+    "frozenInstall": "passed in corrected detached clean verification copy at 0bd93dea9d7035426b34600a6bae13277b3f08bd",
     "openspec": "strict validation 7/7 passed; apply state all_done at 10/10",
     "repositorySafety": "passed for 211 tracked files",
     "rootTypecheck": "passed for all six buildable workspace packages",
     "rootBuild": "passed for all six buildable workspace packages",
-    "rootTests": "327 tests passed: contracts 92, foundation 48, library 144, mock-relay 43",
+    "rootTests": "329 tests passed: contracts 92, foundation 48, library 146, mock-relay 43",
     "packageExports": "passed for all seven workspace packages",
     "runtimeDependencies": "workspace packages plus pure-JS zod, react, react-dom, and scheduler; no install scripts or native markers",
     "platformCoverage": "Windows/POSIX path, ACL, mode, symlink, Unicode, ZIP, and portability coverage audited",
     "repositoryAudit": "no tracked secret, user image, local config, path leak, or generated/cache artifact",
     "scope": "61 changed files against f6e1b309213bb87d741199377c2bebdaa9cbcad0, all within Library/OpenSpec/governance ownership",
     "planningConsistency": "proposal, design, three delta specs, six frozen main specs, tasks, PD-002/003/004, plan, commits, and thread state passed",
-    "gitClean": "verification copy and primary worktree were clean before independent review",
-    "independentReview": "failed: public ZIP export ignored partial FileHandle.write results and allowed symlink/junction traversal into protected legacy roots",
-    "currentState": "corrected task 5.1 committed and verified; task 5.2 remains for clean-copy reverification",
+    "gitClean": "corrected verification copy and primary worktree clean",
+    "independentReview": "both findings corrected: public ZIP export writes all bytes and rejects canonical protected-root traversal",
+    "currentState": "corrected tasks 5.1 and 5.2 complete; OpenSpec all_done",
     "correctiveRegression": "partial FileHandle writes produce a complete decodable/importable ZIP; Windows junction/POSIX symlink traversal into protected roots is rejected without modifying existing output",
     "correctedLibraryTests": "19 files, 146 tests passed",
     "correctedRootTests": "329 tests passed: contracts 92, foundation 48, library 146, mock-relay 43",
     "correctedImplementationScope": "packages/library/src/service.ts and packages/library/test/conformance/service.test.ts only"
   },
   "applyOwnership": {
-    "state": "active-single-owner",
+    "state": "complete-awaiting-controller",
     "activeOwnerThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
     "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "successorThreadId": "019f7261-2c57-7a01-b519-e1de521819fe"
@@ -69,7 +69,7 @@
     "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-checkpoint-before-review-rerun-task-5.2"
+    "status": "generation-2-lane-complete-after-independent-review"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
@@ -125,7 +125,9 @@
     ],
     "correctiveImplementationCommit": "634712d5c4233f1a58ff1a33d94420fcb3504367",
     "correctiveTaskStateCommit": "858e4e8b7886a53d904d24485f880af588b15f46",
-    "status": "task-5.1-corrected-task-5.2-pending",
+    "status": "corrected-all-done",
+    "correctiveVerificationBaseline": "0bd93dea9d7035426b34600a6bae13277b3f08bd",
+    "correctiveFinalTaskStateCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
     "reopenedTasks": ["5.1", "5.2"],
     "blockers": []
   },
@@ -155,6 +157,37 @@
       "Provider execution, HTTP/MCP transport, session/origin enforcement, and resolver/executor composition remain Creation and Integration responsibilities.",
       "Studio UI/browser journeys, real relay acceptance, and deployment/release remain downstream responsibilities.",
       "This clean-copy run used Windows with Node.js 24.15.0; Node.js 20.19 and macOS/Linux acceptance remain for the cross-platform Integration/CI gate."
+    ]
+  },
+  "correctedCompletion": {
+    "tasks": "10/10",
+    "validatedAt": "2026-07-18T08:53:34.8754346+08:00",
+    "verifiedHead": "0bd93dea9d7035426b34600a6bae13277b3f08bd",
+    "implementationCommit": "634712d5c4233f1a58ff1a33d94420fcb3504367",
+    "taskStateCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
+    "validation": {
+      "independentReviewRegressions": "passed: complete decodable/importable partial-write ZIP and protected-root junction/symlink rejection with no overwrite",
+      "frozenInstall": "passed",
+      "openspecStrict": "7/7 passed",
+      "safety": "passed for 211 tracked files",
+      "typecheck": "passed",
+      "build": "passed",
+      "tests": "329 passed",
+      "packageExports": "seven of seven passed",
+      "runtimeNativeAudit": "passed",
+      "windowsPosixCoverage": "passed",
+      "secretImagePathAudit": "passed",
+      "publicOperationFreeze": "passed",
+      "providerBoundary": "passed",
+      "diffScope": "passed",
+      "planningConsistency": "passed",
+      "gitClean": true
+    },
+    "blockers": [],
+    "residualRisks": [
+      "Provider execution, HTTP/MCP transport, session/origin enforcement, and resolver/executor composition remain Creation and Integration responsibilities.",
+      "Studio UI/browser journeys, real relay acceptance, deployment, and release remain downstream responsibilities.",
+      "The corrected clean-copy run used Windows with Node.js 24.15.0; exact Node.js 20.19 and macOS/Linux acceptance remain for Integration/CI."
     ]
   }
 }
