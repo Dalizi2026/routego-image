@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-integration-task-2.2-correction-pre-handoff-generation-4",
+  "status": "active-integration-task-2.2-accepted-generation-2-handoff-pending",
   "threadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1756\\生图插件",
   "branch": "codex/routego-controller-g4",
@@ -13,7 +13,7 @@
   "generation": 4,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "g4-compaction-2-integration-task-1.5-complete-awaiting-checkpoint-2026-07-18",
-  "lastHealthAudit": "passed-generation-4-compaction-2-authority-and-task-2.2-scope-audit; integration-compaction-4-pre-handoff-checkpoint-accepted; correction-only",
+  "lastHealthAudit": "passed-generation-4-compaction-2-and-integration-task-2.2-correction-independent-review; generation-2-handoff-pending",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -119,6 +119,7 @@
     "Integration task 1.5 direct checkpoint 6482a22f322f71494ee63df4d760f35051e18b23 was independently accepted after exact two-file implementation review, isolated tasks.md and integration.json state commits, mock-relay 44/44, mock-relay/Creation/root typechecks, builds, repository safety 387, strict OpenSpec 19/19 and diff checks. The same generation-1 sole apply owner may resume only its already-started task 2.1; task 2.2 remains locked pending the next direct checkpoint and Controller review.",
     "Integration task 2.1 direct checkpoint 38acc116e63ef8231041e2edec099bd31fcdd568 was independently accepted after direct implementation/task-state/thread-state ancestry, exact eleven-file scope, frozen install for eight workspaces, stream-route 15/15, Integration and root typechecks/builds, seven-package exports, contracts 96/96, exact pngjs dependency/license/native audit, repository safety 395, strict OpenSpec 19/19, diff checks and clean Git. At Integration compaction 3, only bounded five-file task 2.2 in the same streaming gate is activated; task 2.3 remains locked.",
     "Integration task 2.2 checkpoint e3e74c2847886b00b3f4b5d0e102075cd97f1c7c has correct commit ancestry and exact five-file scope but is not accepted. Controller reproduced that StrictSseDecoder undercounts each CRLF delimiter by one byte: a raw 398-byte terminal record passes maximumEventBytes=394. Only a task-2.2 root correction and raw-byte CRLF regression are authorized; task 2.3 remains locked.",
-    "Integration generation 1 compaction-4 checkpoint 8bcf49953342485baee142ebe6457383bcd06b5a was independently confirmed as a clean governance-only integration.json commit directly after e3e74c2. PD-006 pre-handoff is active: Integration may finish only the current task-2.2 correction and prepare handoff; no task 2.3 work is authorized."
+    "Integration generation 1 compaction-4 checkpoint 8bcf49953342485baee142ebe6457383bcd06b5a was independently confirmed as a clean governance-only integration.json commit directly after e3e74c2. PD-006 pre-handoff was active: Integration was allowed only to finish the current task-2.2 correction and prepare handoff.",
+    "Integration task 2.2 corrected checkpoint 8de8eab3d0b433440c7a29142d76f2d5117b0a84 was independently accepted. Corrective implementation acc4a4cb56ce99ed1a854a95c1286daecba3be33 changes only sse.ts and sse.test.ts; the original 398-byte CRLF event is rejected at maximumEventBytes=394, exact LF/CRLF boundaries pass, Studio 28/28 focused and 125/125 full tests pass, typecheck/build/safety 397/strict 19/19/diff/Git are clean. Generation-2 handoff and sole-owner activation are now required before task 2.3."
   ]
 }
