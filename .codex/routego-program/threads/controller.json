@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-integration-generation-2-task-2.5-only",
+  "status": "active-integration-generation-2-task-3.1-only",
   "threadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1756\\生图插件",
   "branch": "codex/routego-controller-g4",
   "startingCommit": "e8b96e3685b939843d9029657bd2108116a38b03",
   "registrationCommit": "c292c2d461ed33000d7f154edba04908f36eedce",
-  "headCommit": "fd13a734f4387d8ea194246b361b5c1a1623b3b0",
+  "headCommit": "94d7eba0eb4cfb0d9f2f6523b1e74dfef01fc95d",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 4,
   "observableCompactions": 3,
   "lastCompactionFingerprint": "g4-compaction-3-integration-g2-handoff-preparation-after-task-2.2-2026-07-18",
-  "lastHealthAudit": "passed-generation-4-compaction-3-checkpoint-and-integration-generation-2-compaction-2-health-audit-before-task-2.5",
+  "lastHealthAudit": "passed-generation-4-compaction-3-checkpoint-integration-generation-2-task-2.5-browser-review-and-streaming-task-group-consistency-audit",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -127,6 +127,7 @@
     "The user changed routego-program-continuity from every 10 minutes to every 15 minutes. The automation remains ACTIVE, dynamically resolves the current Controller, deduplicates through integrationReadiness.lastDirectCheckpoint, and archives each completed automation-run task. Direct send_message_to_thread plus read_thread reporting remains the primary path; older 10-minute notes and handoffs remain historical facts.",
     "Integration generation 2 task 2.3 checkpoint 63c4e60e7e9e5ca769f900c66b8d46c175967fe7 was independently accepted after exact implementation/task-state/thread-state ancestry, exact three-file implementation scope, code review, Studio 131/131 twice, typecheck, library and Vite builds, repository safety 398, strict OpenSpec 19/19, diff checks and clean Git. At G2 compaction 1 and G4 compaction 3, only bounded five-file task 2.4 in the same Studio streaming work group is activated; task 2.5 remains locked.",
     "Integration generation 2 task 2.4 checkpoint 855afc11b1d8778d2cde1e8629ac49cd6581def6 was independently accepted after exact five-file scope and ancestry, stream-state/resource-lifecycle code review, Studio 140/140, typecheck, library and Vite builds, repository safety 400, strict OpenSpec 19/19, diff checks and clean Git. The 506.19 kB Vite advisory is non-failing and outside this task's configuration scope. Only one-file browser task 2.5 is activated; task 3.1 remains locked pending task-group review.",
-    "Integration generation 2 completed its compaction-2 health audit before task 2.5 at clean HEAD 855afc11b1d8778d2cde1e8629ac49cd6581def6. Full authority, OpenSpec 9/29, task-2.5 one-file ownership, 15-minute fallback contract and external safety boundaries remain clear; PD-006 permits the same sole owner to execute only task 2.5 while task 3.1 stays locked."
+    "Integration generation 2 completed its compaction-2 health audit before task 2.5 at clean HEAD 855afc11b1d8778d2cde1e8629ac49cd6581def6. Full authority, OpenSpec 9/29, task-2.5 one-file ownership, 15-minute fallback contract and external safety boundaries remain clear; PD-006 permits the same sole owner to execute only task 2.5 while task 3.1 stays locked.",
+    "Integration generation 2 task 2.5 and the complete tasks 2.1-2.5 streaming gate at checkpoint 794595578a13a32770e999c351a647596aebbd0c were independently accepted. Exact one-file scope and commit ancestry passed; Playwright 11/11 plus focused streaming 4/4, Studio 140/140, typecheck, safety 400, strict OpenSpec 19/19, request/security/lifetime evidence and clean Git passed. Proposal, design, all 11 deltas and tasks show a coherent gate with no 3.x implementation or public-surface drift. Only task 3.1 is activated; task 3.2 remains locked."
   ]
 }
