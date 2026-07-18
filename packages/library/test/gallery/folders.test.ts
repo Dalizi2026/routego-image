@@ -91,7 +91,7 @@ async function createHarness() {
     now,
     idFactory: () => ids[idIndex++]!
   });
-  const assets = new LibraryAssetStore({ indexStore, protectedRoots: [] });
+  const assets = new LibraryAssetStore({ indexStore, now, protectedRoots: [] });
   const execution = {
     attemptCount: 1,
     providerRequestCount: 1,
@@ -162,6 +162,35 @@ describe("Library folder persistence", () => {
       work.id
     ]);
     expect(reordered.folders.map((folder) => folder.order)).toEqual([0, 1, 2]);
+  });
+
+  it("uses one injected monotonic clock for asset creation and folder mutation", async () => {
+    const { indexStore, service } = await createHarness();
+    const initial = await indexStore.read();
+    expect(
+      initial.assets.map((asset) => ({
+        id: asset.id,
+        createdAt: asset.createdAt,
+        updatedAt: asset.updatedAt
+      }))
+    ).toEqual([
+      {
+        id: "asset-one",
+        createdAt: "2026-07-18T01:00:00.000Z",
+        updatedAt: "2026-07-18T01:00:00.000Z"
+      },
+      {
+        id: "asset-two",
+        createdAt: "2026-07-18T01:01:00.000Z",
+        updatedAt: "2026-07-18T01:01:00.000Z"
+      }
+    ]);
+
+    const folder = await service.createFolder("Clock evidence");
+    await service.assignFolders(["asset-one"], [folder.id]);
+    const updated = (await indexStore.read()).assets.find((asset) => asset.id === "asset-one")!;
+    expect(updated.updatedAt).toBe("2026-07-18T01:03:00.000Z");
+    expect(Date.parse(updated.updatedAt)).toBeGreaterThanOrEqual(Date.parse(updated.createdAt));
   });
 
   it("persists many-to-many assignment/removal and reports only real changes", async () => {
