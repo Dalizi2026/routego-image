@@ -134,6 +134,28 @@
     "archiveOwnRuns": true,
     "authoritativeWorktreeResolution": "Locate active Controller thread, verify it matches this record, then read that Controller worktree; do not trust a stale dirty main checkout."
   },
+  "policyActivation": {
+    "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    "governanceCommit": "5e7dee834f7e181f3f4e7f4075359d2b2e45c241",
+    "allActiveOwnersAcknowledged": true,
+    "controllerReceipt": {
+      "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+      "delivered": true,
+      "readBackConfirmed": true,
+      "acknowledged": true
+    },
+    "applyOwnerReceipt": {
+      "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+      "messageType": "LOW_CONTEXT_HANDOFF_POLICY_ACK",
+      "head": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+      "gitClean": true,
+      "delivered": true,
+      "readBackConfirmed": true,
+      "acknowledged": true
+    },
+    "registeredInactiveSuccessors": [],
+    "otherUnfinishedLanes": []
+  },
   "history": {
     "index": ".codex/routego-program/history/pre-pd008-state-index.json",
     "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",

@@ -24,7 +24,7 @@
   },
   "currentOperation": {
     "id": "PD-008-low-context-lossless-handoff",
-    "state": "policy-active-successor-registration-authorized",
+    "state": "policy-active-all-current-owners-acknowledged-successor-registration-authorized",
     "allowedNext": "Create/register a fresh Integration G3 with the validated low-context capsule.",
     "forbidden": ["Integration product/OpenSpec edits", "G2 archive before G3 acceptance", "task 3.2 activation before sole-owner governance"]
   },
@@ -36,6 +36,7 @@
   },
   "reportingContractAcknowledged": true,
   "lowContextLosslessHandoffAcknowledged": true,
+  "policyNotificationReadBackConfirmed": true,
   "externalStateAuthorized": false,
   "history": {
     "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",

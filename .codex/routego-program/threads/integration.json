@@ -64,6 +64,14 @@
     "fallback": "routego-program-continuity every 30 minutes reads compact state, deduplicates and archives its own run",
     "acknowledged": true
   },
+  "pd008PolicyAcknowledgement": {
+    "messageType": "LOW_CONTEXT_HANDOFF_POLICY_ACK",
+    "governanceCommit": "5e7dee834f7e181f3f4e7f4075359d2b2e45c241",
+    "sourceOwnerHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "sourceOwnerGitClean": true,
+    "controllerReceived": true,
+    "controllerReadBackConfirmed": true
+  },
   "evidence": {
     "completedTasks": ".codex/routego-program/evidence/integration-generation-2-tasks.json",
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
