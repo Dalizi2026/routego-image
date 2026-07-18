@@ -7,6 +7,8 @@
 - 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\ec66\生图插件`
 - 交接治理起始提交：`649e4fe1da0bacdeb0eca9c3d20378a209303fdd`
 - 真实登记提交：`f89ee833fa1c6900d2c850ba7e65b42677cad25b`
+- Controller 登记提交：`9a8d5d90180a5cdfa5c5945b95b57bfc0ff9f701`
+- Controller 激活提交：`fe58fff02ac6f64248262ac57f90f5f40f18717e`
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\8b8b\生图插件`
 - 产品/OpenSpec 安全提交：`313fafba3a1d49d6b65db30fb679fd77d8760d18`
 - OpenSpec：`7/11`

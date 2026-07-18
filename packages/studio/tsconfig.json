@@ -6,8 +6,9 @@
     "outDir": "../../.typecheck/studio",
     "rootDir": ".",
     "tsBuildInfoFile": "../../.typecheck/studio.tsbuildinfo",
-    "types": ["react", "react-dom"]
+    "jsx": "react-jsx",
+    "types": ["node", "react", "react-dom"]
   },
   "references": [{ "path": "../contracts" }],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts"]
 }

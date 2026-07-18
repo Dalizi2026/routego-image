@@ -41,14 +41,19 @@
 
 ## Apply-owner 互斥
 
-- 来源任务已暂停 apply 权限，不得继续修改产品代码或 `add-routego-studio` OpenSpec 工件。
-- 继任任务在任何写入前必须运行新鲜的 OpenSpec status/apply instructions 两条 JSON 命令。
+- 本交接治理提交形成后，来源任务的 apply 权限暂停，不得继续修改产品代码或 `add-routego-studio` OpenSpec 工件。
+- 继任任务在真实线程 ID、worktree、分支和登记提交写入权威状态前只能只读审计。
+- 继任任务在任何写入前必须运行两条新鲜命令：
+  - `openspec status --change add-routego-studio --json`
+  - `openspec instructions apply --change add-routego-studio --json`
 - 继任任务确认安全基线、4/11 状态、下一任务 `2.2` 和所有权后，必须向 Program Controller `019f715f-c042-7590-a38b-ffb406315903` 发送结构化 `[STUDIO_HANDOFF_ACCEPTED]`。
 - Program Controller 收到接管确认并归档来源任务后，继任任务才成为唯一 apply-owner，且只能从 `2.2` 继续，不得重做已完成任务。
 
 ## 防止无声中断
 
 只要 change 未全部完成，任务在输出 final answer 或进入 idle 前必须实际向当前 Controller 发送 `[LANE_CHECKPOINT]`、`[BLOCKED]`、`[PLAN_DEVIATION]`、`[DEPENDENCY_COMPLETE]` 或 `[LANE_COMPLETE]` 之一。不得只在自身 final answer 中请求唤醒。
+
+`[LANE_CHECKPOINT]` 至少包含 lane/change、branch、完整 HEAD、OpenSpec 完成数、已完成和下一任务、Git 清洁状态、最近验证、observableCompactions、停止原因及推荐动作。
 
 第二次可观察压缩必须形成安全提交；下一任务若是大型原子任务，必须请求 Controller 创建 successor。第三次压缩仍强制新任务、新 worktree 交接。
 
