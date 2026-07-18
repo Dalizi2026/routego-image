@@ -565,6 +565,7 @@ export class MockRoutegoService implements LocalRoutegoService {
             } satisfies RoutegoServiceError
           }
         : {}),
+      primaryArtifactId: seed.artifactId,
       renditions: [
         {
           artifactId: seed.artifactId,

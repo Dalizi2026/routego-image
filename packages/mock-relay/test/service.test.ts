@@ -266,6 +266,21 @@ describe("deterministic mock application service", () => {
     expect(JSON.stringify({ detail, resource })).not.toContain("/Users/");
   });
 
+  it("keeps the deterministic Library detail primary aligned with its seeded output rendition", async () => {
+    const detail = await createMockRoutegoService().getAssetDetail({
+      assetId: "mock-asset-output"
+    });
+    const parsed = getAssetDetailResultSchema.parse(detail);
+
+    expect(parsed.status).toBe("succeeded");
+    expect(parsed.asset).toBeDefined();
+    const asset = parsed.asset!;
+    expect(asset.primaryArtifactId).toBe(asset.renditions[0]!.artifactId);
+    expect(asset.relationships.find((relationship) => relationship.role === "output")?.artifactId).toBe(
+      asset.primaryArtifactId
+    );
+  });
+
   it("preserves per-item partial mutation outcomes from a deterministic preflight", async () => {
     const service = createMockRoutegoService({
       fixtureByOperation: {
