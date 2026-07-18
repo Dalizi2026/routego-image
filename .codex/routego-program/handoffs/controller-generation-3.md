@@ -5,6 +5,8 @@
 - 计划分支：`codex/routego-controller-g3`。
 - 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\0c1f\生图插件`。
 - 起始交接提交：`5a8f8a21c23cc4292449da039f196c0ed604a82f`。
+- 登记提交：`72e72c6ec4f9809f0c7cf8919e1ddf15f350c872`。
+- 接管状态：已接受；G3 在 `codex/routego-controller-g3` 的 `72e72c6ec4f9809f0c7cf8919e1ddf15f350c872` 完成全部权威、登记和 Integration 状态核验，Git clean。
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\5b80\生图插件`。
 - 来源分支：`codex/routego-controller-g2`。
 - 来源可观察压缩：`3`。
@@ -30,6 +32,7 @@
 - Integration 已完整读取计划、AGENTS、program、Integration 状态、PD-002/003/004、18 份主规格及 Creation/Library/Studio 三个归档 change，并核验干净分支与精确提交。
 - `openspec/changes/integrate-routego-image-plugin` 目前故意不存在，这是已授权的 proposal 起点。Integration 尚未创建 proposal/design/delta specs/tasks，也未修改产品代码。
 - G3 接管并完成独立核验前，不向 Integration 发送 apply 授权。G3 首先只能发送“使用 openspec-propose 创建并严格验证完整规划工件”的阶段激活；收到 `[INTEGRATION_PLAN_READY]` 后由 Controller 独立审查，再决定是否允许 apply。
+- 接管期间发现 Integration 已在旧状态下生成两个未跟踪规划文件：`.openspec.yaml` 与 `proposal.md`。Integration 已确认 tracked diff 为零、产品文件未修改、没有 design/specs/tasks、验证或提交。激活后的权威处置是保留这两个文件原样且不提交，由 G3 先独立审查已报告的 Library 来源关系与 Studio SSE 跨泳道偏差；本交接和激活提交均不构成偏差批准、proposal 继续授权或 apply 授权。
 
 ## G3 强制启动顺序
 

@@ -3,7 +3,8 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "handoff-accepted-planning-authorized",
+  "status": "governance-hold-pending-controller-g3-deviation-review",
+  "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "threadId": "019f72fd-fb6f-7b52-b383-03471f42f05a",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4687\\生图插件",
   "branch": "codex/routego-integration",
@@ -13,11 +14,23 @@
   "generation": 0,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed-authority-registration-and-handoff-audit",
+  "lastHealthAudit": "hold-acknowledged-no-tracked-or-product-diff",
   "successorThreadId": null,
-  "openspecState": "change-not-created-authorized-proposal-start",
-  "openspecProgress": "0/planning",
-  "nextTask": "Use openspec-propose to create coherent proposal, design, delta specs, and tasks for integrate-routego-image-plugin before any product implementation.",
+  "openspecState": "proposal-draft-untracked-governance-hold",
+  "openspecProgress": "proposal-draft-only-no-validation",
+  "nextTask": "Preserve the two untracked planning files unchanged and await Controller G3 independent deviation review and explicit proposal-only continuation disposition.",
+  "governanceHold": {
+    "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
+    "dirtyPaths": [
+      "openspec/changes/integrate-routego-image-plugin/.openspec.yaml",
+      "openspec/changes/integrate-routego-image-plugin/proposal.md"
+    ],
+    "trackedDiff": "none",
+    "productFilesChanged": false,
+    "planningArtifacts": "proposal draft only; no design, delta specs, tasks, validation, or commit",
+    "planDeviation": "reported and forwarded; not approved",
+    "disposition": "preserve files unchanged and uncommitted; Controller G3 must independently inspect the exact worktree and frozen Library/Studio boundaries before authorizing any further planning"
+  },
   "dependsOn": [
     "add-routego-image-creation",
     "add-routego-image-library",

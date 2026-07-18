@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "integration-dispatching",
+  "status": "integration-planning-governance-review",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -14,7 +14,7 @@
   },
   "laneContinuityPolicy": {
     "silentIdleForbidden": true,
-    "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
+    "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
     "requiredBeforeIncompleteIdle": [
       "LANE_CHECKPOINT",
       "BLOCKED",
@@ -165,14 +165,20 @@
     }
   },
   "integrationReadiness": {
-    "status": "registered-awaiting-handoff-acceptance",
+    "status": "handoff-accepted-governance-hold-pending-deviation-review",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
       "add-routego-image-library",
       "add-routego-studio"
     ],
-    "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits"
+    "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
+    "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
+    "planningHold": "preserve untracked .openspec.yaml and proposal.md unchanged and uncommitted; no design/specs/tasks, validation, product change, or apply authorization before Controller G3 independent deviation review",
+    "reportedDeviations": [
+      "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
+      "live partial Studio events require independent review of the frozen Studio SSE transport/workbench boundary"
+    ]
   },
   "automations": {
     "foundationAuditGate": {
