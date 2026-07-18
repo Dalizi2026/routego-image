@@ -3,7 +3,7 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "lane-complete-after-post-archive-verification",
+  "status": "completed-archived",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
@@ -32,6 +32,11 @@
   "nextTask": null,
   "lastImplementationCommit": "99fd61d8e707a159b2a78330e03a376c170b0d37",
   "lastOpenSpecCommit": "61a3a7d432d40e54064c44535108cc8302e6b258",
+  "initialMergeCommit": "220d340f8c9cf7ab6891d8ee5191e97b3bc5e11a",
+  "mergeCommit": "c7ee16a6bca371e656ce11253c31636f7f05e9d1",
+  "specSyncCommit": "a9875ed368324b03941893a1ab994b3ff039a499",
+  "archivePath": "openspec/changes/archive/2026-07-18-add-routego-image-library",
+  "archiveCommit": null,
   "recentValidation": {
     "frozenInstall": "passed in post-archive detached clean verification copy at 3cd8007e40675e6e5c1e93d2d09a34cc078944dc",
     "openspec": "strict validation 7/7 passed; apply state all_done at 10/10",
@@ -63,8 +68,8 @@
     "correctedImplementationScope": "packages/library/src/service.ts and packages/library/test/conformance/service.test.ts only"
   },
   "applyOwnership": {
-    "state": "active-single-owner",
-    "activeOwnerThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
+    "state": "completed-archived",
+    "activeOwnerThreadId": null,
     "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "successorThreadId": "019f7261-2c57-7a01-b519-e1de521819fe"
   },
@@ -82,7 +87,7 @@
     "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-lane-complete-after-post-archive-verification"
+    "status": "generation-2-lane-complete-archived"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
