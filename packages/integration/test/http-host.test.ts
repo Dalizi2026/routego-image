@@ -1,0 +1,419 @@
+import { EventEmitter } from "node:events";
+import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import {
+  routegoStatusResultSchema,
+  type LocalRoutegoService,
+  type RoutegoOpenStudioResult
+} from "@routego-image/contracts";
+
+import {
+  IntegrationLoopbackHttpHost,
+  type IssuedStudioLaunch
+} from "../src/runtime/http-host";
+import {
+  IntegrationHttpLifecycle,
+  type ManagedIntegrationHttpHost,
+  type RuntimeSignalSource
+} from "../src/runtime/lifecycle";
+import { StudioSessionManager } from "../src/runtime/sessions";
+import { loadStudioStaticAssets, type StudioStaticAssetRegistry } from "../src/runtime/static";
+
+const temporaryRoots = new Set<string>();
+
+afterEach(async () => {
+  await Promise.all([...temporaryRoots].map(async (root) => {
+    await rm(root, { recursive: true, force: true });
+    temporaryRoots.delete(root);
+  }));
+});
+
+function statusResult() {
+  return routegoStatusResultSchema.parse({
+    schemaVersion: 1,
+    configured: false,
+    hasApiKey: false,
+    models: [],
+    capabilities: [],
+    defaults: {
+      size: "auto",
+      aspectRatio: "auto",
+      quality: "auto",
+      format: "png",
+      count: 1,
+      partialImages: 0,
+      transparentMode: "off",
+      moderation: "auto",
+      saveToLibrary: true
+    },
+    service: {
+      status: "ready",
+      version: "1.0.0",
+      nodeVersion: "v20.19.0",
+      uptimeSeconds: 1,
+      mcpAvailable: true,
+      httpAvailable: true,
+      studioAvailable: true
+    }
+  });
+}
+
+function service(overrides: Record<string, unknown> = {}): LocalRoutegoService {
+  return new Proxy(overrides, {
+    get(target, property) {
+      if (typeof property === "string" && property in target) return target[property];
+      return async () => {
+        throw new Error(`Unused service method: ${String(property)}`);
+      };
+    }
+  }) as unknown as LocalRoutegoService;
+}
+
+async function staticFixture(): Promise<{
+  readonly root: string;
+  readonly registry: StudioStaticAssetRegistry;
+}> {
+  const root = await mkdtemp(join(tmpdir(), "routego-static-"));
+  temporaryRoots.add(root);
+  await mkdir(join(root, "assets"));
+  await writeFile(join(root, "assets", "app.ab12cd.js"), "globalThis.routegoLoaded=true;", "utf8");
+  await writeFile(join(root, "assets", "app.ab12cd.css"), "body{color:#123}", "utf8");
+  const registry = await loadStudioStaticAssets({
+    rootDirectory: root,
+    assets: {
+      "/assets/app.ab12cd.js": "assets/app.ab12cd.js",
+      "/assets/app.ab12cd.css": "assets/app.ab12cd.css"
+    }
+  });
+  return { root, registry };
+}
+
+function sessionTokenFromBootstrap(html: string): string {
+  const match = /"sessionToken":"([A-Za-z0-9_-]+)"/u.exec(html);
+  if (match?.[1] === undefined) throw new Error("Bootstrap did not contain an in-memory session token");
+  return match[1];
+}
+
+async function closeQuietly(host: IntegrationLoopbackHttpHost | undefined): Promise<void> {
+  if (host === undefined) return;
+  await host.close();
+}
+
+describe("StudioSessionManager", () => {
+  it("keeps bounded independent launch/API tokens and prunes exact expiry boundaries", () => {
+    let now = Date.parse("2026-07-19T00:00:00.000Z");
+    const manager = new StudioSessionManager({
+      maximumActiveSessions: 2,
+      sessionTtlMs: 1_000,
+      launchTtlMs: 100,
+      now: () => now
+    });
+
+    const first = manager.issue();
+    const second = manager.issue();
+    expect(first.sessionToken).not.toBe(first.launchToken);
+    expect(first.sessionToken).not.toBe(second.sessionToken);
+    expect(manager.size).toBe(2);
+    expect(() => manager.issue()).toThrow(/active session limit/u);
+
+    const activated = manager.consumeLaunchToken(first.launchToken);
+    expect(activated).toMatchObject({ id: first.id, sessionToken: first.sessionToken });
+    expect(manager.consumeLaunchToken(first.launchToken)).toBeUndefined();
+    expect(manager.authorizeSessionToken(first.launchToken)).toBeUndefined();
+    expect(manager.authorizeSessionToken(first.sessionToken)?.id).toBe(first.id);
+    expect(manager.authorizeSessionToken("synthetic-mismatched-token-that-is-long-enough")).toBeUndefined();
+
+    now += 100;
+    expect(manager.consumeLaunchToken(second.launchToken)).toBeUndefined();
+    expect(manager.authorizeSessionToken(second.sessionToken)?.id).toBe(second.id);
+    now += 900;
+    expect(manager.authorizeSessionToken(first.sessionToken)).toBeUndefined();
+    expect(manager.size).toBe(0);
+
+    manager.close();
+    expect(manager.closed).toBe(true);
+    expect(() => manager.issue()).toThrow(/closed/u);
+  });
+});
+
+describe("StudioStaticAssetRegistry", () => {
+  it("serves only allowlisted immutable assets with exact MIME, size, ETag, and methods", async () => {
+    const { registry } = await staticFixture();
+    const response = registry.handle("GET", "/assets/app.ab12cd.js", "", {});
+    expect(response.status).toBe(200);
+    expect(response.headers).toMatchObject({
+      "content-type": "text/javascript; charset=utf-8",
+      "content-length": "30",
+      "cache-control": "public, max-age=31536000, immutable",
+      "x-content-type-options": "nosniff"
+    });
+    expect(response.headers?.["etag"]).toMatch(/^"sha256-[A-Za-z0-9_-]+"$/u);
+    expect(Buffer.from(response.body as Uint8Array).toString("utf8")).toBe("globalThis.routegoLoaded=true;");
+
+    const conditional = registry.handle("GET", "/assets/app.ab12cd.js", "", {
+      "if-none-match": response.headers?.["etag"]
+    });
+    expect(conditional.status).toBe(304);
+    expect(conditional.body).toBeUndefined();
+
+    const head = registry.handle("HEAD", "/assets/app.ab12cd.css", "", {});
+    expect(head.status).toBe(200);
+    expect(head.headers?.["content-type"]).toBe("text/css; charset=utf-8");
+    expect(head.body).toBeUndefined();
+
+    for (const [path, search] of [
+      ["/assets", ""],
+      ["/assets/", ""],
+      ["/assets/not-allowlisted.js", ""],
+      ["/assets/%2e%2e/secret.js", ""],
+      ["/assets/app.ab12cd.js", "?path=secret"]
+    ] as const) {
+      const denied = registry.handle("GET", path, search, {});
+      expect(denied.status).toBe(404);
+      expect(String(denied.body)).not.toMatch(/(?:routego-static|secret\.js|\\Users\\)/u);
+    }
+    expect(registry.handle("POST", "/assets/app.ab12cd.js", "", {}).status).toBe(405);
+  });
+
+  it("rejects an allowlisted symlink that escapes the static root", async () => {
+    const root = await mkdtemp(join(tmpdir(), "routego-static-contained-"));
+    const outside = await mkdtemp(join(tmpdir(), "routego-static-outside-"));
+    temporaryRoots.add(root);
+    temporaryRoots.add(outside);
+    await mkdir(join(root, "assets"));
+    await writeFile(join(outside, "outside.js"), "globalThis.outside=true;", "utf8");
+    await symlink(outside, join(root, "assets", "escape"), process.platform === "win32" ? "junction" : "dir");
+
+    await expect(loadStudioStaticAssets({
+      rootDirectory: root,
+      assets: { "/assets/outside.js": "assets/escape/outside.js" }
+    })).rejects.toThrow(/escapes the static root/u);
+  });
+});
+
+describe("IntegrationLoopbackHttpHost", () => {
+  it("binds only IPv4/IPv6 loopback, bootstraps once, reuses sessions, and delegates protected JSON", async () => {
+    const { registry } = await staticFixture();
+    const status = vi.fn(async () => statusResult());
+    const local = service({ status });
+    expect(() => new IntegrationLoopbackHttpHost({
+      service: local,
+      localService: local,
+      address: "0.0.0.0" as "127.0.0.1",
+      staticAssets: registry,
+      entryModuleRoute: "/assets/app.ab12cd.js"
+    })).toThrow(/bind only/u);
+
+    for (const address of ["127.0.0.1", "::1"] as const) {
+      const host = new IntegrationLoopbackHttpHost({
+        service: local,
+        localService: local,
+        address,
+        staticAssets: registry,
+        entryModuleRoute: "/assets/app.ab12cd.js",
+        styleRoutes: ["/assets/app.ab12cd.css"]
+      });
+      try {
+        const first = await host.openStudioSession();
+        expect(first.result).toMatchObject({ reused: false, address });
+        const launchUrl = new URL(first.result.url);
+        expect(launchUrl.searchParams.get("token")).toBe(first.session.launchToken);
+        expect(first.session.launchToken).not.toBe(first.session.sessionToken);
+
+        const invalidQuery = await fetch(`${first.result.url}&unexpected=true`);
+        expect(invalidQuery.status).toBe(403);
+        const bootstrap = await fetch(first.result.url);
+        expect(bootstrap.status).toBe(200);
+        expect(bootstrap.headers.get("cache-control")).toContain("no-store");
+        expect(bootstrap.headers.get("set-cookie")).toBeNull();
+        const html = await bootstrap.text();
+        expect(sessionTokenFromBootstrap(html)).toBe(first.session.sessionToken);
+        expect(html.indexOf("history.replaceState")).toBeLessThan(html.indexOf('type="module"'));
+        expect(html).not.toContain(first.session.launchToken);
+        expect((await fetch(first.result.url)).status).toBe(403);
+
+        const staticResponse = await fetch(`${host.address!.origin}/assets/app.ab12cd.js`);
+        expect(staticResponse.status).toBe(200);
+        expect(staticResponse.headers.get("content-type")).toBe("text/javascript; charset=utf-8");
+        expect(staticResponse.headers.get("access-control-allow-origin")).toBeNull();
+
+        const api = `${host.address!.origin}/api/v1/status?refreshCapabilities=false`;
+        const accepted = await fetch(api, {
+          headers: {
+            origin: host.address!.origin,
+            "x-routego-session": first.session.sessionToken
+          }
+        });
+        expect(accepted.status).toBe(200);
+        expect(accepted.headers.get("access-control-allow-origin")).toBe(host.address!.origin);
+        expect(accepted.headers.get("access-control-allow-credentials")).toBeNull();
+        expect(await accepted.json()).toMatchObject({ configured: false });
+
+        const preflight = await fetch(api, {
+          method: "OPTIONS",
+          headers: {
+            origin: host.address!.origin,
+            "access-control-request-method": "GET",
+            "access-control-request-headers": "x-routego-session"
+          }
+        });
+        expect(preflight.status).toBe(204);
+        expect(preflight.headers.get("access-control-allow-origin")).toBe(host.address!.origin);
+        expect(preflight.headers.get("access-control-allow-origin")).not.toBe("*");
+
+        for (const headers of [
+          { origin: host.address!.origin, "x-routego-session": first.session.launchToken },
+          { origin: "https://example.invalid", "x-routego-session": first.session.sessionToken },
+          { origin: host.address!.origin, "x-routego-session": first.session.sessionToken, cookie: "sid=forbidden" }
+        ]) {
+          const denied = await fetch(api, { headers });
+          expect(denied.status).toBe(403);
+          expect(await denied.text()).not.toContain(first.session.sessionToken);
+        }
+
+        const second = await host.openStudioSession();
+        expect(second.result.reused).toBe(true);
+        expect(host.sessions.size).toBe(2);
+        const firstStillValid = await fetch(api, {
+          headers: { origin: host.address!.origin, "x-routego-session": first.session.sessionToken }
+        });
+        expect(firstStillValid.status).toBe(200);
+      } finally {
+        await closeQuietly(host);
+      }
+      expect(host.address).toBeUndefined();
+      expect(host.sessions.size).toBe(0);
+    }
+    expect(status).toHaveBeenCalled();
+  });
+
+  it("rejects launch/session tokens at their exact independent expiry boundaries", async () => {
+    const { registry } = await staticFixture();
+    let now = Date.parse("2026-07-19T00:00:00.000Z");
+    const sessions = new StudioSessionManager({
+      sessionTtlMs: 1_000,
+      launchTtlMs: 100,
+      now: () => now
+    });
+    const local = service({ status: async () => statusResult() });
+    const host = new IntegrationLoopbackHttpHost({
+      service: local,
+      localService: local,
+      address: "127.0.0.1",
+      staticAssets: registry,
+      entryModuleRoute: "/assets/app.ab12cd.js",
+      sessions
+    });
+    try {
+      const launch = await host.openStudioSession();
+      now += 100;
+      expect((await fetch(launch.result.url)).status).toBe(403);
+      const api = `${host.address!.origin}/api/v1/status`;
+      expect((await fetch(api, {
+        headers: { origin: host.address!.origin, "x-routego-session": launch.session.sessionToken }
+      })).status).toBe(200);
+      now += 900;
+      expect((await fetch(api, {
+        headers: { origin: host.address!.origin, "x-routego-session": launch.session.sessionToken }
+      })).status).toBe(403);
+      expect(sessions.size).toBe(0);
+    } finally {
+      await host.close();
+    }
+  });
+});
+
+describe("IntegrationHttpLifecycle", () => {
+  it("reuses a healthy listener, replaces it on request, and releases signals without forcing exit", async () => {
+    const { registry } = await staticFixture();
+    const local = service({ status: async () => statusResult() });
+    const hosts: IntegrationLoopbackHttpHost[] = [];
+    const lifecycle = new IntegrationHttpLifecycle({
+      createHost(address) {
+        const host = new IntegrationLoopbackHttpHost({
+          service: local,
+          localService: local,
+          address,
+          staticAssets: registry,
+          entryModuleRoute: "/assets/app.ab12cd.js"
+        });
+        hosts.push(host);
+        return host;
+      }
+    });
+    const signals = new EventEmitter();
+    lifecycle.installSignalHandlers(signals as RuntimeSignalSource);
+
+    const first = await lifecycle.openStudio({ address: "127.0.0.1", reuseExisting: true });
+    const firstBootstrap = await fetch(first.url);
+    const firstToken = sessionTokenFromBootstrap(await firstBootstrap.text());
+    const firstOrigin = new URL(first.url).origin;
+    const second = await lifecycle.openStudio({ address: "127.0.0.1", reuseExisting: true });
+    expect(second.reused).toBe(true);
+    expect(new URL(second.url).origin).toBe(firstOrigin);
+    expect(hosts).toHaveLength(1);
+    expect(hosts[0]?.sessions.size).toBe(2);
+    expect(lifecycle.studioSession().expiresAt).toBe(second.expiresAt);
+    expect((await fetch(`${firstOrigin}/api/v1/status`, {
+      headers: { origin: firstOrigin, "x-routego-session": firstToken }
+    })).status).toBe(200);
+
+    const replacement = await lifecycle.openStudio({ address: "127.0.0.1", reuseExisting: false });
+    expect(replacement.reused).toBe(false);
+    expect(hosts).toHaveLength(2);
+    expect(hosts[0]?.isHealthy).toBe(false);
+    expect(hosts[0]?.sessions.closed).toBe(true);
+
+    signals.emit("SIGTERM");
+    await lifecycle.shutdown();
+    expect(lifecycle.closed).toBe(true);
+    expect(hosts[1]?.isHealthy).toBe(false);
+    expect(signals.listenerCount("SIGINT")).toBe(0);
+    expect(signals.listenerCount("SIGTERM")).toBe(0);
+    await expect(lifecycle.openStudio({ address: "127.0.0.1", reuseExisting: true })).rejects.toThrow(/shutting down/u);
+  });
+
+  it("recursively redacts shutdown diagnostics", async () => {
+    const diagnostics: unknown[] = [];
+    const sessions = new StudioSessionManager();
+    const fakeHost: ManagedIntegrationHttpHost = {
+      address: { address: "127.0.0.1" },
+      isHealthy: true,
+      sessions,
+      async openStudioSession(): Promise<IssuedStudioLaunch> {
+        const issued = sessions.issue();
+        const result: RoutegoOpenStudioResult = {
+          schemaVersion: 1,
+          url: `http://127.0.0.1:43119/?token=${issued.launchToken}`,
+          expiresAt: issued.expiresAt,
+          reused: false,
+          address: "127.0.0.1"
+        };
+        return { result, session: issued };
+      },
+      async close() {
+        throw new Error(
+          "Authorization: Bearer synthetic-secret sessionToken=synthetic-session path=C:\\Users\\secret\\image.png data:image/png;base64,AAAA"
+        );
+      }
+    };
+    const lifecycle = new IntegrationHttpLifecycle({
+      createHost: () => fakeHost,
+      logger(value) {
+        diagnostics.push(value);
+      }
+    });
+    await lifecycle.openStudio({ address: "127.0.0.1", reuseExisting: true });
+    await expect(lifecycle.shutdown()).rejects.toThrow(/synthetic-secret/u);
+    const rendered = JSON.stringify(diagnostics);
+    expect(rendered).not.toContain("synthetic-secret");
+    expect(rendered).not.toContain("synthetic-session");
+    expect(rendered).not.toContain("C:\\\\Users\\\\secret");
+    expect(rendered).not.toContain("base64,AAAA");
+    expect(rendered).toContain("[REDACTED]");
+  });
+});
