@@ -1,8 +1,10 @@
 # Program Controller generation 2 交接清单
 
 - 来源 Controller：`019f715f-c042-7590-a38b-ffb406315903`，generation 1。
-- 继任 Controller：`pending`，generation 2。
+- 继任 Controller：`019f728e-0b4d-7552-b03a-7ca53eb9c0ae`，generation 2。
 - 计划分支：`codex/routego-controller-g2`。
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\5b80\生图插件`。
+- 起始交接提交：`4be05e4d9c134363affb0ff02c50bb6ca7767a32`。
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\d46b\生图插件`。
 - 来源可观察压缩：`3`。
 - 交接原因：Controller 已达到第 3 次可观察压缩，必须交给全新任务和新 worktree；下一个原子工作是 Library 独立复验、合并、规格同步、归档和主线全量验证。
