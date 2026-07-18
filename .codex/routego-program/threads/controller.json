@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "pre-handoff-integration-generation-2-task-3.1-png-bound-correction",
+  "status": "pre-handoff-integration-generation-2-task-3.1-png-decoder-profile-correction",
   "threadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1756\\生图插件",
   "branch": "codex/routego-controller-g4",
   "startingCommit": "e8b96e3685b939843d9029657bd2108116a38b03",
   "registrationCommit": "c292c2d461ed33000d7f154edba04908f36eedce",
-  "headCommit": "f986ca4866422edd890896cf3522807499559b70",
+  "headCommit": "9d7dc18acbbaf66be31ef8e7d3b7767604f81c82",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 4,
   "observableCompactions": 4,
   "lastCompactionFingerprint": "g4-compaction-4-task-3.1-review-before-successor-handoff-2026-07-18",
-  "lastHealthAudit": "passed-corrected-task-3.1-lineage-scope-exact-probe-matrix-tests-build-safety-and-clean-git; failed-untrusted-png-predecode-memory-bound-audit",
+  "lastHealthAudit": "passed-task-3.1-png-predecode-dimension-pixel-bound-lineage-scope-tests-build-safety-and-clean-git; failed-pngjs-16bit-and-interlaced-allocation-path-audit",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -133,6 +133,7 @@
     "Integration task 3.1 checkpoint 5963a2a2c4fc18b7d0a0b2c219d336efb9b0c36f has correct three-commit ancestry and exact five-file scope; Integration 33/33, typecheck, dependency-order build, repository safety 405, strict OpenSpec 19/19, diff checks and Git cleanliness passed. It is not accepted because the probe matrix can persist false supported evidence: Edits and Responses multi-image probes send only one image, and generic HTTP success can claim feature-specific support without conclusive request/response evidence. Only probes.ts and provider.test.ts correction is authorized; task 3.2 remains locked.",
     "Controller generation 4 reached observable compaction 4 during task-3.1 review. PD-006 pre-handoff is active: G4 may complete only this review correction and successor handoff preparation, and must not activate the large task 3.2. After corrected 3.1 acceptance, fresh Controller and Integration successor governance must complete before product work resumes.",
     "Integration generation 2 reached observable compaction 4 before editing the task-3.1 review correction. Its full authority, fresh apply, exact two-file scope, OpenSpec 11/29, clean HEAD 5963a2a2c4fc18b7d0a0b2c219d336efb9b0c36f, direct-reporting contract and external safety audit passed. It may finish only the bounded correction and handoff preparation; task 3.2 remains prohibited.",
-    "Corrected task 3.1 checkpoint 2020b6e012242132f2214097d32ca4b9ff45d003 has exact corrective/task-state/thread-state ancestry and two-file implementation scope. The exact capability request/response proof matrix fixes the prior false-support defect; Integration 69/69, typecheck, dependency-order build, safety 405, strict OpenSpec 19/19 and clean Git passed. It is not accepted because provider PNG proof bytes reach PNG.sync.read without a pre-decode IHDR dimension/pixel/decoded-byte bound, allowing compressed-image memory exhaustion. Only that two-file bound correction is authorized; task 3.2 remains locked."
+    "Corrected task 3.1 checkpoint 2020b6e012242132f2214097d32ca4b9ff45d003 has exact corrective/task-state/thread-state ancestry and two-file implementation scope. The exact capability request/response proof matrix fixes the prior false-support defect; Integration 69/69, typecheck, dependency-order build, safety 405, strict OpenSpec 19/19 and clean Git passed. It is not accepted because provider PNG proof bytes reach PNG.sync.read without a pre-decode IHDR dimension/pixel/decoded-byte bound, allowing compressed-image memory exhaustion. Only that two-file bound correction is authorized; task 3.2 remains locked.",
+    "PNG-bound task 3.1 checkpoint 627a7078863abc36a0962277f737ed90bf44cb69 has exact three-commit correction ancestry and two-file implementation scope. Integration 71/71, typecheck, dependency-order build, safety 405, strict OpenSpec 19/19 and clean Git passed; IHDR/dimension/pixel/RGBA checks precede pngjs. It is not accepted because 16-bit PNG still permits eight-byte-per-pixel intermediate allocation and interlace=1 enters pngjs' unbounded zlib.inflateSync path. Only an 8-bit non-interlaced proof-profile correction is authorized; task 3.2 remains locked."
   ]
 }
