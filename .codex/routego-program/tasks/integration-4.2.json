@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "5f044459af71eec02149a28dc615931e0d6b8b5fef391b506a865d253eab2ec8",
+  "contentSha256": "9794791f922108259840706352e3d593c5f3cc179330c9b8546be702288c326b",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.2",
-  "status": "phase-b-wip-checkpoint-pd-010-owner-only-planning-authorized-host-correction-locked",
-  "sourceCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+  "status": "phase-b-wip-checkpoint-pd-010-planning-accepted-host-correction-authorized",
+  "sourceCommit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
-    "fileSha256": "1a0145ef1f4eae77376e14fdbff55b2e06b1d0722d171def3a5d5694b8a66250",
-    "lineSha256": "d6282a75ca648d510951505d9d1519ac7e71519b9d04fd7c6230c6f88097471e",
-    "lineBytes": 2861
+    "fileSha256": "9ac7d42eca808e3c20eb98035028f21b4b343dcf2ecade0b4ad30ab4a7537ee6",
+    "lineSha256": "f89a36fb0e121e72a7cc9d00f68f69954f0b102cb6afdd4b467145b725a4d44e",
+    "lineBytes": 4812
   },
   "dependencies": ["2.1", "3.2", "3.5", "4.1"],
   "allowedFiles": [
@@ -81,8 +81,8 @@
   "directSpecifications": [
     {
       "path": "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
-      "sha256": "a8ab61153ee8137dcad782b41bfbaff0700569a27867a69b1761a4dd5153035e",
-      "bytes": 7039,
+      "sha256": "d8c7ed766151976be5abf98a54e6d7954d47bc76fe8144d2d959ee66b2a5bd56",
+      "bytes": 8010,
       "reason": "Protected loopback HTTP route, resource, upload, session and process-boundary requirements."
     },
     {
@@ -121,9 +121,9 @@
     "decision": ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md",
     "decisionSha256": "dd6cbdb7abf19652363a1e4f4ab6660bfe4208ae441a0ee05746291635d06650",
     "decisionSha256ByteCounting": "utf8-after-crlf-to-lf-normalization",
-    "status": "owner-only-openspec-planning-authorized-host-correction-locked-phase-b-wip-preserved",
-    "planningCommit": null,
-    "planningParent": null,
+    "status": "owner-only-openspec-planning-accepted-host-correction-authorized-phase-b-wip-preserved",
+    "planningCommit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
+    "planningParent": "ea3227112ed66f36e24a69a486cc2f61531225de",
     "originalTaskId": "4.1",
     "reportedDuringTaskId": "4.2",
     "sourceCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
@@ -139,9 +139,11 @@
       "packages/integration/test/routes.test.ts",
       "packages/integration/test/stream-route.test.ts"
     ],
-    "implementationGate": "Only the exact three-file owner-only PD-010 OpenSpec update is authorized. The two-file HTTP-host correction remains locked until planning acceptance; the preserved four-file Phase B WIP remains locked until host-correction acceptance.",
+    "implementationGate": "The owner-only PD-010 OpenSpec update is accepted. One exact two-file HTTP-host correction is authorized; the preserved four-file Phase B WIP remains locked until the host-correction checkpoint passes focused/full verification and Controller acceptance.",
     "planningAuthorized": true,
-    "hostCorrectionLocked": true,
+    "planningAccepted": true,
+    "hostCorrectionLocked": false,
+    "hostCorrectionAuthorized": true,
     "phaseBWipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "phaseBLocked": true,
     "phaseBAuthorized": false,

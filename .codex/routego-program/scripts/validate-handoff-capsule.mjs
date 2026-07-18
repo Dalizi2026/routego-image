@@ -441,12 +441,20 @@ if (capsule.startup.byteCounting !== "utf8-after-crlf-to-lf-normalization") {
 if (!Number.isInteger(capsule.startup.expectedNormalizedUtf8Bytes)) {
   fail("startup expected normalized byte count is missing");
 }
+if (
+  !/^[0-9a-f]{40}$/.test(capsule.startup.fallbackSourceCommit ?? "") ||
+  !reachable(capsule.startup.fallbackSourceCommit)
+) {
+  fail("startup fallback source commit is missing or unreachable");
+} else if (taskCapsule && capsule.startup.fallbackSourceCommit !== taskCapsule.sourceCommit) {
+  fail("startup fallback source commit must equal the current task source commit");
+}
 
 let startupBytes = 0;
 for (const startupFile of capsule.startup.mandatoryFiles) {
   try {
     startupBytes += normalizeUtf8LineEndings(
-      readRepositoryPath(startupFile, capsule.successor.startingCommit),
+      readRepositoryPath(startupFile, capsule.startup.fallbackSourceCommit),
     ).length;
   } catch (error) {
     fail("startup file unavailable: " + startupFile + " (" + error.message + ")");

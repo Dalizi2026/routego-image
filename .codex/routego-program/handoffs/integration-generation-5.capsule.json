@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "cd2d215a0a5c2830b0ad8f2a9c6ece40138e612ad623af228c75befa9d4b6520",
+  "capsuleSha256": "6b5135c550b792620c4cac84959af53d278a2e89b813f3861dcd80af985c6a37",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,7 +22,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "plannedBranch": "codex/routego-integration-g5",
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
-    "registrationStatus": "activated-sole-owner-task-4.2-pd-010-planning-authorized-host-correction-locked",
+    "registrationStatus": "activated-sole-owner-task-4.2-pd-010-planning-accepted-host-correction-authorized-phase-b-locked",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
     "registrationCommitSemantics": "The Controller registration governance commit and successor incorporation commit are exact; the containing activation commit cannot self-reference its own SHA."
@@ -34,16 +34,20 @@
     "nextTaskId": "4.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.2.json",
-      "sha256": "5f044459af71eec02149a28dc615931e0d6b8b5fef391b506a865d253eab2ec8"
+      "sha256": "9794791f922108259840706352e3d593c5f3cc179330c9b8546be702288c326b"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
     "successorApplyAuthorized": true,
     "phaseBWipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "phaseBWipCheckpointParent": "12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d",
+    "planningCommit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
+    "planningParent": "ea3227112ed66f36e24a69a486cc2f61531225de",
     "taskComplete": false,
     "pd010PlanningAuthorized": true,
-    "hostCorrectionLocked": true,
+    "pd010PlanningAccepted": true,
+    "hostCorrectionLocked": false,
+    "hostCorrectionAuthorized": true,
     "phaseBResumeLocked": true
   },
   "completedEvidence": [
@@ -120,7 +124,8 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 112623,
+    "fallbackSourceCommit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
+    "expectedNormalizedUtf8Bytes": 114805,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
