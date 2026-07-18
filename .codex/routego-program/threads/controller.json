@@ -8,11 +8,11 @@
   "branch": "codex/routego-controller-g2",
   "startingCommit": "4be05e4d9c134363affb0ff02c50bb6ca7767a32",
   "registrationCommit": "fc882b94f68b3c5247e0251cd13f20f4777c0ee7",
-  "headCommit": "0b32e8d5ce7fd00128cdd8c6b07d26830ce118c8",
+  "headCommit": "f05415e2e4836d3a032180d4239b05a0a94bf3ab",
   "generation": 2,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed-handoff-accepted",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "g2-compaction-1-library-corrected-5.2-studio-6.1-2026-07-18",
+  "lastHealthAudit": "passed-after-g2-compaction-1-authority-reread",
   "successorThreadId": null,
   "predecessorThreadId": "019f715f-c042-7590-a38b-ffb406315903",
   "predecessorGeneration": 1,
@@ -83,6 +83,7 @@
     "A fresh pinned Studio generation 3 task 019f7296-ee8d-7bd1-aa0f-376914e35408 and isolated worktree C:\\Users\\MLTZ\\.codex\\worktrees\\3cf3\\生图插件 were created from exact handoff commit 6cc3640849a0d4a89481e25d4234f7f7b5a4ec52; Studio registration commit dfcb6f85fedd3b2da8853ef37a0ce97f238741dc must be accepted before sole-owner activation.",
     "Studio generation 3 accepted the handoff at clean branch codex/routego-studio-g3 HEAD dfcb6f85fedd3b2da8853ef37a0ce97f238741dc after fresh authority and OpenSpec 9/11 checks; Studio generation 2 was archived before G3 sole-owner activation for task 6.1.",
     "Independent Controller review of Library delivery fd62a90dc1899ab9d0c993b7192da910e2fa4914 reproduced a public ZIP false-success defect: a controlled legal partial FileHandle.write returned outputPath with no warning but produced an invalid truncated ZIP. Library generation 2 was reactivated as sole owner to fix task 5.1 and rerun task 5.2 before any merge.",
-    "The same Library review reproduced a protected-root bypass: an apparently safe output directory junction targeting protected legacy data received the exported ZIP because service.ts validated only the lexical path. Both defects remain within task 5.1 service/conformance scope."
+    "The same Library review reproduced a protected-root bypass: an apparently safe output directory junction targeting protected legacy data received the exported ZIP because service.ts validated only the lexical path. Both defects remain within task 5.1 service/conformance scope.",
+    "Controller generation 2 observed its first context compaction while Library had committed corrected task 5.1 at 0bd93dea9d7035426b34600a6bae13277b3f08bd and was running task 5.2, while Studio generation 3 was executing task 6.1 in tests/browser only. A fresh authority, branch, worktree, lane-owner and Git-clean audit passed before governance resumed."
   ]
 }
