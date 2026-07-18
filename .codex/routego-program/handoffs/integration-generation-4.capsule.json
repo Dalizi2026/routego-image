@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "04b1830eb2442708cff0b72c982af8879ef7c1913177fc7e3bc719df4406d38b",
+  "capsuleSha256": "ff0662074febbb8ab071d7c2eb61e5a08d39471d3951623a7598e587672c6928",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
   "generation": {
-    "source": 2,
-    "successor": 3
+    "source": 3,
+    "successor": 4
   },
   "source": {
-    "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
-    "branch": "codex/routego-integration-g2",
-    "acceptedProductCommit": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
-    "handoffCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "handoffParent": "d974cb0d16b7e14ca0766392c7d52356b4967d3c"
-  },
-  "successor": {
     "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
-    "plannedBranch": "codex/routego-integration-g3",
-    "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "registrationStatus": "activated-sole-owner-task-3.5-unlocked-not-started",
-    "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
-    "registrationCommitSemantics": "The registration commit is recorded after a fresh successor task/worktree exists; a containing commit cannot self-reference its own SHA."
+    "branch": "codex/routego-integration-g3",
+    "acceptedProductCommit": "17208da376f71790561ae87e3d59b77287765b3b",
+    "handoffCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+    "handoffParent": "b41340603ddfb57fc83d1fc73c56c0728ddfd69b"
+  },
+  "successor": {
+    "threadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a818\\生图插件",
+    "plannedBranch": "codex/routego-integration-g4",
+    "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+    "registrationStatus": "registered-awaiting-low-context-acceptance-task-3.5-locked",
+    "registrationCommit": null,
+    "registrationCommitSemantics": "The registration commit is recorded only after a fresh successor task and worktree exist; pending identity is a legal pre-registration state."
   },
   "currentState": {
     "openspecTotal": 29,
@@ -33,11 +33,11 @@
     "nextTaskId": "3.5",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-3.5.json",
-      "sha256": "17fc8643d58e24b1e5a749d3c2af31ba0f53733563070c916b0a38378239189a"
+      "sha256": "9ccc7eaebcc42b0d0a1abb4d6532c6b09fca4af3ac5eaeb1a925d5f95d6f79b1"
     },
-    "taskLocked": false,
-    "sourceIsSoleApplyOwner": false,
-    "successorApplyAuthorized": true
+    "taskLocked": true,
+    "sourceIsSoleApplyOwner": true,
+    "successorApplyAuthorized": false
   },
   "completedEvidence": [
     {
@@ -59,20 +59,18 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": [],
+    "blockers": ["Integration G4 low-context acceptance and explicit sole-owner activation are pending."],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "residualRisks": [
-      "Ignored node_modules were initialized from the local pnpm cache during registration verification; zero packages were downloaded, tracked files and lockfile are unchanged, and environment policy blocked cleanup.",
-      "Task 3.3 relies on RoutegoLibraryService for filesystem containment; upload discard or expiry after preparation must be handled by task 3.4 before persistence or projection.",
-      "Task 3.5 must wire task 3.4 preflight and stable source staging before provider submission; task 4.2 still owns protected resource HTTP streaming."
+      "Task 3.5 must wire task 3.4 preflight and stable source staging before provider submission.",
+      "Protected resource HTTP streaming remains task 4.2 and must not be implemented in task 3.5."
     ]
   },
   "context": {
-    "sourceObservableCompactions": 5,
-    "sourceCompactionFingerprint": "2026-07-18-generation-2-compaction-5-after-task-3.1-acceptance-during-generation-3-handoff-preparation",
-    "successorObservableCompactions": 2,
-    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|c53821eec3a0a92fdc63de31ccddbc52c7370703|context-compaction-2-before-task-3.4-implementation|13/29",
+    "sourceObservableCompactions": 3,
+    "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc|context-compaction-3-after-task-3.4-before-task-3.5-activation|14/29",
+    "successorObservableCompactions": 0,
     "handoffAcceptanceCompactionLimit": 0,
     "failureLabel": "HANDOFF_CONTEXT_BUDGET_FAILED"
   },
@@ -93,7 +91,7 @@
       ".codex/routego-program/authority-summary.md",
       ".codex/routego-program/program.json",
       ".codex/routego-program/threads/integration.json",
-      ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
+      ".codex/routego-program/handoffs/integration-generation-4.capsule.json",
       ".codex/routego-program/tasks/integration-3.5.json",
       "openspec/changes/integrate-routego-image-plugin/specs/integrated-local-routego-service/spec.md",
       "openspec/specs/local-service-boundaries/spec.md",
@@ -105,7 +103,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 99337,
+    "expectedNormalizedUtf8Bytes": 98064,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
@@ -127,7 +125,7 @@
       "directed expansion cannot restore authority",
       "explicit user request"
     ],
-    "contextBudgetFailure": "If any observable compaction occurs before handoff acceptance, send HANDOFF_CONTEXT_BUDGET_FAILED; do not activate successor, keep predecessor as owner, keep the next product task locked, shrink the capsule/state and create a fresh successor if needed."
+    "contextBudgetFailure": "If any observable compaction occurs before handoff acceptance, send HANDOFF_CONTEXT_BUDGET_FAILED; do not activate the successor, keep G3 frozen as owner, keep task 3.5 locked, shrink the capsule/state and create a fresh successor if needed."
   },
   "safety": {
     "noProductOrOpenSpecEditsBeforeActivation": true,

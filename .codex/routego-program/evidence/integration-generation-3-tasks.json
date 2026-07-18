@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "3095523a31c19959e13ef183fd48d0de2d251a906f73f085d6da9f8bbf5ccaf3",
+  "contentSha256": "b896c776082284a397c7a656f7e7d49d18a21dbb2b12b866ecb1f5ff66d7a786",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "generation": 3,
   "sourceActivationHead": "57d2957789037945e423ac0417835b12acc132da",
-  "openspecProgress": "13/29",
+  "openspecProgress": "14/29",
   "gitClean": true,
   "externalStateAuthorized": false,
   "tasks": [
@@ -41,6 +41,22 @@
       "rootCauseFixes": "Use per-resolution and completion-time upload expiry checks; require explicit deterministic identity allocation; reject repeated artifact/upload ownership or metadata drift; validate unknown resolver structures before use; recursively freeze validated requests.",
       "blockers": [],
       "residualRisk": "Filesystem containment remains a RoutegoLibraryService boundary, and upload discard or expiry after preparation must be handled by task 3.4 before persistence or projection."
+    },
+    {
+      "taskId": "3.4",
+      "activationIncorporationHead": "c53821eec3a0a92fdc63de31ccddbc52c7370703",
+      "contextCheckpointCommit": "3a275da06e435f6b2ce80d167a0e47a17e331725",
+      "implementationCommit": "17208da376f71790561ae87e3d59b77287765b3b",
+      "taskStateCommit": "b41340603ddfb57fc83d1fc73c56c0728ddfd69b",
+      "checkpointCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+      "files": [
+        "packages/integration/src/composition/results.ts",
+        "packages/integration/test/results.test.ts"
+      ],
+      "verification": "Fresh OpenSpec apply reported 14/29; Controller independently passed Integration typecheck, 151/151 tests and build, Library 164/164 tests, strict OpenSpec 19/19, repository safety 432, git diff checks, exact two-file scope and clean Git.",
+      "rootCauseFixes": "Stage upload sources stably before provider work; reject request-divergent graphs; preserve validated output through same-identity ephemeral fallback when durable projection fails; bind public output approval to the exact canonical requested directory.",
+      "blockers": [],
+      "residualRisk": "Task 3.5 must wire preflight, staging and finalization into production service execution; task 4.2 still owns protected resource HTTP streaming."
     }
   ],
   "relatedDecisions": [

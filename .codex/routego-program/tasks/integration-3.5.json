@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "9ccc7eaebcc42b0d0a1abb4d6532c6b09fca4af3ac5eaeb1a925d5f95d6f79b1",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "3.5",
+  "status": "locked-awaiting-integration-generation-4-low-context-acceptance",
+  "sourceCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "e00abc5daf502d5efcbdc66de764dbe7d200bbbe5d735fcda69dba8823ac337d",
+    "lineSha256": "4beda673c5ca6770eb8d57d36e75b6f50bbd4a3ee6b034c538b37738d1583614",
+    "lineBytes": 1072
+  },
+  "dependencies": ["3.1", "3.2", "3.3", "3.4"],
+  "allowedFiles": [
+    "packages/integration/src/composition/service.ts",
+    "packages/integration/src/index.ts",
+    "packages/integration/test/service.test.ts"
+  ],
+  "allowedFileMode": "create-or-modify exactly the three allowed files; all parent directories exist at the source commit",
+  "forbiddenFileGlobs": [
+    "packages/library/**",
+    "packages/creation/**",
+    "packages/contracts/**",
+    "packages/studio/**",
+    "packages/integration/src/composition/inputs.ts",
+    "packages/integration/src/composition/graph.ts",
+    "packages/integration/src/composition/results.ts",
+    "packages/integration/src/provider/**",
+    "packages/integration/src/image/**",
+    "packages/integration/src/runtime/**",
+    "openspec/**",
+    ".codex-plugin/**",
+    "skills/**",
+    "scripts/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "**/binding.gyp"
+  ],
+  "requiredBehavior": [
+    "Compose one production LocalRoutegoService object implementing the complete frozen public, Studio, Library, upload, settings, provider and lifecycle method matrix without adding public tools.",
+    "Route status, settings, model refresh and explicitly confirmed probes through Library-owned provider context while keeping credentials in memory and outputs recursively redacted.",
+    "Compose public and Studio generate/edit execution through the task 3.3 stable input preparation and task 3.4 staging/finalization primitives, preserving one operation identity, exact provider request counts and truthful partial/failure/billing state.",
+    "Implement bounded ordered public and Studio batch behavior, cancellation, execution events and recovery without replaying uncertain or billable work.",
+    "Delegate search, manage, openStudio, upload and Library methods to the single injected Library state so public and Studio observe the same durable assets and resources.",
+    "Validate every external input and output through the frozen schemas and fail closed on malformed provider, Library or composed results without leaking paths, credentials, bytes or diagnostics."
+  ],
+  "verification": [
+    "openspec instructions apply --change integrate-routego-image-plugin --json",
+    "pnpm --filter @routego-image/integration typecheck",
+    "pnpm --filter @routego-image/integration test",
+    "pnpm --filter @routego-image/integration build",
+    "exact LocalRoutegoService public, Studio, Library, upload, settings and provider method matrix",
+    "shared Library state across public and Studio flows",
+    "success, partial, failure, degraded, cancelled and ordered batch/provider-count cases",
+    "invalid input/output closure, cancellation, recovery, health and execution-event cases",
+    "exact seven public tools with no cross-lane path, credential, image-byte or diagnostic leakage",
+    "pnpm typecheck",
+    "pnpm build",
+    "pnpm test",
+    "node scripts/check-package-exports.mjs",
+    "node scripts/check-repository-safety.mjs",
+    "git diff --check",
+    "exact three-file implementation scope"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/integrated-local-routego-service/spec.md",
+      "sha256": "78ead55b0295fe044e3552f62f625c1393f8a7fb7191761140cb2186284aa6ac",
+      "bytes": 10837,
+      "reason": "Complete Integration production composition, provider context, input/output lifecycle and Library ownership requirements."
+    },
+    {
+      "path": "openspec/specs/local-service-boundaries/spec.md",
+      "sha256": "b594eb13b4b0f771859dfcda5eb6b748dc9c30c459ebd714287d5ee72af7fa42",
+      "bytes": 10007,
+      "reason": "Frozen LocalRoutegoService method ownership, validation, cross-filesystem boundaries and exact public delegation contract."
+    },
+    {
+      "path": "openspec/specs/shared-image-contracts/spec.md",
+      "sha256": "ee211f7caff8be45fadc1717fca141baf306d0d3953fd0cd34fef037ac0c2e39",
+      "bytes": 21363,
+      "reason": "Frozen public and Studio inputs, outputs, errors, batches, settings, resources and seven-tool schemas."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "activation": {
+    "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "controllerGeneration": 5,
+    "integrationThreadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
+    "integrationGeneration": 4,
+    "acceptedPreviousTaskImplementationCommit": "17208da376f71790561ae87e3d59b77287765b3b",
+    "acceptedPreviousTaskCheckpointCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+    "soleApplyOwner": false,
+    "applyAuthorized": false,
+    "started": false
+  },
+  "unresolvedIssues": [],
+  "knownRisks": [
+    "Task 3.5 must wire task 3.4 preflight and stable staging before provider submission rather than only during result projection.",
+    "Protected resource HTTP streaming remains task 4.2 and must not be implemented or simulated as complete here."
+  ],
+  "externalStateAuthorized": false
+}
