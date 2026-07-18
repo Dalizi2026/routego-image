@@ -2,22 +2,22 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-authoritative-controller-generation-6-integration-generation-5-task-4.2-pd-010-planning-accepted-host-correction-authorized-phase-b-locked",
+  "status": "active-authoritative-controller-generation-6-integration-generation-5-task-4.2-pd-010-host-correction-accepted-phase-b-authorized",
   "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
   "branch": "codex/routego-controller-g6",
   "startingCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
   "registrationCommit": "84698588f8693bf1392a786089427f43605a2914",
   "activationCommit": null,
-  "verifiedHeadBeforeContainingCommit": "b9d8fdbbbf59147b38055c31898831866e863e8c",
+  "verifiedHeadBeforeContainingCommit": "60b18c7ff64e10d9bec57cd98e4e29f21eb5828b",
   "generation": 6,
   "authoritative": true,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "controller|routego-image-1.0|e8d7beeb0624dd9231931d9fc4ad41db123a131c|context-compaction-2-during-task-4.2-phase-b-backpressure-plan-deviation|16/29",
   "lastHealthAudit": {
-    "status": "passed-controller-compaction-2-generation-5-compaction-2-pd-010-planning-accepted-host-correction-authorized-phase-b-locked",
+    "status": "passed-controller-compaction-2-generation-5-compaction-2-pd-010-host-correction-accepted-phase-b-authorized",
     "controllerGitClean": true,
-    "controllerHeadBeforeContainingCommit": "b9d8fdbbbf59147b38055c31898831866e863e8c",
+    "controllerHeadBeforeContainingCommit": "60b18c7ff64e10d9bec57cd98e4e29f21eb5828b",
     "integrationGeneration2GitClean": true,
     "integrationHandoffHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
     "integrationGeneration3CheckpointHead": "b34caaabd419f357ed91b6bb44ac0dd7700ed73a",
@@ -41,6 +41,8 @@
     "integrationGeneration5WipCheckpointParent": "12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d",
     "integrationGeneration5Pd010PlanningHead": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
     "integrationGeneration5Pd010PlanningParent": "ea3227112ed66f36e24a69a486cc2f61531225de",
+    "integrationGeneration5Pd010HostCorrectionHead": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
+    "integrationGeneration5Pd010HostCorrectionParent": "fdf1fcebd071fd5453831da893ce37038ced7506",
     "integrationGeneration5GitClean": true,
     "integrationGeneration5ObservableCompactions": 2,
     "integrationGeneration5LastCompactionFingerprint": "integration|integrate-routego-image-plugin|12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d|context-compaction-2-during-task-4.2-phase-b-wip-checkpoint-before-PD-010|16/29",
@@ -48,13 +50,13 @@
     "openspecProgress": "16/29",
     "task4_1Accepted": true,
     "task4_2Locked": false,
-    "verification": "PD-009 Phase A remains accepted. Controller verified the PD-010 planning commit 1f476a3c34bb8ae7eaaf460957e6192c2a031567 has exact design/codex-plugin-runtime/tasks scope, task 4.2 remains unchecked and WIP 60df6b9a6fdb7587171b893e2a658d25ade17bdd is preserved. Fresh status/apply instructions, strict OpenSpec 19/19, diff check and Git clean passed; exact two-file host correction is authorized while Phase B remains locked."
+    "verification": "PD-009 Phase A and PD-010 planning remain accepted. Controller independently reviewed and passed the exact two-file host correction 3e04958f145f2207cc6bdf369af6198eedfb71b2: host/routes 14/14, Integration typecheck and 181/181 tests, root 747 tests, safety 453, strict OpenSpec 19/19, diff check and Git clean. Phase B is authorized to resume from preserved WIP 60df6b9a6fdb7587171b893e2a658d25ade17bdd."
   },
   "currentOperation": {
     "id": "PD-010-task-4.2-http-backpressure-disconnect-cleanup",
-    "state": "task-4.2-pd-010-planning-accepted-exact-two-file-host-correction-authorized-phase-b-wip-locked",
-    "allowedNext": "Integration G5 may incorporate this exact governance commit, validate it, then implement and commit only packages/integration/src/runtime/http-host.ts and packages/integration/test/http-host.test.ts. It must run the focused/full verification and report the corrective checkpoint; Phase B remains locked until Controller acceptance.",
-    "forbidden": ["Any edit to the preserved four-file Phase B WIP before host correction acceptance", "Session/static/lifecycle or other product/test edits", "Route-layer masking, expiry shortening, whole-body buffering or duplicate lease cleanup", "Any task 4.3 or later edit", "Task 4.2 checkbox before implementation acceptance", "Controller product/OpenSpec edits", "external approval gates 7.2, 8.2 or 9.1 without fresh user approval"]
+    "state": "task-4.2-pd-010-host-correction-accepted-preserved-four-file-phase-b-authorized",
+    "allowedNext": "Integration G5 may incorporate this exact governance commit, validate it, then resume only the preserved Phase B files routes.ts, stream-route.ts, routes.test.ts and stream-route.test.ts. It must rerun focused/full verification and create the separate task 4.2 Phase B implementation commit; task 4.2 remains unchecked until Controller acceptance.",
+    "forbidden": ["Any further HTTP-host or host-test edit without a new proven deviation", "Session/static/lifecycle or other product/test edits", "Route-layer masking, expiry shortening, whole-body buffering or duplicate cleanup", "Any task 4.3 or later edit", "Task 4.2 checkbox before Phase B implementation acceptance", "Controller product/OpenSpec edits", "external approval gates 7.2, 8.2 or 9.1 without fresh user approval"]
   },
   "integrationOwner": {
     "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
@@ -63,12 +65,12 @@
     "plannedBranch": "codex/routego-integration-g5",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "currentHead": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
+    "currentHead": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
     "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
     "gitClean": true,
     "observableCompactions": 2,
     "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d|context-compaction-2-during-task-4.2-phase-b-wip-checkpoint-before-PD-010|16/29",
-    "status": "activated-sole-apply-owner-task-4.2-pd-010-planning-accepted-host-correction-authorized-phase-b-locked",
+    "status": "activated-sole-apply-owner-task-4.2-pd-010-host-correction-accepted-phase-b-authorized",
     "handoffAudit": {
       "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
       "reportedStartupFiles": 12,
@@ -99,6 +101,14 @@
       "scope": "design.md; specs/codex-plugin-runtime/spec.md; tasks.md",
       "controllerAccepted": true
     },
+    "latestCorrectiveCheckpoint": {
+      "taskId": "4.2",
+      "owningTaskId": "4.1",
+      "commit": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
+      "parent": "fdf1fcebd071fd5453831da893ce37038ced7506",
+      "scope": "packages/integration/src/runtime/http-host.ts; packages/integration/test/http-host.test.ts",
+      "controllerAccepted": true
+    },
     "sourceOwner": {
       "generation": 4,
       "threadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
@@ -119,11 +129,11 @@
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "currentHead": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
+    "currentHead": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
     "gitClean": true,
     "observableCompactions": 2,
     "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d|context-compaction-2-during-task-4.2-phase-b-wip-checkpoint-before-PD-010|16/29",
-    "status": "activated-sole-apply-owner-task-4.2-pd-010-planning-accepted-host-correction-authorized-phase-b-locked",
+    "status": "activated-sole-apply-owner-task-4.2-pd-010-host-correction-accepted-phase-b-authorized",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-5.capsule.json"
   },
   "successor": {
@@ -134,7 +144,7 @@
     "plannedBranch": "codex/routego-controller-g6",
     "startingCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
     "registrationCommit": "84698588f8693bf1392a786089427f43605a2914",
-    "currentHead": "b9d8fdbbbf59147b38055c31898831866e863e8c",
+    "currentHead": "60b18c7ff64e10d9bec57cd98e4e29f21eb5828b",
     "acceptedHead": "0a687150fc4f4460a6ddddb803d0f0bd99fa47cc",
     "gitClean": true,
     "observableCompactions": 2,
