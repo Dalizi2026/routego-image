@@ -191,7 +191,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-task-2.2-correction-required-task-2.3-locked",
+    "status": "offline-apply-pre-handoff-task-2.2-correction-only-task-2.3-locked",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -199,7 +199,7 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
+    "integrationHead": "8bcf49953342485baee142ebe6457383bcd06b5a",
     "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
@@ -209,25 +209,27 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 2 remains healthy. Integration generation 1 remains at compaction 3 after its Git checkpoint. Task 2.2 checkpoint e3e74c2847886b00b3f4b5d0e102075cd97f1c7c was received but failed independent CRLF event-byte-bound verification, so only a narrow task-2.2 correction is authorized. Task 2.3 and every later task remain locked. No external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 2 remains healthy. Integration generation 1 is now at compaction 4 pre-handoff after a clean governance-only checkpoint. It may finish only the current narrow task-2.2 CRLF correction and prepare handoff; task 2.3 and every later task remain locked. No external authority is added.",
     "lastDirectCheckpoint": {
-      "messageType": "INTEGRATION_TASK_CHECKPOINT",
+      "messageType": "INTEGRATION_HEALTH_CHECKPOINT",
       "workerThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
-      "completedTask": "2.2-reported-correction-required",
+      "completedTask": "2.2-correction-pending",
       "nextTask": "2.2-correction",
-      "reportedHead": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
-      "checkpointCommit": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
+      "reportedHead": "8bcf49953342485baee142ebe6457383bcd06b5a",
+      "checkpointCommit": "8bcf49953342485baee142ebe6457383bcd06b5a",
       "planningCommit": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
       "implementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
       "taskStateCommit": "722c183fed4efdf62d7f678feacc30a9bd64c961",
-      "threadStateCommit": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
+      "threadStateCommit": "8bcf49953342485baee142ebe6457383bcd06b5a",
       "openspecProgress": "7/29-reported-not-accepted",
       "gitState": "clean; no staged or untracked files",
+      "observableCompactions": 4,
+      "stopReason": "PD-006 compaction 4 pre-handoff; finish only task-2.2 correction and prepare handoff",
       "controllerReceived": true,
       "controllerReadBackConfirmed": true,
       "controllerAccepted": false,
       "reviewFinding": "CRLF event records undercount each two-byte line ending as one byte, allowing a raw 398-byte terminal record through maximumEventBytes=394.",
-      "acceptedByControllerMessage": "INTEGRATION_TASK_2_2_REVIEW_CORRECTION_REQUIRED"
+      "acceptedByControllerMessage": "INTEGRATION_HEALTH_CHECKPOINT_ACCEPTED_PD_006_COMPACTION_4_CORRECTION_ONLY"
     },
     "activePlanDeviation": {
       "messageType": "PLAN_DEVIATION",
@@ -250,6 +252,7 @@
       "task2_2Locked": true,
       "task2_2ContinuationAuthorized": false,
       "task2_2CorrectionAuthorized": true,
+      "task2_2PreHandoff": true,
       "task2_3Locked": true
     }
   },
