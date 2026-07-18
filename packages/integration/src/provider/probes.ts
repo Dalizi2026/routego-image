@@ -33,8 +33,8 @@ import { readBoundedResponseBytes } from "./models";
 export const DEFAULT_CAPABILITY_PROBE_TIMEOUT_MS = 120_000;
 export const MAX_CAPABILITY_PROBE_ERROR_BYTES = 32 * 1024;
 export const MAX_CAPABILITY_PROBE_SUCCESS_BYTES = 8 * 1024 * 1024;
-// Capability probes inspect proof images rather than materializing unrestricted provider output.
-// These limits cover normal image-model proof sizes while capping pngjs' decoded RGBA allocation at 16 MiB.
+// Capability probes inspect 8-bit, non-interlaced proof images rather than materializing unrestricted
+// provider output. This decoder profile keeps pngjs on its bounded four-byte RGBA path, capped at 16 MiB.
 export const MAX_CAPABILITY_PROBE_PNG_DIMENSION = 4_096;
 export const MAX_CAPABILITY_PROBE_PNG_PIXELS = 4 * 1_024 * 1_024;
 export const MAX_CAPABILITY_PROBE_PNG_RGBA_BYTES = 16 * 1_024 * 1_024;
@@ -403,13 +403,7 @@ interface BoundedPngHeader {
 
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 const PNG_IHDR_TOTAL_BYTES = 33;
-const PNG_BIT_DEPTHS_BY_COLOR_TYPE = new Map<number, ReadonlySet<number>>([
-  [0, new Set([1, 2, 4, 8, 16])],
-  [2, new Set([8, 16])],
-  [3, new Set([1, 2, 4, 8])],
-  [4, new Set([8, 16])],
-  [6, new Set([8, 16])]
-]);
+const PNG_8_BIT_COLOR_TYPES = new Set([0, 2, 3, 4, 6]);
 
 function pngCrc32(bytes: Buffer, start: number, end: number): number {
   let crc = 0xffff_ffff;
@@ -442,12 +436,12 @@ function boundedPngHeader(bytes: Buffer): BoundedPngHeader | undefined {
   if (
     width < 1 ||
     height < 1 ||
-    bitDepth === undefined ||
+    bitDepth !== 8 ||
     colorType === undefined ||
-    !PNG_BIT_DEPTHS_BY_COLOR_TYPE.get(colorType)?.has(bitDepth) ||
+    !PNG_8_BIT_COLOR_TYPES.has(colorType) ||
     compressionMethod !== 0 ||
     filterMethod !== 0 ||
-    (interlaceMethod !== 0 && interlaceMethod !== 1)
+    interlaceMethod !== 0
   ) {
     return undefined;
   }

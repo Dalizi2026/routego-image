@@ -892,6 +892,43 @@ describe("exact confirmed capability probes", () => {
     expect(readSpy).not.toHaveBeenCalled();
   });
 
+  it("rejects 16-bit and interlaced pngjs decoder profiles before allocation", async () => {
+    const cases = [
+      { label: "16-bit grayscale", value: pngHeaderBase64({ width: 1, height: 1, bitDepth: 16, colorType: 0 }) },
+      { label: "16-bit RGB", value: pngHeaderBase64({ width: 1, height: 1, bitDepth: 16, colorType: 2 }) },
+      { label: "16-bit grayscale alpha", value: pngHeaderBase64({ width: 1, height: 1, bitDepth: 16, colorType: 4 }) },
+      { label: "16-bit RGBA", value: pngHeaderBase64({ width: 1, height: 1, bitDepth: 16, colorType: 6 }) },
+      { label: "Adam7 interlace", value: pngHeaderBase64({ width: 1, height: 1, interlaceMethod: 1 }) }
+    ] as const;
+    const readSpy = vi.spyOn(PNG.sync, "read");
+
+    for (const testCase of cases) {
+      const { owner } = mockProbeOwner();
+      const fetchImpl = vi.fn<typeof fetch>(async () => probeImageResponse(testCase.value));
+      const result = await probeProviderCapability(owner, probeInput({
+        providerId: "provider-synthetic"
+      }), { fetch: fetchImpl, now: () => now });
+
+      expect(fetchImpl, testCase.label).toHaveBeenCalledTimes(1);
+      expect(owner.persistCapabilityProbe, testCase.label).toHaveBeenCalledTimes(1);
+      expect(result, testCase.label).toMatchObject({
+        status: "failed",
+        mayHaveBilled: true,
+        record: { state: "unknown" },
+        error: { code: "invalid_response", mayHaveBilled: true }
+      });
+      const persisted = owner.persistCapabilityProbe.mock.calls[0]?.[0];
+      expect(
+        persisted?.record.evidence.some(
+          (item) => item.source === "successful-request" || item.source === "degraded-fallback"
+        ),
+        testCase.label
+      ).toBe(false);
+    }
+
+    expect(readSpy).not.toHaveBeenCalled();
+  });
+
   it("sends deterministic primary plus image[] bytes for an Edits multi-image probe", async () => {
     const { owner } = mockProbeOwner();
     const synthetic = createDeterministicSyntheticPngInputs();
