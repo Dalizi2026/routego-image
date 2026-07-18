@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-4-active-sole-apply-owner-task-3.5-accepted-next-4.1-unlocked-not-started",
+  "status": "generation-4-active-sole-apply-owner-task-4.1-accepted-next-4.2-locked-pending-lane-checkpoint-acceptance",
   "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
   "threadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a818\\生图插件",
@@ -13,7 +13,7 @@
   "registrationCommit": "e38ede29a7bb2802ca874c099f7a11e6aff11524",
   "incorporationCommit": "ec97b7f97b9768ca586480d4c7e99be81015196c",
   "activationIncorporationHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
-  "currentHead": "2f425859d64eeb1b347749a05ffc9a13261a0746",
+  "currentHead": "19662a9b449364df76557e884cb9256742e60762",
   "gitCleanAtRegistration": true,
   "gitClean": true,
   "observableCompactions": 2,
@@ -39,15 +39,15 @@
   },
   "openspec": {
     "totalTasks": 29,
-    "completedTasks": 15,
-    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5"],
-    "nextTaskId": "4.1",
-    "nextTaskLocked": false
+    "completedTasks": 16,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1"],
+    "nextTaskId": "4.2",
+    "nextTaskLocked": true
   },
   "currentTask": {
-    "id": "4.1",
+    "id": "4.2",
     "taskSource": "openspec/changes/integrate-routego-image-plugin/tasks.md",
-    "activationStatus": "unlocked-not-started"
+    "activationStatus": "locked-pending-integration-task-4.1-lane-checkpoint-acceptance"
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-4.capsule.json",
@@ -57,32 +57,35 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|2f425859d64eeb1b347749a05ffc9a13261a0746|task-3.5-checkpoint-accepted-next-4.1-unlocked|15/29",
-    "messageType": "INTEGRATION_TASK_3_5_CHECKPOINT_ACCEPTED",
-    "completedTaskId": "3.5",
-    "nextTaskId": "4.1",
-    "reportedHead": "2f425859d64eeb1b347749a05ffc9a13261a0746",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|19662a9b449364df76557e884cb9256742e60762|task-4.1-accepted-next-4.2-locked|16/29",
+    "messageType": "INTEGRATION_TASK_4_1_TASK_STATE_ACCEPTED",
+    "completedTaskId": "4.1",
+    "nextTaskId": "4.2",
+    "reportedHead": "19662a9b449364df76557e884cb9256742e60762",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
     "taskAccepted": true,
-    "laneCheckpointCommit": "2f425859d64eeb1b347749a05ffc9a13261a0746",
-    "laneCheckpointCommitPending": false
+    "laneCheckpointCommitPending": true
   },
   "latestTaskCompletion": {
-    "taskId": "3.5",
-    "activationIncorporationHead": "a452f2c66689555db0c5d8a5bb47e86ca3cd82cb",
-    "implementationCommit": "5e970a7f08536e07cccac581a0c7d7ca56ba2d66",
-    "taskStateCommit": "f919880f782e411a141711e9370aa1b8fed49780",
-    "checkpointBaseCommit": "f919880f782e411a141711e9370aa1b8fed49780",
+    "taskId": "4.1",
+    "implementationBaseCommit": "f4132d279e97019ca2316ab6523d7245b8a540ab",
+    "implementationCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
+    "implementationParent": "f4132d279e97019ca2316ab6523d7245b8a540ab",
+    "taskStateCommit": "19662a9b449364df76557e884cb9256742e60762",
+    "taskStateParent": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
+    "checkpointBaseCommit": "19662a9b449364df76557e884cb9256742e60762",
     "controllerAccepted": true,
     "files": [
-      "packages/integration/src/composition/service.ts",
-      "packages/integration/src/index.ts",
-      "packages/integration/test/service.test.ts"
+      "packages/integration/src/runtime/sessions.ts",
+      "packages/integration/src/runtime/static.ts",
+      "packages/integration/src/runtime/http-host.ts",
+      "packages/integration/src/runtime/lifecycle.ts",
+      "packages/integration/test/http-host.test.ts"
     ],
-    "verification": "Controller independently passed Integration typecheck, Integration 162/162 tests and build, root 728 total tests across seven workspace packages, root build/typecheck, strict OpenSpec 19/19, seven-package exports, repository safety 437, exact implementation/task-state scopes and clean Git.",
+    "verification": "Controller independently passed Integration typecheck, Integration 169/169 tests and build, root 735 total tests across seven workspace packages, root build/typecheck, strict OpenSpec 19/19, seven-package exports, repository safety 442, exact implementation/task-state scopes and clean Git.",
     "externalStateTouched": false
   },
   "reportingContract": {
