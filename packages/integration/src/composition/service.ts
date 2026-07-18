@@ -432,7 +432,7 @@ function studioError(
     ...(error.httpStatus === undefined ? {} : { httpStatus: error.httpStatus }),
     ...(error.providerCode === undefined ? {} : { providerCode: error.providerCode }),
     ...(error.capability === undefined ? {} : { capability: error.capability }),
-    partialArtifacts,
+    partialArtifacts: partialArtifacts.slice(0, 4),
     receivedAnyOutput: error.receivedAnyOutput,
     mayHaveBilled: error.mayHaveBilled
   });

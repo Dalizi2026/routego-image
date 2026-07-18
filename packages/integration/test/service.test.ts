@@ -487,6 +487,111 @@ describe("task 3.5 Studio composition, events, and cancellation", () => {
     expect(rendered).not.toMatch(/data:image|base64|"path"/u);
   });
 
+  it("keeps twelve result partials while bounding the nested error and emitting one failed terminal", async () => {
+    const execute: CreationExecution = async (_request, context) => {
+      for (let index = 0; index < 12; index += 1) {
+        await context.onEvent?.({
+          type: "partial",
+          requestId: context.requestId,
+          sequence: index + 1,
+          occurredAt: BASE_NOW.toISOString(),
+          artifact: artifact(`${context.requestId}:partial:${index}`, "partial", index % 4, 0x20 + index)
+        });
+      }
+      throw new Error(
+        "Authorization: Bearer synthetic-secret C:\\Users\\Synthetic\\Library\\private.png"
+      );
+    };
+    const { service } = await createHarness({ executeCreation: execute });
+
+    const events = await collectEvents(service.executeStudioStream(studioRequest()));
+    expect(events.map((event) => event.type)).toEqual([
+      "started",
+      ...Array.from({ length: 12 }, () => "partial"),
+      "failed"
+    ]);
+    expect(events.map((event) => event.sequence)).toEqual(Array.from({ length: 14 }, (_, index) => index));
+    expect(events.filter((event) => event.type === "completed" || event.type === "failed")).toHaveLength(1);
+    const terminal = events.at(-1);
+    expect(terminal).toMatchObject({
+      type: "failed",
+      error: {
+        code: "internal_contract",
+        partialArtifacts: Array.from({ length: 4 }, () => ({ phase: "partial" })),
+        receivedAnyOutput: true,
+        mayHaveBilled: true
+      },
+      receivedAnyOutput: true,
+      mayHaveBilled: true
+    });
+
+    const result = await service.studioGenerate(studioRequest());
+    expect(result).toMatchObject({
+      status: "failed",
+      execution: { receivedAnyOutput: true, mayHaveBilled: true },
+      error: { receivedAnyOutput: true, mayHaveBilled: true }
+    });
+    expect(result.partialArtifacts).toHaveLength(12);
+    expect(result.error?.partialArtifacts).toHaveLength(4);
+    expect(result.failedSlots[0]?.error.partialArtifacts).toHaveLength(4);
+    const rendered = JSON.stringify({ events, result });
+    expect(rendered).not.toContain("synthetic-secret");
+    expect(rendered).not.toContain("C:\\Users\\Synthetic");
+    expect(rendered).not.toMatch(/data:image|base64|"path"/u);
+  });
+
+  it("keeps five result partials when cancellation produces the unique failed terminal", async () => {
+    let serviceUnderTest: ProductionLocalRoutegoService;
+    const execute: CreationExecution = async (_request, context) => {
+      for (let index = 0; index < 5; index += 1) {
+        await context.onEvent?.({
+          type: "partial",
+          requestId: context.requestId,
+          sequence: index + 1,
+          occurredAt: BASE_NOW.toISOString(),
+          artifact: artifact(`${context.requestId}:partial:${index}`, "partial", index % 4, 0x30 + index)
+        });
+      }
+      serviceUnderTest.cancelOperation(context.requestId);
+      throw Object.assign(new Error("The synthetic operation was cancelled after partial output."), {
+        code: "cancelled"
+      });
+    };
+    const { service } = await createHarness({ executeCreation: execute });
+    serviceUnderTest = service;
+
+    const events = await collectEvents(service.executeStudioStream(studioRequest()));
+    expect(events.map((event) => event.type)).toEqual([
+      "started",
+      ...Array.from({ length: 5 }, () => "partial"),
+      "failed"
+    ]);
+    expect(events.map((event) => event.sequence)).toEqual(Array.from({ length: 7 }, (_, index) => index));
+    expect(events.filter((event) => event.type === "completed" || event.type === "failed")).toHaveLength(1);
+    expect(events.at(-1)).toMatchObject({
+      type: "failed",
+      error: {
+        code: "cancelled",
+        partialArtifacts: Array.from({ length: 4 }, () => ({ phase: "partial" })),
+        receivedAnyOutput: true,
+        mayHaveBilled: true
+      },
+      receivedAnyOutput: true,
+      mayHaveBilled: true
+    });
+
+    const result = await service.studioGenerate(studioRequest());
+    expect(result).toMatchObject({
+      status: "failed",
+      execution: { receivedAnyOutput: true, mayHaveBilled: true },
+      error: { code: "cancelled", receivedAnyOutput: true, mayHaveBilled: true }
+    });
+    expect(result.partialArtifacts).toHaveLength(5);
+    expect(result.error?.partialArtifacts).toHaveLength(4);
+    expect(result.failedSlots[0]?.error.partialArtifacts).toHaveLength(4);
+    expect(JSON.stringify({ events, result })).not.toMatch(/data:image|base64|[A-Z]:\\|"path"|Authorization/u);
+  });
+
   it("uses the same Library instance for Studio creation and public search", async () => {
     const { service } = await createHarness();
     const result = await service.studioGenerate(studioRequest({ saveToLibrary: true }));
