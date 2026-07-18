@@ -3,7 +3,7 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "lane-complete-after-independent-review",
+  "status": "post-archive-verification-failed-reactivated",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
@@ -26,9 +26,9 @@
   "controllerActivationCommit": "c9ac706321500b01dabbf92ed81ba39cd566127e",
   "controllerReviewGovernanceCommit": "0b32e8d5ce7fd00128cdd8c6b07d26830ce118c8",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
-  "openspecProgress": "10/10",
-  "lastCompletedTask": "5.2",
-  "nextTask": null,
+  "openspecProgress": "10/10 recorded; tasks 3.2 and 5.2 require reopen",
+  "lastCompletedTask": "5.1 accepted; 3.2 verification and 5.2 reopened by Controller",
+  "nextTask": "3.2 shared-clock test fixture correction, then 5.2 full revalidation",
   "lastImplementationCommit": "634712d5c4233f1a58ff1a33d94420fcb3504367",
   "lastOpenSpecCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
   "recentValidation": {
@@ -54,7 +54,7 @@
     "correctedImplementationScope": "packages/library/src/service.ts and packages/library/test/conformance/service.test.ts only"
   },
   "applyOwnership": {
-    "state": "complete-awaiting-controller",
+    "state": "active-single-owner",
     "activeOwnerThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
     "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "successorThreadId": "019f7261-2c57-7a01-b519-e1de521819fe"
@@ -73,7 +73,7 @@
     "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-lane-complete-after-independent-review"
+    "status": "generation-2-reactivated-after-post-archive-verification-failure"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
@@ -133,6 +133,21 @@
     "correctiveVerificationBaseline": "0bd93dea9d7035426b34600a6bae13277b3f08bd",
     "correctiveFinalTaskStateCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
     "reopenedTasks": ["5.1", "5.2"],
+    "blockers": []
+  },
+  "postArchiveReactivation": {
+    "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
+    "failedArchiveCommit": "2477b3ed4abcd909c1d3a8a837c02c813427feea",
+    "archiveRevertCommit": "fcac5c2abb8684e8b3bb66f21409905a4e5aaa32",
+    "failingTest": "packages/library/test/gallery/folders.test.ts: persists many-to-many assignment/removal and reports only real changes",
+    "finding": "The folder test injects a clock beginning at 2026-07-18T01:00:00Z into LibraryFolderStore while LibraryAssetStore uses the real clock. After real UTC passes the fixture mutation time, assignment writes updatedAt earlier than createdAt and deterministically fails index validation.",
+    "rootCause": "The test harness does not share its injected monotonic clock across the asset and folder stores even though production RoutegoLibraryService composition does.",
+    "requiredOwnerTask": "Reopen tasks 3.2 and 5.2, inject the same deterministic monotonic clock into the asset store within folders.test.ts, prove the test passes across a simulated later current time, rerun the complete clean-copy conformance gate, and issue a new delivery.",
+    "allowedScope": [
+      "packages/library/test/gallery/folders.test.ts",
+      "openspec/changes/add-routego-image-library/tasks.md",
+      ".codex/routego-program/threads/library.json"
+    ],
     "blockers": []
   },
   "supersededCompletion": {
