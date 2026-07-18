@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "controller-generation-4-handoff-pending",
+  "status": "controller-generation-4-active-integration-task-2.1-awaiting-dispatch",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -16,7 +16,7 @@
   },
   "laneContinuityPolicy": {
     "silentIdleForbidden": true,
-    "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
+    "controllerThreadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
     "requiredBeforeIncompleteIdle": [
       "LANE_CHECKPOINT",
       "BLOCKED",
@@ -186,7 +186,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-held-for-controller-generation-4",
+    "status": "offline-apply-awaiting-controller-generation-4-task-2.1-dispatch",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -204,7 +204,7 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "Controller generation 3 reached observable compaction 3 after independently accepting Integration task 1.4 at clean HEAD 0223dfbe7ee4e3683c1c63044246a318a5afc053. Integration generation 1 remains the sole offline apply owner, but task 2.1 is held until a fresh Controller generation 4 task/worktree accepts and is activated. No external authority is added.",
+    "continuityGate": "Controller generation 4 task 019f73d0-1bf4-73c2-8ca9-e28370d34595 accepted the generation-3 handoff at clean branch codex/routego-controller-g4 HEAD c292c2d461ed33000d7f154edba04908f36eedce after complete authority, Integration and automation audits and explicit dual-path reporting acknowledgement. After incorporating the activation governance commit, G4 may send a new structured follow-up unlocking only Integration task 2.1. No external authority is added.",
     "lastDirectCheckpoint": {
       "messageType": "INTEGRATION_TASK_CHECKPOINT",
       "workerThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",

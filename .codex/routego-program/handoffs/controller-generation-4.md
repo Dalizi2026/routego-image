@@ -7,7 +7,9 @@
 - 来源分支：`codex/routego-controller-g3`。
 - 计划继任分支：`codex/routego-controller-g4`。
 - 权威交接提交：`e8b96e3685b939843d9029657bd2108116a38b03`。
-- Registration 提交：包含真实 successor task/worktree 登记的后续治理提交；完整 SHA 在 `[CONTROLLER_SUCCESSOR_REGISTERED]` 中传递。
+- Registration 提交：`c292c2d461ed33000d7f154edba04908f36eedce`。
+- 接管状态：G4 已在 clean `codex/routego-controller-g4` HEAD `c292c2d461ed33000d7f154edba04908f36eedce` 完成全部权威、Integration、自动化与 Git 审计，并通过真实消息向 G3 回传 `[CONTROLLER_HANDOFF_ACCEPTED]`；G3 已用 `read_thread` 回读确认。
+- 双路径确认：G4 明确承诺直接 `send_message_to_thread` + `read_thread` 是主链，`routego-program-continuity` 是 10 分钟项目级漏报兜底，后续任何 Controller/Integration successor 都必须在创建、登记、接受和激活时继承此契约。
 - 交接原因：Controller G3 在收到 Integration 任务 1.4 后出现新的明确模型上下文摘要，达到第 3 次可观测压缩。按健康协议，必须在授权大型任务 2.1 前交给全新顶层任务和新 worktree。
 
 ## Integration 当前权威状态
