@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "1e1cedfd2e6ecc1e39fbf5b26f1211cf054e53adbf7a0f826be2363428752bb6",
+  "capsuleSha256": "9c2f74c6be84744b0674034ddf6b0c1725283ffe51d6d79a6ca971514a292b63",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -34,7 +34,7 @@
     "nextTaskId": "4.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.2.json",
-      "sha256": "896284be4a50bfde0a20ee0097192ba31811e63ca8660321be8c935e7ba30a05"
+      "sha256": "fc9a336c73f3eb654f4135073dfc8cafa006819ca81537d5d14eb6d74ab8a138"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
@@ -65,12 +65,13 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": [],
+    "blockers": ["PD-009: owner-only OpenSpec update and exact two-file task-3.5 common-root correction must be accepted before task 4.2 product edits resume."],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "taskBeyond4_2Locked": true,
     "residualRisks": [
       "Task 4.2 must preserve immutable partial-resource expiry after disconnect/cancel while closing active execution channels.",
+      "Task 4.2 must first repair the task-3.5 nested service-error partialArtifacts bound so valid 5-12 partial failures can emit one failed terminal before EOF.",
       "Task 4.2 must not implement task 4.3 MCP process/CLI behavior or any alternate stream route."
     ]
   },
@@ -88,7 +89,7 @@
   },
   "reportingContract": {
     "primary": "After every OpenSpec task, task group, safe checkpoint, blocker, deviation, handoff, activation or delivery, call real send_message_to_thread to the current Controller from program.json and then call read_thread to confirm receipt.",
-    "fallback": "routego-program-continuity archives its own run task as its first action every 30 minutes, then reads compact current state and deduplicates with latestDirectCheckpoint; it is missed-message fallback only.",
+    "fallback": "routego-program-continuity records exact CODEX_THREAD_ID, reads compact current state and deduplicates with latestDirectCheckpoint, then archives its own run by explicit ID as the final tool action; it is missed-message fallback only.",
     "fallbackIntervalMinutes": 30,
     "finalAnswerAloneIsInsufficient": true,
     "heartbeatInheritanceAssumed": false
@@ -111,7 +112,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 98274,
+    "expectedNormalizedUtf8Bytes": 103785,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
