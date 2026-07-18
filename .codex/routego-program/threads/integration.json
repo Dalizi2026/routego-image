@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "planning-complete-awaiting-controller-apply-review",
+  "status": "planning-revised-awaiting-controller-review",
   "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "threadId": "019f72fd-fb6f-7b52-b383-03471f42f05a",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4687\\生图插件",
@@ -14,11 +14,16 @@
   "generation": 0,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "2026-07-18-summary-checkpoint-uncommitted-integration-plan-at-149ca920feb6fc714db4e210e4a304f6540f3e57",
-  "lastHealthAudit": "passed-after-first-observable-compaction-full-planning-consistency-and-strict-validation",
+  "lastHealthAudit": "passed-after-controller-g3-findings-1-through-5-planning-revision-and-strict-validation",
   "successorThreadId": null,
-  "openspecState": "planning-complete-apply-ready-controller-review-required",
+  "openspecState": "revised-planning-complete-apply-ready-controller-review-required",
   "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 0/28 apply tasks executed",
-  "nextTask": "Commit the complete planning artifacts, send INTEGRATION_PLAN_READY with the full planning SHA, then wait for explicit Controller apply authorization without product edits.",
+  "planningCommit": "3ae25501f1f47b98c212fd9d47d89837ea75cd96",
+  "planningCommitLineage": [
+    "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
+    "3ae25501f1f47b98c212fd9d47d89837ea75cd96"
+  ],
+  "nextTask": "Wait for Controller G3 review of the revised INTEGRATION_PLAN_READY delivery; do not edit product files, start apply, or execute external actions without explicit follow-up authorization.",
   "governanceHold": {
     "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
     "dirtyPaths": [
@@ -27,7 +32,7 @@
     ],
     "trackedDiff": "none",
     "productFilesChanged": false,
-    "planningArtifacts": "proposal/design/11 delta specs/tasks complete; strict validation and planning consistency audit passed",
+    "planningArtifacts": "proposal/design/11 delta specs/tasks revised for Controller G3 findings 1-5; strict validation and planning consistency audit passed",
     "planDeviation": "PD-005 accepted for Integration planning only; apply remains prohibited",
     "disposition": "Superseded by the structured proposal-only activation. The preserved draft was revised and completed without product edits; Controller review is required before apply."
   },
@@ -36,6 +41,19 @@
     "activationGovernanceCommit": "997268b070ea6b23e513b342bc6f1aef28944050",
     "deviationDecisionCommit": "a101b44faedb8259bb898e5d890774497d805d27",
     "proposalOnly": true,
+    "applyAuthorized": false,
+    "externalStateAuthorized": false
+  },
+  "planningReview": {
+    "reviewedPlanningCommit": "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
+    "revisedPlanningCommit": "3ae25501f1f47b98c212fd9d47d89837ea75cd96",
+    "resolvedFindings": [
+      "chromakey uses one existing output identity and no extra rendition or relationship role within the 17+12+4=33 bound",
+      "SSE uses POST /api/v1/studio/creation/stream with exactly one first started event, requestId consistency, one terminal, terminal-before-EOF, and no sentinels",
+      "reader and channel cleanup is separate from the five-minute protected partial-resource lifetime",
+      "offline release preparation task 8.1 depends on 7.1 while external release task 8.2 depends on both 7.2 and 8.1",
+      "planning lineage and Controller-review wait state are recorded"
+    ],
     "applyAuthorized": false,
     "externalStateAuthorized": false
   },
