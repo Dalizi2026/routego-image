@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-integration-task-2.1-generation-4",
+  "status": "active-integration-task-2.2-generation-4",
   "threadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1756\\生图插件",
   "branch": "codex/routego-controller-g4",
   "startingCommit": "e8b96e3685b939843d9029657bd2108116a38b03",
   "registrationCommit": "c292c2d461ed33000d7f154edba04908f36eedce",
-  "headCommit": "a3cb5a0ad86f7113c348b0714cfba1b2435e6665",
+  "headCommit": "6cbe964d3d42d285037666ac282143beb9f226c2",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 4,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "g4-compaction-2-integration-task-1.5-complete-awaiting-checkpoint-2026-07-18",
-  "lastHealthAudit": "passed-generation-4-compaction-2-authority-task-1.5-lineage-scope-openspec-wip-and-regression-audit",
+  "lastHealthAudit": "passed-generation-4-compaction-2-task-2.1-lineage-scope-stream-contract-dependency-openspec-and-regression-audit",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -116,6 +116,7 @@
     "G4 observable compaction 1 was audited with fresh authority reads. Integration task 2.1 is paused after reproducing a frozen baseline typecheck failure in packages/mock-relay/src/service/mock-service.ts:530 caused by the required primaryArtifactId contract field; PD-007 authorizes planning-only revision for a separate mock corrective task 1.5 before 2.1.",
     "Integration planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 was independently verified as a direct child of checkpoint 94a7870e2d9eb0bda14062b52e6f8a31bc520248 with exactly four approved planning files, OpenSpec 4/29, next task 1.5, strict 19/19, unchanged packages/mock-relay, and preserved unstaged task-2.1 WIP. Task 1.5 is the only newly activated implementation scope.",
     "Controller generation 4 observable compaction 2 was audited from clean branch codex/routego-controller-g4 HEAD a3cb5a0ad86f7113c348b0714cfba1b2435e6665. Authority, PD-006 all-role threshold, Integration ownership, task-1.5 lineage, exact commit scopes, OpenSpec 5/29, task-2.1 allowed WIP, direct reporting and external safety boundaries remain clear.",
-    "Integration task 1.5 direct checkpoint 6482a22f322f71494ee63df4d760f35051e18b23 was independently accepted after exact two-file implementation review, isolated tasks.md and integration.json state commits, mock-relay 44/44, mock-relay/Creation/root typechecks, builds, repository safety 387, strict OpenSpec 19/19 and diff checks. The same generation-1 sole apply owner may resume only its already-started task 2.1; task 2.2 remains locked pending the next direct checkpoint and Controller review."
+    "Integration task 1.5 direct checkpoint 6482a22f322f71494ee63df4d760f35051e18b23 was independently accepted after exact two-file implementation review, isolated tasks.md and integration.json state commits, mock-relay 44/44, mock-relay/Creation/root typechecks, builds, repository safety 387, strict OpenSpec 19/19 and diff checks. The same generation-1 sole apply owner may resume only its already-started task 2.1; task 2.2 remains locked pending the next direct checkpoint and Controller review.",
+    "Integration task 2.1 direct checkpoint 38acc116e63ef8231041e2edec099bd31fcdd568 was independently accepted after direct implementation/task-state/thread-state ancestry, exact eleven-file scope, frozen install for eight workspaces, stream-route 15/15, Integration and root typechecks/builds, seven-package exports, contracts 96/96, exact pngjs dependency/license/native audit, repository safety 395, strict OpenSpec 19/19, diff checks and clean Git. At Integration compaction 3, only bounded five-file task 2.2 in the same streaming gate is activated; task 2.3 remains locked."
   ]
 }
