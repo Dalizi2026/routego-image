@@ -1,7 +1,7 @@
 import { deflateSync } from "node:zlib";
 import os from "node:os";
 import path from "node:path";
-import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, open, readFile, rm, symlink, writeFile } from "node:fs/promises";
 
 import { afterEach, describe, expect, it } from "vitest";
 import {
@@ -22,6 +22,7 @@ import {
   RoutegoLibraryService,
   UploadStore,
   createRoutegoLibraryService,
+  decodeZipArchive,
   type LibrarySettingsService
 } from "../../src/index";
 
@@ -102,7 +103,12 @@ async function* binaryChunks(bytes: Uint8Array): AsyncGenerator<Uint8Array> {
   if (middle < bytes.byteLength) yield bytes.subarray(middle);
 }
 
-async function createHarness(prefix: string) {
+async function createHarness(
+  prefix: string,
+  options: {
+    readonly publicProtectedRoots?: (root: string) => readonly string[];
+  } = {}
+) {
   const root = await mkdtemp(path.join(os.tmpdir(), `routego-conformance-${prefix}-`));
   roots.push(root);
   const homeDirectory = path.join(root, "home");
@@ -130,7 +136,7 @@ async function createHarness(prefix: string) {
     mutations: { protectedRoots: [], idFactory: (kind) => next(kind) },
     portability: { idFactory: (kind) => next(kind) },
     zipPreflightIdFactory: () => next("preflight"),
-    publicProtectedRoots: []
+    publicProtectedRoots: options.publicProtectedRoots?.(root) ?? []
   });
   return { root, homeDirectory, dataRoot, libraryRoot, service };
 }
@@ -338,5 +344,91 @@ describe("@routego-image/library service composition", () => {
     expect(targetSearch.items).toHaveLength(1);
     expect(targetSearch.items[0]?.assetId).toBe(seeded.assetId);
     expect(JSON.stringify(imported)).not.toContain(publicExport.outputPath);
+  });
+
+  it("writes every public ZIP byte when FileHandle.write completes partially", async () => {
+    const source = await createHarness("zip-partial-write");
+    const seeded = await seedAsset(source, {
+      assetId: "asset-partial-write",
+      artifactId: "artifact-partial-write",
+      fill: 0x66
+    });
+    const requestedOutput = path.join(source.root, "exports", "partial.zip");
+    await mkdir(path.dirname(requestedOutput), { recursive: true });
+    await writeFile(requestedOutput, "preserve-existing", "utf8");
+
+    const probeHandle = await open(path.join(source.root, "file-handle-prototype-probe"), "w");
+    const fileHandlePrototype = Object.getPrototypeOf(probeHandle) as {
+      write: (
+        this: object,
+        buffer: Uint8Array
+      ) => Promise<{ readonly bytesWritten: number; readonly buffer: Uint8Array }>;
+    };
+    const originalWrite = fileHandlePrototype.write;
+    await probeHandle.close();
+    let partialCalls = 0;
+    fileHandlePrototype.write = async function (buffer) {
+      const length = buffer.byteLength > 1 ? Math.ceil(buffer.byteLength / 2) : buffer.byteLength;
+      if (length < buffer.byteLength) partialCalls += 1;
+      return await originalWrite.call(this, buffer.subarray(0, length));
+    };
+
+    const publicExport = await (async () => {
+      try {
+        return await source.service.manageLibrary({
+          action: "export-zip",
+          assetIds: [seeded.assetId],
+          outputPath: requestedOutput
+        });
+      } finally {
+        fileHandlePrototype.write = originalWrite;
+      }
+    })();
+
+    expect(partialCalls).toBeGreaterThan(0);
+    expect(await readFile(requestedOutput, "utf8")).toBe("preserve-existing");
+    expect(publicExport.outputPath).toBe(path.join(source.root, "exports", "partial-2.zip"));
+    const exportedBytes = await readFile(publicExport.outputPath!);
+    expect(() => decodeZipArchive(exportedBytes)).not.toThrow();
+
+    const target = await createHarness("zip-partial-write-import");
+    const imported = await target.service.manageLibrary({
+      action: "import-zip",
+      zipPath: publicExport.outputPath!
+    });
+    expect(imported).toMatchObject({ importedCount: 1, skippedCount: 0 });
+  });
+
+  it("rejects a public ZIP destination whose symlink or junction resolves into a protected root", async () => {
+    const source = await createHarness("zip-protected-link", {
+      publicProtectedRoots: (root) => [path.join(root, "protected-legacy")]
+    });
+    const seeded = await seedAsset(source, {
+      assetId: "asset-protected-link",
+      artifactId: "artifact-protected-link",
+      fill: 0x77
+    });
+    const protectedRoot = path.join(source.root, "protected-legacy");
+    const apparentSafeRoot = path.join(source.root, "apparently-safe");
+    const protectedExisting = path.join(protectedRoot, "export.zip");
+    await mkdir(protectedRoot, { recursive: true });
+    await writeFile(protectedExisting, "preserve-protected-existing", "utf8");
+    await symlink(
+      protectedRoot,
+      apparentSafeRoot,
+      process.platform === "win32" ? "junction" : "dir"
+    );
+
+    await expect(
+      source.service.manageLibrary({
+        action: "export-zip",
+        assetIds: [seeded.assetId],
+        outputPath: path.join(apparentSafeRoot, "export.zip")
+      })
+    ).rejects.toMatchObject({ code: "path_unsafe" });
+    expect(await readFile(protectedExisting, "utf8")).toBe("preserve-protected-existing");
+    await expect(access(path.join(protectedRoot, "export-2.zip"))).rejects.toMatchObject({
+      code: "ENOENT"
+    });
   });
 });

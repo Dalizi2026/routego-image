@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { createReadStream } from "node:fs";
-import { lstat, unlink } from "node:fs/promises";
+import { lstat, mkdir, realpath, unlink, type FileHandle } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -58,7 +58,7 @@ import {
 import { createProtectedLegacyRoots, type PathPlatform } from "@routego-image/foundation";
 
 import { LibrarySettingsStore, type LibrarySettingsStoreOptions } from "./config/store";
-import { LibraryError } from "./errors";
+import { isNodeError, LibraryError } from "./errors";
 import { createExclusiveFile } from "./fs/paths";
 import { LibraryAssetStore, type LibraryAssetStoreOptions } from "./gallery/assets";
 import { ImageLibraryIndexStore, type ImageLibraryIndexStoreOptions } from "./gallery/index-store";
@@ -183,6 +183,68 @@ function isContained(root: string, candidate: string, platform: NodeJS.Platform)
 
 function overlaps(left: string, right: string, platform: NodeJS.Platform): boolean {
   return isContained(left, right, platform) || isContained(right, left, platform);
+}
+
+async function canonicalizeThroughExistingAncestor(
+  candidate: string,
+  platform: NodeJS.Platform
+): Promise<string> {
+  const selectedPath = pathApi(platform);
+  let cursor = selectedPath.resolve(candidate);
+  const missingSegments: string[] = [];
+  while (true) {
+    let metadata;
+    try {
+      metadata = await lstat(cursor);
+    } catch (error) {
+      if (!isNodeError(error, "ENOENT")) {
+        throw new LibraryError("path_unsafe", "The ZIP output path could not be inspected.", {
+          cause: error
+        });
+      }
+      const parent = selectedPath.dirname(cursor);
+      if (parent === cursor) {
+        throw new LibraryError("path_unsafe", "The ZIP output path has no existing ancestor.");
+      }
+      missingSegments.unshift(selectedPath.basename(cursor));
+      cursor = parent;
+      continue;
+    }
+
+    let canonical: string;
+    try {
+      canonical = await realpath(cursor);
+    } catch (error) {
+      throw new LibraryError("path_unsafe", "The ZIP output path could not be resolved safely.", {
+        cause: error
+      });
+    }
+    if (missingSegments.length > 0) {
+      const canonicalMetadata = await lstat(canonical).catch((error: unknown) => {
+        throw new LibraryError("path_unsafe", "The ZIP output ancestor is unavailable.", {
+          cause: error
+        });
+      });
+      if (!canonicalMetadata.isDirectory()) {
+        throw new LibraryError("path_unsafe", "The ZIP output ancestor is not a directory.");
+      }
+    } else if (!metadata.isDirectory() && !metadata.isSymbolicLink()) {
+      return canonical;
+    }
+    return selectedPath.resolve(canonical, ...missingSegments);
+  }
+}
+
+async function writeAll(handle: FileHandle, chunk: Uint8Array): Promise<void> {
+  let offset = 0;
+  while (offset < chunk.byteLength) {
+    const remaining = chunk.byteLength - offset;
+    const { bytesWritten } = await handle.write(chunk.subarray(offset));
+    if (!Number.isSafeInteger(bytesWritten) || bytesWritten < 1 || bytesWritten > remaining) {
+      throw new LibraryError("file_write_failed", "The public ZIP export could not be written.");
+    }
+    offset += bytesWritten;
+  }
 }
 
 function resultStatus(items: readonly MutationItem[]): ExecuteLibraryMutationResult["status"] {
@@ -610,11 +672,15 @@ export class RoutegoLibraryService implements LibraryApplicationService {
     }
   }
 
-  #assertPublicOutputAllowed(candidate: string): void {
+  #assertPublicOutputAllowed(
+    candidate: string,
+    libraryRoot = this.indexStore.paths.root,
+    protectedRoots = this.#publicProtectedRoots
+  ): void {
     const normalizedCandidate = normalizedPath(candidate, this.#platform);
-    const normalizedLibraryRoot = normalizedPath(this.indexStore.paths.root, this.#platform);
+    const normalizedLibraryRoot = normalizedPath(libraryRoot, this.#platform);
     if (isContained(normalizedLibraryRoot, normalizedCandidate, this.#platform)) return;
-    for (const protectedRoot of this.#publicProtectedRoots) {
+    for (const protectedRoot of protectedRoots) {
       if (overlaps(normalizedCandidate, normalizedPath(protectedRoot, this.#platform), this.#platform)) {
         throw new LibraryError(
           "path_unsafe",
@@ -622,6 +688,53 @@ export class RoutegoLibraryService implements LibraryApplicationService {
         );
       }
     }
+  }
+
+  async #resolvePublicOutputDirectory(absoluteOutputPath: string): Promise<string> {
+    const selectedPath = pathApi(this.#platform);
+    this.#assertPublicOutputAllowed(absoluteOutputPath);
+    const requestedDirectory = selectedPath.dirname(absoluteOutputPath);
+    const requestedFileName = selectedPath.basename(absoluteOutputPath);
+    const [projectedDirectory, canonicalLibraryRoot, canonicalProtectedRoots] = await Promise.all([
+      canonicalizeThroughExistingAncestor(requestedDirectory, this.#platform),
+      canonicalizeThroughExistingAncestor(this.indexStore.paths.root, this.#platform),
+      Promise.all(
+        this.#publicProtectedRoots.map(async (root) =>
+          canonicalizeThroughExistingAncestor(root, this.#platform)
+        )
+      )
+    ]);
+    this.#assertPublicOutputAllowed(
+      selectedPath.join(projectedDirectory, requestedFileName),
+      canonicalLibraryRoot,
+      canonicalProtectedRoots
+    );
+    try {
+      await mkdir(projectedDirectory, { recursive: true });
+    } catch (error) {
+      throw new LibraryError("path_unsafe", "The ZIP output directory could not be created safely.", {
+        cause: error
+      });
+    }
+    const canonicalDirectory = await realpath(projectedDirectory).catch((error: unknown) => {
+      throw new LibraryError("path_unsafe", "The ZIP output directory could not be resolved safely.", {
+        cause: error
+      });
+    });
+    const metadata = await lstat(canonicalDirectory).catch((error: unknown) => {
+      throw new LibraryError("path_unsafe", "The ZIP output directory is unavailable.", {
+        cause: error
+      });
+    });
+    if (!metadata.isDirectory()) {
+      throw new LibraryError("path_unsafe", "The ZIP output destination is not a directory.");
+    }
+    this.#assertPublicOutputAllowed(
+      selectedPath.join(canonicalDirectory, requestedFileName),
+      canonicalLibraryRoot,
+      canonicalProtectedRoots
+    );
+    return canonicalDirectory;
   }
 
   async #copyExportToPublicPath(
@@ -633,20 +746,19 @@ export class RoutegoLibraryService implements LibraryApplicationService {
     }
     const selectedPath = pathApi(this.#platform);
     const absolute = selectedPath.resolve(requestedPath);
-    this.#assertPublicOutputAllowed(absolute);
     const extension = selectedPath.extname(absolute);
     const requestedBaseName =
       extension.toLocaleLowerCase("en-US") === ".zip"
         ? selectedPath.basename(absolute, extension)
         : selectedPath.basename(absolute);
     const output = await createExclusiveFile({
-      directory: selectedPath.dirname(absolute),
+      directory: await this.#resolvePublicOutputDirectory(absolute),
       requestedBaseName,
       extension: ".zip"
     });
     try {
       for await (const chunk of createReadStream(backing.path)) {
-        await output.handle.write(chunk);
+        await writeAll(output.handle, chunk);
       }
       await output.handle.sync();
       await output.handle.close();
