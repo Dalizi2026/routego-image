@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-3-registered-awaiting-low-context-acceptance-generation-2-frozen-sole-owner-task-3.2-locked",
+  "status": "generation-3-handoff-audit-fix-pending-incorporation-and-revalidation-generation-2-frozen-sole-owner-task-3.2-locked",
   "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
   "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
@@ -11,7 +11,10 @@
   "generation": 3,
   "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
   "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
+  "incorporationCommit": "b34caaabd419f357ed91b6bb44ac0dd7700ed73a",
+  "currentHead": "b34caaabd419f357ed91b6bb44ac0dd7700ed73a",
   "gitCleanAtRegistration": true,
+  "gitClean": true,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": false,
@@ -43,20 +46,21 @@
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
-    "status": "registered-awaiting-successor-validation-and-acceptance",
+    "status": "audit-failed-deterministic-byte-fix-pending-incorporation-and-revalidation",
     "acceptanceCompactionLimit": 0,
     "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|3f1878bbe2e5dc2680b92422a43160bc1cac8802|3.1-accepted-and-generation-3-handoff-prepared|11/29",
-    "messageType": "INTEGRATION_GENERATION_3_HANDOFF_READY",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|b34caaabd419f357ed91b6bb44ac0dd7700ed73a|handoff-audit-failed-raw-line-ending-byte-invariant|11/29",
+    "messageType": "HANDOFF_AUDIT_FAILED",
     "completedTaskId": "3.1",
     "nextTaskId": "3.2",
-    "reportedHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "reportedHead": "b34caaabd419f357ed91b6bb44ac0dd7700ed73a",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
-    "controllerAccepted": true
+    "controllerAccepted": true,
+    "handoffAccepted": false
   },
   "reportingContract": {
     "primary": "send_message_to_thread plus read_thread after every task/group/checkpoint/blocker/deviation/handoff/activation/delivery",
@@ -68,6 +72,7 @@
     "governanceCommit": "5e7dee834f7e181f3f4e7f4075359d2b2e45c241",
     "startupMaxFiles": 12,
     "startupMaxUtf8Bytes": 122880,
+    "startupByteCounting": "utf8-after-crlf-to-lf-normalization",
     "fullHistoryDefaultReadForbidden": true,
     "acknowledgementRequiredBeforeAcceptance": true
   },

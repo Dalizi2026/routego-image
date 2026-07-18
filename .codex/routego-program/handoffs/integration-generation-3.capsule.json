@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "69a03c22a29020b4493fb9179ed8e11922823906d6077023b70502c6f5ff81a8",
+  "capsuleSha256": "22fa48c3f5a8fc69121dfbf83930c267667000d37a357a19bcb529f94d8c41f6",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -48,7 +48,7 @@
   ],
   "authority": {
     "summaryPath": ".codex/routego-program/authority-summary.md",
-    "summarySha256": "52adf2ff5bcd5d6ac7f8d37529fed1ca03e88ed01f682fb70a5626283ab477b9",
+    "summarySha256": "6387478ec031eb7aeddb0fa6ec90674114bf855113828f6305ad6d061c70e910",
     "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
     "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
@@ -98,6 +98,8 @@
     ],
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
+    "byteCounting": "utf8-after-crlf-to-lf-normalization",
+    "expectedNormalizedUtf8Bytes": 91254,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

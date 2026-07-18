@@ -58,6 +58,8 @@
 - 单个 lane 当前状态：建议不超过 32 KiB；
 - successor 默认启动：不超过 120 KiB UTF-8、最多 12 个文件。
 
+启动文件的精确 UTF-8 字节数必须先把 CRLF 规范化为 LF 后计算，并记录在 handoff capsule 中。Git 的 `core.autocrlf` 或不同工作树检出方式不得改变该不变量；原始工作树换行字节数只能作为诊断信息，不能作为 handoff acceptance 门禁。
+
 不得删除证据或省略关键字段来满足预算。超出内容必须转移到带完整 SHA 和内容指纹的 history/evidence 文件。
 
 若 successor 在 handoff acceptance 前发生一次可观测上下文压缩，必须发送 HANDOFF_CONTEXT_BUDGET_FAILED：

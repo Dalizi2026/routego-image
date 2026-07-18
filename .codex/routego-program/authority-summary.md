@@ -28,7 +28,7 @@
 ## 低上下文无损交接
 
 - PD-008 取代 successor 启动时默认全量重读。默认只读 AGENTS、本文、紧凑 program、自 lane state、handoff capsule、task capsule、直接相关 delta/main specs 和当前有效 PD。
-- 默认最多 12 个文件、120 KiB UTF-8；authority summary 16 KiB、handoff capsule 24 KiB、program 48 KiB、lane state 32 KiB、直接治理消息 12 KiB。
+- 默认最多 12 个文件、120 KiB UTF-8；启动字节统一按 CRLF 规范化为 LF 后计算，必须与 capsule 的精确预期值一致；authority summary 16 KiB、handoff capsule 24 KiB、program 48 KiB、lane state 32 KiB、直接治理消息 12 KiB。
 - 只有 capsule/状态/OpenSpec/Git 不一致、公共边界、验收根因、PLAN_DEVIATION 或健康审计失败时定向展开。
 - 全量审计仅限初建、最终 Integration conformance、main spec 同步/archive、release/rollback 门禁、定向恢复失败或用户明确要求。
 - acceptance 前出现一次压缩即 HANDOFF_CONTEXT_BUDGET_FAILED；successor 不得激活，predecessor 保持 owner。

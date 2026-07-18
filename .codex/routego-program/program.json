@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-008-active-integration-generation-3-registered-awaiting-low-context-acceptance-task-3.2-locked",
+  "status": "pd-008-integration-generation-3-handoff-audit-fix-pending-incorporation-and-revalidation-task-3.2-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
   "authoritySummary": {
     "path": ".codex/routego-program/authority-summary.md",
-    "sha256": "52adf2ff5bcd5d6ac7f8d37529fed1ca03e88ed01f682fb70a5626283ab477b9"
+    "sha256": "6387478ec031eb7aeddb0fa6ec90674114bf855113828f6305ad6d061c70e910"
   },
   "governance": {
     "activeDecisions": [
@@ -25,6 +25,7 @@
       "lowContextLossless": true,
       "startupMaxFiles": 12,
       "startupMaxUtf8Bytes": 122880,
+      "startupByteCounting": "utf8-after-crlf-to-lf-normalization",
       "handoffAcceptanceCompactionLimit": 0,
       "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
       "auditFailure": "HANDOFF_AUDIT_FAILED"
@@ -57,10 +58,10 @@
     "role": "program-controller",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
     "branch": "codex/routego-controller-g5",
-    "verifiedHeadBeforeContainingCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",
+    "verifiedHeadBeforeContainingCommit": "351f126ef5a28cc8d378a116e400434c27fcd3cd",
     "status": "authoritative",
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "g5-compaction-1-after-controller-activation-before-integration-g3-registration-2026-07-18"
+    "observableCompactions": 2,
+    "lastCompactionFingerprint": "g5-compaction-2-during-integration-g3-low-context-acceptance-2026-07-18"
   },
   "applyOwner": {
     "lane": "integration",
@@ -77,11 +78,25 @@
   "successor": {
     "lane": "integration",
     "generation": 3,
-    "status": "registered-inactive-awaiting-low-context-acceptance",
+    "status": "registered-inactive-awaiting-byte-invariant-fix-incorporation-and-revalidation",
     "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
     "plannedBranch": "codex/routego-integration-g3",
     "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
+    "incorporationCommit": "b34caaabd419f357ed91b6bb44ac0dd7700ed73a",
+    "gitClean": true,
+    "observableCompactions": 0,
+    "handoffAudit": {
+      "status": "failed-contained-fix-prepared",
+      "reportedStartupFiles": 12,
+      "reportedRawWorktreeUtf8Bytes": 90557,
+      "registeredRawWorktreeUtf8Bytes": 89769,
+      "rootCause": "The validator counted checkout-specific CRLF bytes, so identical Git content produced a false 788-byte mismatch across worktrees.",
+      "resolution": "Count normalized UTF-8 bytes after CRLF-to-LF conversion and require the capsule's exact normalized invariant.",
+      "handoffAccepted": false,
+      "activationAttempted": false
+    },
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
     "invalidatedUnregisteredDraft": {
       "threadId": "019f753a-3afc-7123-9631-181698e86db2",
@@ -106,22 +121,24 @@
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|3f1878bbe2e5dc2680b92422a43160bc1cac8802|3.1-accepted-and-generation-3-handoff-prepared|11/29",
-    "messageType": "INTEGRATION_GENERATION_3_HANDOFF_READY",
-    "workerThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-    "reportedHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|b34caaabd419f357ed91b6bb44ac0dd7700ed73a|handoff-audit-failed-raw-line-ending-byte-invariant|11/29",
+    "messageType": "HANDOFF_AUDIT_FAILED",
+    "workerThreadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+    "reportedHead": "b34caaabd419f357ed91b6bb44ac0dd7700ed73a",
     "completedTaskId": "3.1",
     "nextTaskId": "3.2",
     "openspecProgress": "11/29",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
-    "controllerAccepted": true
+    "controllerAccepted": true,
+    "handoffAccepted": false
   },
   "currentBlockers": [
-    "Integration G3 registration, low-context acceptance, G2 archival and explicit sole-owner activation are required before task 3.2."
+    "Integration G3 must incorporate the deterministic startup-byte governance fix, rerun low-context acceptance, then G2 archival and explicit sole-owner activation are required before task 3.2."
   ],
   "currentRisks": [
-    "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence."
+    "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence.",
+    "The original startup-byte report used raw worktree line endings and was not portable across Git worktrees. The contained governance fix normalizes CRLF to LF before enforcing the exact capsule byte invariant."
   ],
   "externalApprovalGates": {
     "tasks": ["7.2", "8.2", "9.1"],

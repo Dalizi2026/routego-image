@@ -123,6 +123,8 @@
         "mandatoryFiles",
         "maxFiles",
         "maxUtf8Bytes",
+        "byteCounting",
+        "expectedNormalizedUtf8Bytes",
         "escalationTriggers",
         "fullAuditTriggers",
         "contextBudgetFailure"
