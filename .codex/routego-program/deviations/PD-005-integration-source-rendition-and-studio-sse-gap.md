@@ -70,4 +70,3 @@ Potential implementation files are limited to the exact contract, Library, Studi
 - This decision authorizes proposal/design/delta-spec/task continuation only after the Controller sends a structured proposal-only activation message.
 - It does not authorize apply, product edits, task checkboxes, real credentials, real user images, real Library data, real relay calls, billable probes, installation replacement, deployment, publication, marketplace replacement, or release.
 - Integration must return `[INTEGRATION_PLAN_READY]` with a complete commit and strict validation. Controller approval of that plan is still required before apply.
-
