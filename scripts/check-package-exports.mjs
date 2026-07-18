@@ -35,6 +35,11 @@ const packages = [
     browserSafe: false
   },
   {
+    directory: "packages/integration",
+    expectedExports: ["ROUTEGO_INTEGRATION_PACKAGE_VERSION", "createStudioCreationStreamRoute"],
+    browserSafe: false
+  },
+  {
     directory: "packages/studio",
     expectedExports: ["ROUTEGO_STUDIO_PACKAGE_VERSION"],
     browserSafe: true

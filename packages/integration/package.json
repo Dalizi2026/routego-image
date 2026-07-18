@@ -1,0 +1,30 @@
+{
+  "name": "@routego-image/integration",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --build tsconfig.json --pretty false",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@routego-image/contracts": "workspace:*",
+    "@routego-image/creation": "workspace:*",
+    "@routego-image/foundation": "workspace:*",
+    "@routego-image/library": "workspace:*",
+    "pngjs": "7.0.0"
+  },
+  "devDependencies": {
+    "@types/pngjs": "6.0.5"
+  }
+}

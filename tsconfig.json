@@ -6,6 +6,7 @@
     { "path": "./packages/mock-relay" },
     { "path": "./packages/creation" },
     { "path": "./packages/library" },
+    { "path": "./packages/integration" },
     { "path": "./packages/studio" }
   ]
 }
