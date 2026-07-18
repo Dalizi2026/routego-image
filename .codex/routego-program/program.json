@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-009-controller-generation-6-active-integration-generation-5-task-4.2-phase-a-common-root-correction-authorized-phase-b-locked",
+  "status": "pd-009-controller-generation-6-active-integration-generation-5-task-4.2-phase-a-accepted-phase-b-authorized",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -72,7 +72,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "branch": "codex/routego-integration-g5",
     "acceptedProductCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
-    "currentHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+    "currentHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
@@ -83,14 +83,14 @@
   "successor": {
     "lane": "integration",
     "generation": 5,
-    "status": "activated-sole-apply-owner-task-4.2-phase-a-authorized-phase-b-locked",
+    "status": "activated-sole-apply-owner-task-4.2-phase-a-accepted-phase-b-authorized",
     "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "plannedBranch": "codex/routego-integration-g5",
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-    "currentHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+    "currentHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
     "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
     "gitClean": true,
     "observableCompactions": 1,
@@ -112,16 +112,19 @@
       "activationAuthorized": true,
       "commonRootCorrectionAuthorized": true,
       "phaseAAuthorized": true,
-      "phaseBLocked": true,
+      "phaseAAccepted": true,
+      "phaseBLocked": false,
+      "phaseBAuthorized": true,
+      "acceptedPhaseAImplementationCommit": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
       "acceptedPlanningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
-      "pauseReason": "Only the exact two-file PD-009 Phase A correction is authorized. The original four-file task 4.2 Phase B remains locked until Phase A checkpoint acceptance."
+      "pauseReason": null
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|8353f3b5024ffcf96c5c71adaa93bac53d93da57|pd-009-openspec-planning-accepted-phase-a-authorized|16/29",
-    "messageType": "INTEGRATION_PD_009_OPENSPEC_UPDATED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|6da30fb3d0a7920120c8f565697370d79a02e2d9|pd-009-phase-a-accepted-phase-b-authorized|16/29",
+    "messageType": "INTEGRATION_PD_009_PHASE_A_IMPLEMENTATION_COMMITTED",
     "workerThreadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
-    "reportedHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+    "reportedHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
     "completedTaskId": "4.1",
     "nextTaskId": "4.2",
     "openspecProgress": "16/29",
@@ -130,7 +133,7 @@
     "controllerAccepted": true,
     "handoffAccepted": true,
     "planDeviationAccepted": true,
-    "controllerIndependentVerification": "Controller independently verified exact design/spec/tasks scope, task 4.2 remains unchecked, strict OpenSpec 19/19 passed, fresh apply instructions report 16/29, Git is clean, and no product file changed. Phase A is authorized for exactly service.ts and service.test.ts; Phase B remains locked."
+    "controllerIndependentVerification": "Controller independently reviewed the one-line nested partialArtifacts slice(0,4) root fix and focused 12-partial failure/5-partial cancellation regressions; Integration typecheck, 171/171 tests, build, repository safety 450, diff check, exact two-file scope and Git clean passed. Phase A is accepted and Phase B is authorized."
   },
   "controllerSuccessor": {
     "lane": "controller",
@@ -183,9 +186,7 @@
     "directReportingPrimary": true,
     "continuityFallbackIntervalMinutes": 30
   },
-  "currentBlockers": [
-    "PD-009 Phase A exact two-file common-root corrective checkpoint must pass focused/full Integration verification and Controller acceptance before the original four-file task 4.2 Phase B resumes."
-  ],
+  "currentBlockers": [],
   "currentRisks": [
     "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence.",
     "Task 3.2 orphan-accounting regressions cover the reproduced same-path replacement schedule; not every theoretical scheduler permutation is exhaustively enumerated.",
@@ -263,8 +264,8 @@
       "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
       "branch": "codex/routego-integration-g5",
-      "acceptedHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
-      "status": "sole-apply-owner-task-4.2-phase-a-authorized-phase-b-locked"
+      "acceptedHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+      "status": "sole-apply-owner-task-4.2-phase-a-accepted-phase-b-authorized"
     },
     "otherUnfinishedLanes": []
   },

@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-5-active-sole-apply-owner-task-4.2-pd-009-phase-a-authorized-phase-b-locked",
+  "status": "generation-5-active-sole-apply-owner-task-4.2-pd-009-phase-a-accepted-phase-b-authorized",
   "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
   "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
@@ -12,7 +12,7 @@
   "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
   "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
   "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
-  "currentHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+  "currentHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
   "latestActivationIncorporationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
   "gitCleanAtRegistration": true,
   "gitClean": true,
@@ -47,7 +47,7 @@
   "currentTask": {
     "id": "4.2",
     "capsule": ".codex/routego-program/tasks/integration-4.2.json",
-    "activationStatus": "pd-009-phase-a-authorized-phase-b-locked",
+    "activationStatus": "pd-009-phase-a-accepted-phase-b-authorized",
     "started": false
   },
   "handoff": {
@@ -58,11 +58,11 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|8353f3b5024ffcf96c5c71adaa93bac53d93da57|pd-009-openspec-planning-accepted-phase-a-authorized|16/29",
-    "messageType": "INTEGRATION_PD_009_OPENSPEC_UPDATED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|6da30fb3d0a7920120c8f565697370d79a02e2d9|pd-009-phase-a-accepted-phase-b-authorized|16/29",
+    "messageType": "INTEGRATION_PD_009_PHASE_A_IMPLEMENTATION_COMMITTED",
     "completedTaskId": "4.1",
     "nextTaskId": "4.2",
-    "reportedHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+    "reportedHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
@@ -90,7 +90,7 @@
   },
   "planDeviation": {
     "decision": ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
-    "status": "planning-accepted-phase-a-authorized-phase-b-locked",
+    "status": "phase-a-implementation-accepted-phase-b-authorized",
     "planningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "planningParent": "c0f965dfe860174522dd9ce2ea50762c226ee6e1",
     "finding": "The task-3.5 service error projection can throw after the fifth through twelfth valid partial because the result maximum is 12 and the nested service-error maximum is 4.",
@@ -109,7 +109,9 @@
       "packages/integration/test/routes.test.ts",
       "packages/integration/test/stream-route.test.ts"
     ],
-    "nextGate": "phase-a-two-file-corrective-commit-controller-acceptance"
+    "phaseAImplementationCommit": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+    "phaseAImplementationParent": "4bd2271e0c137d55050d84ae5ae4aac0be9d9388",
+    "nextGate": "phase-b-four-file-implementation-commit-controller-acceptance"
   },
   "reportingContract": {
     "currentControllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "ffc4829428195c9e8f12b9ff3e1855e614c74ce29fa4815d270f59040f896822",
+  "contentSha256": "612977d99188ddfa1494abed9b893bf503b17b0f4ab12c3a006e1558fadc5cae",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.2",
-  "status": "authorized-phase-a-common-root-correction-phase-b-locked",
+  "status": "phase-a-correction-accepted-phase-b-authorized",
   "sourceCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -103,7 +103,7 @@
     "acceptedPreviousTaskImplementationCommit": "cad0feaa4f9ca65e970a8c6fbdc13b40ad3ee5b9",
     "acceptedPreviousTaskCheckpointCommit": "2379675079c39942061d3907fb63e045f069c75b",
     "acceptedPreviousTaskStateSyncCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
-    "acceptedHead": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+    "acceptedHead": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
     "sourceOwnerArchived": true,
     "soleApplyOwner": true,
     "applyAuthorized": true,
@@ -113,7 +113,7 @@
     "decision": ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
     "decisionSha256": "9e11b7ae4369608e7d84f382da979f144b82ff7ffaa7a44b5d0efb1f566d49e2",
     "decisionSha256ByteCounting": "utf8-after-crlf-to-lf-normalization",
-    "status": "planning-accepted-phase-a-authorized-phase-b-locked",
+    "status": "phase-a-implementation-accepted-phase-b-authorized",
     "planningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
     "planningParent": "c0f965dfe860174522dd9ce2ea50762c226ee6e1",
     "originalTaskId": "3.5",
@@ -133,7 +133,11 @@
     ],
     "implementationGate": "Phase A is authorized as one exact two-file corrective commit; Phase B remains locked until the Phase A corrective checkpoint passes focused/full verification and Controller acceptance.",
     "phaseAAuthorized": true,
-    "phaseBLocked": true
+    "phaseAImplementationCommit": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+    "phaseAImplementationParent": "4bd2271e0c137d55050d84ae5ae4aac0be9d9388",
+    "phaseAAccepted": true,
+    "phaseBLocked": false,
+    "phaseBAuthorized": true
   },
   "unresolvedIssues": [],
   "knownRisks": [
