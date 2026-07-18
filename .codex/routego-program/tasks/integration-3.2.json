@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "0806da96fb3bd3cfc819d0de9c347a8c83cb7716f29398dcf459e261c69dae63",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "3.2",
+  "status": "locked-pending-successor-acceptance-source-archive-and-sole-owner-activation",
+  "sourceCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "d1bf9975af857499089da8354ca4496af94cbcb9172de641c71d5aa90e4d8cf4",
+    "lineSha256": "1445919b0d64b8fdea162d933205b68ff8856263ef0bb1cedaea19f8c40043ba",
+    "lineBytes": 1630
+  },
+  "dependencies": ["3.1"],
+  "allowedFiles": [
+    "packages/integration/src/image/materialize.ts",
+    "packages/integration/src/image/chromakey.ts",
+    "packages/integration/src/runtime/ephemeral-resources.ts",
+    "packages/integration/test/image.test.ts"
+  ],
+  "allowedFileMode": "create-or-modify; each parent directory must already exist",
+  "forbiddenFileGlobs": [
+    "packages/library/**",
+    "packages/creation/**",
+    "packages/integration/src/composition/**",
+    "packages/integration/src/runtime/http-host.ts",
+    "packages/integration/src/runtime/routes.ts",
+    "openspec/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "**/binding.gyp"
+  ],
+  "requiredBehavior": [
+    "Bound output data-URL materialization with metadata and hash validation.",
+    "Exclusive request staging and cleanup with multi-output partial preservation.",
+    "Session-owned ephemeral browser resources with immutable expiry at min(registration plus five minutes, owning session expiry) and immediate shutdown revocation.",
+    "PNG chromakey keeps provider-original bytes transaction-locally, uses processed bytes under the same output identity on success, and falls back to validated original bytes under that same identity on processing failure.",
+    "No transparent-success claim on failure, no second rendition, no new relationship role, and exact 17+12+4=33 worst-case bound."
+  ],
+  "verification": [
+    "openspec instructions apply --change integrate-routego-image-plugin --json",
+    "pnpm --filter @routego-image/integration typecheck",
+    "pnpm --filter @routego-image/integration test",
+    "pnpm --filter @routego-image/integration build",
+    "PNG/JPEG/WebP decode, claims, limits and malformed payload regressions",
+    "multi-output partial preservation, transaction cleanup and exclusive collision regressions",
+    "normal and near-expiry descriptors, immutable expiry/ETag, exact pre/post-expiry fetch and shutdown revocation",
+    "chromakey alpha, same artifact identity, one persisted byte stream, complex-content refusal and processing-failure original fallback",
+    "synthetic-only/no-native audit",
+    "pnpm safety",
+    "git diff --check",
+    "exact four-file scope review"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/integrated-local-routego-service/spec.md",
+      "sha256": "78ead55b0295fe044e3552f62f625c1393f8a7fb7191761140cb2186284aa6ac",
+      "bytes": 10837,
+      "reason": "Direct delta requirements for materialization, ephemeral resources and chromakey."
+    },
+    {
+      "path": "openspec/specs/shared-image-contracts/spec.md",
+      "sha256": "ee211f7caff8be45fadc1717fca141baf306d0d3953fd0cd34fef037ac0c2e39",
+      "bytes": 21363,
+      "reason": "Frozen public artifact, phase, result and relationship contracts."
+    },
+    {
+      "path": "openspec/specs/provider-response-processing/spec.md",
+      "sha256": "fb3ae77d112209a836deda968668a835a678e6d2360734a5ba630692a043318b",
+      "bytes": 6480,
+      "reason": "Frozen provider output and partial-result processing boundary."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "unresolvedIssues": [],
+  "knownRisks": [
+    "Task 3.2 is large and must not begin before sole-owner activation.",
+    "Native dependencies, real images, real relay and billable requests remain prohibited."
+  ],
+  "externalStateAuthorized": false
+}

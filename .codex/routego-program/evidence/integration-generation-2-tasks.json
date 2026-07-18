@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "1c43569d3422f8bb1e25c1f8c77ec7c2339deda9615f2b1e21156e7b3ccacfb7",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "sourceHandoffCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+  "openspecProgress": "11/29",
+  "gitClean": true,
+  "externalStateAuthorized": false,
+  "tasks": [
+    {
+      "taskId": "1.1",
+      "implementationCommit": "0abce8690a35014b80aa8a5f93188ce08fca0608",
+      "taskStateCommit": "5a7cfedbe6f44b402a9d253c475c46869bed6a0d",
+      "checkpointCommit": "737bd0789b228a29ab0c75251be97d07261b54a4",
+      "files": ["packages/contracts/src/library.ts", "packages/contracts/test/library-service.test.ts"],
+      "verification": "Contracts typecheck/tests/build, source/public-phase/33-bound/ownership, seven tools, browser-safe, safety and diff scope passed.",
+      "blockers": [],
+      "decisions": [".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md"]
+    },
+    {
+      "taskId": "1.2",
+      "implementationCommit": "d7103c550fad4b7df4326849cc4471563bc5ff27",
+      "taskStateCommit": "694f32ad5ac673d04876cd4ab4e1b9f037a3c0e0",
+      "checkpointCommit": "9fcd666b473dd4da9292d3320794414e2321130f",
+      "files": ["packages/library/src/gallery/model.ts", "packages/library/src/gallery/assets.ts", "packages/library/src/gallery/read-service.ts", "packages/library/test/gallery/source-renditions.test.ts"],
+      "verification": "Library typecheck/build/tests, mixed source/output, primary, 33/34, ownership, corruption, traversal and legacy regressions passed.",
+      "blockers": []
+    },
+    {
+      "taskId": "1.3",
+      "implementationCommit": "0b5ac07582ec6cdde9ceeb173a02ea72ac751428",
+      "taskStateCommit": "45fd05a1f5df63aaa8488c195e0f2484b1f7f6bb",
+      "checkpointCommit": "a6f1cf116d4e2c4edfac4e249dbf10e39f3acd59",
+      "files": ["packages/library/src/zip/manifest.ts", "packages/library/src/zip/portability.ts", "packages/library/test/zip/portability.test.ts"],
+      "verification": "Library typecheck/build/tests and ZIP graph/remap/integrity/33-bound/Unicode/traversal/atomic regressions passed.",
+      "blockers": []
+    },
+    {
+      "taskId": "1.4",
+      "implementationCommit": "34956e46182d7df8d7b5a6af98659ab2bb68f658",
+      "taskStateCommit": "b54f8dcbc8f36fbb967e14b56b643ef9e25e590d",
+      "checkpointCommit": "0223dfbe7ee4e3683c1c63044246a318a5afc053",
+      "files": ["packages/studio/src/features/library/handoff.ts", "packages/studio/test/library-handoff.test.ts"],
+      "verification": "Studio typecheck/tests/build and exact artifact ownership/order/mask/fail-closed/no-path regressions passed.",
+      "blockers": []
+    },
+    {
+      "taskId": "1.5",
+      "implementationCommit": "5f76c2c24840ab01a73b0e02fda83f209613fec6",
+      "taskStateCommit": "2b86f3ac5f8f19a127ed3a864fabe9bfda9706d1",
+      "checkpointCommit": "6482a22f322f71494ee63df4d760f35051e18b23",
+      "files": ["packages/mock-relay/src/service/mock-service.ts", "packages/mock-relay/test/service.test.ts"],
+      "verification": "Mock relay 44/44, mock/Creation/root typecheck, builds, safety 387, strict OpenSpec 19/19 and exact two-file scope passed.",
+      "rootCause": "The frozen deterministic mock detail omitted the required existing primaryArtifactId.",
+      "failedApproaches": ["Continuing task 2.1 without repairing the shared deterministic baseline was rejected."],
+      "decisions": [".codex/routego-program/deviations/PD-007-integration-mock-primary-artifact-baseline.md"]
+    },
+    {
+      "taskId": "2.1",
+      "implementationCommit": "8aebff8bb61cf3f07fbeefb129b615e751387bb0",
+      "taskStateCommit": "5ba8ebc2ea0efb89fc0bd39d4dec04ac1084d494",
+      "checkpointCommit": "38acc116e63ef8231041e2edec099bd31fcdd568",
+      "files": ["packages/integration/package.json", "packages/integration/tsconfig.json", "packages/integration/tsconfig.build.json", "packages/integration/tsup.config.ts", "packages/integration/vitest.config.ts", "packages/integration/src/index.ts", "packages/integration/src/runtime/stream-route.ts", "packages/integration/test/stream-route.test.ts", "package.json", "pnpm-lock.yaml", "tsconfig.json", "scripts/check-package-exports.mjs"],
+      "verification": "Frozen install, stream-route 15/15, Integration/root typecheck/build, seven exports, contracts 96/96, dependency/license/native, safety 395 and strict 19/19 passed.",
+      "blockers": []
+    },
+    {
+      "taskId": "2.2",
+      "implementationCommit": "acc4a4cb56ce99ed1a854a95c1286daecba3be33",
+      "taskStateCommit": "63bd63543410b6794c3691d82082001f431efa39",
+      "checkpointCommit": "8de8eab3d0b433440c7a29142d76f2d5117b0a84",
+      "files": ["packages/studio/src/api/sse.ts", "packages/studio/test/sse.test.ts"],
+      "verification": "Raw LF/CRLF exact boundaries, Studio focused 28/28 and full 125/125, typecheck/build, safety 397, strict 19/19 and clean scope passed.",
+      "rootCause": "The first implementation counted decoded newline units and undercounted every CRLF delimiter by one raw byte.",
+      "failedApproaches": ["Original checkpoint e3e74c2847886b00b3f4b5d0e102075cd97f1c7c allowed a 398-byte event through a 394-byte bound."],
+      "finalCorrection": "Count raw framing bytes and add exact LF/CRLF boundary regressions."
+    },
+    {
+      "taskId": "2.3",
+      "implementationCommit": "523214c12cc60900cfd57d51706756e579f342d8",
+      "taskStateCommit": "ce3cef79a5a1b8a82af53ac86a0f117dbdfc69bd",
+      "checkpointCommit": "63c4e60e7e9e5ca769f900c66b8d46c175967fe7",
+      "files": ["packages/studio/src/dev/mock-handler.ts", "packages/studio/src/dev/vite-mock-bridge.ts", "packages/studio/test/mock-bridge.test.ts"],
+      "verification": "Studio 131/131 twice, typecheck, Library/Vite builds, safety 398, strict 19/19 and exact scope passed.",
+      "blockers": []
+    },
+    {
+      "taskId": "2.4",
+      "implementationCommit": "f9937d9f00a766af24e988b28187720cba6b5885",
+      "taskStateCommit": "21c308d09f5fc9ea76f561ec2e076132e25878b6",
+      "checkpointCommit": "855afc11b1d8778d2cde1e8629ac49cd6581def6",
+      "files": ["packages/studio/src/features/creation/stream.ts", "packages/studio/src/features/creation/types.ts", "packages/studio/src/features/creation/result.ts", "packages/studio/src/features/creation/CreationWorkbench.tsx", "packages/studio/test/creation-stream.test.ts"],
+      "verification": "Studio 140/140, typecheck, Library/Vite builds, lifecycle/state review, safety 400, strict 19/19 and clean scope passed.",
+      "blockers": []
+    },
+    {
+      "taskId": "2.5",
+      "implementationCommit": "490cfba1f5dde6c695f186952216dc71653bf055",
+      "taskStateCommit": "6c6456442762d90dd487ad604c396956dc475626",
+      "checkpointCommit": "794595578a13a32770e999c351a647596aebbd0c",
+      "files": ["tests/browser/studio.spec.ts"],
+      "verification": "Playwright 11/11 plus streamed core 4/4, Studio 140/140, typecheck, safety 400, strict 19/19 and task-group consistency passed.",
+      "blockers": []
+    },
+    {
+      "taskId": "3.1",
+      "implementationCommit": "d952c533be007ea54a6f836ea0e8bcfb6f9be510",
+      "taskStateCommit": "9e8ec8463196e5f34b07b4372ed61787ffa44c39",
+      "checkpointCommit": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
+      "correctiveImplementationCommits": ["69fbc5b1c2c3ccecdf853971f4c86c84383f5362", "0e3764d92e47cb1df31d07a5ff7c0821ae709b3b", "f7196e3f77a7aaed59e9ea4390e4655066b3e584"],
+      "correctiveTaskStateCommits": ["c6b68f3e59d2a6ec977d7ec0605728bbdc2770e1", "c24ca544eb2c57cd0d19e1bf708c8a16dcb11e4e", "9e8ec8463196e5f34b07b4372ed61787ffa44c39"],
+      "correctiveCheckpointCommits": ["2020b6e012242132f2214097d32ca4b9ff45d003", "627a7078863abc36a0962277f737ed90bf44cb69", "d974cb0d16b7e14ca0766392c7d52356b4967d3c"],
+      "files": ["packages/integration/src/provider/probes.ts", "packages/integration/test/provider.test.ts"],
+      "verification": "Integration 72/72, typecheck, dependency-order build, safety 405, strict OpenSpec 19/19, exact correction scopes and Git clean passed.",
+      "rootCause": "The original probes could persist false support, then provider-controlled PNG proof data reached decoding without complete pre-decode memory/profile bounds.",
+      "failedApproaches": ["One-image multi-image probes and generic HTTP success were not conclusive.", "IHDR dimension bounds alone did not prevent 16-bit intermediate allocation or interlaced unbounded inflate."],
+      "finalCorrection": "Require exact request/response proof and accept only bounded 8-bit non-interlaced PNG decoder paths before PNG.sync.read."
+    }
+  ],
+  "relatedDecisions": [
+    ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+    ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+    ".codex/routego-program/deviations/PD-007-integration-mock-primary-artifact-baseline.md",
+    ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
+  ]
+}

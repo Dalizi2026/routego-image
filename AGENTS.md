@@ -2,15 +2,26 @@
 
 ## 开始工作前
 
-每个 Codex 任务或子代理必须依次读取：
+PD-008 默认使用低上下文、无损细节启动。每个顶层任务或 successor 依次读取：
 
-1. `routego-image-1.0-plan.md`
-2. 本文件
-3. `.codex/routego-program/program.json`
-4. 自己的 `.codex/routego-program/threads/<lane>.json`
-5. 对应 `openspec/changes/<change>/` 下的 proposal、design、specs 和 tasks
+1. 本文件；
+2. `.codex/routego-program/authority-summary.md`；
+3. 紧凑 `.codex/routego-program/program.json`；
+4. 自己的 `.codex/routego-program/threads/<lane>.json`；
+5. 自己的 `.codex/routego-program/handoffs/*.capsule.json`；
+6. capsule 指定的当前 task capsule 或 `tasks.md` 精确任务段；
+7. capsule 指定的直接相关 delta/main specs；
+8. capsule 指定的当前有效 PD。
+
+默认启动最多 12 个文件、120 KiB UTF-8。不得在启动时完整读取全部 18 份 main specs、全部 archived changes、其他 lane 的完整工件、无关 evidence、predecessor 线程历史或旧状态 notes。
+
+只有 capsule/Git/OpenSpec/状态不一致、公共 Schema/架构/所有权/依赖边界、当前任务直接修改能力、验收失败追查根因、`PLAN_DEVIATION` 或健康审计无法确认权威时，才定向读取受影响资料。全量审计只允许用于项目初建、最终 Integration conformance、main spec 同步/archive、release/rollback 门禁、定向恢复失败或用户明确要求。
+
+子代理不读取整个项目历史；提示只包含当前 OpenSpec 任务 ID、允许/禁止文件、验证命令、必要规格片段和 evidence 引用。
 
 若任一权威文件缺失或互相矛盾，停止实现并通知 Program Controller。
+
+handoff capsule 必须通过 `.codex/routego-program/scripts/validate-handoff-capsule.mjs`。失败时发送 `[HANDOFF_AUDIT_FAILED]`，不得猜测继续。successor 在 handoff acceptance 前出现一次上下文压缩时发送 `[HANDOFF_CONTEXT_BUDGET_FAILED]`；successor 不得激活，predecessor 保持 owner，下一产品任务继续锁定。
 
 线程状态中的 `threadId: pending` 表示 Program Controller 已在创建该顶层任务，属于合法启动状态；任务应核对 lane、角色、起始 commit 和 worktree 后继续只读审计，等待真实 ID 回填，不得把 `pending` 单独视为阻塞。
 
@@ -56,11 +67,18 @@
 ## 上下文健康协议
 
 - 当前对话出现上下文压缩、checkpoint 或历史摘要时，先读取线程状态并记录新的事件指纹。
-- 第 2 次可观测压缩必须建立 Git 检查点；第 3 次必须交给全新 Codex 任务和新 worktree。
-- 即使不足三次，重新读取权威文件后仍不能准确确认 change、HEAD、下一任务、契约、所有权或测试状态，也必须提前交接。
+- 第 1～2 次可观测压缩：完成健康审计；只有权威状态、change、HEAD、下一任务、契约、所有权和测试状态均可确认时才继续。
+- 第 3 次可观测压缩：必须建立 Git 安全检查点；完成当前小型/原子边界后重新审计，不得启动新的大型原子任务。
+- 第 4 次可观测压缩：进入预交接状态，只允许完成当前已开始的原子任务和交接准备，不得启动新的大型任务。
+- 第 5 次可观测压缩：只要仍有未完成工作，必须交给全新 Codex 任务和新 worktree。
+- 健康审计失败、无法准确确认权威状态或出现高风险外部条件时，无论压缩次数是否达到五次，都必须提前交接。
 - 交接前不得开始新的大型任务；在安全边界提交工作，并在 `.codex/routego-program/handoffs/` 写清单。
 - 继任任务必须从提交后的 branch/commit 创建，不使用携带完整旧历史的 fork。
 - 继任任务确认 commit、OpenSpec 状态和下一任务后，旧任务才允许归档。
+- 第 5 次可观测压缩或提前健康交接所创建的每一个继任任务，必须完整继承“直接回传主链 + 定时自动化兜底链”约束。Controller 必须在 task 创建提示、registration、handoff acceptance 和 sole-owner activation 中重复写明该约束。
+- 同一四个治理节点还必须重复确认：PD-008 分层读取、无损 history/evidence 引用、12 文件/120 KiB 启动预算和 acceptance 前零压缩门禁。
+- 继任任务的接管确认只有在其明确承诺：每个 OpenSpec 任务、任务组、安全检查点、阻塞、偏差、交接和交付完成后立即调用真实 `send_message_to_thread` 回传 Controller，并调用 `read_thread` 确认送达后才有效；仅输出 final 标签或等待自动化不算完成。
+- 若继任任务未确认上述回传契约，旧任务不得归档，继任任务不得成为唯一 apply-owner，也不得开始下一项产品任务。
 
 ## 安全与 Git
 

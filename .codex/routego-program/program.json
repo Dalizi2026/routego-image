@@ -1,212 +1,176 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "integration-offline-apply-authorized",
+  "status": "pd-008-active-integration-generation-3-registered-awaiting-low-context-acceptance-task-3.2-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
-  "contextPolicy": {
-    "observableOnly": true,
-    "checkpointAt": 2,
-    "mandatoryHandoffAt": 3,
-    "earlyHandoffOnFailedAudit": true,
-    "successorMode": "new-thread-new-worktree"
+  "authoritySummary": {
+    "path": ".codex/routego-program/authority-summary.md",
+    "sha256": "52adf2ff5bcd5d6ac7f8d37529fed1ca03e88ed01f682fb70a5626283ab477b9"
   },
-  "laneContinuityPolicy": {
-    "silentIdleForbidden": true,
-    "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
-    "requiredBeforeIncompleteIdle": [
-      "LANE_CHECKPOINT",
-      "BLOCKED",
-      "PLAN_DEVIATION",
-      "DEPENDENCY_COMPLETE",
-      "LANE_COMPLETE"
+  "governance": {
+    "activeDecisions": [
+      ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+      ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
     ],
-    "checkpointRequiredFields": [
-      "lane/change",
-      "branch/fullHeadSha",
-      "openspecProgress",
-      "completedAndNextTaskIds",
-      "gitClean",
-      "recentVerification",
-      "observableCompactions",
-      "stopReason",
-      "recommendedAction"
-    ],
-    "secondCompactionAction": "commit a safe checkpoint; if the next task is a large atomic task, request a new-thread/new-worktree successor before idle",
-    "thirdCompactionAction": "mandatory new-thread/new-worktree successor handoff",
-    "controllerRequiredActions": [
-      "send follow-up for allowed small work",
-      "create successor for large work",
-      "record a real blocker and wait for external input"
-    ],
-    "directStructuredMessagesRemainPrimary": true
-  },
-  "conformancePolicy": {
-    "requireOpenSpecTaskId": true,
-    "verifyBeforeCommit": true,
-    "commitBeforeTaskCheckbox": true,
-    "stopOnScopeOrContractChange": true,
-    "deviationMessage": "PLAN_DEVIATION"
-  },
-  "changes": [
-    {
-      "id": "establish-routego-image-foundation",
-      "lane": "foundation",
-      "dependsOn": []
+    "contextPolicy": {
+      "observableOnly": true,
+      "checkpointAt": 3,
+      "preHandoffAt": 4,
+      "mandatoryHandoffAt": 5,
+      "earlyHandoffOnFailedAudit": true,
+      "successorMode": "new-thread-new-worktree",
+      "lowContextLossless": true,
+      "startupMaxFiles": 12,
+      "startupMaxUtf8Bytes": 122880,
+      "handoffAcceptanceCompactionLimit": 0,
+      "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
+      "auditFailure": "HANDOFF_AUDIT_FAILED"
     },
-    {
-      "id": "extend-routego-image-foundation-contracts",
-      "lane": "foundation-extension",
-      "dependsOn": ["establish-routego-image-foundation"]
+    "reportingContract": {
+      "primary": "The active apply owner immediately uses send_message_to_thread after every task, group, safe checkpoint, blocker, deviation, handoff, activation or delivery, then uses read_thread to confirm receipt by the current Controller.",
+      "fallback": "routego-program-continuity runs every 30 minutes, reads only compact current state/latest checkpoint, deduplicates and archives its own run task.",
+      "fallbackIntervalMinutes": 30,
+      "finalAnswerAloneIsInsufficient": true,
+      "heartbeatInheritanceAssumed": false
     },
-    {
-      "id": "complete-routego-browser-boundaries",
-      "lane": "foundation-browser-boundary",
-      "dependsOn": ["extend-routego-image-foundation-contracts"]
-    },
-    {
-      "id": "add-routego-image-creation",
-      "lane": "creation",
-      "dependsOn": [
-        "establish-routego-image-foundation",
-        "extend-routego-image-foundation-contracts",
-        "complete-routego-browser-boundaries"
-      ]
-    },
-    {
-      "id": "add-routego-image-library",
-      "lane": "library",
-      "dependsOn": [
-        "establish-routego-image-foundation",
-        "extend-routego-image-foundation-contracts",
-        "complete-routego-browser-boundaries"
-      ]
-    },
-    {
-      "id": "add-routego-studio",
-      "lane": "studio",
-      "dependsOn": [
-        "establish-routego-image-foundation",
-        "extend-routego-image-foundation-contracts",
-        "complete-routego-browser-boundaries"
-      ]
-    },
-    {
-      "id": "integrate-routego-image-plugin",
-      "lane": "integration",
-      "dependsOn": [
-        "add-routego-image-creation",
-        "add-routego-image-library",
-        "add-routego-studio"
-      ]
-    }
-  ],
-  "dispatch": {
-    "foundationThreadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
-    "foundationExtensionThreadId": "019f708d-92bb-78b0-a23d-3a8d68255006",
-    "browserBoundaryThreadId": "019f70fa-6768-72f3-8350-5a95ea02d4e8",
-    "legacyAuditThreadId": "019f6fe8-6fad-7dc1-8057-eeb45e80211e",
-    "upstreamAuditThreadId": "019f6fe8-6fd4-73f0-b83b-1805925c5301",
-    "creationThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
-    "creationPredecessorThreadId": "019f7084-17c4-7442-94e5-458f59b20086",
-    "libraryThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
-    "libraryPredecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
-    "studioThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
-    "studioPredecessorThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
-    "integrationThreadId": "019f72fd-fb6f-7b52-b383-03471f42f05a"
-  },
-  "laneCompletions": {
-    "creation": {
-      "status": "merged-synced-archived",
-      "sourceThreadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
-      "deliveryCommit": "624e7390b902814620d3eeb583ed43a57fd8243a",
-      "mergeCommit": "ebe5b564c3990fa89f5616b636aab0ce053b144a",
-      "specSyncCommit": "86214f666e10e080f6f4ac419d99402f282ef46e",
-      "archivePath": "openspec/changes/archive/2026-07-17-add-routego-image-creation",
-      "archiveCommit": "d03389ec108bcfd9e79ed076048e50b430900028",
-      "postArchiveVerification": "passed",
-      "integrationNotified": false,
-      "waitingFor": []
-    },
-    "library": {
-      "status": "merged-synced-archived",
-      "sourceThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
-      "deliveryCommit": "96fea3b5618808fd00daac274178512daf2a5ff2",
-      "supersedesDelivery": "f92a835990d422da5f4f5e3008383f24aabdcc7b",
-      "implementationCommit": "99fd61d8e707a159b2a78330e03a376c170b0d37",
-      "taskStateCommit": "61a3a7d432d40e54064c44535108cc8302e6b258",
-      "verifiedHead": "3cd8007e40675e6e5c1e93d2d09a34cc078944dc",
-      "openspecProgress": "10/10",
-      "initialMergeCommit": "220d340f8c9cf7ab6891d8ee5191e97b3bc5e11a",
-      "mergeCommit": "c7ee16a6bca371e656ce11253c31636f7f05e9d1",
-      "specSyncCommit": "a9875ed368324b03941893a1ab994b3ff039a499",
-      "archivePath": "openspec/changes/archive/2026-07-18-add-routego-image-library",
-      "archiveCommit": "50141def268015579febee067c311aa09aaf117f",
-      "failedArchiveCommit": "2477b3ed4abcd909c1d3a8a837c02c813427feea",
-      "archiveRevertCommit": "fcac5c2abb8684e8b3bb66f21409905a4e5aaa32",
-      "postArchiveVerification": "passed: frozen install, strict 13/13, safety 261 tracked files, typecheck, build, 404 tests, seven exports, seven-operation freeze, archive/spec/dependency/security/Git-clean audits",
-      "integrationNotified": false,
-      "waitingFor": []
-    },
-    "studio": {
-      "status": "merged-synced-archived",
-      "sourceThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
-      "deliveryCommit": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
-      "verifiedHead": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
-      "openspecProgress": "11/11",
-      "mergeCommit": "987fd2207fde599be85b5dc64b039fb09f500e61",
-      "specSyncCommit": "93b8e92267e91edf16e33c7d36e77965f55724e4",
-      "archivePath": "openspec/changes/archive/2026-07-18-add-routego-studio",
-      "archiveCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
-      "postArchiveVerification": "passed: frozen install, strict 18/18, safety 367 tracked files, typecheck, build, 493 tests, seven exports, Playwright 6/6 plus core repeat, seven-operation freeze, three-lane archive/spec equality, dependency/native/browser/security/Git-clean audits",
-      "integrationNotified": false,
-      "waitingFor": []
-    }
-  },
-  "integrationReadiness": {
-    "status": "planning-approved-offline-apply-authorized",
-    "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
-    "completedDependencies": [
-      "add-routego-image-creation",
-      "add-routego-image-library",
-      "add-routego-studio"
-    ],
-    "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
-    "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
-    "reportedDeviations": [
-      "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
-      "live partial Studio events require independent review of the frozen Studio SSE transport/workbench boundary"
-    ],
-    "deviationDecision": "PD-005 accepted both findings with a narrowed complete source-rendition/retry design and authenticated Studio fetch-stream design; corrections must be prerequisite task groups inside integrate-routego-image-plugin and do not authorize apply",
-    "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
-    "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
-    "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified"
-  },
-  "automations": {
-    "foundationAuditGate": {
-      "id": "routego-foundation",
-      "kind": "heartbeat",
-      "intervalMinutes": 10,
-      "status": "DELETED",
-      "targetThreadId": "019f6fe8-6fb0-7661-8fd8-4951d0d1b766",
-      "deleteWhen": "legacy and upstream audits are accepted by foundation"
-    },
-    "laneContinuityMonitor": {
-      "id": "routego-lane-continuity-monitor",
-      "kind": "heartbeat",
-      "intervalMinutes": 15,
-      "status": "DELETED",
-      "targetThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
-      "lanes": [
-        "creation",
-        "library",
-        "studio"
+    "publicContract": {
+      "mcpTools": [
+        "routego_status",
+        "routego_generate",
+        "routego_edit",
+        "routego_batch",
+        "routego_search_library",
+        "routego_manage_library",
+        "routego_open_studio"
       ],
-      "behavior": "ignore active lanes; report incomplete idle lanes missing a structured checkpoint; prevent duplicate wakeups and concurrent apply owners",
-      "deleteWhen": "creation, library, and studio changes are all complete",
-      "deletedAfter": "all three functional lanes merged, synchronized, archived, and passed frozen mainline verification"
+      "imageArtifactPhase": ["partial", "final"],
+      "fingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c"
+    },
+    "externalStateAuthorized": false
+  },
+  "controller": {
+    "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "generation": 5,
+    "role": "program-controller",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
+    "branch": "codex/routego-controller-g5",
+    "verifiedHeadBeforeContainingCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",
+    "status": "authoritative",
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "g5-compaction-1-after-controller-activation-before-integration-g3-registration-2026-07-18"
+  },
+  "applyOwner": {
+    "lane": "integration",
+    "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+    "generation": 2,
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
+    "branch": "codex/routego-integration-g2",
+    "acceptedProductCommit": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
+    "handoffCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "soleApplyOwner": true,
+    "frozen": true,
+    "gitClean": true
+  },
+  "successor": {
+    "lane": "integration",
+    "generation": 3,
+    "status": "registered-inactive-awaiting-low-context-acceptance",
+    "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
+    "plannedBranch": "codex/routego-integration-g3",
+    "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
+    "invalidatedUnregisteredDraft": {
+      "threadId": "019f753a-3afc-7123-9631-181698e86db2",
+      "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4add\\生图插件",
+      "status": "archived-superseded-by-pd-008-before-registration",
+      "applyOwner": false
     }
+  },
+  "currentChange": {
+    "id": "integrate-routego-image-plugin",
+    "lane": "integration",
+    "openspec": {
+      "totalTasks": 29,
+      "completedTasks": 11,
+      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1"],
+      "nextTaskId": "3.2"
+    },
+    "currentTask": {
+      "capsule": ".codex/routego-program/tasks/integration-3.2.json",
+      "locked": true,
+      "activationAuthorized": false
+    }
+  },
+  "latestDirectCheckpoint": {
+    "eventFingerprint": "integration|integrate-routego-image-plugin|3f1878bbe2e5dc2680b92422a43160bc1cac8802|3.1-accepted-and-generation-3-handoff-prepared|11/29",
+    "messageType": "INTEGRATION_GENERATION_3_HANDOFF_READY",
+    "workerThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+    "reportedHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "completedTaskId": "3.1",
+    "nextTaskId": "3.2",
+    "openspecProgress": "11/29",
+    "controllerReceived": true,
+    "controllerReadBackConfirmed": true,
+    "controllerAccepted": true
+  },
+  "currentBlockers": [
+    "Integration G3 registration, low-context acceptance, G2 archival and explicit sole-owner activation are required before task 3.2."
+  ],
+  "currentRisks": [
+    "A registration verification command initialized ignored node_modules in the G3 worktree from the local pnpm cache. No packages were downloaded and no tracked file or lockfile changed. Cleanup was blocked by the execution environment; the residue is non-product and must not be treated as delivery evidence."
+  ],
+  "externalApprovalGates": {
+    "tasks": ["7.2", "8.2", "9.1"],
+    "freshExplicitUserApprovalRequired": true
+  },
+  "automation": {
+    "id": "routego-program-continuity",
+    "status": "ACTIVE",
+    "intervalMinutes": 30,
+    "compactCurrentStateOnly": true,
+    "fallbackOnly": true,
+    "deduplicateWith": "latestDirectCheckpoint",
+    "archiveOwnRuns": true,
+    "authoritativeWorktreeResolution": "Locate active Controller thread, verify it matches this record, then read that Controller worktree; do not trust a stale dirty main checkout."
+  },
+  "policyActivation": {
+    "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    "governanceCommit": "5e7dee834f7e181f3f4e7f4075359d2b2e45c241",
+    "allActiveOwnersAcknowledged": true,
+    "controllerReceipt": {
+      "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+      "delivered": true,
+      "readBackConfirmed": true,
+      "acknowledged": true
+    },
+    "applyOwnerReceipt": {
+      "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+      "messageType": "LOW_CONTEXT_HANDOFF_POLICY_ACK",
+      "head": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+      "gitClean": true,
+      "delivered": true,
+      "readBackConfirmed": true,
+      "acknowledged": true
+    },
+    "registeredInactiveSuccessors": [
+      {
+        "lane": "integration",
+        "generation": 3,
+        "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+        "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
+        "branch": "codex/routego-integration-g3",
+        "status": "awaiting-low-context-acceptance"
+      }
+    ],
+    "otherUnfinishedLanes": []
+  },
+  "history": {
+    "index": ".codex/routego-program/history/pre-pd008-state-index.json",
+    "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",
+    "integrationTaskEvidence": ".codex/routego-program/evidence/integration-generation-2-tasks.json"
   }
 }

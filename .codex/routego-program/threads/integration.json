@@ -1,352 +1,93 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "offline-apply-generation-2-task-3.1-accepted-generation-3-handoff-prepared-awaiting-controller-g5-authority",
-  "controllerThreadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
-  "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-  "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
-  "branch": "codex/routego-integration-g2",
-  "startingCommit": "776ac00e053404a997f458f21aaecdcd373233e2",
-  "registrationCommit": "2935972129c581fc653b3f27878fd6ba5f5fa6c0",
-  "controllerRegistrationCommit": "2935972129c581fc653b3f27878fd6ba5f5fa6c0",
-  "controllerActivationCommit": "88b419296f5ba781b7d1c8aea7609f90c40985c3",
-  "controllerTask31AcceptanceCommit": "01186e733b7ec6f63785ddd4e9b6aa1128f03462",
-  "generation": 2,
-  "observableCompactions": 5,
-  "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-5-after-task-3.1-acceptance-during-generation-3-handoff-preparation",
-  "lastHealthAudit": "passed-generation-2-compaction-5-handoff-only-authority; accepted clean HEAD d974cb0d16b7e14ca0766392c7d52356b4967d3c; full task-3.1 correction chain reachable; Integration 72/72, typecheck, dependency-order build, safety 405, strict OpenSpec 19/19 and diff/scope/Git-clean checks accepted by Controller; task-3.2 locked; Controller-G5 must become authoritative before Integration-G3 registration",
-  "successorThreadId": "pending",
-  "openspecState": "offline-apply-task-3.1-accepted-generation-3-handoff-prepared-task-3.2-locked",
-  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 11/29; task 3.1 original implementation d952c533be007ea54a6f836ea0e8bcfb6f9be510, exact-proof corrective implementation 69fbc5b1c2c3ccecdf853971f4c86c84383f5362, PNG-bound corrective implementation 0e3764d92e47cb1df31d07a5ff7c0821ae709b3b, decoder-profile corrective implementation f7196e3f77a7aaed59e9ea4390e4655066b3e584 and separate task-state/thread-state commits accepted at d974cb0d16b7e14ca0766392c7d52356b4967d3c; task 3.2 remains locked pending Controller-G5 authority and Integration-G3 registration/handoff acceptance/sole-owner activation",
-  "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
-  "planningCommitLineage": [
-    "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
-    "3ae25501f1f47b98c212fd9d47d89837ea75cd96",
-    "dd02ccfb03b53034afb9314de4fa8441a3846441"
-  ],
-  "controllerApprovalCommit": "35ca516c66f3951a3286cf3f12617271d7fa76aa",
+  "status": "generation-3-registered-awaiting-low-context-acceptance-generation-2-frozen-sole-owner-task-3.2-locked",
+  "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+  "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+  "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
+  "branch": "codex/routego-integration-g3",
+  "generation": 3,
+  "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+  "registrationCommit": null,
+  "registrationCommitSemantics": "The containing commit registers G3 and cannot self-reference its own SHA; the full SHA is delivered by INTEGRATION_SUCCESSOR_REGISTERED.",
+  "gitCleanBeforeRegistration": true,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "soleApplyOwner": false,
+  "frozen": true,
   "applyAuthorized": false,
   "externalStateAuthorized": false,
-  "reportingContract": {
-    "directStructuredMessageRequired": true,
-    "readBackConfirmationRequired": true,
-    "automationRole": "missed-message fallback only",
-    "automationIntervalMinutes": 15,
-    "successorInheritanceRequired": true,
-    "requiredSuccessorAcknowledgement": "Every task, group, checkpoint, blocker, deviation, handoff, activation, or delivery uses direct send_message_to_thread plus read_thread confirmation before the next task starts; routego-program-continuity is a 15-minute missed-message fallback only and heartbeat inheritance is never assumed.",
-    "controllerGovernanceCommit": "01186e733b7ec6f63785ddd4e9b6aa1128f03462",
-    "controllerCorrectionGovernanceCommit": "88add99dc9e65ee8bb1645635ad1e732b901c247",
-    "controllerPngBoundCorrectionGovernanceCommit": "9d7dc18acbbaf66be31ef8e7d3b7767604f81c82",
-    "controllerDecoderProfileCorrectionGovernanceCommit": "a652b120fdf94a1ca9a56aa4bb74d314441002e1",
-    "controllerCompactionAcknowledgementCommit": "f986ca4866422edd890896cf3522807499559b70",
-    "continuityIntervalGovernanceCommit": "c3e063c266487204199bde9f7bf2911fefd883f1"
-  },
-  "contextPolicy": {
-    "decision": "PD-006",
-    "thirdCompactionAction": "mandatory Git checkpoint; finish only current small atomic work; do not start a new large task",
-    "fourthCompactionAction": "pre-handoff; finish current atomic work and prepare handoff only",
-    "fifthCompactionAction": "mandatory new task and new worktree while work remains"
-  },
-  "soleApplyOwner": true,
-  "currentTaskActivation": {
-    "decision": "Controller G4 accepted task 3.1 and authorized generation-3 handoff preparation only",
-    "controllerGovernanceCommit": "01186e733b7ec6f63785ddd4e9b6aa1128f03462",
-    "acceptedRegistrationHead": "2935972129c581fc653b3f27878fd6ba5f5fa6c0",
-    "acceptedTask": "3.1",
-    "acceptedTaskCheckpoint": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
-    "authorizedTask": null,
-    "authorizedWork": "generation-3-handoff-preparation-only",
-    "lockedTask": "3.2",
-    "taskState": "3.1-controller-accepted-generation-3-handoff-prepared-task-3.2-locked",
+  "sourceOwner": {
+    "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+    "generation": 2,
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
+    "branch": "codex/routego-integration-g2",
+    "acceptedProductCommit": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
+    "handoffCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
     "soleApplyOwner": true,
-    "sourceGenerationArchived": true,
-    "externalStateAuthorized": false
+    "frozen": true,
+    "gitClean": true
   },
-  "nextTask": "Task 3.2 is locked. Controller G5 must first become authoritative, then register Integration G3; G3 must accept the handoff and receive explicit sole-owner activation before any implementation inspection or edit.",
-  "successorPreparation": {
-    "status": "generation-3-handoff-prepared-awaiting-controller-g5-authority-and-successor-registration",
-    "sourceGeneration": 2,
-    "targetGeneration": 3,
-    "sourceThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-    "sourceBranch": "codex/routego-integration-g2",
-    "sourceCheckpointParent": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
-    "plannedSuccessorBranch": "codex/routego-integration-g3",
-    "successorThreadId": "pending",
-    "successorWorktree": "pending",
-    "openspecProgress": "11/29",
-    "completedTasks": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1-corrected"],
-    "nextTask": "3.2-locked",
-    "controllerCorrectionGovernanceCommit": "a652b120fdf94a1ca9a56aa4bb74d314441002e1",
-    "controllerTask31AcceptanceCommit": "01186e733b7ec6f63785ddd4e9b6aa1128f03462",
-    "controllerCompactionAcknowledgementCommit": "f986ca4866422edd890896cf3522807499559b70",
-    "observableCompactions": 5,
-    "reportingContractInherited": true,
-    "externalStateAuthorized": false
+  "openspec": {
+    "totalTasks": 29,
+    "completedTasks": 11,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1"],
+    "nextTaskId": "3.2",
+    "nextTaskLocked": true
   },
-  "generation3HandoffPreparation": {
-    "file": ".codex/routego-program/handoffs/integration-generation-3.md",
-    "sourceGeneration": 2,
-    "targetGeneration": 3,
-    "sourceThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-    "sourceWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
-    "sourceBranch": "codex/routego-integration-g2",
-    "acceptedSourceHead": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
-    "controllerGeneration": 4,
-    "controllerThreadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
-    "controllerTask31AcceptanceCommit": "01186e733b7ec6f63785ddd4e9b6aa1128f03462",
-    "plannedSuccessorBranch": "codex/routego-integration-g3",
-    "successorThreadId": "pending",
-    "successorWorktree": "pending",
-    "openspecProgress": "11/29",
-    "completedTasks": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1"],
-    "nextTask": "3.2-locked",
-    "controllerOrdering": "Controller G5 must accept the G4 handoff and become authoritative before creating or registering Integration G3.",
-    "activationBoundary": "Integration G3 may not inspect or implement task 3.2 until it accepts this handoff and receives explicit sole-owner activation; Integration G2 remains frozen and may not self-create or self-activate G3.",
-    "reportingContractInherited": true,
-    "automationIntervalMinutes": 15,
-    "observableCompactions": 5,
-    "externalStateAuthorized": false,
-    "gitCleanAtPreparation": true
-  },
-  "handoffPreparation": {
-    "file": ".codex/routego-program/handoffs/integration-generation-2.md",
-    "sourceGeneration": 1,
-    "targetGeneration": 2,
-    "sourceCheckpoint": "8de8eab3d0b433440c7a29142d76f2d5117b0a84",
-    "controllerGovernanceCommit": "e7f4b5e266356a54a9dc374154cb35b2dfcd9939",
-    "plannedSuccessorBranch": "codex/routego-integration-g2",
-    "successorThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-    "successorWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
-    "successorStartingState": "clean detached HEAD 776ac00e053404a997f458f21aaecdcd373233e2",
-    "openspecProgress": "7/29",
-    "completedTasks": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2"],
-    "nextTask": "2.3",
-    "pd006Reason": "observableCompactions=4; source generation 1 frozen and successor generation 2 read-only until acceptance and sole-owner activation; no new task may start",
-    "externalStateAuthorized": false,
-    "reportingContractInherited": true,
-    "gitCleanAtPreparation": true
-  },
-  "taskReviewCorrection": {
-    "taskId": "2.2",
-    "reviewedCheckpoint": "e3e74c2847886b00b3f4b5d0e102075cd97f1c7c",
-    "reviewedImplementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
-    "reviewedTaskStateCommit": "722c183fed4efdf62d7f678feacc30a9bd64c961",
-    "finding": "CRLF event records undercount raw UTF-8 bytes by one byte per line before maximumEventBytes enforcement",
-    "allowedFiles": [
-      "packages/studio/src/api/sse.ts",
-      "packages/studio/test/sse.test.ts"
-    ],
-    "correctiveImplementationCommit": "acc4a4cb56ce99ed1a854a95c1286daecba3be33",
-    "correctiveTaskStateCommit": "63bd63543410b6794c3691d82082001f431efa39",
-    "status": "completed-controller-accepted",
-    "heldTask": "2.3",
-    "externalStateAuthorized": false
-  },
-  "latestTaskReviewCorrection": {
-    "taskId": "3.1",
-    "reviewedHead": "5963a2a2c4fc18b7d0a0b2c219d336efb9b0c36f",
-    "reviewedImplementationCommit": "d952c533be007ea54a6f836ea0e8bcfb6f9be510",
-    "reviewedTaskStateCommit": "30f0b101e4f01f51a0d41b5c5ab0242b63619f70",
-    "controllerCorrectionGovernanceCommit": "88add99dc9e65ee8bb1645635ad1e732b901c247",
-    "finding": "Capability probes could persist supported evidence without materially exercising or conclusively proving the named provider/model/capability/transport/request-shape pair, including one-image multi-image probes and generic 2xx promotion.",
-    "allowedFiles": [
-      "packages/integration/src/provider/probes.ts",
-      "packages/integration/test/provider.test.ts"
-    ],
-    "correctiveImplementationCommit": "69fbc5b1c2c3ccecdf853971f4c86c84383f5362",
-    "correctiveTaskStateCommit": "c6b68f3e59d2a6ec977d7ec0605728bbdc2770e1",
-    "status": "completed-controller-accepted-generation-3-handoff-prepared",
-    "heldTask": "3.2",
-    "externalStateAuthorized": false
-  },
-  "latestPngBoundCorrection": {
-    "taskId": "3.1",
-    "reviewedHead": "2020b6e012242132f2214097d32ca4b9ff45d003",
-    "reviewedCorrectiveImplementationCommit": "69fbc5b1c2c3ccecdf853971f4c86c84383f5362",
-    "reviewedCorrectiveTaskStateCommit": "c6b68f3e59d2a6ec977d7ec0605728bbdc2770e1",
-    "reviewedCorrectiveThreadStateCommit": "2020b6e012242132f2214097d32ca4b9ff45d003",
-    "controllerGovernanceCommit": "9d7dc18acbbaf66be31ef8e7d3b7767604f81c82",
-    "finding": "Provider-controlled compressed PNG proof bytes could reach PNG.sync.read before bounded IHDR dimensions, pixels and decoded RGBA allocation were verified.",
-    "allowedFiles": [
-      "packages/integration/src/provider/probes.ts",
-      "packages/integration/test/provider.test.ts"
-    ],
-    "correctiveImplementationCommit": "0e3764d92e47cb1df31d07a5ff7c0821ae709b3b",
-    "correctiveTaskStateCommit": "c24ca544eb2c57cd0d19e1bf708c8a16dcb11e4e",
-    "status": "completed-controller-accepted-generation-3-handoff-prepared",
-    "heldTask": "3.2",
-    "externalStateAuthorized": false
-  },
-  "latestDecoderProfileCorrection": {
-    "taskId": "3.1",
-    "reviewedHead": "627a7078863abc36a0962277f737ed90bf44cb69",
-    "reviewedPngBoundImplementationCommit": "0e3764d92e47cb1df31d07a5ff7c0821ae709b3b",
-    "reviewedPngBoundTaskStateCommit": "c24ca544eb2c57cd0d19e1bf708c8a16dcb11e4e",
-    "reviewedPngBoundThreadStateCommit": "627a7078863abc36a0962277f737ed90bf44cb69",
-    "controllerGovernanceCommit": "a652b120fdf94a1ca9a56aa4bb74d314441002e1",
-    "finding": "pngjs 16-bit decoding allocates an eight-byte-per-pixel Uint16Array before normalization and interlaced sync decoding inflates without the non-interlaced maxLength cap.",
-    "allowedFiles": [
-      "packages/integration/src/provider/probes.ts",
-      "packages/integration/test/provider.test.ts"
-    ],
-    "correctiveImplementationCommit": "f7196e3f77a7aaed59e9ea4390e4655066b3e584",
-    "correctiveTaskStateCommit": "9e8ec8463196e5f34b07b4372ed61787ffa44c39",
-    "status": "completed-controller-accepted-generation-3-handoff-prepared",
-    "heldTask": "3.2",
-    "externalStateAuthorized": false
-  },
-  "latestTaskCompletion": {
-    "taskId": "3.1",
-    "implementationCommit": "d952c533be007ea54a6f836ea0e8bcfb6f9be510",
-    "taskStateCommit": "30f0b101e4f01f51a0d41b5c5ab0242b63619f70",
-    "correctiveImplementationCommit": "69fbc5b1c2c3ccecdf853971f4c86c84383f5362",
-    "correctiveTaskStateCommit": "c6b68f3e59d2a6ec977d7ec0605728bbdc2770e1",
-    "pngBoundCorrectiveImplementationCommit": "0e3764d92e47cb1df31d07a5ff7c0821ae709b3b",
-    "pngBoundCorrectiveTaskStateCommit": "c24ca544eb2c57cd0d19e1bf708c8a16dcb11e4e",
-    "decoderProfileCorrectiveImplementationCommit": "f7196e3f77a7aaed59e9ea4390e4655066b3e584",
-    "decoderProfileCorrectiveTaskStateCommit": "9e8ec8463196e5f34b07b4372ed61787ffa44c39",
-    "verification": "All provider context/model/status/redaction and exact request/response proof behavior retained. Capability-proof PNG decoding now accepts only bitDepth=8, interlaceMethod=0 and valid 8-bit PNG color types, keeping pngjs on the bounded four-byte RGBA non-interlaced path before PNG.sync.read. Valid-CRC IHDR fixtures for 16-bit grayscale, RGB, grayscale-alpha and RGBA plus Adam7 interlace remain transient unknown, retain mayHaveBilled=true, make one request with no retry, persist no successful/degraded evidence and never call PNG.sync.read. Exact 8-bit non-interlaced maximum dimension/pixel/RGBA boundary success remains covered. Fresh apply skill/status/instructions; Integration typecheck; all Integration tests 72/72; Integration plus dependency-order workspace build; repository safety 405 tracked files; OpenSpec strict 19/19; git diff --check; exact two-file corrective implementation scope",
-    "externalStateTouched": false,
-    "controllerAcceptanceCommit": "01186e733b7ec6f63785ddd4e9b6aa1128f03462",
-    "acceptedHead": "d974cb0d16b7e14ca0766392c7d52356b4967d3c"
-  },
-  "latestTaskGroupAudit": {
-    "taskGroup": "2.1-2.5 PD-005 authenticated Studio streaming gate",
-    "result": "complete-coherent-no-omissions-no-early-3.x-work-no-implicit-scope-expansion",
-    "evidence": "post-verification reread of proposal, design including all seven listed risks, all 11 delta specs and full tasks; exact stream route/state machine, mock chunking, workbench partial/failure state, descriptor lifetime, cleanup and browser acceptance form one closed prerequisite gate before task 3.1",
-    "publicSurfaceFrozen": "exact seven MCP tools and public ImageArtifact.phase=partial|final unchanged"
+  "currentTask": {
+    "id": "3.2",
+    "capsule": ".codex/routego-program/tasks/integration-3.2.json",
+    "activationStatus": "locked-pending-low-context-acceptance-source-archive-and-sole-owner-activation"
   },
   "handoff": {
-    "file": ".codex/routego-program/handoffs/integration-generation-1.md",
-    "sourceGeneration": 0,
-    "targetGeneration": 1,
-    "sourceCheckpoint": "737bd0789b228a29ab0c75251be97d07261b54a4",
-    "controllerGovernanceCheckpoint": "270e61afafd79e22ec1e9ec4917ae6820fcad304",
-    "plannedSuccessorBranch": "codex/routego-integration-g1",
-    "successorThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
-    "successorWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5b94\\生图插件",
-    "successorStartingPoint": "the governance-only registration commit containing this handoff file, thread-state update, and real successor registration; full SHA is delivered in INTEGRATION_SUCCESSOR_REGISTERED",
-    "openspecProgress": "1/28",
-    "completedTask": "1.1",
-    "nextTask": "1.2",
-    "applyOwnerState": "generation 0 is archived and generation 1 is the sole authorized offline apply owner for tasks 1.2 through 7.1 and 8.1 in dependency order",
-    "productEditsAuthorizedBeforeAcceptance": false,
-    "externalStateAuthorized": false
+    "capsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
+    "status": "registered-awaiting-successor-validation-and-acceptance",
+    "acceptanceCompactionLimit": 0,
+    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
+    "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
-  "continuityCheckpoint": {
-    "observableCompactions": 2,
-    "completedTask": "1.1",
-    "implementationCommit": "0abce8690a35014b80aa8a5f93188ce08fca0608",
-    "taskStateCommit": "5a7cfedbe6f44b402a9d253c475c46869bed6a0d",
-    "verifiedHeadBeforeCheckpoint": "5a7cfedbe6f44b402a9d253c475c46869bed6a0d",
-    "gitCleanBeforeGovernanceCommit": true,
-    "stopReason": "Second observable compaction requires a safe checkpoint and task 1.2 is a large atomic Library task.",
-    "successorRequiredBefore": "1.2",
-    "successorThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
-    "requiredControllerAction": "Register a fresh Integration successor task/worktree from the governance handoff commit, obtain its real registration, and accept the handoff before any product edit."
+  "latestCheckpoint": {
+    "eventFingerprint": "integration|integrate-routego-image-plugin|3f1878bbe2e5dc2680b92422a43160bc1cac8802|3.1-accepted-and-generation-3-handoff-prepared|11/29",
+    "messageType": "INTEGRATION_GENERATION_3_HANDOFF_READY",
+    "completedTaskId": "3.1",
+    "nextTaskId": "3.2",
+    "reportedHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "controllerReceived": true,
+    "controllerReadBackConfirmed": true,
+    "controllerAccepted": true
   },
-  "applyActivation": {
-    "approvedPlanningArtifactCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
-    "approvedPlanningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
-    "controllerApprovalCommit": "35ca516c66f3951a3286cf3f12617271d7fa76aa",
-    "approvalIncorporationCommit": "adf58553abfba931e449388cf78c6b20ccc23076",
-    "authorizedTasks": "1.1 through 7.1 and 8.1 in dependency order, subject to continuity handoff before 1.2",
-    "generationZeroLimit": "task 1.1 only; stop after separate implementation and task-state commits",
-    "applyAuthorized": true,
-    "externalStateAuthorized": false
+  "reportingContract": {
+    "primary": "send_message_to_thread plus read_thread after every task/group/checkpoint/blocker/deviation/handoff/activation/delivery",
+    "fallback": "routego-program-continuity every 30 minutes reads compact state, deduplicates and archives its own run",
+    "acknowledgementRequiredBeforeAcceptance": true
   },
-  "governanceHold": {
-    "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
-    "dirtyPaths": [
-      "openspec/changes/integrate-routego-image-plugin/.openspec.yaml",
-      "openspec/changes/integrate-routego-image-plugin/proposal.md"
-    ],
-    "trackedDiff": "none",
-    "productFilesChanged": false,
-    "planningArtifacts": "proposal/design/11 delta specs/tasks revised for Controller G3 findings 1-5; strict validation and planning consistency audit passed",
-    "planDeviation": "PD-005 accepted for Integration planning only; apply remains prohibited",
-    "disposition": "Superseded by the structured proposal-only activation. The preserved draft was revised and completed without product edits; Controller review is required before apply."
+  "lowContextPolicy": {
+    "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    "governanceCommit": "5e7dee834f7e181f3f4e7f4075359d2b2e45c241",
+    "startupMaxFiles": 12,
+    "startupMaxUtf8Bytes": 122880,
+    "fullHistoryDefaultReadForbidden": true,
+    "acknowledgementRequiredBeforeAcceptance": true
   },
-  "planningActivation": {
-    "controllerGovernanceHead": "149ca920feb6fc714db4e210e4a304f6540f3e57",
-    "activationGovernanceCommit": "997268b070ea6b23e513b342bc6f1aef28944050",
-    "deviationDecisionCommit": "a101b44faedb8259bb898e5d890774497d805d27",
-    "proposalOnly": true,
-    "applyAuthorized": false,
-    "externalStateAuthorized": false
+  "registrationEnvironment": {
+    "localDependencyResidue": "ignored node_modules initialized from local pnpm cache by a Controller verification command",
+    "downloadedPackages": 0,
+    "trackedFilesChanged": false,
+    "lockfileChanged": false,
+    "cleanupAttempt": "blocked by execution environment",
+    "productState": false
   },
-  "planningReview": {
-    "reviewedPlanningCommit": "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
-    "revisedPlanningCommit": "3ae25501f1f47b98c212fd9d47d89837ea75cd96",
-    "resolvedFindings": [
-      "chromakey uses one existing output identity and no extra rendition or relationship role within the 17+12+4=33 bound",
-      "SSE uses POST /api/v1/studio/creation/stream with exactly one first started event, requestId consistency, one terminal, terminal-before-EOF, and no sentinels",
-      "reader/channel and browser object-URL cleanup is separate from immutable partial-resource expiry capped by the earlier of registration plus five minutes or owning-session expiry",
-      "offline release preparation task 8.1 depends on 7.1 while external release task 8.2 depends on both 7.2 and 8.1",
-      "planning lineage and Controller-review wait state are recorded"
-    ],
-    "applyAuthorized": false,
-    "externalStateAuthorized": false
+  "evidence": {
+    "completedTasks": ".codex/routego-program/evidence/integration-generation-2-tasks.json",
+    "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
-  "finalLifecycleReview": {
-    "reviewedDeliveryHead": "5ff9d767e5b8fdf547634c551a7f1a908f297d12",
-    "revisedPlanningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
-    "resolution": "No server-side client release operation is planned. Studio only revokes browser object URLs. Each server descriptor receives immutable expiresAt=min(registration+5 minutes, owning session expiry); stream termination does not shorten it, while descriptor/session expiry or process shutdown revokes access.",
-    "applyAuthorized": false,
-    "externalStateAuthorized": false
-  },
-  "deviationReview": {
-    "decision": "accepted-for-integration-planning-only",
-    "record": ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
-    "correctiveGates": [
-      "Library-only source renditions, 33-item bound, exact relationship artifact ownership, portability, and fail-closed retry reconstruction",
-      "authenticated Studio fetch-stream SSE parsing, partial/final/failure state, cleanup, deterministic mock streaming, and browser verification"
-    ],
-    "separateChangeRequired": false,
-    "applyAuthorized": false,
-    "externalStateAuthorized": false
-  },
-  "dependsOn": [
-    "add-routego-image-creation",
-    "add-routego-image-library",
-    "add-routego-studio"
-  ],
-  "dependencyBaselines": {
-    "creationDelivery": "624e7390b902814620d3eeb583ed43a57fd8243a",
-    "creationArchive": "d03389ec108bcfd9e79ed076048e50b430900028",
-    "libraryDelivery": "96fea3b5618808fd00daac274178512daf2a5ff2",
-    "libraryArchive": "50141def268015579febee067c311aa09aaf117f",
-    "studioDelivery": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
-    "studioArchive": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
-    "frozenMainlineVerification": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
-    "controllerGovernancePreActivation": "81a84ac6d69e278ff014ec271e66f13e2cfb73df",
-    "controllerGovernance": "149ca920feb6fc714db4e210e4a304f6540f3e57"
-  },
-  "startupException": {
-    "reason": "This is the initial proposal owner for the final Integration change, so openspec/changes/integrate-routego-image-plugin is intentionally absent at task creation.",
-    "required": "Treat the missing change directory as the authorized proposal starting state only; read the plan, AGENTS, program, this thread state, PD-002/003/004, all 18 main specs, and the three archived functional changes before invoking openspec-propose. Do not write product code until the new planning artifacts are complete and freshly validated."
-  },
-  "ownership": {
-    "owned": [
-      "final LocalRoutegoService composition across Creation and Library resource boundaries",
-      "seven MCP tool integration and Routego Image Skill wiring without changing the frozen public tool set",
-      "loopback HTTP/session/origin/resource adapters and Studio static serving",
-      "plugin manifest, packaging, install, CI, cross-platform acceptance, and release workflow",
-      "root dependencies, lockfile, workspace configuration, and shared integration-only test infrastructure when justified by the approved Integration OpenSpec"
-    ],
-    "readOnlyWithoutDeviation": [
-      "Creation provider/executor internals",
-      "Library persistence and ZIP internals",
-      "Studio product components and browser journeys",
-      "the 18 frozen main specification requirements"
-    ],
-    "forbidden": [
-      "adding or renaming public MCP tools",
-      "using real API keys, user images, real Library data, or a real relay before explicit user approval",
-      "deployment, publication, marketplace replacement, paid probes, or billable image requests before explicit user approval",
-      "destructive migration or deletion of legacy plugin/configuration/Library data"
-    ]
+  "externalApprovalGates": ["7.2", "8.2", "9.1"],
+  "history": {
+    "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",
+    "sourcePath": ".codex/routego-program/threads/integration.json",
+    "sourceSha256": "31bd389f9b92110b10ff006acb3555b8e8c593c36641d4ce0c7b416f3c47daaa"
   }
 }

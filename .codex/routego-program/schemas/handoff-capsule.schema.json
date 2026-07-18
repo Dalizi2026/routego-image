@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "routego-image-handoff-capsule.schema.json",
+  "title": "Routego Image lossless low-context handoff capsule",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "capsuleType",
+    "capsuleSha256",
+    "lane",
+    "role",
+    "change",
+    "generation",
+    "source",
+    "successor",
+    "currentState",
+    "completedEvidence",
+    "authority",
+    "gates",
+    "context",
+    "git",
+    "reportingContract",
+    "startup"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "capsuleType": { "const": "successor-handoff" },
+    "capsuleSha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "lane": { "type": "string", "minLength": 1 },
+    "role": { "type": "string", "minLength": 1 },
+    "change": { "type": "string", "minLength": 1 },
+    "generation": {
+      "type": "object",
+      "required": ["source", "successor"],
+      "properties": {
+        "source": { "type": "integer", "minimum": 0 },
+        "successor": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "threadId",
+        "worktree",
+        "branch",
+        "acceptedProductCommit",
+        "handoffCommit",
+        "handoffParent"
+      ]
+    },
+    "successor": {
+      "type": "object",
+      "required": [
+        "threadId",
+        "worktree",
+        "plannedBranch",
+        "startingCommit",
+        "registrationStatus"
+      ]
+    },
+    "currentState": {
+      "type": "object",
+      "required": [
+        "openspecTotal",
+        "openspecCompleted",
+        "completedTaskIds",
+        "nextTaskId",
+        "taskCapsule",
+        "taskLocked",
+        "sourceIsSoleApplyOwner"
+      ]
+    },
+    "completedEvidence": {
+      "type": "array",
+      "minItems": 1
+    },
+    "authority": {
+      "type": "object",
+      "required": [
+        "summaryPath",
+        "summarySha256",
+        "publicContractFingerprint",
+        "ownershipFingerprint"
+      ]
+    },
+    "gates": {
+      "type": "object",
+      "required": [
+        "blockers",
+        "approvalRequiredTasks",
+        "externalStateAuthorized"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "sourceObservableCompactions",
+        "sourceCompactionFingerprint",
+        "successorObservableCompactions",
+        "handoffAcceptanceCompactionLimit"
+      ]
+    },
+    "git": {
+      "type": "object",
+      "required": ["sourceClean", "expectedSuccessorClean"]
+    },
+    "reportingContract": {
+      "type": "object",
+      "required": [
+        "primary",
+        "fallback",
+        "fallbackIntervalMinutes",
+        "finalAnswerAloneIsInsufficient"
+      ]
+    },
+    "startup": {
+      "type": "object",
+      "required": [
+        "mandatoryFiles",
+        "maxFiles",
+        "maxUtf8Bytes",
+        "escalationTriggers",
+        "fullAuditTriggers",
+        "contextBudgetFailure"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
