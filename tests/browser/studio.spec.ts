@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { chromium, expect, test, type Page } from "@playwright/test";
 
 import {
+  STUDIO_BASE_URL,
   STUDIO_SESSION_TOKEN,
   installDeterministicMock,
   installSyntheticFaviconBoundary,
@@ -38,6 +39,12 @@ if (!existsSync(chromium.executablePath()) && localBrowserFallback !== undefined
 
 let studioServer: StudioServer | undefined;
 
+interface SecurityExpectationOptions {
+  readonly sensitiveMarkers?: readonly string[];
+  readonly expectedSessionHeader?: string;
+  readonly allowedConsoleHttpStatuses?: readonly number[];
+}
+
 test.beforeAll(async () => {
   studioServer = await startStudioServer();
 });
@@ -49,8 +56,11 @@ test.afterAll(async () => {
 async function expectSecurityClean(
   page: Page,
   audit: BrowserSecurityAudit,
-  sensitiveMarkers: readonly string[] = []
+  options: SecurityExpectationOptions = {}
 ): Promise<void> {
+  const sensitiveMarkers = options.sensitiveMarkers ?? [];
+  const expectedSessionHeader = options.expectedSessionHeader ?? STUDIO_SESSION_TOKEN;
+  const allowedConsoleHttpStatuses = options.allowedConsoleHttpStatuses ?? [];
   const body = await page.locator("body").innerText();
   const storage = await page.evaluate(() => ({
     local: { ...localStorage },
@@ -63,12 +73,19 @@ async function expectSecurityClean(
   expect(body).not.toContain(STUDIO_SESSION_TOKEN);
   expect(JSON.stringify(storage)).not.toContain(STUDIO_SESSION_TOKEN);
   expect(transcript).not.toContain(STUDIO_SESSION_TOKEN);
+  expect(diagnostics).not.toContain(STUDIO_SESSION_TOKEN);
   expect(transcript).not.toMatch(/authorization/iu);
   expect(transcript).not.toMatch(/data:image\//iu);
   expect(transcript).not.toMatch(/;base64,/iu);
   expect(transcript).not.toMatch(/[A-Za-z]:\\/u);
   expect(diagnostics).not.toMatch(/authorization|data:image\/|;base64,|[A-Za-z]:\\/iu);
-  expect(diagnostics).not.toMatch(/^(?:warning|error):/imu);
+  const unexpectedConsoleProblems = audit.consoleMessages.filter((message) => {
+    if (!/^(?:warning|error):/iu.test(message)) return false;
+    return !allowedConsoleHttpStatuses.some((status) =>
+      message.includes(`server responded with a status of ${status}`)
+    );
+  });
+  expect(unexpectedConsoleProblems).toEqual([]);
   for (const marker of sensitiveMarkers) {
     expect(body).not.toContain(marker);
     expect(JSON.stringify(storage)).not.toContain(marker);
@@ -76,10 +93,17 @@ async function expectSecurityClean(
     expect(diagnostics).not.toContain(marker);
   }
 
+  for (const request of audit.requests) {
+    const url = new URL(request.url);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      expect(url.origin).toBe(STUDIO_BASE_URL);
+    }
+  }
+
   for (const request of audit.requests.filter((item) => item.url.includes("/api/v1/"))) {
     expect(request.headers["authorization"]).toBeUndefined();
     expect(request.headers["cookie"]).toBeUndefined();
-    expect(request.headers["x-routego-session"]).toBe(STUDIO_SESSION_TOKEN);
+    expect(request.headers["x-routego-session"]).toBe(expectedSessionHeader);
     expect(request.url).not.toContain(STUDIO_SESSION_TOKEN);
     expect(request.body ?? "").not.toContain(STUDIO_SESSION_TOKEN);
     expect(request.body ?? "").not.toMatch(/data:image\/|;base64,|[A-Za-z]:\\/iu);
@@ -108,7 +132,7 @@ async function submitTextGeneration(page: Page, prompt: string): Promise<void> {
   await page.getByRole("button", { name: "开始生成" }).click();
 }
 
-test("secure boot removes the token and keeps localization, focus, motion, and responsive navigation usable", async ({ page }) => {
+test("secure boot blocks missing and rejected sessions, then keeps a valid localized responsive shell usable", async ({ page, context }) => {
   const audit = observeBrowserSecurity(page);
   await installSyntheticFaviconBoundary(page);
 
@@ -163,6 +187,23 @@ test("secure boot removes the token and keeps localization, focus, motion, and r
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 
   await expectSecurityClean(page, audit);
+
+  const rejectedSessionToken = "routego-studio-rejected-session-token";
+  const rejectedPage = await context.newPage();
+  const rejectedAudit = observeBrowserSecurity(rejectedPage);
+  await installSyntheticFaviconBoundary(rejectedPage);
+  await rejectedPage.goto(`/?token=${encodeURIComponent(rejectedSessionToken)}`);
+  await expect(rejectedPage.getByRole("heading", { name: "本地工作区无法载入" })).toBeVisible();
+  await expect(rejectedPage.getByText("本地会话已失效或被拒绝。")).toBeVisible();
+  await expect(rejectedPage.getByText("请关闭此页面，再从 Routego Image 重新打开 Studio。")).toBeVisible();
+  await expect(rejectedPage.getByRole("heading", { name: "把想法放进显影盘" })).toHaveCount(0);
+  await expect(rejectedPage).toHaveURL(STUDIO_BASE_URL + "/");
+  await expectSecurityClean(rejectedPage, rejectedAudit, {
+    sensitiveMarkers: [rejectedSessionToken],
+    expectedSessionHeader: rejectedSessionToken,
+    allowedConsoleHttpStatuses: [401]
+  });
+  await rejectedPage.close();
 });
 
 test("creation reports success, partial, failure, and degraded outcomes without automatic replay", async ({ context }) => {
@@ -421,5 +462,5 @@ test("Settings keeps API-key replacement write-only and returns only redacted st
     apiKey?: { operation?: string; value?: string };
   };
   expect(secretBody.apiKey).toEqual({ operation: "replace", value: replacementMarker });
-  await expectSecurityClean(page, audit, [replacementMarker]);
+  await expectSecurityClean(page, audit, { sensitiveMarkers: [replacementMarker] });
 });
