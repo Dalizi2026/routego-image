@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "capsuleType": "successor-handoff",
+  "capsuleSha256": "5f1497666773994f5cef906d66a307cc7dbe04681fd48a9e3a01be67d364c1e1",
+  "lane": "integration",
+  "role": "openspec-propose-and-apply-owner",
+  "change": "integrate-routego-image-plugin",
+  "generation": {
+    "source": 5,
+    "successor": 6
+  },
+  "source": {
+    "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
+    "branch": "codex/routego-integration-g5",
+    "acceptedProductCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "handoffCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
+    "handoffParent": "7ba03291adf26c28ac84abfe8cd5a8f5794ea089"
+  },
+  "successor": {
+    "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
+    "plannedBranch": "codex/routego-integration-g6",
+    "startingCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
+    "registrationStatus": "registered-inactive-task-4.3-locked-pending-handoff-acceptance",
+    "registrationCommit": null,
+    "incorporationCommit": null,
+    "registrationCommitSemantics": "The Controller registration governance commit is created after this capsule content is validated; the successor incorporation commit is reported after it merges that governance commit."
+  },
+  "currentState": {
+    "openspecTotal": 29,
+    "openspecCompleted": 17,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1", "4.2"],
+    "nextTaskId": "4.3",
+    "taskCapsule": {
+      "path": ".codex/routego-program/tasks/integration-4.3.json",
+      "sha256": "fc6cb281882cef62ca3e59fdc40d0aa836bd23aa794a32d7c61f026b740de4f4"
+    },
+    "taskLocked": true,
+    "sourceIsSoleApplyOwner": true,
+    "successorApplyAuthorized": false,
+    "acceptedPreviousTaskImplementationCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "acceptedHostCorrectionImplementationCommit": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
+    "acceptedPreviousTaskStateCommit": "7ba03291adf26c28ac84abfe8cd5a8f5794ea089",
+    "acceptedPreviousTaskCheckpointCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
+    "taskComplete": false,
+    "safeCheckpoint": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
+    "observableCompactions": 4,
+    "continuation": "successor-registration-and-audit-only-task-4.3-locked"
+  },
+  "completedEvidence": [
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-2-tasks.json",
+      "sha256": "1c43569d3422f8bb1e25c1f8c77ec7c2339deda9615f2b1e21156e7b3ccacfb7",
+      "taskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1"]
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-3-tasks.json",
+      "sha256": "b896c776082284a397c7a656f7e7d49d18a21dbb2b12b866ecb1f5ff66d7a786",
+      "taskIds": ["3.2", "3.3", "3.4"]
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-4-tasks.json",
+      "sha256": "649ddf87b214c6f5a07916ee42a1080b1b561f71020483a075118004241b73ee",
+      "taskIds": ["3.5", "4.1"]
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-5-tasks.json",
+      "sha256": "fe70521d9f1eecc3be50c3c2b461338672bb4e5e70f860a58523f8dd18e6e197",
+      "taskIds": ["4.2"]
+    }
+  ],
+  "authority": {
+    "summaryPath": ".codex/routego-program/authority-summary.md",
+    "summarySha256": "6387478ec031eb7aeddb0fa6ec90674114bf855113828f6305ad6d061c70e910",
+    "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+    "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+    "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
+  },
+  "gates": {
+    "blockers": [],
+    "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
+    "externalStateAuthorized": false,
+    "taskBeyond4_3Locked": true,
+    "residualRisks": [
+      "Task 4.3 must preserve task 4.2 service, HTTP, session, upload, resource and streaming behavior.",
+      "Process-signal tests must not terminate the real test runner or force business process exit.",
+      "Packaging, installation, real relay acceptance and release remain later gated tasks."
+    ]
+  },
+  "context": {
+    "sourceObservableCompactions": 4,
+    "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|7ba03291adf26c28ac84abfe8cd5a8f5794ea089|context-compaction-4-during-task-4.2-lane-checkpoint-before-commit|17/29",
+    "successorObservableCompactions": 0,
+    "successorCompactionFingerprint": null,
+    "handoffAcceptanceCompactionLimit": 0,
+    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
+    "auditFailure": "HANDOFF_AUDIT_FAILED"
+  },
+  "git": {
+    "sourceClean": true,
+    "expectedSuccessorClean": true
+  },
+  "reportingContract": {
+    "primary": "After every OpenSpec task, task group, safe checkpoint, blocker, deviation, handoff, activation or delivery, call real send_message_to_thread to the current Controller from program.json and then call read_thread to confirm receipt.",
+    "fallback": "routego-program-continuity V4 records exact CODEX_THREAD_ID, verifies the exact Controller seed without normal list_threads enumeration, reads compact current state and deduplicates with latestDirectCheckpoint, then archives its own run by explicit ID as the final tool action; it is missed-message fallback only.",
+    "fallbackIntervalMinutes": 30,
+    "finalAnswerAloneIsInsufficient": true,
+    "heartbeatInheritanceAssumed": false
+  },
+  "startup": {
+    "mandatoryFiles": [
+      "AGENTS.md",
+      ".codex/routego-program/authority-summary.md",
+      ".codex/routego-program/program.json",
+      ".codex/routego-program/threads/integration.json",
+      ".codex/routego-program/handoffs/integration-generation-6.capsule.json",
+      ".codex/routego-program/tasks/integration-4.3.json",
+      "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
+      "openspec/specs/creation-runtime-transports/spec.md",
+      "openspec/specs/local-service-boundaries/spec.md",
+      "openspec/specs/shared-image-contracts/spec.md",
+      ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
+    ],
+    "maxFiles": 12,
+    "maxUtf8Bytes": 122880,
+    "byteCounting": "utf8-after-crlf-to-lf-normalization",
+    "fallbackSourceCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
+    "expectedNormalizedUtf8Bytes": 97010,
+    "authoritySummaryMaxBytes": 16384,
+    "handoffCapsuleMaxBytes": 24576,
+    "directGovernanceMessageMaxBytes": 12288,
+    "programStateMaxBytes": 49152,
+    "laneStateMaxBytes": 32768,
+    "targetedEscalationOnly": true,
+    "fullAuditDefaultForbidden": true
+  },
+  "safety": {
+    "noProductEditsBeforeExplicitCurrentPhaseGate": true,
+    "ownerOnlyOpenSpecPlanningScope": true,
+    "noCredentialsAuthorizationValuesUserImagesRealLibraryRelayOrBillableRequests": true,
+    "noInstallMarketplaceDeployPublishMigrateDeleteOrRelease": true,
+    "sevenPublicToolsAndPublicPhaseFrozen": true
+  }
+}
