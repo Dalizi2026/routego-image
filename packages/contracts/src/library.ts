@@ -6,7 +6,6 @@ import {
   aspectRatioSchema,
   continuationActionSchema,
   editInvariantsSchema,
-  imageArtifactPhaseSchema,
   imageFormatSchema,
   imageOperationKindSchema,
   imageQualitySchema,
@@ -233,10 +232,14 @@ export const libraryAssetRelationshipSchema = z
   })
   .strict();
 
+export const libraryAssetRenditionPhaseSchema = z.enum(["source", "partial", "final"]);
+
+export const MAX_LIBRARY_ASSET_RENDITIONS = 33;
+
 export const libraryAssetRenditionSchema = z
   .object({
     artifactId: identifierSchema,
-    phase: imageArtifactPhaseSchema,
+    phase: libraryAssetRenditionPhaseSchema,
     mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]),
     byteLength: z.number().int().min(1),
     width: z.number().int().min(1).max(65_535),
@@ -274,6 +277,7 @@ export const libraryAssetDetailSchema = z
     model: z.string().trim().min(1).max(200),
     kind: imageOperationKindSchema,
     status: libraryAssetStatusSchema,
+    primaryArtifactId: identifierSchema,
     mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]),
     width: z.number().int().min(1).max(65_535),
     height: z.number().int().min(1).max(65_535),
@@ -284,13 +288,93 @@ export const libraryAssetDetailSchema = z
     effectiveParams: libraryOperationParametersSchema,
     execution: operationExecutionMetadataSchema,
     error: routegoServiceErrorSchema.optional(),
-    renditions: z.array(libraryAssetRenditionSchema).max(16),
+    renditions: z.array(libraryAssetRenditionSchema).min(1).max(MAX_LIBRARY_ASSET_RENDITIONS),
     relationships: z.array(libraryAssetRelationshipSchema).max(128),
     folders: z.array(libraryAssetFolderMembershipSchema).max(100),
     allowedActions: z.array(libraryAssetAllowedActionSchema).max(16)
   })
   .strict()
   .superRefine((value, context) => {
+    const renditionByArtifactId = new Map(
+      value.renditions.map((rendition) => [rendition.artifactId, rendition])
+    );
+    if (renditionByArtifactId.size !== value.renditions.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["renditions"],
+        message: "Asset rendition artifact identifiers must be unique"
+      });
+    }
+    const primaryRendition = renditionByArtifactId.get(value.primaryArtifactId);
+    if (!primaryRendition) {
+      context.addIssue({
+        code: "custom",
+        path: ["primaryArtifactId"],
+        message: "Primary artifact must identify an asset rendition"
+      });
+    } else if (primaryRendition.phase === "source") {
+      context.addIssue({
+        code: "custom",
+        path: ["primaryArtifactId"],
+        message: "Primary artifact must identify a partial or final output"
+      });
+    }
+    if (value.status === "succeeded") {
+      if (!value.renditions.some((rendition) => rendition.phase === "final")) {
+        context.addIssue({
+          code: "custom",
+          path: ["renditions"],
+          message: "Succeeded assets require at least one final rendition"
+        });
+      }
+      if (primaryRendition?.phase !== "final") {
+        context.addIssue({
+          code: "custom",
+          path: ["primaryArtifactId"],
+          message: "Succeeded assets require a final primary artifact"
+        });
+      }
+    }
+    for (const relationship of value.relationships) {
+      if (relationship.role === "output" && relationship.relatedAssetId !== value.id) {
+        context.addIssue({
+          code: "custom",
+          path: ["relationships"],
+          message: "Output relationships must belong to the described asset"
+        });
+      }
+      if (relationship.role === "output" && relationship.artifactId === undefined) {
+        context.addIssue({
+          code: "custom",
+          path: ["relationships"],
+          message: "Output relationships require an exact artifact identifier"
+        });
+      }
+      if (relationship.artifactId === undefined) {
+        continue;
+      }
+      const localRendition = renditionByArtifactId.get(relationship.artifactId);
+      if (relationship.relatedAssetId === value.id && !localRendition) {
+        context.addIssue({
+          code: "custom",
+          path: ["relationships"],
+          message: "Relationship artifact must belong to its related asset"
+        });
+      } else if (relationship.relatedAssetId !== value.id && localRendition) {
+        context.addIssue({
+          code: "custom",
+          path: ["relationships"],
+          message: "Relationship artifact cannot be assigned to another asset"
+        });
+      }
+      if (relationship.role === "output" && localRendition?.phase === "source") {
+        context.addIssue({
+          code: "custom",
+          path: ["relationships"],
+          message: "Output relationships cannot reference source renditions"
+        });
+      }
+    }
     if (value.kind !== value.requestedParams.kind || value.kind !== value.effectiveParams.kind) {
       context.addIssue({
         code: "custom",
@@ -784,6 +868,8 @@ export type ListFoldersResult = z.output<typeof listFoldersResultSchema>;
 export type ReorderFoldersInput = z.input<typeof reorderFoldersInputSchema>;
 export type ReorderFoldersResult = z.output<typeof reorderFoldersResultSchema>;
 export type LibraryOperationParameters = z.infer<typeof libraryOperationParametersSchema>;
+export type LibraryAssetRenditionPhase = z.infer<typeof libraryAssetRenditionPhaseSchema>;
+export type LibraryAssetRendition = z.infer<typeof libraryAssetRenditionSchema>;
 export type LibraryAssetDetail = z.infer<typeof libraryAssetDetailSchema>;
 export type GetAssetDetailInput = z.input<typeof getAssetDetailInputSchema>;
 export type GetAssetDetailResult = z.output<typeof getAssetDetailResultSchema>;

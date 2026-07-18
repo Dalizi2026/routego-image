@@ -8,15 +8,20 @@ import {
   getAssetDetailResultSchema,
   getBrowserResourceInputSchema,
   getBrowserResourceResultSchema,
+  imageArtifactPhaseSchema,
   libraryAssetDetailSchema,
+  libraryAssetRenditionPhaseSchema,
   libraryMutationRequestSchema,
   listFoldersResultSchema,
+  MAX_LIBRARY_ASSET_RENDITIONS,
   parseStudioOperationInput,
   parseStudioOperationOutput,
   preflightLibraryMutationInputSchema,
   preflightLibraryMutationResultSchema,
   relativeBrowserResourceUrlSchema,
   reorderFoldersInputSchema,
+  routegoOperationDefinitions,
+  routegoOperationNames,
   routegoSearchLibraryInputSchema,
   studioLibrarySearchInputSchema,
   studioLibrarySearchResultSchema,
@@ -103,6 +108,51 @@ const resource = {
   expiresAt: TEST_TIMESTAMP
 };
 
+const rendition = (
+  artifactId: string,
+  phase: "source" | "partial" | "final",
+  mimeType: "image/png" | "image/jpeg" | "image/webp" = "image/png"
+) => ({
+  artifactId,
+  phase,
+  mimeType,
+  byteLength: 68,
+  width: 1,
+  height: 1,
+  sha256: "a".repeat(64),
+  createdAt: TEST_TIMESTAMP
+});
+
+const assetDetail = (overrides: Record<string, unknown> = {}) => ({
+  id: "asset-output",
+  prompt: requestedParams.prompt,
+  model: "gpt-image-2",
+  kind: "edit",
+  status: "succeeded",
+  primaryArtifactId: "artifact-final-0",
+  mimeType: "image/png",
+  width: 1024,
+  height: 1024,
+  createdAt: TEST_TIMESTAMP,
+  updatedAt: TEST_TIMESTAMP,
+  requestedParams,
+  effectiveParams: requestedParams,
+  execution,
+  renditions: [rendition("artifact-final-0", "final")],
+  relationships: [
+    {
+      id: "relationship-output-0",
+      role: "output",
+      relatedAssetId: "asset-output",
+      artifactId: "artifact-final-0",
+      order: 0
+    }
+  ],
+  folders: [],
+  allowedActions: ["edit", "retry", "download"],
+  ...overrides
+});
+
 describe("folder and complete asset detail contracts", () => {
   it("preserves ordered folders and rejects duplicate reorder identifiers", () => {
     expect(
@@ -129,6 +179,7 @@ describe("folder and complete asset detail contracts", () => {
       model: "gpt-image-2",
       kind: "edit",
       status: "succeeded",
+      primaryArtifactId: "artifact-output",
       mimeType: "image/png",
       width: 1024,
       height: 1024,
@@ -202,6 +253,211 @@ describe("folder and complete asset detail contracts", () => {
         error: persistenceError
       }).success
     ).toBe(false);
+  });
+
+  it("keeps source renditions Library-only while accepting mixed source MIME", () => {
+    expect(libraryAssetRenditionPhaseSchema.options).toEqual(["source", "partial", "final"]);
+    expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
+    expect(imageArtifactPhaseSchema.safeParse("source").success).toBe(false);
+
+    const parsed = libraryAssetDetailSchema.parse(
+      assetDetail({
+        renditions: [
+          rendition("artifact-source-target", "source", "image/jpeg"),
+          rendition("artifact-source-mask", "source", "image/png"),
+          rendition("artifact-source-supporting", "source", "image/webp"),
+          rendition("artifact-final-0", "final", "image/png")
+        ],
+        relationships: [
+          {
+            id: "relationship-target",
+            role: "target",
+            relatedAssetId: "asset-output",
+            artifactId: "artifact-source-target",
+            order: 0
+          },
+          {
+            id: "relationship-mask",
+            role: "mask",
+            relatedAssetId: "asset-output",
+            artifactId: "artifact-source-mask",
+            order: 1
+          },
+          {
+            id: "relationship-supporting",
+            role: "supporting",
+            relatedAssetId: "asset-output",
+            artifactId: "artifact-source-supporting",
+            order: 2
+          },
+          {
+            id: "relationship-output",
+            role: "output",
+            relatedAssetId: "asset-output",
+            artifactId: "artifact-final-0",
+            order: 3
+          }
+        ]
+      })
+    );
+
+    expect(parsed.renditions.map((item) => item.phase)).toEqual([
+      "source",
+      "source",
+      "source",
+      "final"
+    ]);
+    expect(JSON.stringify(parsed)).not.toMatch(/(?:filePath|C:\\|\/Users\/|data:image)/u);
+  });
+
+  it("accepts exactly 17 source plus 12 partial plus 4 final renditions and rejects 34", () => {
+    const sources = Array.from({ length: 17 }, (_, index) =>
+      rendition(
+        `artifact-source-${index}`,
+        "source",
+        (["image/png", "image/jpeg", "image/webp"] as const)[index % 3]
+      )
+    );
+    const partials = Array.from({ length: 12 }, (_, index) =>
+      rendition(`artifact-partial-${index}`, "partial")
+    );
+    const finals = Array.from({ length: 4 }, (_, index) =>
+      rendition(`artifact-final-${index}`, "final")
+    );
+    const renditions = [...sources, ...partials, ...finals];
+    const relationships = renditions.map((item, index) => ({
+      id: `relationship-${index}`,
+      role: item.phase === "source" ? ("source" as const) : ("output" as const),
+      relatedAssetId: "asset-output",
+      artifactId: item.artifactId,
+      order: index
+    }));
+
+    const parsed = libraryAssetDetailSchema.parse(assetDetail({ renditions, relationships }));
+    expect(parsed.renditions).toHaveLength(MAX_LIBRARY_ASSET_RENDITIONS);
+    expect(
+      libraryAssetDetailSchema.safeParse({
+        ...assetDetail({ renditions, relationships }),
+        renditions: [...renditions, rendition("artifact-final-overflow", "final")]
+      }).success
+    ).toBe(false);
+  });
+
+  it("requires an output primary, a final succeeded output, and exact local ownership", () => {
+    const sourceAndFinal = [
+      rendition("artifact-source-0", "source"),
+      rendition("artifact-final-0", "final")
+    ];
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({ primaryArtifactId: "artifact-source-0", renditions: sourceAndFinal })
+      ).success
+    ).toBe(false);
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          primaryArtifactId: "artifact-partial-0",
+          renditions: [rendition("artifact-partial-0", "partial")],
+          relationships: [
+            {
+              id: "relationship-output",
+              role: "output",
+              relatedAssetId: "asset-output",
+              artifactId: "artifact-partial-0",
+              order: 0
+            }
+          ]
+        })
+      ).success
+    ).toBe(false);
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          relationships: [
+            {
+              id: "relationship-without-artifact",
+              role: "output",
+              relatedAssetId: "asset-output",
+              order: 0
+            }
+          ]
+        })
+      ).success
+    ).toBe(false);
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          relationships: [
+            {
+              id: "relationship-wrong-owner",
+              role: "target",
+              relatedAssetId: "asset-other",
+              artifactId: "artifact-final-0",
+              order: 0
+            }
+          ]
+        })
+      ).success
+    ).toBe(false);
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          relationships: [
+            {
+              id: "relationship-missing-artifact",
+              role: "output",
+              relatedAssetId: "asset-output",
+              artifactId: "artifact-not-owned",
+              order: 0
+            }
+          ]
+        })
+      ).success
+    ).toBe(false);
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          status: "partial",
+          primaryArtifactId: "artifact-partial-0",
+          renditions: [
+            rendition("artifact-source-0", "source"),
+            rendition("artifact-partial-0", "partial")
+          ],
+          relationships: [
+            {
+              id: "relationship-output",
+              role: "output",
+              relatedAssetId: "asset-output",
+              artifactId: "artifact-partial-0",
+              order: 0
+            }
+          ]
+        })
+      ).success
+    ).toBe(true);
+  });
+
+  it("keeps the public MCP surface at exactly seven tool names", () => {
+    expect(routegoOperationNames).toEqual([
+      "status",
+      "generate",
+      "edit",
+      "batch",
+      "searchLibrary",
+      "manageLibrary",
+      "openStudio"
+    ]);
+    expect(
+      Object.values(routegoOperationDefinitions).map((definition) => definition.toolName)
+    ).toEqual([
+      "routego_status",
+      "routego_generate",
+      "routego_edit",
+      "routego_batch",
+      "routego_search_library",
+      "routego_manage_library",
+      "routego_open_studio"
+    ]);
   });
 });
 
