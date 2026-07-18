@@ -75,15 +75,23 @@ When `saveToLibrary=true`, Integration SHALL preallocate one operation asset ID,
 - **THEN** Integration SHALL not report a saved Library asset and SHALL preserve truthful provider output/billing facts as partial or failed
 
 ### Requirement: Unsaved and project-copy results remain honest
-Studio operations with `saveToLibrary=false` SHALL use bounded expiring Integration resources without creating Library records. Each ephemeral image descriptor SHALL remain fetchable through its fixed five-minute TTL unless explicitly released after all client references are removed; stream terminal, disconnect, cancel, or unmount MUST NOT shorten that TTL, while process shutdown SHALL revoke it. Public operations with `saveToLibrary=false` MUST have an approved output directory and SHALL use safe exclusive output placement. Project copies after Library ingestion SHALL use Library's contained non-overwriting copy behavior.
+Studio operations with `saveToLibrary=false` SHALL use bounded expiring Integration resources without creating Library records. At registration, each ephemeral image descriptor SHALL receive an immutable expiry no later than `min(registration time + 5 minutes, owning session expiry)`. Stream terminal, disconnect, cancel, unmount, or browser object-URL revocation MUST NOT shorten that expiry, while descriptor/session expiry or process shutdown SHALL revoke server access. Public operations with `saveToLibrary=false` MUST have an approved output directory and SHALL use safe exclusive output placement. Project copies after Library ingestion SHALL use Library's contained non-overwriting copy behavior.
 
 #### Scenario: Studio result is not saved
-- **WHEN** Studio disables Library saving
-- **THEN** the result SHALL use protected resources with a five-minute descriptor expiry, no durable asset ID, and cleanup only after expiry, explicit safe release, or shutdown
+- **WHEN** Studio disables Library saving while its session has at least five minutes remaining
+- **THEN** the result SHALL use protected resources expiring five minutes after registration, no durable asset ID, and server cleanup at descriptor expiry or shutdown
+
+#### Scenario: Owning session is near expiry
+- **WHEN** an ephemeral resource is registered less than five minutes before its owning session expires
+- **THEN** its descriptor expiry SHALL equal the earlier session expiry and SHALL NOT promise a longer fetch window
 
 #### Scenario: Failed stream retains a partial resource
 - **WHEN** a validated partial descriptor is followed by failure, disconnect, cancellation, or workbench unmount
-- **THEN** the reader/channel SHALL close while the protected partial remains fetchable until its original expiry unless the client explicitly releases it after removing every reference
+- **THEN** the reader/channel SHALL close while the protected partial remains fetchable until its original descriptor/session expiry, and revoking a browser object URL SHALL not revoke the server descriptor
+
+#### Scenario: Exact resource lifetime boundary is crossed
+- **WHEN** a protected partial is fetched immediately before and then at or after its immutable descriptor or owning-session expiry
+- **THEN** the pre-expiry fetch SHALL be authorized and the later fetch SHALL fail safely without extending the descriptor
 
 #### Scenario: Public unsaved request lacks output directory
 - **WHEN** a public operation disables Library saving and supplies no approved destination

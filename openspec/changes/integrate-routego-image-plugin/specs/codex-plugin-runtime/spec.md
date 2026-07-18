@@ -64,7 +64,11 @@ All non-static local routes SHALL require an active session header and exact mat
 - **THEN** the runtime SHALL reject it without routing a second stream surface or treating the sentinel as completion
 
 ### Requirement: Runtime lifecycle releases every resource
-The plugin process SHALL keep stdout protocol-only, write only recursively redacted diagnostics to stderr, recover Library state before readiness, and release HTTP listeners, sessions, event channels, streams, abort controllers, readers, timers, browser resources, temporary files, and MCP framing state on their defined lifecycle boundaries. Terminal, disconnect, cancellation, or invalid input SHALL close readers/channels but SHALL NOT revoke a validated ephemeral partial before its fixed five-minute descriptor expiry or explicit safe release; process shutdown SHALL revoke all ephemeral resources. It MUST NOT force `process.exit()` as a business result protocol.
+The plugin process SHALL keep stdout protocol-only, write only recursively redacted diagnostics to stderr, recover Library state before readiness, and release HTTP listeners, sessions, event channels, streams, abort controllers, readers, timers, browser resources, temporary files, and MCP framing state on their defined lifecycle boundaries. Every ephemeral descriptor expiry SHALL be fixed at registration no later than `min(registration time + 5 minutes, owning session expiry)`. Terminal, disconnect, cancellation, invalid input, or browser object-URL revocation SHALL close client/stream resources but SHALL NOT shorten that server descriptor expiry; descriptor/session expiry and process shutdown SHALL revoke server resources. The runtime MUST NOT force `process.exit()` as a business result protocol.
+
+#### Scenario: Session-capped descriptor expires
+- **WHEN** a resource is registered for a session with less than five minutes remaining
+- **THEN** its descriptor SHALL expire with the session, allow protected fetch only before that exact boundary, and reject access at or after expiry
 
 #### Scenario: Operation completes successfully
 - **WHEN** one MCP or HTTP operation returns

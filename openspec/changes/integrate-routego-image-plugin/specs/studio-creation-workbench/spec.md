@@ -9,7 +9,7 @@ Studio SHALL submit generate/edit streaming requests only through `POST /api/v1/
 
 #### Scenario: Stream fails after partial output
 - **WHEN** the route emits a partial artifact followed by a failed terminal event
-- **THEN** Studio SHALL preserve the partial artifact and matching `receivedAnyOutput=true` and `mayHaveBilled=true` evidence, keep its protected resource fetchable through the original five-minute descriptor TTL, close the reader/channel, and SHALL NOT present automatic safe replay
+- **THEN** Studio SHALL preserve the partial artifact and matching `receivedAnyOutput=true` and `mayHaveBilled=true` evidence, keep its protected resource fetchable until the immutable descriptor expiry capped by the owning session, close the reader/channel, and SHALL NOT present automatic safe replay
 
 #### Scenario: Stream framing or sequence is invalid
 - **WHEN** content type, UTF-8, line/event size, JSON, schema, first/unique started rule, request ID, sequence order, terminal count, terminal-before-EOF rule, sentinel policy, or post-terminal data is invalid
@@ -17,10 +17,10 @@ Studio SHALL submit generate/edit streaming requests only through `POST /api/v1/
 
 #### Scenario: User cancels the stream
 - **WHEN** the user cancels or leaves the active operation
-- **THEN** Studio SHALL abort the fetch, cancel/release the reader and channel, preserve already validated partial facts and their original five-minute resource expiry, and stop accepting later events
+- **THEN** Studio SHALL abort the fetch, cancel/release the reader and channel, revoke browser object URLs that no longer have UI references, preserve already validated partial facts and their original session-capped descriptor expiry, and stop accepting later events
 
 #### Scenario: Partial resource expires or runtime shuts down
-- **WHEN** a retained partial reaches its descriptor expiry or the plugin process shuts down
+- **WHEN** a retained partial reaches its descriptor or owning-session expiry, or the plugin process shuts down
 - **THEN** its protected fetch SHALL fail safely and Studio SHALL retain only the truthful expired/unavailable output fact without claiming the bytes remain accessible
 
 ### Requirement: Deterministic Studio mock streams rather than buffers
@@ -37,7 +37,7 @@ The development mock handler and Vite bridge SHALL expose `POST /api/v1/studio/c
 ## MODIFIED Requirements
 
 ### Requirement: Honest creation outcomes
-Studio SHALL render succeeded, partial, failed, and degraded creation results with protected artifacts, requested/effective parameters, relationships, failed slots, billing/output flags, and structured errors. For streamed generate/edit operations it SHALL render validated partial artifacts as they arrive, promote only a validated completed result, and preserve partial artifacts plus billing/output risk after a failed terminal event. Closing a stream SHALL release readers/channels but MUST NOT revoke a retained partial before its five-minute descriptor expiry or explicit safe release. It MUST NOT display a failed or unavailable operation as successful.
+Studio SHALL render succeeded, partial, failed, and degraded creation results with protected artifacts, requested/effective parameters, relationships, failed slots, billing/output flags, and structured errors. For streamed generate/edit operations it SHALL render validated partial artifacts as they arrive, promote only a validated completed result, and preserve partial artifacts plus billing/output risk after a failed terminal event. Closing a stream or revoking browser object URLs SHALL release client resources but MUST NOT revoke a retained server descriptor before its immutable `min(registration + 5 minutes, session expiry)` boundary. Studio MUST NOT display a failed or unavailable operation as successful.
 
 #### Scenario: Partial output is returned
 - **WHEN** a creation result or stream contains partial artifacts and a failure
@@ -45,7 +45,7 @@ Studio SHALL render succeeded, partial, failed, and degraded creation results wi
 
 #### Scenario: Stream completes after partial images
 - **WHEN** validated partial events are followed by a validated completed result
-- **THEN** Studio SHALL retain the truthful final result and SHALL clean up superseded transient partial resources without losing requested/effective metadata
+- **THEN** Studio SHALL retain the truthful final result, revoke superseded browser object URLs when no UI reference remains, and leave server descriptors to expire at their original session-capped boundary or shutdown without losing requested/effective metadata
 
 #### Scenario: Capability unavailable
 - **WHEN** `studioEdit` or an image-input request returns `capability_unavailable`
