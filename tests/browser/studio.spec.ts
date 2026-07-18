@@ -39,10 +39,44 @@ if (!existsSync(chromium.executablePath()) && localBrowserFallback !== undefined
 
 let studioServer: StudioServer | undefined;
 
+const STUDIO_CREATION_STREAM_PATH = "/api/v1/studio/creation/stream";
+const STREAM_REGISTERED_AT = Date.parse("2026-01-01T00:00:00.000Z");
+const STREAM_FULL_EXPIRY = Date.parse("2026-01-01T00:05:00.000Z");
+const STREAM_NEAR_EXPIRY = Date.parse("2026-01-01T00:00:30.000Z");
+
+interface RawStreamResource {
+  readonly resourceId: string;
+  readonly relativeUrl: string;
+  readonly expiresAt: string;
+}
+
+interface RawStreamEvent {
+  readonly type: string;
+  readonly artifact?: { readonly resource?: RawStreamResource };
+  readonly result?: {
+    readonly finalArtifacts?: ReadonlyArray<{ readonly resource?: RawStreamResource }>;
+  };
+}
+
+interface RawStreamProbe {
+  readonly status: number;
+  readonly contentType: string | null;
+  readonly fixture: string | null;
+  readonly chunkSizes: readonly number[];
+  readonly body: string;
+}
+
+interface ResourceBoundaryState {
+  now: number;
+  shutdown: boolean;
+  readonly expiresAtByResourceId: Map<string, number>;
+}
+
 interface SecurityExpectationOptions {
   readonly sensitiveMarkers?: readonly string[];
   readonly expectedSessionHeader?: string;
   readonly allowedConsoleHttpStatuses?: readonly number[];
+  readonly allowedConsoleMessages?: readonly RegExp[];
 }
 
 test.beforeAll(async () => {
@@ -61,6 +95,7 @@ async function expectSecurityClean(
   const sensitiveMarkers = options.sensitiveMarkers ?? [];
   const expectedSessionHeader = options.expectedSessionHeader ?? STUDIO_SESSION_TOKEN;
   const allowedConsoleHttpStatuses = options.allowedConsoleHttpStatuses ?? [];
+  const allowedConsoleMessages = options.allowedConsoleMessages ?? [];
   const body = await page.locator("body").innerText();
   const storage = await page.evaluate(() => ({
     local: { ...localStorage },
@@ -81,6 +116,7 @@ async function expectSecurityClean(
   expect(diagnostics).not.toMatch(/authorization|data:image\/|;base64,|[A-Za-z]:\\/iu);
   const unexpectedConsoleProblems = audit.consoleMessages.filter((message) => {
     if (!/^(?:warning|error):/iu.test(message)) return false;
+    if (allowedConsoleMessages.some((pattern) => pattern.test(message))) return false;
     return !allowedConsoleHttpStatuses.some((status) =>
       message.includes(`server responded with a status of ${status}`)
     );
@@ -130,6 +166,244 @@ async function runCapabilityProbe(page: Page, capability: string): Promise<void>
 async function submitTextGeneration(page: Page, prompt: string): Promise<void> {
   await page.getByLabel("提示词").fill(prompt);
   await page.getByRole("button", { name: "开始生成" }).click();
+}
+
+async function probeRawStream(page: Page, fixture: string): Promise<RawStreamProbe> {
+  return page.evaluate(
+    async ({ path, prompt, token }) => {
+      const response = await fetch(path, {
+        method: "POST",
+        headers: {
+          accept: "text/event-stream; charset=utf-8",
+          "content-type": "application/json",
+          "x-routego-session": token
+        },
+        body: JSON.stringify({ kind: "generate", prompt }),
+        cache: "no-store",
+        credentials: "omit",
+        redirect: "error"
+      });
+      const reader = response.body?.getReader();
+      if (reader === undefined) throw new Error("The deterministic stream omitted its body.");
+      const decoder = new TextDecoder();
+      const chunkSizes: number[] = [];
+      let body = "";
+      while (true) {
+        const result = await reader.read();
+        if (result.done) break;
+        chunkSizes.push(result.value.byteLength);
+        body += decoder.decode(result.value, { stream: true });
+      }
+      body += decoder.decode();
+      reader.releaseLock();
+      return {
+        status: response.status,
+        contentType: response.headers.get("content-type"),
+        fixture: response.headers.get("x-routego-mock-stream-fixture"),
+        chunkSizes,
+        body
+      };
+    },
+    {
+      path: STUDIO_CREATION_STREAM_PATH,
+      prompt: `mock-stream:${fixture}`,
+      token: STUDIO_SESSION_TOKEN
+    }
+  );
+}
+
+function parseRawStreamEvents(body: string): readonly RawStreamEvent[] {
+  return body
+    .split(/\r?\n\r?\n/u)
+    .filter((record) => record.trim() !== "")
+    .map((record) => {
+      const data = record
+        .split(/\r?\n/u)
+        .filter((line) => line.startsWith("data:"))
+        .map((line) => line.slice(5).replace(/^ /u, ""))
+        .join("\n");
+      return JSON.parse(data) as RawStreamEvent;
+    });
+}
+
+function partialResource(events: readonly RawStreamEvent[]): RawStreamResource {
+  const resource = events.find((event) => event.type === "partial")?.artifact?.resource;
+  if (resource === undefined) throw new Error("The deterministic stream omitted its partial resource.");
+  return resource;
+}
+
+async function installStreamUiObserver(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const observation = {
+      states: [] as string[],
+      resourceIds: [] as string[]
+    };
+    const capture = (): void => {
+      for (const panel of document.querySelectorAll<HTMLElement>("[data-stream-state]")) {
+        const state = panel.dataset["streamState"];
+        if (state !== undefined && !observation.states.includes(state)) {
+          observation.states.push(state);
+        }
+      }
+      for (const card of document.querySelectorAll<HTMLElement>("[data-resource-id]")) {
+        const resourceId = card.dataset["resourceId"];
+        if (resourceId !== undefined && !observation.resourceIds.includes(resourceId)) {
+          observation.resourceIds.push(resourceId);
+        }
+      }
+    };
+    const observer = new MutationObserver(capture);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      childList: true,
+      subtree: true
+    });
+    capture();
+    Object.defineProperty(window, "__routegoStreamUiObservation", {
+      configurable: true,
+      value: { observation, observer }
+    });
+  });
+}
+
+async function readStreamUiObservation(page: Page): Promise<{
+  readonly states: readonly string[];
+  readonly resourceIds: readonly string[];
+}> {
+  return page.evaluate(() => {
+    const value = (window as unknown as {
+      readonly __routegoStreamUiObservation?: {
+        readonly observation: { readonly states: string[]; readonly resourceIds: string[] };
+      };
+    }).__routegoStreamUiObservation;
+    return value?.observation ?? { states: [], resourceIds: [] };
+  });
+}
+
+async function installObjectUrlAudit(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const created: string[] = [];
+    const revoked: string[] = [];
+    const createObjectUrl = URL.createObjectURL.bind(URL);
+    const revokeObjectUrl = URL.revokeObjectURL.bind(URL);
+    Object.defineProperty(URL, "createObjectURL", {
+      configurable: true,
+      value(blob: Blob) {
+        const value = createObjectUrl(blob);
+        created.push(value);
+        return value;
+      }
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      configurable: true,
+      value(value: string) {
+        revoked.push(value);
+        revokeObjectUrl(value);
+      }
+    });
+    Object.defineProperty(window, "__routegoObjectUrlAudit", {
+      configurable: true,
+      value: { created, revoked }
+    });
+  });
+}
+
+async function readObjectUrlAudit(page: Page): Promise<{
+  readonly created: readonly string[];
+  readonly revoked: readonly string[];
+}> {
+  return page.evaluate(() =>
+    (window as unknown as {
+      readonly __routegoObjectUrlAudit?: {
+        readonly created: string[];
+        readonly revoked: string[];
+      };
+    }).__routegoObjectUrlAudit ?? { created: [], revoked: [] }
+  );
+}
+
+async function installResourceBoundary(page: Page): Promise<ResourceBoundaryState> {
+  const state: ResourceBoundaryState = {
+    now: STREAM_REGISTERED_AT,
+    shutdown: false,
+    expiresAtByResourceId: new Map()
+  };
+  await page.route("**/api/v1/resources/**", async (route) => {
+    const resourceId = decodeURIComponent(new URL(route.request().url()).pathname.split("/").at(-1) ?? "");
+    const expiresAt =
+      state.expiresAtByResourceId.get(resourceId) ??
+      (resourceId.endsWith("-stream-partial-resource") ? STREAM_FULL_EXPIRY : Number.POSITIVE_INFINITY);
+    if (state.shutdown) {
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({ error: { code: "runtime_shutdown", safeMessage: "The local runtime is unavailable." } })
+      });
+      return;
+    }
+    if (state.now >= expiresAt) {
+      await route.fulfill({
+        status: 410,
+        contentType: "application/json",
+        body: JSON.stringify({ error: { code: "resource_expired", safeMessage: "The protected resource expired." } })
+      });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "image/png",
+      headers: {
+        "cache-control": "no-store",
+        "content-length": String(syntheticPng.buffer.byteLength)
+      },
+      body: syntheticPng.buffer
+    });
+  });
+  return state;
+}
+
+async function fetchProtectedStatus(page: Page, relativeUrl: string): Promise<number> {
+  return page.evaluate(
+    async ({ relativeUrl: url, token }) => {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            accept: "image/png",
+            "x-routego-session": token
+          },
+          cache: "no-store",
+          credentials: "omit",
+          redirect: "error"
+        });
+        return response.status;
+      } catch {
+        return 0;
+      }
+    },
+    { relativeUrl, token: STUDIO_SESSION_TOKEN }
+  );
+}
+
+function expectExactStreamRequest(
+  audit: BrowserSecurityAudit,
+  prompt: string
+): void {
+  const request = audit.requests.find((item) => {
+    if (new URL(item.url).pathname !== STUDIO_CREATION_STREAM_PATH) return false;
+    try {
+      return (JSON.parse(item.body ?? "{}") as { readonly prompt?: unknown }).prompt === prompt;
+    } catch {
+      return false;
+    }
+  });
+  expect(request).toBeDefined();
+  expect(request?.method).toBe("POST");
+  expect(new URL(request?.url ?? STUDIO_BASE_URL).search).toBe("");
+  expect(request?.headers["accept"]).toBe("text/event-stream; charset=utf-8");
+  expect(request?.headers["content-type"]).toBe("application/json");
+  expect(request?.headers["x-routego-session"]).toBe(STUDIO_SESSION_TOKEN);
+  expect(request?.headers["authorization"]).toBeUndefined();
+  expect(request?.headers["cookie"]).toBeUndefined();
 }
 
 test("secure boot blocks missing and rejected sessions, then keeps a valid localized responsive shell usable", async ({ page, context }) => {
@@ -226,14 +500,200 @@ test("creation reports success, partial, failure, and degraded outcomes without 
       await expect(page.getByRole("button", { name: "以当前草稿再次提交" })).toBeDisabled();
     }
     if (scenario.fixture === "failure") {
-      await expect(page.getByText("The selected synthetic Studio fixture has no image-input capability.")).toBeVisible();
+      await expect(page.getByRole("alert")).toContainText(
+        "The deterministic stream requires a valid base result."
+      );
     }
     if (scenario.fixture === "degraded") {
       await expect(page.locator(".creation-result--degraded")).toBeVisible();
     }
+    await expectSecurityClean(page, audit, {
+      allowedConsoleHttpStatuses: scenario.fixture === "failure" ? [500] : []
+    });
+    await page.close();
+  }
+});
+
+test("authenticated streamed success is genuinely chunked, enters streaming state, and repeats deterministically", async ({ context }) => {
+  test.setTimeout(90_000);
+  const descriptorFixtures = [
+    { fixture: "full-expiry", expectedExpiry: STREAM_FULL_EXPIRY },
+    { fixture: "near-expiry", expectedExpiry: STREAM_NEAR_EXPIRY }
+  ] as const;
+  const observations: Array<{ readonly eventTypes: readonly string[]; readonly sawStreaming: boolean }> = [];
+
+  for (const descriptorFixture of descriptorFixtures) {
+    const page = await context.newPage();
+    const audit = observeBrowserSecurity(page);
+    const resourceBoundary = await installResourceBoundary(page);
+    await page.clock.setFixedTime(new Date(STREAM_REGISTERED_AT));
+    await openStudio(page);
+
+    const probe = await probeRawStream(page, descriptorFixture.fixture);
+    expect(probe.status).toBe(200);
+    expect(probe.contentType).toBe("text/event-stream; charset=utf-8");
+    expect(probe.fixture).toBe(descriptorFixture.fixture);
+    expect(probe.chunkSizes.length).toBeGreaterThan(1);
+    expect(probe.chunkSizes.every((size) => size > 0)).toBe(true);
+    const events = parseRawStreamEvents(probe.body);
+    expect(events.map((event) => event.type)).toEqual(["started", "partial", "completed"]);
+    const resource = partialResource(events);
+    expect(Date.parse(resource.expiresAt)).toBe(descriptorFixture.expectedExpiry);
+    expect(descriptorFixture.expectedExpiry - STREAM_REGISTERED_AT).toBe(
+      descriptorFixture.fixture === "full-expiry" ? 300_000 : 30_000
+    );
+    resourceBoundary.expiresAtByResourceId.set(resource.resourceId, descriptorFixture.expectedExpiry);
+    resourceBoundary.now = descriptorFixture.expectedExpiry - 1;
+    expect(await fetchProtectedStatus(page, resource.relativeUrl)).toBe(200);
+    resourceBoundary.now = descriptorFixture.expectedExpiry;
+    expect(await fetchProtectedStatus(page, resource.relativeUrl)).toBe(410);
+
+    resourceBoundary.now = STREAM_REGISTERED_AT;
+    await installStreamUiObserver(page);
+    await submitTextGeneration(page, "mock-stream:completed");
+    await expect(page.getByRole("heading", { name: "图像已生成" })).toBeVisible();
+    const observation = await readStreamUiObservation(page);
+    expect(observation.states).toContain("streaming");
+    observations.push({
+      eventTypes: events.map((event) => event.type),
+      sawStreaming: observation.states.includes("streaming")
+    });
+
+    expectExactStreamRequest(audit, `mock-stream:${descriptorFixture.fixture}`);
+    expectExactStreamRequest(audit, "mock-stream:completed");
+    await expectSecurityClean(page, audit, { allowedConsoleHttpStatuses: [410] });
+    await page.close();
+  }
+
+  expect(observations).toEqual([
+    { eventTypes: ["started", "partial", "completed"], sawStreaming: true },
+    { eventTypes: ["started", "partial", "completed"], sawStreaming: true }
+  ]);
+});
+
+test("failure after partial preserves risk and descriptor lifetime while browser object URLs clean up independently", async ({ page }) => {
+  const audit = observeBrowserSecurity(page);
+  const resourceBoundary = await installResourceBoundary(page);
+  await installObjectUrlAudit(page);
+  await page.clock.setFixedTime(new Date(STREAM_REGISTERED_AT));
+  await openStudio(page);
+
+  await submitTextGeneration(page, "mock-stream:failed");
+  const panel = page.locator('[data-stream-state="stream-failure"]');
+  await expect(panel).toBeVisible();
+  await expect(panel.getByRole("heading", { name: "部分图像已保留" })).toBeVisible();
+  await expect(panel.getByRole("alert")).toContainText(
+    "The deterministic Studio stream ended after a partial image."
+  );
+  const card = panel.locator(".result-card");
+  await expect(card).toHaveCount(1);
+  await expect(card).toHaveAttribute("data-browser-object-url-cleanup", "true");
+  await expect(card).toHaveAttribute("data-server-descriptor-revocation", "false");
+  const resourceId = await card.getAttribute("data-resource-id");
+  if (resourceId === null) throw new Error("The streamed partial omitted its resource identifier.");
+  resourceBoundary.expiresAtByResourceId.set(resourceId, STREAM_FULL_EXPIRY);
+  await expect(card.getByRole("img", { name: "Streamed partial result" })).toBeVisible();
+  await expect(card.locator("time")).toHaveAttribute(
+    "datetime",
+    new Date(STREAM_FULL_EXPIRY).toISOString()
+  );
+  const facts = panel.locator(".creation-result__facts > div");
+  await expect(facts.filter({ has: page.getByText("已收到输出", { exact: true }) }).locator("dd")).toHaveText("是");
+  await expect(facts.filter({ has: page.getByText("可能计费", { exact: true }) }).locator("dd")).toHaveText("是");
+  await expect(panel.getByRole("button", { name: "以当前草稿再次提交" })).toBeDisabled();
+
+  const beforeCleanup = await readObjectUrlAudit(page);
+  expect(beforeCleanup.created.length).toBeGreaterThanOrEqual(1);
+  const activeObjectUrl = beforeCleanup.created.find(
+    (value) => !beforeCleanup.revoked.includes(value)
+  );
+  expect(activeObjectUrl).toBeDefined();
+  const relativeUrl = `/api/v1/resources/${encodeURIComponent(resourceId)}`;
+  await page.getByRole("button", { name: "批量队列" }).click();
+  await expect(panel).toHaveCount(0);
+  await expect.poll(async () => (await readObjectUrlAudit(page)).revoked.includes(activeObjectUrl ?? "")).toBe(true);
+  const afterCleanup = await readObjectUrlAudit(page);
+  expect(afterCleanup.revoked).toContain(activeObjectUrl);
+
+  resourceBoundary.now = STREAM_FULL_EXPIRY - 1;
+  expect(await fetchProtectedStatus(page, relativeUrl)).toBe(200);
+  resourceBoundary.now = STREAM_FULL_EXPIRY;
+  expect(await fetchProtectedStatus(page, relativeUrl)).toBe(410);
+  expectExactStreamRequest(audit, "mock-stream:failed");
+  await expectSecurityClean(page, audit, { allowedConsoleHttpStatuses: [410] });
+});
+
+test("invalid stream state, request identity, schema, sentinel, terminal, and EOF cases fail closed", async ({ context }) => {
+  test.setTimeout(180_000);
+  const scenarios = [
+    { fixture: "missing-started", keepsPartial: false },
+    { fixture: "duplicate-started", keepsPartial: false },
+    { fixture: "late-started", keepsPartial: true },
+    { fixture: "request-id-drift", keepsPartial: false },
+    { fixture: "invalid-sequence", keepsPartial: false },
+    { fixture: "invalid-schema", keepsPartial: false },
+    { fixture: "sentinel", keepsPartial: false },
+    { fixture: "missing-terminal", keepsPartial: false },
+    { fixture: "duplicate-terminal", keepsPartial: true },
+    { fixture: "post-terminal", keepsPartial: false },
+    { fixture: "eof-before-terminal", keepsPartial: true },
+    { fixture: "oversize", keepsPartial: false }
+  ] as const;
+
+  for (const scenario of scenarios) {
+    const page = await context.newPage();
+    const audit = observeBrowserSecurity(page);
+    await page.clock.setFixedTime(new Date(STREAM_REGISTERED_AT));
+    await openStudio(page);
+    const prompt = `mock-stream:${scenario.fixture}`;
+    await submitTextGeneration(page, prompt);
+    const panel = page.locator('[data-stream-state="stream-failure"]');
+    await expect(panel).toBeVisible();
+    await expect(page.getByRole("heading", { name: "图像已生成" })).toHaveCount(0);
+    await expect(page.getByLabel("提示词")).toHaveValue(prompt);
+    await expect(page.getByRole("button", { name: "开始生成" })).toBeEnabled();
+    await expect(panel.locator(".result-card")).toHaveCount(scenario.keepsPartial ? 1 : 0);
+    if (scenario.keepsPartial) {
+      await expect(panel.getByRole("heading", { name: "部分图像已保留" })).toBeVisible();
+      await expect(panel.getByRole("button", { name: "以当前草稿再次提交" })).toBeDisabled();
+    } else {
+      await expect(panel.getByRole("heading", { name: "生成未完成" })).toBeVisible();
+    }
+    expectExactStreamRequest(audit, prompt);
     await expectSecurityClean(page, audit);
     await page.close();
   }
+});
+
+test("disconnect fixture remains live until explicit abort, then closes without replay and preserves validated partials", async ({ page }) => {
+  const audit = observeBrowserSecurity(page);
+  await page.clock.setFixedTime(new Date(STREAM_REGISTERED_AT));
+  await openStudio(page);
+  const streamFailures: string[] = [];
+  page.on("requestfailed", (request) => {
+    if (new URL(request.url()).pathname === STUDIO_CREATION_STREAM_PATH) {
+      streamFailures.push(request.failure()?.errorText ?? "request-failed");
+    }
+  });
+
+  await submitTextGeneration(page, "mock-stream:disconnect");
+  const streaming = page.locator('[data-stream-state="streaming"]');
+  await expect(streaming).toBeVisible();
+  await expect(streaming.locator(".result-card")).toHaveCount(1);
+  await expect(streaming.getByRole("button", { name: "取消当前请求" })).toBeVisible();
+  await streaming.getByRole("button", { name: "取消当前请求" }).click();
+
+  const failed = page.locator('[data-stream-state="stream-failure"]');
+  await expect(failed).toBeVisible();
+  await expect(failed.getByRole("heading", { name: "部分图像已保留" })).toBeVisible();
+  await expect(failed.locator(".result-card")).toHaveCount(1);
+  await expect(failed.getByRole("button", { name: "以当前草稿再次提交" })).toBeDisabled();
+  await expect(page.getByLabel("提示词")).toHaveValue("mock-stream:disconnect");
+  await page.waitForTimeout(50);
+  expect(streamFailures.length).toBeLessThanOrEqual(1);
+  expect(audit.requests.filter((request) => new URL(request.url).pathname === STUDIO_CREATION_STREAM_PATH)).toHaveLength(1);
+  expectExactStreamRequest(audit, "mock-stream:disconnect");
+  await expectSecurityClean(page, audit);
 });
 
 test("confirmed capability probes unlock reference upload, generation, target edit, and target-slot-zero mask save", async ({ page }) => {
@@ -416,11 +876,14 @@ test("Library search, detail, comparison, folders, partial mutations, Trash, and
   await page.getByRole("button", { name: "恢复所选项目" }).click();
   await executeVisiblePreflight(page, "restore");
   await expect(page.locator(".library-preflight")).toContainText("restore");
-  const trashPageSelection = page.getByRole("button", { name: /选择当前页|取消当前页选择/ });
-  if ((await trashPageSelection.textContent())?.includes("选择当前页")) {
-    await trashPageSelection.click();
+  const remainingTrashAsset = page.locator('.library-card input[type="checkbox"]').first();
+  await expect(remainingTrashAsset).toBeVisible();
+  if (!(await remainingTrashAsset.isChecked())) {
+    await remainingTrashAsset.check();
   }
-  await page.getByRole("button", { name: "永久删除" }).click();
+  const permanentDelete = page.getByRole("button", { name: "永久删除" });
+  await expect(permanentDelete).toBeEnabled();
+  await permanentDelete.click();
   await executeVisiblePreflight(page, "permanent-delete");
   await expect(page.locator(".library-preflight")).toContainText("permanent-delete");
 
@@ -463,4 +926,22 @@ test("Settings keeps API-key replacement write-only and returns only redacted st
   };
   expect(secretBody.apiKey).toEqual({ operation: "replace", value: replacementMarker });
   await expectSecurityClean(page, audit, { sensitiveMarkers: [replacementMarker] });
+});
+
+test("process shutdown immediately makes an otherwise live protected stream resource unavailable", async ({ page }) => {
+  const audit = observeBrowserSecurity(page);
+  await page.clock.setFixedTime(new Date(STREAM_REGISTERED_AT));
+  await openStudio(page);
+  const probe = await probeRawStream(page, "full-expiry");
+  const resource = partialResource(parseRawStreamEvents(probe.body));
+  expect(Date.parse(resource.expiresAt)).toBe(STREAM_FULL_EXPIRY);
+  expect(await fetchProtectedStatus(page, resource.relativeUrl)).toBe(200);
+  expectExactStreamRequest(audit, "mock-stream:full-expiry");
+
+  await stopStudioServer(studioServer);
+  studioServer = undefined;
+  expect(await fetchProtectedStatus(page, resource.relativeUrl)).toBe(0);
+  await expectSecurityClean(page, audit, {
+    allowedConsoleMessages: [/^error:Failed to load resource: net::ERR_CONNECTION_REFUSED$/u]
+  });
 });
