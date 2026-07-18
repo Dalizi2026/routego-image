@@ -8,7 +8,7 @@
   "branch": "codex/routego-controller-g2",
   "startingCommit": "4be05e4d9c134363affb0ff02c50bb6ca7767a32",
   "registrationCommit": "fc882b94f68b3c5247e0251cd13f20f4777c0ee7",
-  "headCommit": "a9875ed368324b03941893a1ab994b3ff039a499",
+  "headCommit": "f05415e2e4836d3a032180d4239b05a0a94bf3ab",
   "generation": 2,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "g2-compaction-1-library-corrected-5.2-studio-6.1-2026-07-18",
@@ -84,7 +84,6 @@
     "Studio generation 3 accepted the handoff at clean branch codex/routego-studio-g3 HEAD dfcb6f85fedd3b2da8853ef37a0ce97f238741dc after fresh authority and OpenSpec 9/11 checks; Studio generation 2 was archived before G3 sole-owner activation for task 6.1.",
     "Independent Controller review of Library delivery fd62a90dc1899ab9d0c993b7192da910e2fa4914 reproduced a public ZIP false-success defect: a controlled legal partial FileHandle.write returned outputPath with no warning but produced an invalid truncated ZIP. Library generation 2 was reactivated as sole owner to fix task 5.1 and rerun task 5.2 before any merge.",
     "The same Library review reproduced a protected-root bypass: an apparently safe output directory junction targeting protected legacy data received the exported ZIP because service.ts validated only the lexical path. Both defects remain within task 5.1 service/conformance scope.",
-    "Controller generation 2 observed its first context compaction while Library had committed corrected task 5.1 at 0bd93dea9d7035426b34600a6bae13277b3f08bd and was running task 5.2, while Studio generation 3 was executing task 6.1 in tests/browser only. A fresh authority, branch, worktree, lane-owner and Git-clean audit passed before governance resumed.",
-    "Corrected Library delivery f92a835990d422da5f4f5e3008383f24aabdcc7b passed independent Controller clean-copy verification at 0bd93dea9d7035426b34600a6bae13277b3f08bd, merged at 220d340f8c9cf7ab6891d8ee5191e97b3bc5e11a, synchronized three new main specifications at a9875ed368324b03941893a1ab994b3ff039a499, and moved to openspec/changes/archive/2026-07-18-add-routego-image-library before frozen post-archive verification."
+    "Controller generation 2 observed its first context compaction while Library had committed corrected task 5.1 at 0bd93dea9d7035426b34600a6bae13277b3f08bd and was running task 5.2, while Studio generation 3 was executing task 6.1 in tests/browser only. A fresh authority, branch, worktree, lane-owner and Git-clean audit passed before governance resumed."
   ]
 }
