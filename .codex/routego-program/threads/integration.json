@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "offline-apply-active-generation-2-task-2.3-only",
+  "status": "offline-apply-generation-2-task-2.3-complete-awaiting-controller-review",
   "controllerThreadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
@@ -13,12 +13,12 @@
   "controllerRegistrationCommit": "2935972129c581fc653b3f27878fd6ba5f5fa6c0",
   "controllerActivationCommit": "e010f9a1bf07fd890fba7f77d8f66a13cbe9dd1d",
   "generation": 2,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed-generation-2-registration-handoff-source-archive-reporting-contract-and-sole-owner-activation-audit; task-2.3-not-started",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-1-during-task-2.3-final-review",
+  "lastHealthAudit": "passed-generation-2-compaction-1-authority-context-scope-and-task-2.3-completion-audit; exact-three-file-implementation; task-2.4-held",
   "successorThreadId": null,
-  "openspecState": "offline-apply-active",
-  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 7/29 with corrected task 2.2 implementation acc4a4cb56ce99ed1a854a95c1286daecba3be33 and task-state 63bd63543410b6794c3691d82082001f431efa39 accepted by Controller; task 2.3 held for generation-2 activation",
+  "openspecState": "offline-apply-task-2.3-complete-awaiting-controller-review",
+  "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 8/29; task 2.3 implementation 523214c12cc60900cfd57d51706756e579f342d8 and task-state ce3cef79a5a1b8a82af53ac86a0f117dbdfc69bd complete; task 2.4 remains locked pending Controller review and explicit activation",
   "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
     "e6484be76e6fc2fa33fbe53d418991ea7fd549e1",
@@ -32,9 +32,11 @@
     "directStructuredMessageRequired": true,
     "readBackConfirmationRequired": true,
     "automationRole": "missed-message fallback only",
+    "automationIntervalMinutes": 15,
     "successorInheritanceRequired": true,
-    "requiredSuccessorAcknowledgement": "Every task/checkpoint completion uses direct send_message_to_thread plus read_thread confirmation before the next task starts.",
-    "controllerGovernanceCommit": "e010f9a1bf07fd890fba7f77d8f66a13cbe9dd1d"
+    "requiredSuccessorAcknowledgement": "Every task, group, checkpoint, blocker, deviation, handoff, activation, or delivery uses direct send_message_to_thread plus read_thread confirmation before the next task starts; routego-program-continuity is a 15-minute missed-message fallback only and heartbeat inheritance is never assumed.",
+    "controllerGovernanceCommit": "e010f9a1bf07fd890fba7f77d8f66a13cbe9dd1d",
+    "continuityIntervalGovernanceCommit": "c3e063c266487204199bde9f7bf2911fefd883f1"
   },
   "contextPolicy": {
     "decision": "PD-006",
@@ -49,11 +51,12 @@
     "acceptedRegistrationHead": "2935972129c581fc653b3f27878fd6ba5f5fa6c0",
     "authorizedTask": "2.3",
     "lockedTask": "2.4",
+    "taskState": "2.3-complete-awaiting-controller-review",
     "soleApplyOwner": true,
     "sourceGenerationArchived": true,
     "externalStateAuthorized": false
   },
-  "nextTask": "Execute only task 2.3 after activation reporting/read-back, a complete apply-skill reread, and fresh apply instructions; do not start task 2.4.",
+  "nextTask": "Do not start task 2.4; wait for Controller review and a new explicit sole-owner task activation.",
   "handoffPreparation": {
     "file": ".codex/routego-program/handoffs/integration-generation-2.md",
     "sourceGeneration": 1,
@@ -89,12 +92,10 @@
     "externalStateAuthorized": false
   },
   "latestTaskCompletion": {
-    "taskId": "2.2",
-    "implementationCommit": "acc4a4cb56ce99ed1a854a95c1286daecba3be33",
-    "taskStateCommit": "63bd63543410b6794c3691d82082001f431efa39",
-    "supersedesImplementationCommit": "4de57379940fd4b93250d46642b56acb8b9894eb",
-    "supersedesTaskStateCommit": "722c183fed4efdf62d7f678feacc30a9bd64c961",
-    "verification": "passed correction: exact raw UTF-8 event-byte accounting includes full LF or CRLF delimiters while preserving logical line and body limits; focused LF/CRLF exact-boundary and one-byte-over line/event/body regressions; focused Studio SSE/Gateway 28/28; full Studio 125/125; Studio typecheck and build; repository safety 397 tracked files; OpenSpec strict 19/19; git diff --check; exact two-file correction scope",
+    "taskId": "2.3",
+    "implementationCommit": "523214c12cc60900cfd57d51706756e579f342d8",
+    "taskStateCommit": "ce3cef79a5a1b8a82af53ac86a0f117dbdfc69bd",
+    "verification": "passed exact authenticated POST /api/v1/studio/creation/stream deterministic mock handler and Vite bridge with incremental backpressure-aware body pumping; valid started/partial/completed and started/partial/failed; missing/duplicate/late started; request-ID drift; invalid sequence/schema; DONE sentinel; missing/duplicate terminal; post-terminal; EOF-before-terminal; oversize; abort/disconnect cleanup; full-five-minute and near-expiry descriptor fixtures; raw SSE and parsed-event redaction; unauthorized/method/media/query rejection; deterministic focused 11/11 repeated; full Studio 131/131; Studio typecheck and build; repository safety 398 tracked files; OpenSpec strict 19/19 and change valid; git diff --check; exact three-file implementation scope",
     "externalStateTouched": false
   },
   "handoff": {
