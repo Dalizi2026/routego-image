@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "integration-offline-apply-active-generation-1",
+  "status": "controller-generation-4-handoff-pending",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -186,7 +186,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-active-generation-1",
+    "status": "offline-apply-held-for-controller-generation-4",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -194,7 +194,7 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "a6f1cf116d4e2c4edfac4e249dbf10e39f3acd59",
+    "integrationHead": "0223dfbe7ee4e3683c1c63044246a318a5afc053",
     "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
@@ -204,22 +204,31 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "Integration generation 0 observed compaction 2 during apply activation. It may complete only task 1.1, then must send a clean committed checkpoint and hand off to a fresh Integration task/worktree before task 1.2.",
+    "continuityGate": "Controller generation 3 reached observable compaction 3 after independently accepting Integration task 1.4 at clean HEAD 0223dfbe7ee4e3683c1c63044246a318a5afc053. Integration generation 1 remains the sole offline apply owner, but task 2.1 is held until a fresh Controller generation 4 task/worktree accepts and is activated. No external authority is added.",
     "lastDirectCheckpoint": {
       "messageType": "INTEGRATION_TASK_CHECKPOINT",
       "workerThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
-      "completedTask": "1.3",
-      "nextTask": "1.4",
-      "reportedHead": "a6f1cf116d4e2c4edfac4e249dbf10e39f3acd59",
-      "implementationCommit": "0b5ac07582ec6cdde9ceeb173a02ea72ac751428",
-      "taskStateCommit": "45fd05a1f5df63aaa8488c195e0f2484b1f7f6bb",
-      "openspecProgress": "3/28",
+      "completedTask": "1.4",
+      "nextTask": "2.1",
+      "reportedHead": "0223dfbe7ee4e3683c1c63044246a318a5afc053",
+      "implementationCommit": "34956e46182d7df8d7b5a6af98659ab2bb68f658",
+      "taskStateCommit": "b54f8dcbc8f36fbb967e14b56b643ef9e25e590d",
+      "openspecProgress": "4/28",
       "controllerReceived": true,
       "controllerReadBackConfirmed": true,
-      "acceptedByControllerMessage": "INTEGRATION_TASK_CHECKPOINT_ACCEPTED"
+      "acceptedByControllerMessage": "INTEGRATION_TASK_CHECKPOINT_ACCEPTED_AND_CONTROLLER_HANDOFF_HOLD"
     }
   },
   "automations": {
+    "programContinuity": {
+      "id": "routego-program-continuity",
+      "kind": "cron",
+      "intervalMinutes": 10,
+      "status": "ACTIVE",
+      "projectId": "C:\\Users\\MLTZ\\Documents\\生图插件",
+      "targetResolution": "dynamic from laneContinuityPolicy.controllerThreadId; not bound to one Controller generation",
+      "behavior": "direct send_message_to_thread plus read_thread is the primary completion path; this automation only detects missed messages, deduplicates against integrationReadiness.lastDirectCheckpoint, and enforces successor inheritance of the reporting contract"
+    },
     "foundationAuditGate": {
       "id": "routego-foundation",
       "kind": "heartbeat",
