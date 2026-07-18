@@ -8,10 +8,10 @@
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\ec66\\生图插件",
   "branch": "codex/routego-studio-g2",
   "startingCommit": "649e4fe1da0bacdeb0eca9c3d20378a209303fdd",
-  "headCommit": "90fe3c3b0362939f8827529eadf921cd59ca3254",
+  "headCommit": "ec5ce6992bc22477ffda96d12762e4e23a010ec6",
   "generation": 2,
-  "observableCompactions": 1,
-  "lastCompactionFingerprint": "context-checkpoint-2026-07-18-studio-g2-task-4.2-scope-correction-uncommitted",
+  "observableCompactions": 2,
+  "lastCompactionFingerprint": "context-checkpoint-2026-07-18-studio-g2-task-5.1-settings-wip",
   "lastHealthAudit": "passed",
   "successorThreadId": null,
   "predecessorThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
@@ -24,6 +24,9 @@
   "openspecProgress": "8/11",
   "lastCompletedTask": "4.2",
   "nextTask": "5.1",
+  "currentAtomicTask": "5.1",
+  "successorRequiredAfterTask": "5.1",
+  "successorNextTask": "6.1",
   "lastTaskDelivery": {
     "task": "4.2",
     "scopeCorrectionCommit": "ae15576dd4896de4f371be9664c9b2401cac0eb3",
@@ -40,7 +43,8 @@
     "browser": "desktop and 390x844 deterministic mock checks passed for Library, Trash, detail relationships, keyboard comparison, protected download, identifier-only edit handoff, and one-shot draft preservation with no console warnings/errors or horizontal overflow",
     "maskIntegration": "supported/degraded/unknown gates, target resolution, PNG finalize/slot-zero binding, upload failure recovery, saved/unsaved close, and resource discard regressions passed",
     "libraryTask41": "path-free search/filter/sort/cursor pages, protected cards/detail/resources/download, comparison bounds, Trash retention, and identifier-only one-shot retry/edit handoff passed focused and browser regression checks",
-    "libraryTask42": "folder create/rename/reorder, multi-selection and multi-folder changes, guarded Trash mutations, exact confirmations, per-item partial results, protected ZIP export, single-consume ZIP import, restricted manageLibrary bridging, and conflict/failure recovery passed focused gateway/mock and full Studio gates"
+    "libraryTask42": "folder create/rename/reorder, multi-selection and multi-folder changes, guarded Trash mutations, exact confirmations, per-item partial results, protected ZIP export, single-consume ZIP import, restricted manageLibrary bridging, and conflict/failure recovery passed focused gateway/mock and full Studio gates",
+    "settingsTask51Wip": "Studio typecheck and 13 focused settings/default-synchronization tests passed before the compaction-2 checkpoint"
   },
   "sharedRepositorySafetyFix": {
     "status": "resolved-by-controller",
@@ -94,7 +98,7 @@
     "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-active-task-5.1"
+    "status": "generation-2-active-task-5.1-compaction-2-finish-then-successor"
   },
   "dependsOn": [
     "establish-routego-image-foundation",

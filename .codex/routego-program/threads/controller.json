@@ -6,7 +6,7 @@
   "threadId": "019f715f-c042-7590-a38b-ffb406315903",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d46b\\生图插件",
   "branch": "codex/routego-controller-g1",
-  "headCommit": "b4e0f2072b75c06c251b2db49d9662790ff5c417",
+  "headCommit": "11487690641e3e0461ef19563a23ad7ddfeb069d",
   "generation": 1,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "context-checkpoint-compaction-2-2026-07-18-studio-g2-registration-in-progress",
@@ -72,6 +72,7 @@
     "Library generation 2 accepted the handoff at b4b98f1124a07b66334fc33cf5d7516d1eba100d after fresh status/apply checks confirmed 8/10 and next task 5.1; generation 1 was archived and its worktree removed before sole-owner activation.",
     "Studio generation 2 completed task 4.2 at corrected governance HEAD 90fe3c3b0362939f8827529eadf921cd59ca3254 with 76/76 Studio tests, strict OpenSpec, builds, safety and exact scope checks; at observable compaction 1 the same sole owner was authorized to continue only task 5.1.",
     "Studio task 5.1 defaults-sync deviation was approved as a tasks-only scope correction adding only CreationWorkbench.tsx and a focused settings-workbench sync test; the seam must preserve all non-default draft state and resources while applying validated defaults without remounting or provider calls.",
-    "Library generation 2 completed task 5.1 at clean checkpoint 937c5ca1e8e6ab49deb699673a2f9c9ee3b87d1f with 144/144 Library tests, full root typecheck/build/test, seven package exports and no native runtime dependency; at observable compaction 0 the same sole owner was authorized to continue final task 5.2."
+    "Library generation 2 completed task 5.1 at clean checkpoint 937c5ca1e8e6ab49deb699673a2f9c9ee3b87d1f with 144/144 Library tests, full root typecheck/build/test, seven package exports and no native runtime dependency; at observable compaction 0 the same sole owner was authorized to continue final task 5.2.",
+    "Studio generation 2 established its mandatory compaction-2 checkpoint at ec5ce6992bc22477ffda96d12762e4e23a010ec6 while task 5.1 was in progress; it may finish only 5.1 and must hand off to a fresh task/worktree before task 6.1."
   ]
 }
