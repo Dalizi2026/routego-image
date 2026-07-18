@@ -166,17 +166,28 @@ try {
 }
 
 if (program && controller) {
-  const sourceMatches =
-    program.controller.threadId === capsule.source.threadId &&
-    program.controller.generation === capsule.generation.source &&
-    program.controller.worktree === capsule.source.worktree &&
-    program.controller.branch === capsule.source.branch &&
-    program.controller.status.startsWith("authoritative-pre-handoff") &&
-    controller.threadId === capsule.source.threadId &&
-    controller.generation === capsule.generation.source &&
-    controller.worktree === capsule.source.worktree &&
-    controller.branch === capsule.source.branch &&
-    controller.authoritative === true;
+  const activated = capsule.successor.registrationStatus.startsWith("activated");
+  const sourceMatches = activated
+    ? program.controllerPredecessor?.threadId === capsule.source.threadId &&
+      program.controllerPredecessor?.generation === capsule.generation.source &&
+      program.controllerPredecessor?.worktree === capsule.source.worktree &&
+      program.controllerPredecessor?.branch === capsule.source.branch &&
+      program.controllerPredecessor?.authorityRevoked === true &&
+      controller.predecessor?.threadId === capsule.source.threadId &&
+      controller.predecessor?.generation === capsule.generation.source &&
+      controller.predecessor?.worktree === capsule.source.worktree &&
+      controller.predecessor?.branch === capsule.source.branch &&
+      controller.predecessor?.authorityRevoked === true
+    : program.controller.threadId === capsule.source.threadId &&
+      program.controller.generation === capsule.generation.source &&
+      program.controller.worktree === capsule.source.worktree &&
+      program.controller.branch === capsule.source.branch &&
+      program.controller.status.startsWith("authoritative-pre-handoff") &&
+      controller.threadId === capsule.source.threadId &&
+      controller.generation === capsule.generation.source &&
+      controller.worktree === capsule.source.worktree &&
+      controller.branch === capsule.source.branch &&
+      controller.authoritative === true;
   const programSuccessor = program.controllerSuccessor;
   const controllerSuccessor = controller.successor;
   const successorMatches =
@@ -190,7 +201,18 @@ if (program && controller) {
     controllerSuccessor?.generation === capsule.generation.successor &&
     controllerSuccessor?.worktree === capsule.successor.worktree &&
     controllerSuccessor?.plannedBranch === capsule.successor.plannedBranch &&
-    controllerSuccessor?.observableCompactions === 0;
+    controllerSuccessor?.observableCompactions === 0 &&
+    (!activated ||
+      (program.controller.threadId === capsule.successor.threadId &&
+        program.controller.generation === capsule.generation.successor &&
+        program.controller.worktree === capsule.successor.worktree &&
+        program.controller.branch === capsule.successor.plannedBranch &&
+        program.controller.authoritative === true &&
+        controller.threadId === capsule.successor.threadId &&
+        controller.generation === capsule.generation.successor &&
+        controller.worktree === capsule.successor.worktree &&
+        controller.branch === capsule.successor.plannedBranch &&
+        controller.authoritative === true));
   if (!sourceMatches || !successorMatches) {
     fail("program/controller/capsule authority identity mismatch");
   } else {

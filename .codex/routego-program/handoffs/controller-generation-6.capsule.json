@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "controller-successor-handoff",
-  "capsuleSha256": "83f3d778a0814527426ec48f12688c9fa5e37edecda5ff9695981ccc6726013c",
+  "capsuleSha256": "fda6b361649faedeffddf0d6765ea5447f13a9f1bec79b14ac58d67bdce40922",
   "lane": "controller",
   "role": "program-controller",
   "program": "routego-image-1.0",
@@ -17,17 +17,19 @@
     "handoffParent": "e38ede29a7bb2802ca874c099f7a11e6aff11524",
     "observableCompactions": 4,
     "lastCompactionFingerprint": "g5-compaction-4-during-integration-g4-sole-owner-activation-2026-07-19",
-    "authoritative": true,
-    "preHandoff": true
+    "wasAuthoritativeAtHandoff": true,
+    "authorityRevoked": true,
+    "preHandoffComplete": true
   },
   "successor": {
     "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
     "plannedBranch": "codex/routego-controller-g6",
     "startingCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
-    "registrationStatus": "registered-awaiting-low-context-acceptance",
-    "registrationCommit": null,
-    "registrationCommitSemantics": "The containing Controller registration governance commit cannot self-reference its own SHA; the direct registration message supplies the exact full commit after creation."
+    "registrationStatus": "activated-authoritative-controller-generation-6",
+    "registrationCommit": "84698588f8693bf1392a786089427f43605a2914",
+    "acceptedHead": "84698588f8693bf1392a786089427f43605a2914",
+    "registrationCommitSemantics": "The accepted registration commit is recorded after the clean zero-compaction successor audit; the containing authority activation commit cannot self-reference its own SHA."
   },
   "currentIntegration": {
     "threadId": "019f7633-a831-7b62-a00a-d4b6fba5515e",
@@ -67,7 +69,7 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": ["Controller G6 low-context acceptance and explicit Controller authority activation are pending."],
+    "blockers": [],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "integrationTaskBeyond3_5Locked": true
@@ -104,7 +106,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 69979,
+    "expectedNormalizedUtf8Bytes": 71990,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
