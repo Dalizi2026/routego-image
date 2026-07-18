@@ -42,7 +42,7 @@
     "scope": "61 changed files against f6e1b309213bb87d741199377c2bebdaa9cbcad0, all within Library/OpenSpec/governance ownership",
     "planningConsistency": "proposal, design, three delta specs, six frozen main specs, tasks, PD-002/003/004, plan, commits, and thread state passed",
     "gitClean": "verification copy and primary worktree were clean before independent review",
-    "independentReview": "failed: public ZIP export ignored partial FileHandle.write results and could report a truncated archive as successful",
+    "independentReview": "failed: public ZIP export ignored partial FileHandle.write results and allowed symlink/junction traversal into protected legacy roots",
     "currentState": "tasks 5.1 and 5.2 reopened for root-cause correction and full reverification"
   },
   "applyOwnership": {
@@ -111,8 +111,14 @@
     "reviewedDelivery": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
     "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "controllerGovernanceCommit": "0b32e8d5ce7fd00128cdd8c6b07d26830ce118c8",
-    "finding": "Public path-based ZIP export could return outputPath without warnings while a legal partial FileHandle.write produced a truncated archive.",
-    "rootCause": "copyExportToPublicPath performed one FileHandle.write per stream chunk and ignored bytesWritten.",
+    "findings": [
+      "Public path-based ZIP export could return outputPath without warnings while a legal partial FileHandle.write produced a truncated archive.",
+      "A lexical output path outside protected roots could traverse an existing symlink/junction parent whose canonical destination was inside a protected legacy root."
+    ],
+    "rootCauses": [
+      "copyExportToPublicPath performed one FileHandle.write per stream chunk and ignored bytesWritten.",
+      "assertPublicOutputAllowed checked only lexical paths, while publication followed existing link/junction components without canonical parent revalidation."
+    ],
     "reopenedTasks": ["5.1", "5.2"],
     "blockers": []
   },
