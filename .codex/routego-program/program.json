@@ -182,7 +182,8 @@
     "deviationDecision": "PD-005 accepted both findings with a narrowed complete source-rendition/retry design and authenticated Studio fetch-stream design; corrections must be prerequisite task groups inside integrate-routego-image-plugin and do not authorize apply",
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
-    "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified"
+    "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
+    "continuityGate": "Integration generation 0 observed compaction 2 during apply activation. It may complete only task 1.1, then must send a clean committed checkpoint and hand off to a fresh Integration task/worktree before task 1.2."
   },
   "automations": {
     "foundationAuditGate": {
