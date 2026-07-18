@@ -24,7 +24,8 @@ import {
   UNCONFIRMED_CAPABILITY_MESSAGE,
   useCapabilityRegistry,
   validateCreationCapabilities,
-  type CapabilityDecision
+  type CapabilityDecision,
+  type CapabilityResolver
 } from "../capabilities";
 import {
   MaskEditor,
@@ -75,6 +76,59 @@ import {
 import "./creation.css";
 
 const UNCONFIRMED_MESSAGE = UNCONFIRMED_CAPABILITY_MESSAGE;
+
+export function creationDefaultsFingerprint(
+  defaults: ReadSettingsResult["defaults"]
+): string {
+  return JSON.stringify([
+    defaults.size,
+    defaults.aspectRatio,
+    defaults.quality,
+    defaults.format,
+    defaults.count,
+    defaults.partialImages,
+    defaults.transparentMode,
+    defaults.moderation,
+    defaults.saveToLibrary
+  ]);
+}
+
+export function synchronizeCreationDraftDefaults(
+  draft: CreationDraft,
+  defaults: ReadSettingsResult["defaults"],
+  resolve: CapabilityResolver
+): CreationDraft {
+  const normalizedDefaults = normalizeCreationDraftForCapabilities(
+    createInitialCreationDraft(defaults),
+    resolve
+  ).controls;
+  return {
+    ...draft,
+    controls: {
+      ...draft.controls,
+      size: normalizedDefaults.size,
+      aspectRatio: normalizedDefaults.aspectRatio,
+      quality: normalizedDefaults.quality,
+      format: normalizedDefaults.format,
+      count: normalizedDefaults.count,
+      partialImages: normalizedDefaults.partialImages,
+      transparentMode: normalizedDefaults.transparentMode,
+      moderation: normalizedDefaults.moderation,
+      saveToLibrary: normalizedDefaults.saveToLibrary
+    }
+  };
+}
+
+export function synchronizeBatchDraftDefaults(
+  items: readonly BatchDraftItem[],
+  defaults: ReadSettingsResult["defaults"],
+  resolve: CapabilityResolver
+): readonly BatchDraftItem[] {
+  return items.map((item) => ({
+    ...item,
+    draft: synchronizeCreationDraftDefaults(item.draft, defaults, resolve)
+  }));
+}
 
 const copy = {
   zh: {
@@ -595,6 +649,8 @@ export function CreationWorkbench({
     () => normalizeCreationDraftForCapabilities(createInitialCreationDraft(defaults), resolve),
     [defaults, resolve]
   );
+  const defaultsFingerprint = creationDefaultsFingerprint(defaults);
+  const appliedDefaultsFingerprintRef = useRef(defaultsFingerprint);
   const [draft, setDraft] = useState<CreationDraft>(() => initialDraft);
   const [singleDraft, setSingleDraft] = useState<CreationDraft>(() => cloneCreationDraft(initialDraft));
   const [submission, setSubmission] = useState<SubmissionState>({ status: "idle" });
@@ -619,6 +675,20 @@ export function CreationWorkbench({
   useEffect(() => {
     draftRef.current = draft;
   }, [draft]);
+
+  useEffect(() => {
+    if (appliedDefaultsFingerprintRef.current === defaultsFingerprint) return;
+    appliedDefaultsFingerprintRef.current = defaultsFingerprint;
+    setDraft((current) => {
+      const next = synchronizeCreationDraftDefaults(current, defaults, resolve);
+      draftRef.current = next;
+      return next;
+    });
+    setSingleDraft((current) =>
+      synchronizeCreationDraftDefaults(current, defaults, resolve)
+    );
+    setBatchItems((current) => synchronizeBatchDraftDefaults(current, defaults, resolve));
+  }, [defaults, defaultsFingerprint, resolve]);
 
   useEffect(() => {
     if (maskEditorOpen && maskTarget.status !== "ready") {

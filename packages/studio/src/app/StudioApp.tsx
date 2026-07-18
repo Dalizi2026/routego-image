@@ -13,6 +13,7 @@ import {
   LibraryWorkspace,
   type LibraryCreationHandoff
 } from "../features/library";
+import { SettingsWorkspace } from "../features/settings";
 import { I18nProvider, useI18n, type MessageKey } from "../i18n";
 import "../styles/index.css";
 import {
@@ -186,7 +187,7 @@ function StatusLedger({
         </div>
         <div>
           <dt>{t("status.provider")}</dt>
-          <dd>{service.providerId ?? t("status.unconfigured")}</dd>
+          <dd>{settings.activeProviderId ?? service.providerId ?? t("status.unconfigured")}</dd>
         </div>
         <div>
           <dt>{t("app.profiles")}</dt>
@@ -237,11 +238,13 @@ function StudioWorkspace({
   gateway,
   service,
   settings,
+  onSettingsChange,
   routeContent
 }: {
   readonly gateway: StudioGateway;
   readonly service: RoutegoStatusResult;
   readonly settings: ReadSettingsResult;
+  readonly onSettingsChange: (settings: ReadSettingsResult) => void;
   readonly routeContent?: Partial<Record<StudioRoute, ReactNode>>;
 }) {
   const { language, t, toggleLanguage } = useI18n();
@@ -284,7 +287,14 @@ function StudioWorkspace({
           onCreationHandoff={handleCreationHandoff}
         />
       ),
-    ...(routeContent?.settings === undefined ? {} : { settings: routeContent.settings })
+    settings:
+      routeContent?.settings ?? (
+        <SettingsWorkspace
+          gateway={gateway}
+          settings={settings}
+          onSettingsChange={onSettingsChange}
+        />
+      )
   } satisfies Partial<Record<Exclude<StudioRoute, "workbench">, ReactNode>>;
   const headingRef = useRef<HTMLElement>(null);
 
@@ -355,6 +365,11 @@ export function StudioApp({
 }) {
   const [attempt, setAttempt] = useState(0);
   const [boot, setBoot] = useState<BootState>({ status: "loading" });
+  const updateSettings = useCallback((settings: ReadSettingsResult) => {
+    setBoot((current) =>
+      current.status === "ready" ? { ...current, settings } : current
+    );
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -391,18 +406,32 @@ export function StudioApp({
     };
   }, [attempt, gateway]);
 
+  const activeProfile =
+    boot.status === "ready"
+      ? boot.settings.profiles.find(
+          (profile) =>
+            profile.id === boot.settings.activeProviderId && profile.isActive
+        )
+      : undefined;
+
   return (
     <I18nProvider>
       {boot.status === "ready" ? (
         <CapabilityProvider
-          providerId={boot.service.providerId}
-          model={boot.settings.defaults.model ?? boot.service.models[0]}
+          providerId={boot.settings.activeProviderId ?? boot.service.providerId}
+          model={
+            boot.settings.defaults.model ??
+            activeProfile?.defaultModel ??
+            activeProfile?.models[0] ??
+            boot.service.models[0]
+          }
           snapshots={boot.service.capabilities}
         >
           <StudioWorkspace
             gateway={gateway}
             service={boot.service}
             settings={boot.settings}
+            onSettingsChange={updateSettings}
             {...(routeContent === undefined ? {} : { routeContent })}
           />
         </CapabilityProvider>
