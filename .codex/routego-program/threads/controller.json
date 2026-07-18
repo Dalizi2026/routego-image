@@ -8,12 +8,12 @@
   "branch": "codex/routego-controller-g5",
   "startingCommit": "01186e733b7ec6f63785ddd4e9b6aa1128f03462",
   "registrationCommit": "c468285fefb3a531ebdfd5517975200ac84c1e92",
-  "headCommit": "2fd55378a08479050ee3847b352a731ca21fb200",
+  "headCommit": "f0ceb6ea3d73a2bd91f271196b4f589b1510e59d",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 5,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "lastHealthAudit": "passed-generation-5-full-authority-integration-task-3.1-lineage-72-tests-typecheck-dependency-build-safety-406-strict-openspec-automation-and-dual-path-handoff-acceptance-audit",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "g5-compaction-1-after-controller-activation-before-integration-g3-registration-2026-07-18",
+  "lastHealthAudit": "passed-generation-5-compaction-1-authority-git-clean-integration-generation-2-frozen-handoff-head-3f1878b-task-3.2-locked-dual-path-reporting-confirmed",
   "successorThreadId": null,
   "successorGeneration": null,
   "successorWorktree": null,
@@ -142,6 +142,7 @@
     "PNG-bound task 3.1 checkpoint 627a7078863abc36a0962277f737ed90bf44cb69 has exact three-commit correction ancestry and two-file implementation scope. Integration 71/71, typecheck, dependency-order build, safety 405, strict OpenSpec 19/19 and clean Git passed; IHDR/dimension/pixel/RGBA checks precede pngjs. It is not accepted because 16-bit PNG still permits eight-byte-per-pixel intermediate allocation and interlace=1 enters pngjs' unbounded zlib.inflateSync path. Only an 8-bit non-interlaced proof-profile correction is authorized; task 3.2 remains locked.",
     "Final task 3.1 checkpoint d974cb0d16b7e14ca0766392c7d52356b4967d3c is independently accepted. The f7196e3f77a7aaed59e9ea4390e4655066b3e584 correction restricts capability-proof PNGs to 8-bit non-interlaced decoder paths before pngjs; 72/72 Integration tests, typecheck, dependency-order build, safety 405, strict OpenSpec 19/19, exact scopes and clean Git passed. Integration G2 is frozen for generation-3 handoff preparation; task 3.2 remains locked.",
     "Controller G4 and Integration G2 are both at compaction 4 pre-handoff. Controller generation 5 must become authoritative before it registers Integration generation 3. No task 3.2 product work may begin during either handoff.",
-    "Controller generation 5 task 019f751c-75c3-7e52-9af1-28db9dad4463 accepted the handoff at clean branch codex/routego-controller-g5 HEAD c468285fefb3a531ebdfd5517975200ac84c1e92 after the complete mandatory read set, task-3.1 correction lineage, Integration 72/72, typecheck, dependency-order build, safety 406 at the governance handoff head, strict OpenSpec 19/19, automation and Git-clean audits. G5 explicitly acknowledged direct send_message_to_thread plus read_thread as primary and the active 15-minute automation as fallback only. The authoritative Controller pointer is switched to G5 by the activation governance commit containing this record; G5 may register Integration G3 only, while task 3.2 remains locked."
+    "Controller generation 5 task 019f751c-75c3-7e52-9af1-28db9dad4463 accepted the handoff at clean branch codex/routego-controller-g5 HEAD c468285fefb3a531ebdfd5517975200ac84c1e92 after the complete mandatory read set, task-3.1 correction lineage, Integration 72/72, typecheck, dependency-order build, safety 406 at the governance handoff head, strict OpenSpec 19/19, automation and Git-clean audits. G5 explicitly acknowledged direct send_message_to_thread plus read_thread as primary and the active 15-minute automation as fallback only. The authoritative Controller pointer is switched to G5 by the activation governance commit containing this record; G5 may register Integration G3 only, while task 3.2 remains locked.",
+    "Controller generation 5 observable compaction 1 was audited from authoritative clean HEAD f0ceb6ea3d73a2bd91f271196b4f589b1510e59d. Program/controller authority still points to G5; Integration G2 remains the frozen sole apply owner at clean handoff HEAD 3f1878bbe2e5dc2680b92422a43160bc1cac8802 with accepted product checkpoint d974cb0d16b7e14ca0766392c7d52356b4967d3c, OpenSpec 11/29 and task 3.2 locked. G5 may proceed only with Integration G3 registration, full read-only acceptance, G2 archival, and explicit sole-owner activation."
   ]
 }
