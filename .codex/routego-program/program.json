@@ -40,7 +40,24 @@
       "create successor for large work",
       "record a real blocker and wait for external input"
     ],
-    "directStructuredMessagesRemainPrimary": true
+    "directStructuredMessagesRemainPrimary": true,
+    "dualPathCompletionReporting": {
+      "primary": "The active Integration apply owner must immediately call send_message_to_thread after every completed OpenSpec task, task group, clean checkpoint, blocker, deviation, handoff, activation, or delivery event, then call read_thread to confirm receipt by the authoritative Controller task.",
+      "fallback": "The project-level continuity automation checks every 10 minutes for progress or HEAD changes lacking a matching direct Controller message and requests an immediate catch-up report.",
+      "finalAnswerAloneIsInsufficient": true,
+      "automationIsFallbackOnly": true,
+      "requiredCompletionFields": [
+        "lane/change",
+        "completedTaskIds and nextTaskId",
+        "branch and full HEAD",
+        "implementation and task-state commit SHAs",
+        "OpenSpec progress",
+        "verification results",
+        "Git clean",
+        "observableCompactions",
+        "blockers and external gates"
+      ]
+    }
   },
   "conformancePolicy": {
     "requireOpenSpecTaskId": true,
