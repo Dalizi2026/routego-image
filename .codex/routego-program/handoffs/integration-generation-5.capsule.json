@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "a6743aa13ad5c91dfc5804e6d726986e2c75ee8b6c79383233351b915c043805",
+  "capsuleSha256": "cd6fbdd39665c0dc4230046b726fd8ca06db0a2f8658f1e9c732bfdd39dcb8b1",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,7 +22,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
     "plannedBranch": "codex/routego-integration-g5",
     "startingCommit": "cc49c06406a8526f1bdd43e4ab158421b367ee6c",
-    "registrationStatus": "activated-sole-owner-task-4.2-pd-010-host-correction-accepted-phase-b-authorized",
+    "registrationStatus": "activated-sole-owner-task-4.2-pd-011-phase-b-implementation-promoted-awaiting-task-state",
     "registrationCommit": "6aaa1510a29e4cd520d6a44d1d096160091488c1",
     "incorporationCommit": "813deefd199e8b83a52d60dcc7ecd02b963f8bb2",
     "registrationCommitSemantics": "The Controller registration governance commit and successor incorporation commit are exact; the containing activation commit cannot self-reference its own SHA."
@@ -34,7 +34,7 @@
     "nextTaskId": "4.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.2.json",
-      "sha256": "9dbfb0c11fa94fc7a41344df026f0ccd46c118f57db2e0f82e52ad7b716f8e44"
+      "sha256": "7ca0f95c3584e753af5ae626bd65bc5ff66f8eff866243b1f6fdda32d099e828"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
@@ -51,8 +51,17 @@
     "hostCorrectionLocked": false,
     "hostCorrectionAuthorized": true,
     "hostCorrectionAccepted": true,
-    "phaseBResumeLocked": false,
-    "phaseBAuthorized": true
+    "phaseBResumeLocked": true,
+    "phaseBAuthorized": false,
+    "phaseBImplementationCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "phaseBImplementationParent": "12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d",
+    "phaseBImplementationPromoted": true,
+    "phaseBImplementationAccepted": true,
+    "promotionDecision": ".codex/routego-program/deviations/PD-011-task-4.2-immutable-wip-promotion.md",
+    "taskStateLocked": true,
+    "safeCheckpoint": "c879e78cb1a5f73ca4f0800146105b5107c29dc0",
+    "observableCompactions": 3,
+    "continuation": "continue-current-phase-b-atomic-only"
   },
   "completedEvidence": [
     {
@@ -93,8 +102,8 @@
   "context": {
     "sourceObservableCompactions": 3,
     "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|cc49c06406a8526f1bdd43e4ab158421b367ee6c|context-compaction-3-after-task-4.1-before-task-4.2-implementation|16/29",
-    "successorObservableCompactions": 2,
-    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d|context-compaction-2-during-task-4.2-phase-b-wip-checkpoint-before-PD-010|16/29",
+    "successorObservableCompactions": 3,
+    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|c879e78cb1a5f73ca4f0800146105b5107c29dc0|context-compaction-3-during-task-4.2-phase-b-resume-before-revalidation-and-implementation-commit|16/29",
     "handoffAcceptanceCompactionLimit": 0,
     "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
     "auditFailure": "HANDOFF_AUDIT_FAILED"
@@ -122,14 +131,14 @@
       "openspec/specs/local-service-boundaries/spec.md",
       "openspec/specs/shared-image-contracts/spec.md",
       ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
-      ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md",
+      ".codex/routego-program/deviations/PD-011-task-4.2-immutable-wip-promotion.md",
       ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
     ],
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
-    "expectedNormalizedUtf8Bytes": 116332,
+    "expectedNormalizedUtf8Bytes": 118457,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

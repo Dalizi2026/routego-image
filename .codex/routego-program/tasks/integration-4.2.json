@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "9dbfb0c11fa94fc7a41344df026f0ccd46c118f57db2e0f82e52ad7b716f8e44",
+  "contentSha256": "7ca0f95c3584e753af5ae626bd65bc5ff66f8eff866243b1f6fdda32d099e828",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.2",
-  "status": "pd-010-host-correction-accepted-phase-b-authorized",
+  "status": "pd-011-phase-b-implementation-promoted-awaiting-task-state",
   "sourceCommit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -114,6 +114,10 @@
     "hostCorrectionImplementationCommit": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
     "hostCorrectionImplementationParent": "fdf1fcebd071fd5453831da893ce37038ced7506",
     "hostCorrectionAccepted": true,
+    "phaseBImplementationCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "phaseBImplementationParent": "12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d",
+    "phaseBImplementationPromoted": true,
+    "phaseBImplementationAccepted": true,
     "sourceOwnerArchived": true,
     "soleApplyOwner": true,
     "applyAuthorized": true,
@@ -151,8 +155,8 @@
     "hostCorrectionImplementationParent": "fdf1fcebd071fd5453831da893ce37038ced7506",
     "hostCorrectionAccepted": true,
     "phaseBWipCheckpointCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
-    "phaseBLocked": false,
-    "phaseBAuthorized": true,
+    "phaseBLocked": true,
+    "phaseBAuthorized": false,
     "priorDecision": {
       "decision": ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
       "decisionSha256": "9e11b7ae4369608e7d84f382da979f144b82ff7ffaa7a44b5d0efb1f566d49e2",
@@ -160,6 +164,19 @@
       "phaseAImplementationCommit": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
       "status": "accepted"
     }
+  },
+  "promotionDecision": {
+    "decision": ".codex/routego-program/deviations/PD-011-task-4.2-immutable-wip-promotion.md",
+    "decisionSha256": "72b8f6051442b301d8b4107be86ad9bfc6e1f8b34e56154ada890cbdba280a04",
+    "decisionSha256ByteCounting": "utf8-after-crlf-to-lf-normalization",
+    "option": "A",
+    "implementationCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+    "implementationParent": "12e84ae7600ef6d12a03b0cc5a8a25bbe3b2ec7d",
+    "promotionHead": "c879e78cb1a5f73ca4f0800146105b5107c29dc0",
+    "promotionBasis": "Exact four-file immutable commit, unchanged four blobs after accepted host correction, successful post-host verification, no truthful non-empty replacement commit available.",
+    "implementationAccepted": true,
+    "taskStateLocked": true,
+    "emptyCommitAuthorized": false
   },
   "unresolvedIssues": [],
   "knownRisks": [
