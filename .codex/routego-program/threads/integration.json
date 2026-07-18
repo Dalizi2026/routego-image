@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "planning-lifecycle-revised-awaiting-controller-review",
+  "status": "offline-apply-active",
   "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "threadId": "019f72fd-fb6f-7b52-b383-03471f42f05a",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4687\\生图插件",
@@ -12,11 +12,11 @@
   "registrationCommit": "5afdec25e3c8b318d46e11ca73517bd2b21f924b",
   "controllerRegistrationCommit": "dd3a601e00e320399d65ccc71fd3932fda0107e1",
   "generation": 0,
-  "observableCompactions": 1,
-  "lastCompactionFingerprint": "2026-07-18-summary-checkpoint-uncommitted-integration-plan-at-149ca920feb6fc714db4e210e4a304f6540f3e57",
-  "lastHealthAudit": "passed-after-controller-g3-final-lifecycle-planning-revision-and-strict-validation",
+  "observableCompactions": 2,
+  "lastCompactionFingerprint": "2026-07-18-compaction-2-offline-apply-activation-at-adf58553abfba931e449388cf78c6b20ccc23076",
+  "lastHealthAudit": "passed-after-controller-g3-offline-apply-authorization-merge-and-compaction-2-checkpoint",
   "successorThreadId": null,
-  "openspecState": "revised-planning-complete-apply-ready-controller-review-required",
+  "openspecState": "offline-apply-active",
   "openspecProgress": "proposal/design/11-delta-specs/tasks-complete; 0/28 apply tasks executed",
   "planningCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
   "planningCommitLineage": [
@@ -24,7 +24,20 @@
     "3ae25501f1f47b98c212fd9d47d89837ea75cd96",
     "dd02ccfb03b53034afb9314de4fa8441a3846441"
   ],
-  "nextTask": "Wait for Controller G3 review of the revised INTEGRATION_PLAN_READY delivery; do not edit product files, start apply, or execute external actions without explicit follow-up authorization.",
+  "controllerApprovalCommit": "35ca516c66f3951a3286cf3f12617271d7fa76aa",
+  "applyAuthorized": true,
+  "externalStateAuthorized": false,
+  "nextTask": "Execute task 1.1 only, verify and commit its implementation and sole-owner task state separately, then stop generation 0 and hand off before task 1.2.",
+  "applyActivation": {
+    "approvedPlanningArtifactCommit": "dd02ccfb03b53034afb9314de4fa8441a3846441",
+    "approvedPlanningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
+    "controllerApprovalCommit": "35ca516c66f3951a3286cf3f12617271d7fa76aa",
+    "approvalIncorporationCommit": "adf58553abfba931e449388cf78c6b20ccc23076",
+    "authorizedTasks": "1.1 through 7.1 and 8.1 in dependency order, subject to continuity handoff before 1.2",
+    "generationZeroLimit": "task 1.1 only; stop after separate implementation and task-state commits",
+    "applyAuthorized": true,
+    "externalStateAuthorized": false
+  },
   "governanceHold": {
     "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
     "dirtyPaths": [
