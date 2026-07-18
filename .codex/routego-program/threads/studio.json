@@ -14,6 +14,7 @@
   "lastCompactionFingerprint": "context-checkpoint-2026-07-18-studio-g2-task-5.1-settings-wip",
   "lastHealthAudit": "passed",
   "successorThreadId": null,
+  "successorHandoffFile": ".codex/routego-program/handoffs/studio-generation-3.md",
   "predecessorThreadId": "019f71d8-03f8-7c20-a816-8bed99e07881",
   "predecessorGeneration": 1,
   "productCheckpointCommit": "313fafba3a1d49d6b65db30fb679fd77d8760d18",
@@ -65,7 +66,7 @@
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
     "controllerContinuityCommit": "874b627dfb4125e6b01e307fa4231a7f1a7b3daa",
-    "status": "generation-2-task-5.1-complete-awaiting-successor"
+    "status": "generation-2-task-5.1-complete-successor-request-ready"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
