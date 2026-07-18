@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "9ccc7eaebcc42b0d0a1abb4d6532c6b09fca4af3ac5eaeb1a925d5f95d6f79b1",
+  "contentSha256": "851d745d91eea3e8d772190a305c43bccfb0695e45496a6d8a897bb84cb859f2",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "3.5",
-  "status": "locked-awaiting-integration-generation-4-low-context-acceptance",
+  "status": "authorized-for-integration-generation-4-sole-apply-owner-not-started",
   "sourceCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -93,8 +93,10 @@
     "integrationGeneration": 4,
     "acceptedPreviousTaskImplementationCommit": "17208da376f71790561ae87e3d59b77287765b3b",
     "acceptedPreviousTaskCheckpointCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
-    "soleApplyOwner": false,
-    "applyAuthorized": false,
+    "acceptedHead": "ec97b7f97b9768ca586480d4c7e99be81015196c",
+    "sourceOwnerArchived": true,
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
     "started": false
   },
   "unresolvedIssues": [],

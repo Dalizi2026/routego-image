@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "ff0662074febbb8ab071d7c2eb61e5a08d39471d3951623a7598e587672c6928",
+  "capsuleSha256": "5a5449396d0261b6d4affe3c9a42cfec7a5fad11811e0fd5ff571146e163c670",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,9 +22,10 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a818\\生图插件",
     "plannedBranch": "codex/routego-integration-g4",
     "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
-    "registrationStatus": "registered-awaiting-low-context-acceptance-task-3.5-locked",
-    "registrationCommit": null,
-    "registrationCommitSemantics": "The registration commit is recorded only after a fresh successor task and worktree exist; pending identity is a legal pre-registration state."
+    "registrationStatus": "activated-sole-owner-task-3.5-unlocked-not-started",
+    "registrationCommit": "e38ede29a7bb2802ca874c099f7a11e6aff11524",
+    "incorporationCommit": "ec97b7f97b9768ca586480d4c7e99be81015196c",
+    "registrationCommitSemantics": "The Controller registration governance commit is recorded after a fresh successor task/worktree exists; a containing activation commit cannot self-reference its own SHA."
   },
   "currentState": {
     "openspecTotal": 29,
@@ -33,11 +34,11 @@
     "nextTaskId": "3.5",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-3.5.json",
-      "sha256": "9ccc7eaebcc42b0d0a1abb4d6532c6b09fca4af3ac5eaeb1a925d5f95d6f79b1"
+      "sha256": "851d745d91eea3e8d772190a305c43bccfb0695e45496a6d8a897bb84cb859f2"
     },
-    "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
-    "successorApplyAuthorized": false
+    "taskLocked": false,
+    "sourceIsSoleApplyOwner": false,
+    "successorApplyAuthorized": true
   },
   "completedEvidence": [
     {
@@ -59,7 +60,7 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": ["Integration G4 low-context acceptance and explicit sole-owner activation are pending."],
+    "blockers": [],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "residualRisks": [
@@ -68,8 +69,8 @@
     ]
   },
   "context": {
-    "sourceObservableCompactions": 3,
-    "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc|context-compaction-3-after-task-3.4-before-task-3.5-activation|14/29",
+    "sourceObservableCompactions": 4,
+    "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc|context-compaction-4-after-g4-handoff|14/29",
     "successorObservableCompactions": 0,
     "handoffAcceptanceCompactionLimit": 0,
     "failureLabel": "HANDOFF_CONTEXT_BUDGET_FAILED"
@@ -103,7 +104,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 98064,
+    "expectedNormalizedUtf8Bytes": 98903,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
@@ -125,7 +126,7 @@
       "directed expansion cannot restore authority",
       "explicit user request"
     ],
-    "contextBudgetFailure": "If any observable compaction occurs before handoff acceptance, send HANDOFF_CONTEXT_BUDGET_FAILED; do not activate the successor, keep G3 frozen as owner, keep task 3.5 locked, shrink the capsule/state and create a fresh successor if needed."
+    "contextBudgetFailure": "If any observable compaction occurs before handoff acceptance, send HANDOFF_CONTEXT_BUDGET_FAILED; do not activate the successor, keep the predecessor as owner, keep the next product task locked, shrink the capsule/state and create a fresh successor if needed."
   },
   "safety": {
     "noProductOrOpenSpecEditsBeforeActivation": true,
