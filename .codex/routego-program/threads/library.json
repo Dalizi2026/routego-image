@@ -3,12 +3,12 @@
   "lane": "library",
   "change": "add-routego-image-library",
   "role": "openspec-apply-owner",
-  "status": "lane-complete",
+  "status": "applying-independent-review-fix",
   "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
   "branch": "codex/routego-library-g2",
   "startingCommit": "af069a742b641605d516e888afafca8db5661e66",
-  "headCommit": "514db95441d389999bd6341f335aeaaca1cba226",
+  "headCommit": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
   "generation": 2,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "library-g2-compaction-1-task-5.2-head-937c5ca1-2026-07-18",
@@ -21,10 +21,11 @@
   "registrationCommit": "b4b98f1124a07b66334fc33cf5d7516d1eba100d",
   "controllerRegistrationCommit": "9189b7a4f8155b5e62def6f786e5d7723eb8a3f0",
   "controllerActivationCommit": "c9ac706321500b01dabbf92ed81ba39cd566127e",
+  "controllerReviewGovernanceCommit": "0b32e8d5ce7fd00128cdd8c6b07d26830ce118c8",
   "handoffFile": ".codex/routego-program/handoffs/library-generation-2.md",
-  "openspecProgress": "10/10",
-  "lastCompletedTask": "5.2",
-  "nextTask": null,
+  "openspecProgress": "8/10",
+  "lastCompletedTask": "4.2",
+  "nextTask": "5.1",
   "lastImplementationCommit": "8feb9dc2d4f53336d1190fc069b2774ddf4c241b",
   "lastOpenSpecCommit": "514db95441d389999bd6341f335aeaaca1cba226",
   "recentValidation": {
@@ -40,10 +41,12 @@
     "repositoryAudit": "no tracked secret, user image, local config, path leak, or generated/cache artifact",
     "scope": "61 changed files against f6e1b309213bb87d741199377c2bebdaa9cbcad0, all within Library/OpenSpec/governance ownership",
     "planningConsistency": "proposal, design, three delta specs, six frozen main specs, tasks, PD-002/003/004, plan, commits, and thread state passed",
-    "gitClean": "verification copy and primary worktree clean"
+    "gitClean": "verification copy and primary worktree were clean before independent review",
+    "independentReview": "failed: public ZIP export ignored partial FileHandle.write results and could report a truncated archive as successful",
+    "currentState": "tasks 5.1 and 5.2 reopened for root-cause correction and full reverification"
   },
   "applyOwnership": {
-    "state": "complete-awaiting-controller",
+    "state": "active-single-owner",
     "activeOwnerThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
     "predecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "successorThreadId": "019f7261-2c57-7a01-b519-e1de521819fe"
@@ -59,10 +62,10 @@
     "worktreeRemoved": true
   },
   "continuityGovernance": {
-    "controllerThreadId": "019f715f-c042-7590-a38b-ffb406315903",
+    "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
     "checkpointBeforeIncompleteIdle": true,
     "monitorId": "routego-lane-continuity-monitor",
-    "status": "generation-2-lane-complete"
+    "status": "generation-2-independent-review-fix-task-5.1"
   },
   "dependsOn": [
     "establish-routego-image-foundation",
@@ -104,7 +107,17 @@
       "plugin manifest and release workflow"
     ]
   },
-  "completion": {
+  "reviewReactivation": {
+    "reviewedDelivery": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
+    "controllerThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
+    "controllerGovernanceCommit": "0b32e8d5ce7fd00128cdd8c6b07d26830ce118c8",
+    "finding": "Public path-based ZIP export could return outputPath without warnings while a legal partial FileHandle.write produced a truncated archive.",
+    "rootCause": "copyExportToPublicPath performed one FileHandle.write per stream chunk and ignored bytesWritten.",
+    "reopenedTasks": ["5.1", "5.2"],
+    "blockers": []
+  },
+  "supersededCompletion": {
+    "supersededByReview": true,
     "tasks": "10/10",
     "validatedAt": "2026-07-18T08:02:11.5533413+08:00",
     "verifiedHead": "341a2fe7d2cfe82ca4a9ac315423071c6911701d",
