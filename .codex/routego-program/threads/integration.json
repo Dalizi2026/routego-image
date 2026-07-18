@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "role": "openspec-propose-and-apply-owner",
+  "status": "awaiting-thread-registration",
+  "threadId": "pending",
+  "worktree": "pending",
+  "branch": "codex/routego-integration",
+  "startingCommit": "81a84ac6d69e278ff014ec271e66f13e2cfb73df",
+  "registrationCommit": null,
+  "generation": 0,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "lastHealthAudit": "pending-startup-audit",
+  "successorThreadId": null,
+  "openspecState": "change-not-created-authorized-proposal-start",
+  "openspecProgress": "0/planning",
+  "nextTask": "Use openspec-propose to create coherent proposal, design, delta specs, and tasks for integrate-routego-image-plugin before any product implementation.",
+  "dependsOn": [
+    "add-routego-image-creation",
+    "add-routego-image-library",
+    "add-routego-studio"
+  ],
+  "dependencyBaselines": {
+    "creationDelivery": "624e7390b902814620d3eeb583ed43a57fd8243a",
+    "creationArchive": "d03389ec108bcfd9e79ed076048e50b430900028",
+    "libraryDelivery": "96fea3b5618808fd00daac274178512daf2a5ff2",
+    "libraryArchive": "50141def268015579febee067c311aa09aaf117f",
+    "studioDelivery": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
+    "studioArchive": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
+    "frozenMainlineVerification": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
+    "controllerGovernance": "81a84ac6d69e278ff014ec271e66f13e2cfb73df"
+  },
+  "startupException": {
+    "reason": "This is the initial proposal owner for the final Integration change, so openspec/changes/integrate-routego-image-plugin is intentionally absent at task creation.",
+    "required": "Treat the missing change directory as the authorized proposal starting state only; read the plan, AGENTS, program, this thread state, PD-002/003/004, all 18 main specs, and the three archived functional changes before invoking openspec-propose. Do not write product code until the new planning artifacts are complete and freshly validated."
+  },
+  "ownership": {
+    "owned": [
+      "final LocalRoutegoService composition across Creation and Library resource boundaries",
+      "seven MCP tool integration and Routego Image Skill wiring without changing the frozen public tool set",
+      "loopback HTTP/session/origin/resource adapters and Studio static serving",
+      "plugin manifest, packaging, install, CI, cross-platform acceptance, and release workflow",
+      "root dependencies, lockfile, workspace configuration, and shared integration-only test infrastructure when justified by the approved Integration OpenSpec"
+    ],
+    "readOnlyWithoutDeviation": [
+      "Creation provider/executor internals",
+      "Library persistence and ZIP internals",
+      "Studio product components and browser journeys",
+      "the 18 frozen main specification requirements"
+    ],
+    "forbidden": [
+      "adding or renaming public MCP tools",
+      "using real API keys, user images, real Library data, or a real relay before explicit user approval",
+      "deployment, publication, marketplace replacement, paid probes, or billable image requests before explicit user approval",
+      "destructive migration or deletion of legacy plugin/configuration/Library data"
+    ]
+  }
+}
