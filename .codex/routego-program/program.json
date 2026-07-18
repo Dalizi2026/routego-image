@@ -133,20 +133,21 @@
       ]
     },
     "library": {
-      "status": "independent-review-failed-task-5.1-reopened",
+      "status": "merged-synced-archived",
       "sourceThreadId": "019f7261-2c57-7a01-b519-e1de521819fe",
-      "deliveryCommit": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
-      "taskStateCommit": "514db95441d389999bd6341f335aeaaca1cba226",
-      "verifiedHead": "341a2fe7d2cfe82ca4a9ac315423071c6911701d",
+      "deliveryCommit": "f92a835990d422da5f4f5e3008383f24aabdcc7b",
+      "supersedesDelivery": "fd62a90dc1899ab9d0c993b7192da910e2fa4914",
+      "implementationCommit": "634712d5c4233f1a58ff1a33d94420fcb3504367",
+      "taskStateCommit": "33128c24b0088a33e401bb08eebc4e0e1dcf3b2d",
+      "verifiedHead": "0bd93dea9d7035426b34600a6bae13277b3f08bd",
       "openspecProgress": "10/10",
-      "mergeCommit": null,
-      "specSyncCommit": null,
-      "archivePath": null,
+      "mergeCommit": "220d340f8c9cf7ab6891d8ee5191e97b3bc5e11a",
+      "specSyncCommit": "a9875ed368324b03941893a1ab994b3ff039a499",
+      "archivePath": "openspec/changes/archive/2026-07-18-add-routego-image-library",
       "archiveCommit": null,
-      "postArchiveVerification": null,
+      "postArchiveVerification": "pending",
       "integrationNotified": false,
       "waitingFor": [
-        "library-task-5.1-partial-write-fix-and-5.2-reverification",
         "add-routego-studio"
       ]
     }
