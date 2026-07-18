@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "controller-generation-4-active-integration-task-2.1-awaiting-dispatch",
+  "status": "controller-generation-4-active-integration-task-2.1",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -191,7 +191,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-awaiting-controller-generation-4-task-2.1-dispatch",
+    "status": "offline-apply-task-2.1-active",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -199,7 +199,7 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "0223dfbe7ee4e3683c1c63044246a318a5afc053",
+    "integrationHead": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
     "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
@@ -209,19 +209,20 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "Controller generation 4 task 019f73d0-1bf4-73c2-8ca9-e28370d34595 accepted the generation-3 handoff at clean branch codex/routego-controller-g4 HEAD c292c2d461ed33000d7f154edba04908f36eedce after complete authority, Integration and automation audits and explicit dual-path reporting acknowledgement. After incorporating the activation governance commit, G4 may send a new structured follow-up unlocking only Integration task 2.1. No external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. Integration generation 1 checkpoint 94a7870e2d9eb0bda14062b52e6f8a31bc520248 at observable compaction 2 was independently accepted and does not require a successor; only task 2.1 remains authorized. No external authority is added.",
     "lastDirectCheckpoint": {
-      "messageType": "INTEGRATION_TASK_CHECKPOINT",
+      "messageType": "INTEGRATION_HEALTH_CHECKPOINT",
       "workerThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
       "completedTask": "1.4",
       "nextTask": "2.1",
-      "reportedHead": "0223dfbe7ee4e3683c1c63044246a318a5afc053",
+      "reportedHead": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
+      "checkpointCommit": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
       "implementationCommit": "34956e46182d7df8d7b5a6af98659ab2bb68f658",
       "taskStateCommit": "b54f8dcbc8f36fbb967e14b56b643ef9e25e590d",
       "openspecProgress": "4/28",
       "controllerReceived": true,
       "controllerReadBackConfirmed": true,
-      "acceptedByControllerMessage": "INTEGRATION_TASK_CHECKPOINT_ACCEPTED_AND_CONTROLLER_HANDOFF_HOLD"
+      "acceptedByControllerMessage": "INTEGRATION_HEALTH_CHECKPOINT_ACCEPTED_PD_006_TASK_2_1_CONTINUE"
     }
   },
   "automations": {
