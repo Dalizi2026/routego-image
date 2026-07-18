@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "13a903e37839fe5ab3f401b689df006f75828c457e0fbf09d0316d3c0f990dc0",
+  "capsuleSha256": "04b1830eb2442708cff0b72c982af8879ef7c1913177fc7e3bc719df4406d38b",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,18 +22,18 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
     "plannedBranch": "codex/routego-integration-g3",
     "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "registrationStatus": "activated-sole-owner-task-3.4-unlocked-not-started",
+    "registrationStatus": "activated-sole-owner-task-3.5-unlocked-not-started",
     "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
     "registrationCommitSemantics": "The registration commit is recorded after a fresh successor task/worktree exists; a containing commit cannot self-reference its own SHA."
   },
   "currentState": {
     "openspecTotal": 29,
-    "openspecCompleted": 13,
-    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3"],
-    "nextTaskId": "3.4",
+    "openspecCompleted": 14,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4"],
+    "nextTaskId": "3.5",
     "taskCapsule": {
-      "path": ".codex/routego-program/tasks/integration-3.4.json",
-      "sha256": "753e468589ac4ccdb9d6a01063321ff1621dd6cc992ad03a35622ec2e91927a0"
+      "path": ".codex/routego-program/tasks/integration-3.5.json",
+      "sha256": "17fc8643d58e24b1e5a749d3c2af31ba0f53733563070c916b0a38378239189a"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
@@ -47,8 +47,8 @@
     },
     {
       "path": ".codex/routego-program/evidence/integration-generation-3-tasks.json",
-      "sha256": "3095523a31c19959e13ef183fd48d0de2d251a906f73f085d6da9f8bbf5ccaf3",
-      "taskIds": ["3.2", "3.3"]
+      "sha256": "b896c776082284a397c7a656f7e7d49d18a21dbb2b12b866ecb1f5ff66d7a786",
+      "taskIds": ["3.2", "3.3", "3.4"]
     }
   ],
   "authority": {
@@ -64,14 +64,15 @@
     "externalStateAuthorized": false,
     "residualRisks": [
       "Ignored node_modules were initialized from the local pnpm cache during registration verification; zero packages were downloaded, tracked files and lockfile are unchanged, and environment policy blocked cleanup.",
-      "Task 3.3 relies on RoutegoLibraryService for filesystem containment; upload discard or expiry after preparation must be handled by task 3.4 before persistence or projection."
+      "Task 3.3 relies on RoutegoLibraryService for filesystem containment; upload discard or expiry after preparation must be handled by task 3.4 before persistence or projection.",
+      "Task 3.5 must wire task 3.4 preflight and stable source staging before provider submission; task 4.2 still owns protected resource HTTP streaming."
     ]
   },
   "context": {
     "sourceObservableCompactions": 5,
     "sourceCompactionFingerprint": "2026-07-18-generation-2-compaction-5-after-task-3.1-acceptance-during-generation-3-handoff-preparation",
-    "successorObservableCompactions": 1,
-    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|57d2957789037945e423ac0417835b12acc132da|context-compaction-1-during-task-3.2|11/29",
+    "successorObservableCompactions": 2,
+    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|c53821eec3a0a92fdc63de31ccddbc52c7370703|context-compaction-2-before-task-3.4-implementation|13/29",
     "handoffAcceptanceCompactionLimit": 0,
     "failureLabel": "HANDOFF_CONTEXT_BUDGET_FAILED"
   },
@@ -93,9 +94,9 @@
       ".codex/routego-program/program.json",
       ".codex/routego-program/threads/integration.json",
       ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
-      ".codex/routego-program/tasks/integration-3.4.json",
+      ".codex/routego-program/tasks/integration-3.5.json",
       "openspec/changes/integrate-routego-image-plugin/specs/integrated-local-routego-service/spec.md",
-      "openspec/changes/integrate-routego-image-plugin/specs/durable-image-library/spec.md",
+      "openspec/specs/local-service-boundaries/spec.md",
       "openspec/specs/shared-image-contracts/spec.md",
       ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
       ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
@@ -104,7 +105,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 93964,
+    "expectedNormalizedUtf8Bytes": 99337,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
