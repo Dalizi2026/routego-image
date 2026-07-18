@@ -8,12 +8,12 @@
   "branch": "codex/routego-controller-g3",
   "startingCommit": "5a8f8a21c23cc4292449da039f196c0ed604a82f",
   "registrationCommit": "72e72c6ec4f9809f0c7cf8919e1ddf15f350c872",
-  "headCommit": "29ce19a192891b5ca6f6239f1c53b8820b3355dd",
+  "headCommit": "df02f471a9b56dbc443ccdcdbcb894a0fcf7f0d8",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 3,
   "observableCompactions": 2,
   "lastCompactionFingerprint": "g3-compaction-2-integration-task-1.1-successor-pending-2026-07-18",
-  "lastHealthAudit": "passed-successor-inherited-dual-path-completion-reporting-governance-update",
+  "lastHealthAudit": "passed-direct-checkpoint-durable-receipt-state-and-fallback-deduplication-update",
   "successorThreadId": null,
   "predecessorThreadId": "019f728e-0b4d-7552-b03a-7ca53eb9c0ae",
   "predecessorGeneration": 2,
@@ -106,6 +106,7 @@
     "Controller generation 3 observed its second context compaction after Integration task 1.1 reached a clean 1/28 checkpoint. A fresh governance audit confirmed Controller branch/worktree cleanliness, Integration generation 0 remains stopped before task 1.2, and a new Integration successor task/worktree is required before apply continues. The continuity automation was converted from a G3-bound heartbeat to a project-level recurring job that dynamically resolves the authoritative controllerThreadId across Controller generations.",
     "Integration generation 1 accepted the handoff at c2d04ab968348bda5b99506d814eaae6aeddfa42 after complete authority reread, fresh status/apply instructions, strict 19/19, and Git-clean verification. Generation 0 was archived and its Git worktree registration was removed before activation. The malformed successorWorktree value in the predecessor integration.json was superseded by the actual Unicode path C:\\Users\\MLTZ\\.codex\\worktrees\\5b94\\生图插件 and corrected in generation-1 activation state commit 1b8d38fbfc33b9b92b93f167170afe215e5cc0f0. Program dispatch points to generation 1, which is now the sole offline apply owner and may execute only task 1.2 next after a fresh apply-instructions read.",
     "Integration generation 1 completed task 1.2 at clean governance HEAD 9fcd666b473dd4da9292d3320794414e2321130f but did not directly notify Controller. The durable continuity policy now requires two parallel paths: immediate Integration-to-Controller send_message_to_thread plus read_thread confirmation as the primary path after every task/checkpoint, and the 10-minute project automation only as a missed-message fallback. Integration must send the missing task-1.2 report before starting task 1.3.",
-    "The dual-path completion-reporting contract is now a mandatory inherited property of every successor created after the third observable compaction or an early health handoff. Controller must include it in creation, registration, acceptance, and sole-owner activation messages; a successor cannot be accepted, activated, or allowed to start the next product task until it explicitly acknowledges direct send_message_to_thread plus read_thread reporting after every completion event."
+    "The dual-path completion-reporting contract is now a mandatory inherited property of every successor created after the third observable compaction or an early health handoff. Controller must include it in creation, registration, acceptance, and sole-owner activation messages; a successor cannot be accepted, activated, or allowed to start the next product task until it explicitly acknowledges direct send_message_to_thread plus read_thread reporting after every completion event.",
+    "The continuity fallback produced a duplicate task-1.3 catch-up request because successful direct Controller receipt existed only in thread history and not in machine-readable program state. Program integrationReadiness now records the last accepted direct checkpoint, reported HEAD, progress, Controller receipt, and read-back confirmation. Automation must compare this evidence before issuing a missed-message alert; matching accepted evidence suppresses duplicate catch-up messages."
   ]
 }
