@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "governance-hold-pending-controller-g3-deviation-review",
+  "status": "proposal-continuation-authorized-corrective-gates-required",
   "controllerThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "threadId": "019f72fd-fb6f-7b52-b383-03471f42f05a",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4687\\生图插件",
@@ -14,11 +14,11 @@
   "generation": 0,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "lastHealthAudit": "hold-acknowledged-no-tracked-or-product-diff",
+  "lastHealthAudit": "passed-controller-g3-pd-005-independent-review",
   "successorThreadId": null,
-  "openspecState": "proposal-draft-untracked-governance-hold",
+  "openspecState": "proposal-draft-untracked-authorized-for-pd-005-revision",
   "openspecProgress": "proposal-draft-only-no-validation",
-  "nextTask": "Preserve the two untracked planning files unchanged and await Controller G3 independent deviation review and explicit proposal-only continuation disposition.",
+  "nextTask": "After Controller G3 sends the structured proposal-only activation, revise proposal.md for PD-005, then create coherent design, modified/new delta specs, and exact tasks; validate strictly and send INTEGRATION_PLAN_READY without product edits.",
   "governanceHold": {
     "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
     "dirtyPaths": [
@@ -29,7 +29,18 @@
     "productFilesChanged": false,
     "planningArtifacts": "proposal draft only; no design, delta specs, tasks, validation, or commit",
     "planDeviation": "reported and forwarded; not approved",
-    "disposition": "preserve files unchanged and uncommitted; Controller G3 must independently inspect the exact worktree and frozen Library/Studio boundaries before authorizing any further planning"
+    "disposition": "PD-005 review completed; preserve the files until the structured proposal-only activation, then revise planning only. No apply or product edit is authorized."
+  },
+  "deviationReview": {
+    "decision": "accepted-for-integration-planning-only",
+    "record": ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+    "correctiveGates": [
+      "Library-only source renditions, 33-item bound, exact relationship artifact ownership, portability, and fail-closed retry reconstruction",
+      "authenticated Studio fetch-stream SSE parsing, partial/final/failure state, cleanup, deterministic mock streaming, and browser verification"
+    ],
+    "separateChangeRequired": false,
+    "applyAuthorized": false,
+    "externalStateAuthorized": false
   },
   "dependsOn": [
     "add-routego-image-creation",

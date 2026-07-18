@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "integration-planning-governance-review",
+  "status": "integration-planning-authorized-with-corrective-gates",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -165,7 +165,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "handoff-accepted-governance-hold-pending-deviation-review",
+    "status": "proposal-continuation-authorized-corrective-gates-required",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -174,11 +174,12 @@
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
     "integrationHead": "4e0a31b192a4b51a56c90c6475b11d4d094a3013",
-    "planningHold": "preserve untracked .openspec.yaml and proposal.md unchanged and uncommitted; no design/specs/tasks, validation, product change, or apply authorization before Controller G3 independent deviation review",
+    "planningHold": "Controller G3 accepted PD-005 for proposal/design/spec/task planning only; preserved proposal must be revised, corrective gates must be explicit, and apply remains prohibited pending INTEGRATION_PLAN_READY review",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
       "live partial Studio events require independent review of the frozen Studio SSE transport/workbench boundary"
-    ]
+    ],
+    "deviationDecision": "PD-005 accepted both findings with a narrowed complete source-rendition/retry design and authenticated Studio fetch-stream design; corrections must be prerequisite task groups inside integrate-routego-image-plugin and do not authorize apply"
   },
   "automations": {
     "foundationAuditGate": {
