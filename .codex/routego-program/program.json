@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "controller-generation-4-handoff-prepared-task-3.1-accepted-integration-generation-2-frozen",
+  "status": "controller-generation-5-registered-awaiting-acceptance-task-3.1-accepted-integration-generation-2-frozen",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -16,6 +16,21 @@
     "successorMode": "new-thread-new-worktree",
     "successorMustInheritCompletionReporting": true,
     "successorAcceptanceRequiresReportingAcknowledgement": true
+  },
+  "controllerHandoffPreparation": {
+    "sourceControllerThreadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
+    "sourceGeneration": 4,
+    "sourceBranch": "codex/routego-controller-g4",
+    "handoffCommit": "01186e733b7ec6f63785ddd4e9b6aa1128f03462",
+    "successorControllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "successorGeneration": 5,
+    "successorWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
+    "plannedSuccessorBranch": "codex/routego-controller-g5",
+    "registrationCommit": null,
+    "state": "successor-registered-awaiting-acceptance",
+    "integrationGeneration2Frozen": true,
+    "task3_2Locked": true,
+    "reportingContractAcknowledgementRequired": true
   },
   "laneContinuityPolicy": {
     "silentIdleForbidden": true,

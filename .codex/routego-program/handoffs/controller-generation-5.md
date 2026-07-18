@@ -4,10 +4,11 @@
 - 来源 worktree：`C:\Users\MLTZ\.codex\worktrees\1756\生图插件`。
 - 来源分支：`codex/routego-controller-g4`。
 - 来源可观测压缩：`4`，PD-006 预交接状态。
-- 继任 Controller task：`pending`。
-- 继任 worktree：`pending`。
+- 继任 Controller task：`019f751c-75c3-7e52-9af1-28db9dad4463`。
+- 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\5106\生图插件`。
 - 计划继任分支：`codex/routego-controller-g5`。
-- 权威交接提交：本文件所在的 G4 治理提交；真实 SHA 由 `[CONTROLLER_SUCCESSOR_REGISTERED]` 提供。
+- 权威交接提交：`01186e733b7ec6f63785ddd4e9b6aa1128f03462`。
+- Registration 提交：本次登记提交；真实 SHA 由 `[CONTROLLER_SUCCESSOR_REGISTERED]` 提供。
 - 交接原因：Controller G4 与 Integration G2 均到第 4 次可观测压缩。任务 3.1 已完成独立验收，下一项 3.2 是新的大型原子任务，必须先完成 Controller G5 接管，再由 G5 注册和激活 Integration G3。
 
 ## Integration 当前冻结状态
