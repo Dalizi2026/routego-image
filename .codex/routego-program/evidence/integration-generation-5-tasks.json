@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "fe70521d9f1eecc3be50c3c2b461338672bb4e5e70f860a58523f8dd18e6e197",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "generation": 5,
+  "sourceActivationHead": "fb35d1261dd6da5116e0bed36d936adbd01082a5",
+  "handoffCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
+  "openspecProgress": "17/29",
+  "gitClean": true,
+  "observableCompactions": 4,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|7ba03291adf26c28ac84abfe8cd5a8f5794ea089|context-compaction-4-during-task-4.2-lane-checkpoint-before-commit|17/29",
+  "externalStateAuthorized": false,
+  "tasks": [
+    {
+      "taskId": "4.2",
+      "phaseAPlanningCommit": "8353f3b5024ffcf96c5c71adaa93bac53d93da57",
+      "phaseAImplementationCommit": "6da30fb3d0a7920120c8f565697370d79a02e2d9",
+      "pd010PlanningCommit": "1f476a3c34bb8ae7eaaf460957e6192c2a031567",
+      "hostCorrectionImplementationCommit": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
+      "phaseBImplementationCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
+      "taskStateCommit": "7ba03291adf26c28ac84abfe8cd5a8f5794ea089",
+      "checkpointCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
+      "files": [
+        "packages/integration/src/composition/service.ts",
+        "packages/integration/test/service.test.ts",
+        "packages/integration/src/runtime/http-host.ts",
+        "packages/integration/test/http-host.test.ts",
+        "packages/integration/src/runtime/routes.ts",
+        "packages/integration/src/runtime/stream-route.ts",
+        "packages/integration/test/routes.test.ts",
+        "packages/integration/test/stream-route.test.ts"
+      ],
+      "verification": "Controller independently accepted focused route, stream and real HTTP-host regressions; Integration typecheck, 181/181 tests and build; Studio gateway regressions; root typecheck, build and 747/747 tests; seven-package exports; strict OpenSpec 19/19; repository safety 453; exact phase, task-state and lane-checkpoint scopes; and clean Git.",
+      "governanceCorrection": "PD-009 repaired the task-3.5 nested failed-result projection root. PD-010 repaired HTTP-host disconnect cleanup under response backpressure. PD-011 truthfully promoted the immutable exact-four-file WIP commit after post-host verification instead of manufacturing an empty or artificial replacement commit.",
+      "blockers": [],
+      "residualRisk": "Task 4.3 must add only the MCP process and CLI boundary around the accepted service and HTTP lifecycle; packaging, installation and real relay acceptance remain later tasks and approval gates."
+    }
+  ],
+  "relatedDecisions": [
+    ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+    ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+    ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
+    ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md",
+    ".codex/routego-program/deviations/PD-011-task-4.2-immutable-wip-promotion.md"
+  ]
+}
