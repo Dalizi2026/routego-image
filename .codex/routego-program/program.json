@@ -215,7 +215,7 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. Controller G4 is now at observable compaction 4 and may complete only the current task-3.1 review/correction plus successor handoff preparation; it must not activate task 3.2. Integration generation 2 remains at compaction 3 and may perform only the bounded task-3.1 review correction. After corrected 3.1 acceptance, fresh Controller and Integration successor governance is required before the large task 3.2. No real network, credentials, billable probe or other external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. Controller G4 and Integration generation 2 are both now at observable compaction 4. Each may complete only the current bounded task-3.1 semantic probe correction and successor handoff preparation; neither may activate or begin task 3.2. After corrected 3.1 acceptance, fresh Controller and Integration successor registration, acceptance and activation governance is required before the large task 3.2. No real network, credentials, billable probe or other external authority is added.",
     "currentTaskActivation": {
       "messageType": "INTEGRATION_TASK_3_1_REVIEW_CORRECTION_REQUIRED",
       "taskId": "3.1",
@@ -228,15 +228,33 @@
         "packages/integration/src/provider/probes.ts",
         "packages/integration/test/provider.test.ts"
       ],
-      "observableCompactions": 3,
-      "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-3-after-task-3.1-activation-before-implementation",
-      "healthAudit": "commit lineage, exact five-file implementation scope, Integration 33/33, typecheck, dependency-order build, safety 405, strict OpenSpec 19/19 and clean Git passed; semantic review failed because several declared exact capability probes do not materially exercise or conclusively validate the named capability",
+      "observableCompactions": 4,
+      "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-4-during-task-3.1-review-correction-before-edits",
+      "healthAudit": "Integration G2 reread the complete authority/apply context at clean HEAD 5963a2a2c4fc18b7d0a0b2c219d336efb9b0c36f and confirmed exact two-file correction scope, OpenSpec 11/29, direct-reporting contract and external safety. Compaction 4 pre-handoff permits finishing only this correction and handoff preparation.",
       "gitClean": true,
       "task3_1Locked": true,
       "task3_1CorrectionAuthorized": true,
       "task3_2Locked": true,
       "reportingFallbackMinutes": 15,
       "externalStateAuthorized": false
+    },
+    "lastHealthCheckpoint": {
+      "messageType": "INTEGRATION_CONTEXT_HEALTH_CHECKPOINT",
+      "workerThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+      "reportedHead": "5963a2a2c4fc18b7d0a0b2c219d336efb9b0c36f",
+      "openspecProgress": "11/29",
+      "observableCompactions": 4,
+      "lastCompactionFingerprint": "2026-07-18-generation-2-compaction-4-during-task-3.1-review-correction-before-edits",
+      "authorizedWork": "task 3.1 semantic exact-probe review correction only",
+      "allowedFiles": [
+        "packages/integration/src/provider/probes.ts",
+        "packages/integration/test/provider.test.ts"
+      ],
+      "task3_2Locked": true,
+      "gitClean": true,
+      "externalStateTouched": false,
+      "controllerReceived": true,
+      "controllerReadBackConfirmed": true
     },
     "lastDirectCheckpoint": {
       "messageType": "INTEGRATION_TASK_CHECKPOINT",
