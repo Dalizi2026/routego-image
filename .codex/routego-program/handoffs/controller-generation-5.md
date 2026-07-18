@@ -8,7 +8,9 @@
 - 继任 worktree：`C:\Users\MLTZ\.codex\worktrees\5106\生图插件`。
 - 计划继任分支：`codex/routego-controller-g5`。
 - 权威交接提交：`01186e733b7ec6f63785ddd4e9b6aa1128f03462`。
-- Registration 提交：本次登记提交；真实 SHA 由 `[CONTROLLER_SUCCESSOR_REGISTERED]` 提供。
+- Registration 提交：`c468285fefb3a531ebdfd5517975200ac84c1e92`。
+- 接管状态：G5 已在 clean `codex/routego-controller-g5` HEAD `c468285fefb3a531ebdfd5517975200ac84c1e92` 完成全部强制读取、身份、Integration、OpenSpec、自动化和 Git 审计，并通过真实消息向 G4 回传 `[CONTROLLER_HANDOFF_ACCEPTED]`；G4 已回读收到。
+- 权威激活：包含本清单、`program.json`、`controller.json` 和当前 Integration 交接状态更新的后续治理提交切换权威 Controller 到 G5；完整 SHA 通过 `[CONTROLLER_ACTIVATION_GOVERNANCE]` 传递。
 - 交接原因：Controller G4 与 Integration G2 均到第 4 次可观测压缩。任务 3.1 已完成独立验收，下一项 3.2 是新的大型原子任务，必须先完成 Controller G5 接管，再由 G5 注册和激活 Integration G3。
 
 ## Integration 当前冻结状态
@@ -16,10 +18,11 @@
 - 当前唯一 apply owner：Integration generation 2 task `019f743d-a9e1-7752-b797-c0af436183ab`。
 - worktree：`C:\Users\MLTZ\.codex\worktrees\83b9\生图插件`。
 - branch：`codex/routego-integration-g2`。
-- clean HEAD：`d974cb0d16b7e14ca0766392c7d52356b4967d3c`。
+- 已接受产品 HEAD：`d974cb0d16b7e14ca0766392c7d52356b4967d3c`。
+- 当前 clean 治理 HEAD：`3f1878bbe2e5dc2680b92422a43160bc1cac8802`，只新增 `integration-generation-3.md` 并更新 `integration.json`，没有产品或 OpenSpec 改动。
 - OpenSpec：`11/29`；已完成并由 Controller 接受 `1.1-1.5`、`2.1-2.5`、`3.1`。
 - 下一任务：`3.2`，严格锁定；不得读取其实现范围后开始编辑、暂存或提交。
-- G2 observableCompactions=`4`，只允许准备 `.codex/routego-program/handoffs/integration-generation-3.md` 与更新 `integration.json`；不得修改产品或 OpenSpec。
+- G2 observableCompactions=`5`，generation-3 交接已准备完成并冻结；不得修改产品或 OpenSpec，也不得自行创建或激活 G3。
 - G2 的最终 3.1 修正链：原实现 `d952c533be007ea54a6f836ea0e8bcfb6f9be510`；精确能力证明 `69fbc5b1c2c3ccecdf853971f4c86c84383f5362`；PNG 预解码边界 `0e3764d92e47cb1df31d07a5ff7c0821ae709b3b`；8 位非交错解码器配置 `f7196e3f77a7aaed59e9ea4390e4655066b3e584`；最终 task-state `9e8ec8463196e5f34b07b4372ed61787ffa44c39`；最终 thread-state `d974cb0d16b7e14ca0766392c7d52356b4967d3c`。
 - 独立验收：Integration 72/72、Integration typecheck、依赖顺序 build、repository safety 405、OpenSpec strict 19/19、精确提交链/范围、Git clean 全部通过。
 
@@ -39,6 +42,13 @@
 - 主链：当前 Integration apply owner 每完成 OpenSpec 任务、任务组、安全 checkpoint、阻塞、偏差、交接、activation 或 delivery，立即真实 `send_message_to_thread` 到 program.json 当前 Controller，并调用 `read_thread` 确认送达。
 - 兜底链：`routego-program-continuity` 每 15 分钟只检查漏报，以 `integrationReadiness.lastDirectCheckpoint` 去重，并归档自身完成的运行任务；它不是主完成渠道。
 - Controller G5 与 Integration G3 的创建提示、registration、handoff acceptance、controller/sole-owner activation 都必须重复并明确确认本契约。不得假设 heartbeat 自动继承；final 标签不算送达。
+
+## G5 接管审计结果
+
+- 真实身份：task `019f751c-75c3-7e52-9af1-28db9dad4463`，worktree `C:\Users\MLTZ\.codex\worktrees\5106\生图插件`，branch `codex/routego-controller-g5`。
+- 独立复验：Integration `72/72`、typecheck、contracts/foundation/mock-relay/creation/library/studio/integration 依赖顺序 build、OpenSpec strict `19/19` 均通过。
+- 安全计数：当前 G2 交接 HEAD 为 406 个跟踪文件，比已接受产品 HEAD 的 405 只多一份 generation-3 交接 Markdown，差异已解释且 Git clean。
+- 激活后权限：G5 只可创建和登记 Integration G3；G3 接受交接前不得归档 G2，G2 归档和 sole-owner activation 前不得解锁或开始任务 3.2。
 
 ## 持续安全边界
 

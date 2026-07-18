@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "controller-generation-5-registered-awaiting-acceptance-task-3.1-accepted-integration-generation-2-frozen",
+  "status": "controller-generation-5-active-integration-generation-3-registration-pending-task-3.2-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -26,15 +26,18 @@
     "successorGeneration": 5,
     "successorWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
     "plannedSuccessorBranch": "codex/routego-controller-g5",
-    "registrationCommit": null,
-    "state": "successor-registered-awaiting-acceptance",
+    "registrationCommit": "c468285fefb3a531ebdfd5517975200ac84c1e92",
+    "activationParent": "2fd55378a08479050ee3847b352a731ca21fb200",
+    "activationCommitSemantics": "The Git commit containing this record activates Controller generation 5 and cannot self-reference its own SHA; the full SHA is delivered through the direct CONTROLLER_ACTIVATION_GOVERNANCE message.",
+    "state": "successor-accepted-controller-generation-5-authoritative-integration-generation-3-registration-pending",
     "integrationGeneration2Frozen": true,
     "task3_2Locked": true,
-    "reportingContractAcknowledgementRequired": true
+    "integrationGeneration3RegistrationAuthorized": true,
+    "reportingContractAcknowledged": true
   },
   "laneContinuityPolicy": {
     "silentIdleForbidden": true,
-    "controllerThreadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
+    "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
     "requiredBeforeIncompleteIdle": [
       "LANE_CHECKPOINT",
       "BLOCKED",
@@ -155,8 +158,8 @@
     "libraryPredecessorThreadId": "019f71ed-2149-73c2-851d-368a54c1ed5b",
     "studioThreadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
     "studioPredecessorThreadId": "019f7245-f614-7911-9ea1-c974cd82fa35",
-    "integrationThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
-    "integrationPredecessorThreadId": "019f72fd-fb6f-7b52-b383-03471f42f05a"
+    "integrationThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
+    "integrationPredecessorThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d"
   },
   "laneCompletions": {
     "creation": {
@@ -207,7 +210,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-task-3.1-accepted-integration-generation-2-frozen-controller-generation-5-handoff-pending",
+    "status": "offline-apply-generation-2-frozen-generation-3-handoff-ready-controller-generation-5-active-task-3.2-locked",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -215,7 +218,8 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
+    "integrationHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+    "integrationAcceptedProductHead": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
     "integrationThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
     "integrationGeneration": 2,
     "integrationWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\83b9\\生图插件",
@@ -230,7 +234,7 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. Controller G4 and Integration generation 2 are both at compaction 4. Corrected task 3.1 is independently accepted at clean HEAD d974cb0d16b7e14ca0766392c7d52356b4967d3c. G2 is frozen and may prepare only the Integration generation-3 handoff; G4 is frozen to Controller generation-5 registration/acceptance/activation governance. Task 3.2 remains prohibited until G5 is authoritative and then registers, accepts and activates Integration G3. No real network, credentials, billable probe or other external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. Controller G5 is authoritative after complete acceptance and independent re-verification. Integration generation 2 is frozen at governance-only handoff HEAD 3f1878bbe2e5dc2680b92422a43160bc1cac8802 with accepted product checkpoint d974cb0d16b7e14ca0766392c7d52356b4967d3c and observable compaction 5. G5 may only create and register Integration generation 3 next. G2 remains the frozen sole apply owner until G3 accepts the handoff and G2 is archived; task 3.2 remains locked until explicit G3 sole-owner activation. No real network, credentials, billable probe or other external authority is added.",
     "currentTaskActivation": {
       "messageType": "INTEGRATION_TASK_3_1_ACCEPTED_PREPARE_GENERATION_3_HANDOFF",
       "taskId": "3.1",
@@ -273,12 +277,12 @@
       "controllerReadBackConfirmed": true
     },
     "lastDirectCheckpoint": {
-      "messageType": "INTEGRATION_TASK_CHECKPOINT",
+      "messageType": "INTEGRATION_GENERATION_3_HANDOFF_READY",
       "workerThreadId": "019f743d-a9e1-7752-b797-c0af436183ab",
-      "completedTask": "3.1-accepted",
-      "nextTask": "3.2-locked-pending-controller-g5-and-integration-g3-governance",
-      "reportedHead": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
-      "checkpointCommit": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
+      "completedTask": "3.1-accepted-and-generation-3-handoff-prepared",
+      "nextTask": "3.2-locked-pending-integration-generation-3-registration-acceptance-archive-and-sole-owner-activation",
+      "reportedHead": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+      "checkpointCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
       "registrationCommit": "2935972129c581fc653b3f27878fd6ba5f5fa6c0",
       "planningCommit": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
       "implementationCommit": "d952c533be007ea54a6f836ea0e8bcfb6f9be510",
@@ -287,16 +291,22 @@
       "pngBoundCorrectiveImplementationCommit": "0e3764d92e47cb1df31d07a5ff7c0821ae709b3b",
       "decoderProfileCorrectiveImplementationCommit": "f7196e3f77a7aaed59e9ea4390e4655066b3e584",
       "taskStateCommit": "9e8ec8463196e5f34b07b4372ed61787ffa44c39",
-      "threadStateCommit": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
+      "threadStateCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
+      "acceptedProductCheckpoint": "d974cb0d16b7e14ca0766392c7d52356b4967d3c",
+      "handoffFile": ".codex/routego-program/handoffs/integration-generation-3.md",
+      "plannedSuccessorGeneration": 3,
+      "plannedSuccessorBranch": "codex/routego-integration-g3",
+      "successorThreadId": "pending",
+      "successorWorktree": "pending",
       "openspecProgress": "11/29-accepted",
       "gitState": "clean; no staged or untracked files",
-      "observableCompactions": 4,
-      "stopReason": "Corrected task 3.1 independently accepted; Integration G2 is frozen for generation-3 handoff preparation and task 3.2 remains locked until Controller G5 and Integration G3 governance completes",
+      "observableCompactions": 5,
+      "stopReason": "Integration G2 completed the governance-only generation-3 handoff and is frozen; Controller G5 is authoritative and may register G3, but task 3.2 remains locked until acceptance, G2 archival and explicit sole-owner activation",
       "controllerReceived": true,
       "controllerReadBackConfirmed": true,
       "controllerAccepted": true,
       "reviewFinding": "Final correction restricts provider capability-proof PNGs to validated 8-bit non-interlaced paths before PNG.sync.read, preserving exact IHDR/CRC/dimension/pixel/RGBA bounds and preventing the 16-bit intermediate-buffer and interlaced unbounded-inflate paths. The earlier false-support and decompression-memory findings are closed.",
-      "acceptedByControllerMessage": "INTEGRATION_TASK_3_1_ACCEPTED_PREPARE_GENERATION_3_HANDOFF",
+      "acceptedByControllerMessage": "CONTROLLER_GENERATION_5_ACTIVATED_INTEGRATION_GENERATION_3_REGISTRATION_ONLY",
       "exactImplementationFiles": [
         "packages/integration/src/provider/probes.ts",
         "packages/integration/test/provider.test.ts"
