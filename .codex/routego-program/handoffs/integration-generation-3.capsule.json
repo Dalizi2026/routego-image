@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "753becebd47b3d3080bd1f39f4f4b42bed0a03763eb1c9ffeb58861491cfda78",
+  "capsuleSha256": "66cd3d5b39f67f924384e02ccad202fb2d9c92571d3e4263392026cc321c6641",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,18 +22,18 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
     "plannedBranch": "codex/routego-integration-g3",
     "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "registrationStatus": "activated-sole-owner-task-3.2-unlocked",
+    "registrationStatus": "activated-sole-owner-task-3.3-unlocked-not-started",
     "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
     "registrationCommitSemantics": "The registration commit is recorded after a fresh successor task/worktree exists; a containing commit cannot self-reference its own SHA."
   },
   "currentState": {
     "openspecTotal": 29,
-    "openspecCompleted": 11,
-    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1"],
-    "nextTaskId": "3.2",
+    "openspecCompleted": 12,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2"],
+    "nextTaskId": "3.3",
     "taskCapsule": {
-      "path": ".codex/routego-program/tasks/integration-3.2.json",
-      "sha256": "6db330720645620330f8f5f4f4cce278420b08807b0ae11eb760e711590e8b15"
+      "path": ".codex/routego-program/tasks/integration-3.3.json",
+      "sha256": "6da6403e963d62a36d2e5e04d467d67773393176ce4767c8b7a093883bc31420"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
@@ -44,6 +44,11 @@
       "path": ".codex/routego-program/evidence/integration-generation-2-tasks.json",
       "sha256": "1c43569d3422f8bb1e25c1f8c77ec7c2339deda9615f2b1e21156e7b3ccacfb7",
       "taskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1"]
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-3-tasks.json",
+      "sha256": "eb4519925095d08b6942dab6a214c4585adacb9c2da3bbed49f748977a276c9d",
+      "taskIds": ["3.2"]
     }
   ],
   "authority": {
@@ -64,7 +69,8 @@
   "context": {
     "sourceObservableCompactions": 5,
     "sourceCompactionFingerprint": "2026-07-18-generation-2-compaction-5-after-task-3.1-acceptance-during-generation-3-handoff-preparation",
-    "successorObservableCompactions": 0,
+    "successorObservableCompactions": 1,
+    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|57d2957789037945e423ac0417835b12acc132da|context-compaction-1-during-task-3.2|11/29",
     "handoffAcceptanceCompactionLimit": 0,
     "failureLabel": "HANDOFF_CONTEXT_BUDGET_FAILED"
   },
@@ -86,10 +92,10 @@
       ".codex/routego-program/program.json",
       ".codex/routego-program/threads/integration.json",
       ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
-      ".codex/routego-program/tasks/integration-3.2.json",
+      ".codex/routego-program/tasks/integration-3.3.json",
       "openspec/changes/integrate-routego-image-plugin/specs/integrated-local-routego-service/spec.md",
+      "openspec/specs/durable-image-library/spec.md",
       "openspec/specs/shared-image-contracts/spec.md",
-      "openspec/specs/provider-response-processing/spec.md",
       ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
       ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
       ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
@@ -97,7 +103,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 91453,
+    "expectedNormalizedUtf8Bytes": 95741,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
@@ -119,7 +125,7 @@
       "directed expansion cannot restore authority",
       "explicit user request"
     ],
-    "contextBudgetFailure": "If any observable compaction occurs before handoff acceptance, send HANDOFF_CONTEXT_BUDGET_FAILED; do not activate successor, keep predecessor as owner, keep task 3.2 locked, shrink the capsule/state and create a fresh successor if needed."
+    "contextBudgetFailure": "If any observable compaction occurs before handoff acceptance, send HANDOFF_CONTEXT_BUDGET_FAILED; do not activate successor, keep predecessor as owner, keep the next product task locked, shrink the capsule/state and create a fresh successor if needed."
   },
   "safety": {
     "noProductOrOpenSpecEditsBeforeActivation": true,

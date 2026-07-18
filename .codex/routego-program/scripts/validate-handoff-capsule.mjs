@@ -227,12 +227,29 @@ if (taskCapsule) {
     }
   }
 
+  const allowedParentDirectoriesToCreate = new Set(
+    (taskCapsule.allowedParentDirectoriesToCreate ?? []).map(normalizePath),
+  );
+  for (const newParent of allowedParentDirectoriesToCreate) {
+    const existingAncestor = dirname(newParent);
+    try {
+      git(["cat-file", "-e", taskCapsule.sourceCommit + ":" + existingAncestor]);
+    } catch {
+      fail("declared new allowed parent has missing ancestor: " + existingAncestor);
+    }
+    if (!taskCapsule.allowedFiles.some((allowed) => dirname(normalizePath(allowed)) === newParent)) {
+      fail("declared new allowed parent is unused: " + newParent);
+    }
+  }
+
   for (const allowed of taskCapsule.allowedFiles) {
     const parent = dirname(normalizePath(allowed));
     try {
       git(["cat-file", "-e", taskCapsule.sourceCommit + ":" + parent]);
     } catch {
-      fail("allowed file parent is missing at source commit: " + parent);
+      if (!allowedParentDirectoriesToCreate.has(parent)) {
+        fail("allowed file parent is missing at source commit: " + parent);
+      }
     }
     for (const forbidden of taskCapsule.forbiddenFileGlobs) {
       if (pathOverlap(allowed, forbidden)) {

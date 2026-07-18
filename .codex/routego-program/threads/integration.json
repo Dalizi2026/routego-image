@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-3-active-sole-apply-owner-task-3.2-unlocked-not-started",
+  "status": "generation-3-active-sole-apply-owner-task-3.2-accepted-task-3.3-unlocked-not-started",
   "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
   "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
@@ -12,11 +12,11 @@
   "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
   "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
   "incorporationCommit": "12169d245d4f124f796ba137e1cb6410d5c7dff9",
-  "currentHead": "12169d245d4f124f796ba137e1cb6410d5c7dff9",
+  "currentHead": "3ffd36a91402f58a7492905a706868c2874ba93d",
   "gitCleanAtRegistration": true,
   "gitClean": true,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|57d2957789037945e423ac0417835b12acc132da|context-compaction-1-during-task-3.2|11/29",
   "soleApplyOwner": true,
   "frozen": false,
   "applyAuthorized": true,
@@ -36,14 +36,14 @@
   },
   "openspec": {
     "totalTasks": 29,
-    "completedTasks": 11,
-    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1"],
-    "nextTaskId": "3.2",
+    "completedTasks": 12,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2"],
+    "nextTaskId": "3.3",
     "nextTaskLocked": false
   },
   "currentTask": {
-    "id": "3.2",
-    "capsule": ".codex/routego-program/tasks/integration-3.2.json",
+    "id": "3.3",
+    "capsule": ".codex/routego-program/tasks/integration-3.3.json",
     "activationStatus": "unlocked-sole-owner-authorized-not-started"
   },
   "handoff": {
@@ -54,15 +54,30 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|12169d245d4f124f796ba137e1cb6410d5c7dff9|generation-3-handoff-accepted|11/29",
-    "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
-    "completedTaskId": "3.1",
-    "nextTaskId": "3.2",
-    "reportedHead": "12169d245d4f124f796ba137e1cb6410d5c7dff9",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|3ffd36a91402f58a7492905a706868c2874ba93d|task-3.2-complete-controller-accepted|12/29",
+    "messageType": "INTEGRATION_TASK_COMPLETED",
+    "completedTaskId": "3.2",
+    "nextTaskId": "3.3",
+    "reportedHead": "3ffd36a91402f58a7492905a706868c2874ba93d",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true
+  },
+  "latestTaskCompletion": {
+    "taskId": "3.2",
+    "implementationCommit": "11cae33251f996d6410f7953ce50af1c43ffd7fe",
+    "taskStateCommit": "be938689f6552f67dcf9f048fa23a2f0757fda64",
+    "checkpointCommit": "3ffd36a91402f58a7492905a706868c2874ba93d",
+    "controllerAccepted": true,
+    "files": [
+      "packages/integration/src/image/materialize.ts",
+      "packages/integration/src/image/chromakey.ts",
+      "packages/integration/src/runtime/ephemeral-resources.ts",
+      "packages/integration/test/image.test.ts"
+    ],
+    "verification": "Controller independently passed typecheck, 102/102 tests, build, strict OpenSpec, repository safety 424, exact scopes and clean Git.",
+    "externalStateTouched": false
   },
   "reportingContract": {
     "primary": "send_message_to_thread plus read_thread after every task/group/checkpoint/blocker/deviation/handoff/activation/delivery",
@@ -88,6 +103,7 @@
   },
   "evidence": {
     "completedTasks": ".codex/routego-program/evidence/integration-generation-2-tasks.json",
+    "generation3Tasks": ".codex/routego-program/evidence/integration-generation-3-tasks.json",
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "externalApprovalGates": ["7.2", "8.2", "9.1"],

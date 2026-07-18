@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "6da6403e963d62a36d2e5e04d467d67773393176ce4767c8b7a093883bc31420",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "3.3",
+  "status": "authorized-for-integration-generation-3-sole-apply-owner-not-started",
+  "sourceCommit": "3ffd36a91402f58a7492905a706868c2874ba93d",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "2f538633683d84c17291448f3d2a10a4f930ad676a0ab5e70f99316ecef1c3f3",
+    "lineSha256": "0759f3174620b02f98730dafd289ebb257fe2e324147a0b4759dc620faaa4a51",
+    "lineBytes": 979
+  },
+  "dependencies": ["1.2", "3.1"],
+  "allowedFiles": [
+    "packages/integration/src/composition/inputs.ts",
+    "packages/integration/src/composition/graph.ts",
+    "packages/integration/test/inputs.test.ts"
+  ],
+  "allowedParentDirectoriesToCreate": [
+    "packages/integration/src/composition"
+  ],
+  "allowedFileMode": "create-or-modify exactly the three allowed files; only packages/integration/src/composition may be created as their missing parent directory",
+  "forbiddenFileGlobs": [
+    "packages/library/**",
+    "packages/creation/**",
+    "packages/contracts/**",
+    "packages/integration/src/image/**",
+    "packages/integration/src/provider/**",
+    "packages/integration/src/runtime/**",
+    "packages/integration/src/composition/results.ts",
+    "packages/integration/src/composition/service.ts",
+    "openspec/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "**/binding.gyp"
+  ],
+  "requiredBehavior": [
+    "Resolve ordered Studio asset, artifact and upload locators only through RoutegoLibraryService and upload ownership; never pass unresolved locators to Creation.",
+    "Preserve target, reference, supporting and mask order, role and optional label exactly; bind any mask only to target slot zero.",
+    "Support text-only generation without creating physical inputs, and enforce the exact 16 physical image plus optional mask boundary.",
+    "Validate upload purpose, lifecycle and contained verified metadata; fail closed on expired, consumed, missing, corrupt, ambiguous or inconsistent locators before any provider call.",
+    "Allocate operation and source artifact identities deterministically and construct the durable relationship plan without persisting outputs in this task.",
+    "Construct the exact internal path-based Creation request using only verified contained paths, including continuation previous-output intent without leaking Studio locators or public paths."
+  ],
+  "verification": [
+    "openspec instructions apply --change integrate-routego-image-plugin --json",
+    "pnpm --filter @routego-image/integration typecheck",
+    "pnpm --filter @routego-image/integration test",
+    "pnpm --filter @routego-image/integration build",
+    "text-only and mixed target/reference/supporting/mask cases",
+    "exact order, role, label, ownership and mask-slot-zero cases",
+    "existing asset/artifact versus upload resolution cases",
+    "expired, consumed, missing, corrupt and inconsistent locator failures with zero provider calls",
+    "continuation previous-output, 16-plus-mask and bounds cases",
+    "node scripts/check-repository-safety.mjs",
+    "git diff --check",
+    "exact three-file scope plus only the declared composition parent directory"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/integrated-local-routego-service/spec.md",
+      "sha256": "78ead55b0295fe044e3552f62f625c1393f8a7fb7191761140cb2186284aa6ac",
+      "bytes": 10837,
+      "reason": "Direct Integration requirements for resolving Studio locators before Creation execution."
+    },
+    {
+      "path": "openspec/specs/durable-image-library/spec.md",
+      "sha256": "fd6c83475768d097b1e37766702b39914e27eefb43156ac2850f91a24d964a82",
+      "bytes": 8058,
+      "reason": "Frozen Library upload lifecycle, locator resolution, containment and ownership boundary."
+    },
+    {
+      "path": "openspec/specs/shared-image-contracts/spec.md",
+      "sha256": "ee211f7caff8be45fadc1717fca141baf306d0d3953fd0cd34fef037ac0c2e39",
+      "bytes": 21363,
+      "reason": "Frozen ordered Studio input roles, mask slot zero, path-free locators and relationship contracts."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "activation": {
+    "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "controllerGeneration": 5,
+    "integrationThreadId": "019f7557-3836-7822-82ab-1e850e4cf157",
+    "integrationGeneration": 3,
+    "acceptedPreviousTaskImplementationCommit": "11cae33251f996d6410f7953ce50af1c43ffd7fe",
+    "acceptedPreviousTaskCheckpointCommit": "3ffd36a91402f58a7492905a706868c2874ba93d",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "started": false
+  },
+  "unresolvedIssues": [],
+  "knownRisks": [
+    "The new composition parent directory is authorized only for inputs.ts and graph.ts; later composition files remain forbidden.",
+    "No provider request, output persistence, HTTP/MCP wiring or public schema change belongs to task 3.3."
+  ],
+  "externalStateAuthorized": false
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "eb4519925095d08b6942dab6a214c4585adacb9c2da3bbed49f748977a276c9d",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "generation": 3,
+  "sourceActivationHead": "57d2957789037945e423ac0417835b12acc132da",
+  "openspecProgress": "12/29",
+  "gitClean": true,
+  "externalStateAuthorized": false,
+  "tasks": [
+    {
+      "taskId": "3.2",
+      "implementationCommit": "11cae33251f996d6410f7953ce50af1c43ffd7fe",
+      "taskStateCommit": "be938689f6552f67dcf9f048fa23a2f0757fda64",
+      "checkpointCommit": "3ffd36a91402f58a7492905a706868c2874ba93d",
+      "files": [
+        "packages/integration/src/image/materialize.ts",
+        "packages/integration/src/image/chromakey.ts",
+        "packages/integration/src/runtime/ephemeral-resources.ts",
+        "packages/integration/test/image.test.ts"
+      ],
+      "verification": "Fresh OpenSpec apply reported 12/29; Controller independently passed Integration typecheck, 102/102 tests, build, strict OpenSpec, repository safety 424, git diff checks, exact four-file scope and clean Git.",
+      "rootCause": "Final review found same-path orphan cleanup could confuse a replacement record with the record whose asynchronous deletion completed.",
+      "finalCorrection": "Use unique orphan record identity and identity-guarded subtraction, with deterministic same-path replacement and concurrent cleanup regressions.",
+      "blockers": [],
+      "residualRisk": "The reproduced replacement schedule is covered; not every theoretical scheduler permutation is exhaustively enumerated."
+    }
+  ],
+  "relatedDecisions": [
+    ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+    ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+    ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
+  ]
+}
