@@ -50,7 +50,8 @@
     "directStructuredMessagesRemainPrimary": true,
     "dualPathCompletionReporting": {
       "primary": "The active Integration apply owner must immediately call send_message_to_thread after every completed OpenSpec task, task group, clean checkpoint, blocker, deviation, handoff, activation, or delivery event, then call read_thread to confirm receipt by the authoritative Controller task.",
-      "fallback": "The project-level continuity automation checks every 10 minutes for progress or HEAD changes lacking a matching direct Controller message and requests an immediate catch-up report.",
+      "fallback": "The project-level continuity automation checks every 15 minutes for progress or HEAD changes lacking a matching direct Controller message and requests an immediate catch-up report.",
+      "automationIntervalMinutes": 15,
       "successorInheritance": "Every successor created after the fifth observable compaction or an early health handoff must receive this full reporting contract in its creation prompt, registration, acceptance, and sole-owner activation. Acceptance is invalid until the successor acknowledges the contract.",
       "finalAnswerAloneIsInsufficient": true,
       "automationIsFallbackOnly": true,
