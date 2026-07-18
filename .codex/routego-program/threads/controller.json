@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-integration-task-2.1-paused-plan-deviation-generation-4",
+  "status": "active-integration-task-1.5-generation-4",
   "threadId": "019f73d0-1bf4-73c2-8ca9-e28370d34595",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1756\\生图插件",
   "branch": "codex/routego-controller-g4",
   "startingCommit": "e8b96e3685b939843d9029657bd2108116a38b03",
   "registrationCommit": "c292c2d461ed33000d7f154edba04908f36eedce",
-  "headCommit": "85c3276d6c5dcf03903362c5ba1daa3ee07de9fb",
+  "headCommit": "6b1a9d3bb65fb85f1a617ac2d1c141fb9fb49c4f",
   "headCommitSemantics": "Verified Controller HEAD immediately before the commit that writes this governance record; the containing Git commit cannot self-reference its own SHA.",
   "generation": 4,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "g4-compaction-1-plan-deviation-task-2.1-mock-primary-artifact-2026-07-18",
-  "lastHealthAudit": "passed-generation-4-compaction-1-authority-plan-deviation-and-integration-scope-audit",
+  "lastHealthAudit": "passed-generation-4-compaction-1-pd-007-planning-review-and-task-1.5-activation-audit",
   "successorThreadId": null,
   "predecessorThreadId": "019f7309-d473-74a2-934b-e81726d90a31",
   "predecessorGeneration": 3,
@@ -113,6 +113,7 @@
     "Controller generation 4 task 019f73d0-1bf4-73c2-8ca9-e28370d34595 accepted the handoff at clean branch codex/routego-controller-g4 HEAD c292c2d461ed33000d7f154edba04908f36eedce after complete authority, Integration task-1.4 lineage/scope/OpenSpec/strict/Git, automation and task-identity audits. G4 explicitly acknowledged that direct send_message_to_thread plus read_thread is primary, project automation is fallback only, and every successor must inherit the same contract. The authoritative Controller pointer is switched to G4 by the activation governance commit containing this state.",
     "PD-006 user-directed governance update is effective for every role: compactions 1-2 require audit, compaction 3 requires a Git checkpoint, compaction 4 is pre-handoff with no new large task, and compaction 5 requires a new thread/worktree; historical handoff records retain their original facts.",
     "Integration generation 1 health checkpoint 94a7870e2d9eb0bda14062b52e6f8a31bc520248 at observable compaction 2 was independently verified and accepted under PD-006. Its old third-compaction successor stop rule is superseded; the same sole apply owner may proceed only with task 2.1 and must directly report completion plus read-back.",
-    "G4 observable compaction 1 was audited with fresh authority reads. Integration task 2.1 is paused after reproducing a frozen baseline typecheck failure in packages/mock-relay/src/service/mock-service.ts:530 caused by the required primaryArtifactId contract field; PD-007 authorizes planning-only revision for a separate mock corrective task 1.5 before 2.1."
+    "G4 observable compaction 1 was audited with fresh authority reads. Integration task 2.1 is paused after reproducing a frozen baseline typecheck failure in packages/mock-relay/src/service/mock-service.ts:530 caused by the required primaryArtifactId contract field; PD-007 authorizes planning-only revision for a separate mock corrective task 1.5 before 2.1.",
+    "Integration planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 was independently verified as a direct child of checkpoint 94a7870e2d9eb0bda14062b52e6f8a31bc520248 with exactly four approved planning files, OpenSpec 4/29, next task 1.5, strict 19/19, unchanged packages/mock-relay, and preserved unstaged task-2.1 WIP. Task 1.5 is the only newly activated implementation scope."
   ]
 }

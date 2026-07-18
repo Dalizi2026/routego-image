@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "program": "routego-image-1.0",
-  "status": "controller-generation-4-active-integration-task-2.1-paused-plan-deviation",
+  "status": "controller-generation-4-active-integration-task-1.5",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -191,7 +191,7 @@
     }
   },
   "integrationReadiness": {
-    "status": "offline-apply-task-2.1-paused-for-pd-007-plan-update",
+    "status": "offline-apply-task-1.5-active-task-2.1-wip-preserved",
     "baselineCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
     "completedDependencies": [
       "add-routego-image-creation",
@@ -199,7 +199,7 @@
       "add-routego-studio"
     ],
     "verification": "frozen mainline passed strict 18/18, safety 367, full typecheck/build, 493 tests, seven exports, Playwright 6/6 plus core repeat, runtime/browser/security/archive and Git-clean audits",
-    "integrationHead": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
+    "integrationHead": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
     "planningHold": "Controller G3 accepted final planning delivery fbd051f42f9649d6c3d88687a6abe8edde99d38e after independent lineage, scope, 28-task, contract, lifecycle and strict 19/19 review. Offline apply tasks 1.1 through 7.1 and 8.1 are authorized in dependency order; tasks 7.2, 8.2 and 9.1 remain blocked on fresh explicit user approvals and completed external gates.",
     "reportedDeviations": [
       "durable uploaded-source relationships require independent review of the frozen Library contract/model/ingestion boundary",
@@ -209,20 +209,21 @@
     "planningCommitCandidate": "dd02ccfb03b53034afb9314de4fa8441a3846441",
     "planningDeliveryHead": "fbd051f42f9649d6c3d88687a6abe8edde99d38e",
     "planningReview": "approved-for-offline-apply; OpenSpec strict 19/19, 28 tasks at 0 complete, exact seven-tool/public-phase freeze, 17+12+4 bound, single stream route/state machine, session-capped partial lifetime and external approval gates verified",
-    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 1 audit passed. Integration generation 1 checkpoint 94a7870e2d9eb0bda14062b52e6f8a31bc520248 remains the committed baseline; task 2.1 is paused for PD-007 planning revision and no external authority is added.",
+    "continuityGate": "PD-006 is active for every role: compactions 1-2 require audit, 3 requires a Git checkpoint, 4 is pre-handoff, and 5 requires a new thread/worktree. G4 compaction 1 audit passed. PD-007 planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 was independently accepted at OpenSpec 4/29; only task 1.5 is active, task 2.1 WIP remains preserved and uncommitted, and no external authority is added.",
     "lastDirectCheckpoint": {
-      "messageType": "INTEGRATION_HEALTH_CHECKPOINT",
+      "messageType": "INTEGRATION_PLAN_UPDATE_READY",
       "workerThreadId": "019f737f-80f3-7cd2-a6c7-aaec1f017d8d",
       "completedTask": "1.4",
-      "nextTask": "2.1",
-      "reportedHead": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
+      "nextTask": "1.5",
+      "reportedHead": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
       "checkpointCommit": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
+      "planningCommit": "c1860f1a06f571a54e4f8c5b9122e0dfa77b5561",
       "implementationCommit": "34956e46182d7df8d7b5a6af98659ab2bb68f658",
       "taskStateCommit": "b54f8dcbc8f36fbb967e14b56b643ef9e25e590d",
-      "openspecProgress": "4/28",
+      "openspecProgress": "4/29",
       "controllerReceived": true,
       "controllerReadBackConfirmed": true,
-      "acceptedByControllerMessage": "INTEGRATION_HEALTH_CHECKPOINT_ACCEPTED_PD_006_TASK_2_1_CONTINUE"
+      "acceptedByControllerMessage": "INTEGRATION_PD_007_PLAN_ACCEPTED_TASK_1_5_ACTIVATED"
     },
     "activePlanDeviation": {
       "messageType": "PLAN_DEVIATION",
@@ -232,10 +233,14 @@
       "committedHead": "94a7870e2d9eb0bda14062b52e6f8a31bc520248",
       "openspecProgress": "4/28",
       "finding": "Frozen deterministic mock detail omits required primaryArtifactId; mock-relay, Creation, and root typecheck fail at the same source.",
-      "disposition": "Planning-only amendment: add task 1.5 with exact mock source/test files, make 2.1 depend on 1.5, then Controller review before implementation unlock.",
+      "disposition": "Accepted at planning commit c1860f1a06f571a54e4f8c5b9122e0dfa77b5561 after exact four-file scope, 4/29 status, 19/19 strict validation, unchanged mock implementation, and preserved task-2.1 WIP review. Task 1.5 only is activated.",
       "productFilesChanged": false,
       "externalStateTouched": false,
-      "controllerReceived": true
+      "controllerReceived": true,
+      "controllerReviewed": true,
+      "strictValidation": "19/19 passed",
+      "task1_5Authorized": true,
+      "task2_1HeldUntil1_5": true
     }
   },
   "automations": {
