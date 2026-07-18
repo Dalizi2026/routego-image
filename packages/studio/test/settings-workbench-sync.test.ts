@@ -193,7 +193,7 @@ describe("mounted workbench defaults synchronization", () => {
     const source = readFileSync(
       new URL("../src/features/creation/CreationWorkbench.tsx", import.meta.url),
       "utf8"
-    );
+    ).replace(/\r\n?/gu, "\n");
     const start = source.indexOf("useEffect(() => {\n    if (appliedDefaultsFingerprintRef.current");
     const end = source.indexOf("if (maskEditorOpen", start + 20);
     const seam = source.slice(start, end);
