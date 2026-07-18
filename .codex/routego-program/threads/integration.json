@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-3-active-sole-apply-owner-task-3.4-accepted-task-3.5-unlocked-not-started",
+  "status": "generation-3-frozen-sole-apply-owner-generation-4-registration-pending-task-3.5-locked",
   "controllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
   "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
@@ -17,11 +17,11 @@
   "latestContextCheckpointCommit": "3a275da06e435f6b2ce80d167a0e47a17e331725",
   "gitCleanAtRegistration": true,
   "gitClean": true,
-  "observableCompactions": 2,
-  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|c53821eec3a0a92fdc63de31ccddbc52c7370703|context-compaction-2-before-task-3.4-implementation|13/29",
+  "observableCompactions": 3,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc|context-compaction-3-after-task-3.4-before-task-3.5-activation|14/29",
   "soleApplyOwner": true,
-  "frozen": false,
-  "applyAuthorized": true,
+  "frozen": true,
+  "applyAuthorized": false,
   "externalStateAuthorized": false,
   "sourceOwner": {
     "threadId": "019f743d-a9e1-7752-b797-c0af436183ab",
@@ -41,12 +41,12 @@
     "completedTasks": 14,
     "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4"],
     "nextTaskId": "3.5",
-    "nextTaskLocked": false
+    "nextTaskLocked": true
   },
   "currentTask": {
     "id": "3.5",
     "capsule": ".codex/routego-program/tasks/integration-3.5.json",
-    "activationStatus": "unlocked-sole-owner-authorized-not-started"
+    "activationStatus": "locked-awaiting-generation-4-acceptance-and-sole-owner-activation"
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
@@ -80,6 +80,16 @@
     ],
     "verification": "Controller independently passed Integration typecheck, 151/151 tests and build, Library 164/164 tests, strict OpenSpec 19/19, repository safety 432, exact scopes and clean Git.",
     "externalStateTouched": false
+  },
+  "successor": {
+    "generation": 4,
+    "threadId": "pending",
+    "worktree": "pending",
+    "plannedBranch": "codex/routego-integration-g4",
+    "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+    "status": "controller-registration-pending-task-3.5-locked",
+    "applyAuthorized": false,
+    "observableCompactions": 0
   },
   "reportingContract": {
     "primary": "send_message_to_thread plus read_thread after every task/group/checkpoint/blocker/deviation/handoff/activation/delivery",

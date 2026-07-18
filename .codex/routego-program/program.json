@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "pd-008-active-integration-generation-3-sole-owner-task-3.5-unlocked-not-started",
+  "status": "pd-008-active-integration-generation-3-frozen-generation-4-registration-pending-task-3.5-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -72,43 +72,25 @@
     "acceptedProductCommit": "17208da376f71790561ae87e3d59b77287765b3b",
     "currentHead": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
     "soleApplyOwner": true,
-    "frozen": false,
-    "applyAuthorized": true,
+    "frozen": true,
+    "applyAuthorized": false,
     "gitClean": true
   },
   "successor": {
     "lane": "integration",
-    "generation": 3,
-    "status": "activated-sole-apply-owner-task-3.5-unlocked-not-started",
-    "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
-    "plannedBranch": "codex/routego-integration-g3",
-    "startingCommit": "3f1878bbe2e5dc2680b92422a43160bc1cac8802",
-    "registrationCommit": "3741896e20154699eaec0417a5ef511b4e71c73b",
-    "incorporationCommit": "12169d245d4f124f796ba137e1cb6410d5c7dff9",
-    "currentHead": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
-    "latestActivationIncorporationHead": "c53821eec3a0a92fdc63de31ccddbc52c7370703",
-    "latestContextCheckpointCommit": "3a275da06e435f6b2ce80d167a0e47a17e331725",
-    "gitClean": true,
-    "observableCompactions": 2,
-    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|c53821eec3a0a92fdc63de31ccddbc52c7370703|context-compaction-2-before-task-3.4-implementation|13/29",
-    "handoffAudit": {
-      "status": "accepted-after-deterministic-byte-fix",
-      "reportedStartupFiles": 12,
-      "reportedRawWorktreeUtf8Bytes": 90557,
-      "registeredRawWorktreeUtf8Bytes": 89769,
-      "rootCause": "The validator counted checkout-specific CRLF bytes, so identical Git content produced a false 788-byte mismatch across worktrees.",
-      "resolution": "Count normalized UTF-8 bytes after CRLF-to-LF conversion and require the capsule's exact normalized invariant.",
-      "handoffAccepted": true,
-      "selfActivationAttempted": false
-    },
-    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-3.capsule.json",
-    "invalidatedUnregisteredDraft": {
-      "threadId": "019f753a-3afc-7123-9631-181698e86db2",
-      "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\4add\\生图插件",
-      "status": "archived-superseded-by-pd-008-before-registration",
-      "applyOwner": false
-    }
+    "generation": 4,
+    "status": "controller-registration-pending-task-3.5-locked",
+    "threadId": null,
+    "worktree": null,
+    "plannedBranch": "codex/routego-integration-g4",
+    "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+    "registrationCommit": null,
+    "incorporationCommit": null,
+    "currentHead": null,
+    "gitClean": null,
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null,
+    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-4.capsule.json"
   },
   "currentChange": {
     "id": "integrate-routego-image-plugin",
@@ -121,8 +103,8 @@
     },
     "currentTask": {
       "capsule": ".codex/routego-program/tasks/integration-3.5.json",
-      "locked": false,
-      "activationAuthorized": true
+      "locked": true,
+      "activationAuthorized": false
     }
   },
   "latestDirectCheckpoint": {
@@ -197,8 +179,19 @@
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\1b58\\生图插件",
       "branch": "codex/routego-integration-g3",
       "acceptedHead": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
-      "status": "sole-apply-owner-task-3.5-unlocked-not-started"
+      "status": "frozen-sole-apply-owner-awaiting-generation-4-acceptance-task-3.5-locked"
     },
+    "registeredInactiveSuccessors": [
+      {
+        "lane": "integration",
+        "generation": 4,
+        "threadId": "pending",
+        "worktree": "pending",
+        "branch": "codex/routego-integration-g4",
+        "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+        "status": "controller-registration-pending"
+      }
+    ],
     "otherUnfinishedLanes": []
   },
   "history": {

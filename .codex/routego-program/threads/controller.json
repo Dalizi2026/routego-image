@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-authoritative-pd-008-integration-generation-3-sole-owner-task-3.5-unlocked-not-started",
+  "status": "active-authoritative-pd-008-integration-generation-3-frozen-generation-4-registration-pending-task-3.5-locked",
   "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\5106\\生图插件",
   "branch": "codex/routego-controller-g5",
@@ -15,7 +15,7 @@
   "observableCompactions": 3,
   "lastCompactionFingerprint": "g5-compaction-3-during-task-3.2-acceptance-and-3.3-activation-2026-07-18",
   "lastHealthAudit": {
-    "status": "passed-task-3.4-controller-independent-acceptance-task-3.5-activation-recorded",
+    "status": "passed-task-3.4-controller-independent-acceptance-generation-3-context-handoff-required",
     "controllerGitClean": true,
     "controllerHeadBeforeContainingCommit": "33305771a05ef72418bf894536557f44b845fcb9",
     "integrationGeneration2GitClean": true,
@@ -26,18 +26,18 @@
     "integrationGeneration3Task3_3Head": "941a119db3f2054da2bca97d6e0ccaa0188da991",
     "integrationGeneration3Task3_4Head": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
     "integrationGeneration3GitClean": true,
-    "integrationGeneration3ObservableCompactions": 2,
+    "integrationGeneration3ObservableCompactions": 3,
     "integrationGeneration2Archived": true,
     "openspecProgress": "14/29",
     "task3_4Accepted": true,
-    "task3_5Locked": false,
+    "task3_5Locked": true,
     "verification": "Implementation scope two files; task-state one OpenSpec file; governance one lane file; Integration typecheck, 151/151 tests and build, Library 164/164 tests, strict OpenSpec 19/19, safety 432, diff checks and clean Git passed."
   },
   "currentOperation": {
-    "id": "OpenSpec-3.5",
-    "state": "task-3.4-accepted-task-3.5-sole-owner-activation",
-    "allowedNext": "Integration G3 may begin and only begin OpenSpec task 3.5 after incorporating this activation governance and sending a read-back acknowledgement.",
-    "forbidden": ["Controller product/OpenSpec edits", "Integration task 4.1 before task 3.5 checkpoint acceptance", "external approval gates 7.2, 8.2 or 9.1 without fresh user approval"]
+    "id": "PD-008-integration-generation-4-handoff",
+    "state": "task-3.4-accepted-generation-3-frozen-generation-4-registration-pending-task-3.5-locked",
+    "allowedNext": "Controller may register a new Integration G4 task/worktree from the clean G3 handoff baseline. G4 must complete low-context acceptance before any sole-owner activation.",
+    "forbidden": ["Controller product/OpenSpec edits", "Integration G3 task 3.5 implementation", "G3 archival before G4 acceptance", "G4 self-activation", "external approval gates 7.2, 8.2 or 9.1 without fresh user approval"]
   },
   "successor": {
     "threadId": "019f7557-3836-7822-82ab-1e850e4cf157",
@@ -50,9 +50,9 @@
     "latestActivationIncorporationHead": "c53821eec3a0a92fdc63de31ccddbc52c7370703",
     "latestContextCheckpointCommit": "3a275da06e435f6b2ce80d167a0e47a17e331725",
     "gitClean": true,
-    "observableCompactions": 2,
-    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|c53821eec3a0a92fdc63de31ccddbc52c7370703|context-compaction-2-before-task-3.4-implementation|13/29",
-    "status": "activated-sole-apply-owner-task-3.5-unlocked-not-started",
+    "observableCompactions": 3,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc|context-compaction-3-after-task-3.4-before-task-3.5-activation|14/29",
+    "status": "frozen-sole-apply-owner-awaiting-generation-4-acceptance-task-3.5-locked",
     "handoffAudit": {
       "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
       "reportedRawWorktreeUtf8Bytes": 90557,
@@ -67,6 +67,14 @@
       "taskStateCommit": "b41340603ddfb57fc83d1fc73c56c0728ddfd69b",
       "checkpointCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
       "accepted": true
+    },
+    "pendingSuccessor": {
+      "generation": 4,
+      "threadId": "pending",
+      "worktree": "pending",
+      "plannedBranch": "codex/routego-integration-g4",
+      "startingCommit": "fcc0a8e6a0e276bb7d267d6dc2502a9c2b9520bc",
+      "status": "controller-registration-pending-task-3.5-locked"
     }
   },
   "reportingContractAcknowledged": true,
