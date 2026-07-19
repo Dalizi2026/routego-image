@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import { cp, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -14,6 +15,26 @@ import { comparePluginPackages, verifyPluginPackage } from "../../../scripts/ver
 
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
 const execFileAsync = promisify(execFile);
+
+interface ArtifactManifest {
+  files: Array<{ path: string; bytes: number; sha256: string }>;
+}
+
+async function rewriteFileAndManifest(
+  packageRoot: string,
+  relativeFile: string,
+  content: string
+): Promise<void> {
+  await writeFile(path.join(packageRoot, ...relativeFile.split("/")), content, "utf8");
+  const manifestPath = path.join(packageRoot, "artifact-manifest.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as ArtifactManifest;
+  const entry = manifest.files.find((candidate) => candidate.path === relativeFile);
+  if (entry === undefined) throw new Error(`Missing manifest entry for ${relativeFile}`);
+  const bytes = Buffer.from(content, "utf8");
+  entry.bytes = bytes.byteLength;
+  entry.sha256 = createHash("sha256").update(bytes).digest("hex");
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+}
 
 describe("Routego Image plugin package", () => {
   let temporaryRoot: string;
@@ -98,5 +119,118 @@ describe("Routego Image plugin package", () => {
     );
 
     await expect(verifyPluginPackage(candidate)).rejects.toThrow(/symbolic link|symlink/u);
+  });
+
+  it("rejects a package root that is itself a symbolic link", async () => {
+    const linkParent = path.join(temporaryRoot, "root-link");
+    const candidate = path.join(linkParent, "routego-image");
+    await mkdir(linkParent, { recursive: true });
+    await symlink(firstPackage, candidate, "dir");
+
+    await expect(verifyPluginPackage(candidate)).rejects.toThrow(/symbolic link|symlink/u);
+  });
+
+  it.each([
+    ["a second MCP server", (manifest: Record<string, any>) => {
+      manifest["mcpServers"]["unexpected"] = {
+        command: "node",
+        args: ["./runtime/index.js"],
+        cwd: "."
+      };
+    }],
+    ["an extra component", (manifest: Record<string, any>) => {
+      manifest["apps"] = { unexpected: "./apps/unexpected.json" };
+      manifest["hooks"] = { unexpected: "./hooks/unexpected.json" };
+    }],
+    ["unknown manifest and server keys", (manifest: Record<string, any>) => {
+      manifest["unexpected"] = true;
+      manifest["mcpServers"]["routego-image"]["unexpected"] = true;
+    }]
+  ])("rejects a rehashed canonical manifest with %s", async (_label, mutate) => {
+    const candidate = path.join(temporaryRoot, `manifest-${String(_label).replaceAll(" ", "-")}`, "routego-image");
+    await cp(firstPackage, candidate, { recursive: true });
+    const manifestPath = path.join(candidate, ".codex-plugin/plugin.json");
+    const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as Record<string, any>;
+    mutate(manifest);
+    await rewriteFileAndManifest(
+      candidate,
+      ".codex-plugin/plugin.json",
+      `${JSON.stringify(manifest, null, 2)}\n`
+    );
+
+    await expect(verifyPluginPackage(candidate)).rejects.toThrow(/accepted|canonical|manifest/u);
+  });
+
+  it.each([
+    ["percent-encoded SVG data URL", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E"],
+    ["short Base64 image data URL", "data:image/png;base64,iVBORw0KGgo="],
+    ["96-character generic Base64 token", "A".repeat(96)]
+  ])("rejects a rehashed runtime containing a %s", async (_label, payload) => {
+    const candidate = path.join(temporaryRoot, `payload-${String(_label).replaceAll(" ", "-")}`, "routego-image");
+    await cp(firstPackage, candidate, { recursive: true });
+    const runtimePath = path.join(candidate, "runtime/index.js");
+    const runtime = await readFile(runtimePath, "utf8");
+    await rewriteFileAndManifest(
+      candidate,
+      "runtime/index.js",
+      `${runtime}\nconst semanticPayloadProbe = ${JSON.stringify(payload)};\n`
+    );
+
+    await expect(verifyPluginPackage(candidate)).rejects.toThrow(/Base64|image payload|credential/u);
+  });
+
+  it("preserves HTTPS text, SHA-256 values, and identifiers below the raw Base64 boundary", async () => {
+    const candidate = path.join(temporaryRoot, "safe-text-boundaries", "routego-image");
+    await cp(firstPackage, candidate, { recursive: true });
+    const runtimePath = path.join(candidate, "runtime/index.js");
+    const runtime = await readFile(runtimePath, "utf8");
+    const safeValues = {
+      url: "https://example.com/assets/reference.png",
+      sha256: "a".repeat(64),
+      identifier: "A".repeat(95)
+    };
+    await rewriteFileAndManifest(
+      candidate,
+      "runtime/index.js",
+      `${runtime}\nconst semanticSafeTextProbe = ${JSON.stringify(safeValues)};\n`
+    );
+
+    await expect(verifyPluginPackage(candidate)).resolves.toMatchObject({
+      files: expect.arrayContaining(["runtime/index.js"])
+    });
+  });
+
+  it.each([
+    ["private macOS temp", "/private/var/folders/ab/build/source.ts"],
+    ["macOS temp alias", "/var/folders/ab/build/source.ts"],
+    ["Unix temp", "/tmp/routego-build/source.ts"],
+    ["file URL", "file:///private/var/folders/ab/build/source.ts"],
+    ["non-C Windows checkout", "D:\\workspace\\routego-image\\source.ts"],
+    ["Windows slash checkout", "E:/workspace/routego-image/source.ts"]
+  ])("rejects a rehashed runtime containing a %s path", async (_label, localPath) => {
+    const candidate = path.join(temporaryRoot, `path-${String(_label).replaceAll(" ", "-")}`, "routego-image");
+    await cp(firstPackage, candidate, { recursive: true });
+    const runtimePath = path.join(candidate, "runtime/index.js");
+    const runtime = await readFile(runtimePath, "utf8");
+    await rewriteFileAndManifest(
+      candidate,
+      "runtime/index.js",
+      `${runtime}\nconst semanticPathProbe = ${JSON.stringify(localPath)};\n`
+    );
+
+    await expect(verifyPluginPackage(candidate)).rejects.toThrow(/local|path|checkout/u);
+  });
+
+  it.each([
+    ["export-from external", 'export * from "unexpected-external";'],
+    ["dynamic import with options", 'void import("unexpected-external", { with: { type: "json" } });']
+  ])("rejects a rehashed runtime containing an %s", async (_label, statement) => {
+    const candidate = path.join(temporaryRoot, `import-${String(_label).replaceAll(" ", "-")}`, "routego-image");
+    await cp(firstPackage, candidate, { recursive: true });
+    const runtimePath = path.join(candidate, "runtime/index.js");
+    const runtime = await readFile(runtimePath, "utf8");
+    await rewriteFileAndManifest(candidate, "runtime/index.js", `${runtime}\n${statement}\n`);
+
+    await expect(verifyPluginPackage(candidate)).rejects.toThrow(/external import|unresolved/u);
   });
 });

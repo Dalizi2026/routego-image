@@ -5,12 +5,43 @@ import { createHash } from "node:crypto";
 import { lstat, readFile, readdir, realpath } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 
 const ARTIFACT_MANIFEST = "artifact-manifest.json";
 const MAXIMUM_FILES = 512;
 const MAXIMUM_FILE_BYTES = 24 * 1_024 * 1_024;
 const MAXIMUM_TOTAL_BYTES = 64 * 1_024 * 1_024;
 const PNGJS_LICENSE_SHA256 = "be75ef59c5cf59715588a17a82dff7dd3e83c4dba3c458676bb9311e05fbedc5";
+const MINIMUM_RAW_BASE64_PAYLOAD_CHARS = 96;
+const ACCEPTED_PLUGIN_MANIFEST = {
+  name: "routego-image",
+  version: "1.0.0",
+  description: "Create, edit, organize, and review images with the local Routego Image runtime.",
+  author: {
+    name: "Routego Image"
+  },
+  skills: "./skills/",
+  mcpServers: {
+    "routego-image": {
+      command: "node",
+      args: ["./scripts/start-routego-image.mjs"],
+      cwd: "."
+    }
+  },
+  interface: {
+    displayName: "Routego Image",
+    shortDescription: "Local image creation, editing, Library, and Studio workflows.",
+    longDescription: "Generate and edit images, run independent batches, manage the Routego Library, and continue work in the loopback-only Routego Image Studio.",
+    developerName: "Routego Image",
+    category: "Productivity",
+    capabilities: ["Interactive", "Write"],
+    defaultPrompt: [
+      "Check Routego status, then generate an image from my prompt.",
+      "编辑这张图片，并保留我指定的内容。",
+      "Open Routego Image Studio for the current session."
+    ]
+  }
+};
 const EXACT_FILES = new Set([
   ".codex-plugin/plugin.json",
   "skills/routego-image/SKILL.md",
@@ -135,12 +166,8 @@ function validateContentManifest(value) {
 }
 
 function validatePluginManifest(value) {
-  const server = plainObject(value?.mcpServers) ? value.mcpServers["routego-image"] : undefined;
-  if (!plainObject(value) || value.name !== "routego-image" || value.version !== "1.0.0" ||
-      value.skills !== "./skills/" || !plainObject(server) || server.command !== "node" ||
-      JSON.stringify(server.args) !== JSON.stringify(["./scripts/start-routego-image.mjs"]) ||
-      server.cwd !== ".") {
-    fail("the Codex plugin manifest does not match the accepted relocatable runtime contract");
+  if (!isDeepStrictEqual(value, ACCEPTED_PLUGIN_MANIFEST)) {
+    fail("the Codex plugin manifest does not exactly match the accepted canonical manifest");
   }
 }
 
@@ -201,8 +228,9 @@ function validateAllowlist(files) {
 function validateRuntimeImports(runtimeText) {
   const specifiers = [];
   const patterns = [
-    /^\s*import(?:\s+[^"'`;]+?\s+from)?\s*["']([^"']+)["'];?\s*$/gmu,
-    /\bimport\s*\(\s*["']([^"']+)["']\s*\)/gu,
+    /\bimport\s+(?:[^"'`;]+?\s+from\s*)?["']([^"']+)["']/gu,
+    /\bexport\s+(?:type\s+)?(?:\*|\{[^}]*\})\s+from\s*["']([^"']+)["']/gu,
+    /\bimport\s*\(\s*["']([^"']+)["']\s*(?:,\s*[\s\S]*?)?\)/gu,
     /\b(?:require|__require)\s*\(\s*["']([^"']+)["']\s*\)/gu
   ];
   for (const pattern of patterns) {
@@ -219,26 +247,37 @@ function validateRuntimeImports(runtimeText) {
 
 function validateTextSecurity(relativePath, text, packageRoot) {
   const forbiddenRoots = [packageRoot, process.cwd()].map((root) => root.replaceAll("\\", "/"));
-  if (forbiddenRoots.some((root) => root.length > 1 && text.replaceAll("\\", "/").includes(root)) ||
-      /file:\/\/\/(?:Users|home)\//u.test(text) ||
-      /(?:^|["'\s])\/(?:Users|home)\/[A-Za-z0-9._-]+\//mu.test(text) ||
-      /[A-Za-z]:\\Users\\[^\\]+\\/u.test(text)) {
+  const normalizedText = text.replaceAll("\\", "/");
+  if (forbiddenRoots.some((root) => root.length > 1 && normalizedText.includes(root)) ||
+      /file:\/\/\/(?:Users|home|private\/var\/folders|var\/folders|tmp)\//u.test(normalizedText) ||
+      /(?:^|["'\s(])\/(?:Users|home)\/[A-Za-z0-9._-]+\//mu.test(normalizedText) ||
+      /(?:^|["'\s(])\/(?:private\/var\/folders|var\/folders|tmp)\//mu.test(normalizedText) ||
+      /(?:^|["'\s(])[A-Za-z]:\/{1,2}[^\s"']+/mu.test(normalizedText)) {
     fail(`a source checkout or local user path is embedded in ${relativePath}`);
   }
+  const imageDataUrlPattern = /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*(?:;base64)?,(?!\$\{)(?:(?:%[0-9a-f]{2})|[a-z0-9+\/_~.!$&*=@?:-])+/iu;
+  const rawBase64Pattern = new RegExp(
+    `(?:^|[^A-Za-z0-9+/])([A-Za-z0-9+/]{${MINIMUM_RAW_BASE64_PAYLOAD_CHARS},}={0,2})(?![A-Za-z0-9+/=])`,
+    "mu"
+  );
   if (/-----BEGIN [A-Z ]*PRIVATE KEY-----/u.test(text) ||
       /\bsk-[A-Za-z0-9_-]{20,}\b/u.test(text) ||
       /\bBearer\s+[A-Za-z0-9._~+/-]{16,}/u.test(text) ||
-      /data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/]{64,}/iu.test(text)) {
+      imageDataUrlPattern.test(text) || rawBase64Pattern.test(text)) {
     fail(`a credential or image payload is embedded in ${relativePath}`);
   }
 }
 
 export async function verifyPluginPackage(packageDirectory) {
-  const root = await realpath(path.resolve(packageDirectory));
-  const rootStats = await lstat(root);
-  if (!rootStats.isDirectory() || path.basename(root) !== "routego-image") {
+  const requestedRoot = path.resolve(packageDirectory);
+  const requestedRootStats = await lstat(requestedRoot);
+  if (requestedRootStats.isSymbolicLink()) {
+    fail("the package root must not be a symbolic link");
+  }
+  if (!requestedRootStats.isDirectory() || path.basename(requestedRoot) !== "routego-image") {
     fail("the package root must be a real directory named routego-image");
   }
+  const root = await realpath(requestedRoot);
   const files = await collectFiles(root);
   validateAllowlist(files);
   const fileSet = new Set(files);
