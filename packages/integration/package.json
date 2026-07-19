@@ -14,6 +14,7 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsup",
+    "test:package": "vitest run --config vitest.config.ts test/package.test.ts",
     "typecheck": "tsc --build tsconfig.json --pretty false",
     "test": "vitest run --config vitest.config.ts"
   },

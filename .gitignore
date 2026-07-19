@@ -9,6 +9,7 @@ coverage/
 .cache/
 playwright-report/
 test-results/
+.routego-plugin-build/
 
 # Local runtime state and secrets
 .env
