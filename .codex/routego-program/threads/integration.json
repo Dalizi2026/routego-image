@@ -4,7 +4,7 @@
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
   "status": "generation-6-active-sole-owner-task-4.3-pd-012-planning-committed-awaiting-controller-g7-review-product-locked",
-  "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+  "controllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
   "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
   "branch": "codex/routego-integration-g6",
@@ -106,8 +106,8 @@
     "externalStateTouched": false
   },
   "reportingContract": {
-    "currentControllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "currentControllerGeneration": 6,
+    "currentControllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "currentControllerGeneration": 7,
     "primary": "send_message_to_thread plus read_thread after every task/group/checkpoint/blocker/deviation/handoff/activation/delivery",
     "fallback": "routego-program-continuity ARCHIVE_EARLY_V5 records exact CODEX_THREAD_ID, archives that own run as the second tool action, then reads compact state and deduplicates missed reports",
     "acknowledgementRequiredBeforeAcceptance": true

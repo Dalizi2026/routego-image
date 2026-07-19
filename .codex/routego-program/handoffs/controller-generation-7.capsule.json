@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "controller-successor-handoff",
-  "capsuleSha256": "215d38b3689fb7e13d30efe7d87df385fd14c1a2551d796d87a97d6237fa29eb",
+  "capsuleSha256": "7e4a66c1c069f5cd3949f53568035815546059d1d5da573d76766ddf4debac41",
   "lane": "controller",
   "role": "program-controller",
   "program": "routego-image-1.0",
@@ -17,17 +17,19 @@
     "handoffParent": "a0b4b62620ef9c2ce7db5879b92d1c2698e7953a",
     "observableCompactions": 5,
     "lastCompactionFingerprint": "controller|routego-image-1.0|5230567298c8af902a87e70e32ed24a6dc9f9d3e|context-compaction-5-during-pd-012-owner-only-openspec-update-after-governance-incorporation|17/29",
-    "authoritative": true,
-    "preHandoff": true
+    "wasAuthoritativeAtHandoff": true,
+    "authorityRevoked": true,
+    "preHandoffComplete": true
   },
   "successor": {
     "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
     "plannedBranch": "codex/routego-controller-g7",
     "startingCommit": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
-    "registrationStatus": "registered-awaiting-low-context-acceptance",
-    "registrationCommit": null,
-    "registrationCommitSemantics": "The containing Controller registration governance commit cannot self-reference its own SHA; the direct registration message supplies the exact full commit after creation."
+    "registrationStatus": "activated-authoritative-controller-generation-7-pd-012-planning-review-pending",
+    "registrationCommit": "e3011075146317423f80e2b5587ba8d281ee444d",
+    "acceptedHead": "e3011075146317423f80e2b5587ba8d281ee444d",
+    "registrationCommitSemantics": "The accepted registration commit is recorded after the clean zero-compaction successor audit; the containing authority activation commit cannot self-reference its own SHA."
   },
   "currentIntegration": {
     "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
@@ -76,8 +78,7 @@
   },
   "gates": {
     "blockers": [
-      "Controller G7 low-context acceptance and explicit Controller authority activation are pending.",
-      "PD-012 exact three-file owner-only OpenSpec planning checkpoint must be committed and independently accepted before the Creation correction is authorized."
+      "PD-012 exact three-file owner-only OpenSpec planning checkpoint must be independently accepted by Controller G7 before the Creation correction is authorized."
     ],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
@@ -115,7 +116,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 75809,
+    "expectedNormalizedUtf8Bytes": 76108,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-7-registered-awaiting-acceptance-integration-task-4.3-pd-012-planning-committed-awaiting-successor-review-product-locked",
+  "status": "controller-generation-7-activated-authoritative-integration-task-4.3-pd-012-planning-committed-awaiting-review-product-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -49,16 +49,16 @@
     "externalStateAuthorized": false
   },
   "controller": {
-    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "generation": 6,
+    "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "generation": 7,
     "role": "program-controller",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
-    "branch": "codex/routego-controller-g6",
-    "verifiedHeadBeforeContainingCommit": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
-    "status": "authoritative-pre-handoff-controller-generation-7-registered",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
+    "branch": "codex/routego-controller-g7",
+    "verifiedHeadBeforeContainingCommit": "e3011075146317423f80e2b5587ba8d281ee444d",
+    "status": "authoritative-controller-generation-7-pd-012-planning-review-pending",
     "authoritative": true,
-    "observableCompactions": 5,
-    "lastCompactionFingerprint": "controller|routego-image-1.0|5230567298c8af902a87e70e32ed24a6dc9f9d3e|context-compaction-5-during-pd-012-owner-only-openspec-update-after-governance-incorporation|17/29"
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null
   },
   "applyOwner": {
     "lane": "integration",
@@ -128,14 +128,14 @@
     "lane": "controller",
     "role": "program-controller",
     "generation": 7,
-    "status": "registered-awaiting-low-context-acceptance",
+    "status": "activated-authoritative",
     "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
     "plannedBranch": "codex/routego-controller-g7",
     "startingCommit": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
-    "registrationCommit": null,
-    "currentHead": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
-    "acceptedHead": null,
+    "registrationCommit": "e3011075146317423f80e2b5587ba8d281ee444d",
+    "currentHead": "e3011075146317423f80e2b5587ba8d281ee444d",
+    "acceptedHead": "e3011075146317423f80e2b5587ba8d281ee444d",
     "gitClean": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null,
@@ -143,21 +143,22 @@
   },
   "controllerPredecessor": {
     "lane": "controller",
-    "generation": 5,
-    "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "generation": 6,
+    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
+    "branch": "codex/routego-controller-g6",
     "authorityRevoked": true,
-    "observableCompactions": 4
+    "observableCompactions": 5,
+    "lastCompactionFingerprint": "controller|routego-image-1.0|5230567298c8af902a87e70e32ed24a6dc9f9d3e|context-compaction-5-during-pd-012-owner-only-openspec-update-after-governance-incorporation|17/29"
   },
   "laneContinuityPolicy": {
-    "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "predecessorControllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "controllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "predecessorControllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
     "dynamicProgramResolutionRequired": true,
     "directReportingPrimary": true,
     "continuityFallbackIntervalMinutes": 30
   },
-  "currentBlockers": [
-    "Controller G7 must complete zero-compaction low-context handoff acceptance and receive explicit activation before it may accept PD-012 planning or authorize the Creation correction."
-  ],
+  "currentBlockers": [],
   "currentRisks": [
     "Task 4.3 remains paused. PD-012 planning is committed at 768bb0db6e44aaee29c645ef8e09ae5efc61c537 but awaits Controller G7 independent acceptance before the exact Creation two-file correction can be authorized.",
     "Task 4.3 must preserve task 4.2 behavior and must not implement packaging, installation or real relay work.",
@@ -176,8 +177,8 @@
     "deduplicateWith": "latestDirectCheckpoint",
     "archiveOwnRuns": true,
     "promptVersion": "ARCHIVE_EARLY_V5",
-    "controllerSeedThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "controllerSeedWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
+    "controllerSeedThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "controllerSeedWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
     "normalListThreadsForbidden": true,
     "cleanupFinding": "V5 reads exact CODEX_THREAD_ID first and archives that own automation run as the second tool action before Controller reads, lease work, memory updates or final output; normal list_threads enumeration remains forbidden."
   },
