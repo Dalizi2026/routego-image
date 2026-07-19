@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "d1e23ba35c38b108ef21cbd674777a393d464c1f3d443ece998f5a3ca341c9ae",
+  "capsuleSha256": "3baa1d49c5306577be33bfa2e186c19bace03a1458f5bdb5c1f52575401ac14e",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -18,13 +18,17 @@
     "handoffParent": "f3d3d67d264160736d8ce3812eb097c3ab509a22"
   },
   "successor": {
-    "threadId": null,
-    "worktree": null,
-    "plannedBranch": null,
+    "threadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "worktree": "/Users/dalizi/Documents/routego-image-integration-g8",
+    "plannedBranch": "codex/routego-integration-g8",
     "startingCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
-    "registrationStatus": "planned-awaiting-thread-creation",
-    "verifiedHeadBeforeContainingCommit": null,
-    "acceptedHead": null
+    "registrationStatus": "registered-awaiting-low-context-acceptance",
+    "registrationAttempt": 1,
+    "registrationCommit": null,
+    "incorporationCommit": "a3f5cd9d5b43085ad6b76503a2b78fe2399b001a",
+    "verifiedHeadBeforeContainingCommit": "a3f5cd9d5b43085ad6b76503a2b78fe2399b001a",
+    "acceptedHead": null,
+    "registrationCommitSemantics": "The containing registration commit cannot self-reference its own SHA. This capsule records the real successor identity and the clean verified HEAD immediately before that commit; task 5.2 remains locked until acceptance and separate activation."
   },
   "currentState": {
     "openspecTotal": 29,
@@ -33,7 +37,7 @@
     "nextTaskId": "5.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-5.2.json",
-      "sha256": "4b68a74c92c9e376f79d22b55ade062e19f0c3f54afbeb5d8110e4716d7363e0"
+      "sha256": "9150dd00e30e3bc483c8b501a896e402a79f110f941a8cc7e8d082ef922c9f82"
     },
     "taskLocked": true,
     "sourceIsSoleApplyOwner": true,
@@ -138,7 +142,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
-    "expectedNormalizedUtf8Bytes": 73283,
+    "expectedNormalizedUtf8Bytes": 75069,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
