@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   imageOperationRequestSchema,
   imageOperationResultSchema,
+  routegoBatchResultSchema,
+  routegoOpenStudioResultSchema,
   routegoOperationDefinitions,
   routegoOperationNames,
   type ImageOperationRequest,
@@ -22,13 +24,32 @@ function request(prompt = "MCP synthetic image"): ImageOperationRequest {
   return imageOperationRequestSchema.parse({ kind: "generate", prompt });
 }
 
-function imageResult(input: ImageOperationRequest) {
+function editRequest(prompt = "MCP synthetic edit"): ImageOperationRequest {
+  return imageOperationRequestSchema.parse({
+    kind: "edit",
+    prompt,
+    targetImage: { path: "/synthetic/target.png" },
+    invariants: { preserve: ["Keep the synthetic subject identity."] }
+  });
+}
+
+function imageResult(
+  input: unknown,
+  options: {
+    readonly artifactId?: string;
+    readonly path?: string;
+    readonly requestId?: string;
+    readonly withPartial?: boolean;
+  } = {}
+) {
+  const parsedInput = imageOperationRequestSchema.parse(input);
+  const artifactId = options.artifactId ?? "artifact-mcp";
   return imageOperationResultSchema.parse({
     schemaVersion: 1,
-    requestId: "request-mcp-result",
+    requestId: options.requestId ?? "request-mcp-result",
     status: "succeeded",
-    requestedParams: input,
-    effectiveParams: input,
+    requestedParams: parsedInput,
+    effectiveParams: parsedInput,
     execution: {
       transport: "single-endpoint-json",
       attemptCount: 1,
@@ -40,32 +61,99 @@ function imageResult(input: ImageOperationRequest) {
     },
     finalArtifacts: [
       {
-        id: "artifact-mcp",
+        id: artifactId,
         slot: 0,
         phase: "final",
+        ...(options.path === undefined ? {} : { path: options.path }),
         mimeType: "image/png",
+        byteLength: 68,
+        width: 1,
+        height: 1,
+        sha256: "a".repeat(64),
+        providerImageId: `provider-${artifactId}`,
         display: { type: "image", dataUrl: `data:image/png;base64,${PNG_BASE64}` },
         createdAt: "2026-07-18T12:00:00.000Z"
       }
     ],
-    partialArtifacts: [],
+    partialArtifacts: options.withPartial
+      ? [
+          {
+            id: `${artifactId}-partial`,
+            slot: 0,
+            phase: "partial",
+            mimeType: "image/png",
+            display: { type: "image", dataUrl: `data:image/png;base64,${PNG_BASE64}` },
+            createdAt: "2026-07-18T11:59:59.000Z"
+          }
+        ]
+      : [],
     failedSlots: [],
-    relationships: []
+    relationships: [
+      {
+        inputRole: "output",
+        outputArtifactId: artifactId,
+        order: 0
+      }
+    ]
   });
 }
 
-function service(generate: (input: ImageOperationRequest) => Promise<unknown>): RoutegoService {
+function failedImageResult(input: unknown) {
+  const parsedInput = imageOperationRequestSchema.parse(input);
+  return imageOperationResultSchema.parse({
+    schemaVersion: 1,
+    requestId: "request-mcp-failed",
+    status: "failed",
+    requestedParams: parsedInput,
+    effectiveParams: parsedInput,
+    execution: {
+      transport: "single-endpoint-json",
+      attemptCount: 1,
+      providerRequestCount: 1,
+      receivedAnyOutput: false,
+      mayHaveBilled: false,
+      degradedContinuation: false,
+      providerImageIds: []
+    },
+    finalArtifacts: [],
+    partialArtifacts: [],
+    failedSlots: [],
+    relationships: [],
+    error: {
+      code: "invalid_response",
+      category: "protocol",
+      stage: "stream",
+      safeMessage:
+        `Authorization: Bearer synthetic-secret https://relay.invalid/error?token=synthetic ` +
+        `C:\\Users\\synthetic\\output.png /home/synthetic/output.png ` +
+        `data:image/png;base64,${PNG_BASE64}`,
+      retryDisposition: "never",
+      partialArtifacts: [],
+      receivedAnyOutput: false,
+      mayHaveBilled: false,
+      details: {
+        authorization: "Bearer synthetic-secret",
+        endpoint: "https://relay.invalid/error?token=synthetic",
+        path: "C:\\Users\\synthetic\\output.png",
+        dataUrl: `data:image/png;base64,${PNG_BASE64}`
+      }
+    }
+  });
+}
+
+function service(overrides: Record<string, unknown>): RoutegoService {
   const unavailable = async () => {
     throw new Error("Unused service method");
   };
   return {
     status: unavailable,
-    generate,
+    generate: unavailable,
     edit: unavailable,
     batch: unavailable,
     searchLibrary: unavailable,
     manageLibrary: unavailable,
-    openStudio: unavailable
+    openStudio: unavailable,
+    ...overrides
   } as RoutegoService;
 }
 
@@ -94,6 +182,12 @@ function resultValue(response: JsonRpcResponse | undefined): unknown {
   return response.result;
 }
 
+function structuredText(result: McpToolResult): Record<string, unknown> {
+  const content = result.content[0];
+  if (content?.type !== "text") throw new Error("Expected structured MCP text content");
+  return JSON.parse(content.text) as Record<string, unknown>;
+}
+
 describe("dependency-free JSON-RPC framing", () => {
   it("decodes fragmented UTF-8 and CRLF/newline-delimited messages", () => {
     const decoder = new JsonRpcLineDecoder();
@@ -112,7 +206,9 @@ describe("dependency-free JSON-RPC framing", () => {
   });
 
   it("returns parse/invalid-request errors without terminating the server", async () => {
-    const server = createRoutegoMcpServer({ service: service(async (input) => imageResult(input)) });
+    const server = createRoutegoMcpServer({
+      service: service({ generate: async (input: unknown) => imageResult(input) })
+    });
     expect(await server.handleLine("{invalid")).toMatchObject({ error: { code: -32700 } });
     expect(await server.handleLine(JSON.stringify({ jsonrpc: "2.0", id: 2 }))).toMatchObject({
       error: { code: -32600 }
@@ -123,7 +219,9 @@ describe("dependency-free JSON-RPC framing", () => {
 
 describe("MCP lifecycle, exact tools, and schema dispatch", () => {
   it("requires initialization and lists exactly the seven frozen tools with derived schemas", async () => {
-    const server = createRoutegoMcpServer({ service: service(async (input) => imageResult(input)) });
+    const server = createRoutegoMcpServer({
+      service: service({ generate: async (input: unknown) => imageResult(input) })
+    });
     expect(
       await server.handleLine(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }))
     ).toMatchObject({ error: { code: -32002 } });
@@ -151,8 +249,10 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
   });
 
   it("validates input, calls the service once, validates output, and returns text plus final image content", async () => {
-    const generate = vi.fn(async (input: ImageOperationRequest) => imageResult(input));
-    const server = createRoutegoMcpServer({ service: service(generate) });
+    const generate = vi.fn(async (input: ImageOperationRequest) =>
+      imageResult(input, { withPartial: true })
+    );
+    const server = createRoutegoMcpServer({ service: service({ generate }) });
     await initialize(server);
     const response = await server.handleLine(
       JSON.stringify({
@@ -174,17 +274,217 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     const toolResult = resultValue(response) as McpToolResult;
     expect(toolResult.isError).toBeUndefined();
     expect(toolResult.content).toHaveLength(2);
-    expect(toolResult.content[0]).toMatchObject({ type: "text" });
-    expect((toolResult.content[0] as { text: string }).text).toContain("[REDACTED_IMAGE_DATA]");
-    expect((toolResult.content[0] as { text: string }).text).not.toContain(PNG_BASE64);
+    const text = structuredText(toolResult);
+    expect(text).toMatchObject({
+      requestId: "request-mcp-result",
+      status: "succeeded",
+      finalArtifacts: [
+        {
+          id: "artifact-mcp",
+          slot: 0,
+          phase: "final",
+          mimeType: "image/png",
+          byteLength: 68,
+          width: 1,
+          height: 1,
+          providerImageId: "provider-artifact-mcp"
+        }
+      ],
+      partialArtifacts: [
+        { id: "artifact-mcp-partial", slot: 0, phase: "partial", mimeType: "image/png" }
+      ],
+      relationships: [{ inputRole: "output", outputArtifactId: "artifact-mcp", order: 0 }]
+    });
+    expect((text["finalArtifacts"] as Array<Record<string, unknown>>)[0]).not.toHaveProperty("path");
+    expect((text["finalArtifacts"] as Array<Record<string, unknown>>)[0]).not.toHaveProperty("display");
+    expect((text["partialArtifacts"] as Array<Record<string, unknown>>)[0]).not.toHaveProperty("display");
+    expect(JSON.stringify(text)).not.toContain("data:image");
+    expect(JSON.stringify(text)).not.toContain(PNG_BASE64);
     expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
+  });
+
+  it("preserves a schema-valid Studio launch URL with its fresh one-time token", async () => {
+    const studioResult = routegoOpenStudioResultSchema.parse({
+      schemaVersion: 1,
+      url: "http://127.0.0.1:43123/?token=synthetic-session-token",
+      expiresAt: "2026-07-18T12:05:00.000Z",
+      reused: false,
+      address: "127.0.0.1"
+    });
+    const openStudio = vi.fn(async () => studioResult);
+    const server = createRoutegoMcpServer({ service: service({ openStudio }) });
+    await initialize(server);
+
+    const response = await server.handleLine(
+      JSON.stringify({
+        jsonrpc: "2.0",
+        id: "open-studio",
+        method: "tools/call",
+        params: {
+          name: "routego_open_studio",
+          arguments: { reuseExisting: true, address: "127.0.0.1" }
+        }
+      })
+    );
+    const toolResult = resultValue(response) as McpToolResult;
+    const text = structuredText(toolResult);
+    expect(openStudio).toHaveBeenCalledTimes(1);
+    expect(routegoOpenStudioResultSchema.parse(text)).toEqual(studioResult);
+    expect(text["url"]).toBe("http://127.0.0.1:43123/?token=synthetic-session-token");
+    expect(toolResult.content).toHaveLength(1);
+  });
+
+  it("preserves a truthful image path while omitting its display payload", async () => {
+    const input = editRequest();
+    const edit = vi.fn(async (parsedInput: ImageOperationRequest) =>
+      imageResult(parsedInput, {
+        artifactId: "artifact-edit",
+        path: "/synthetic/output/edit.png"
+      })
+    );
+    const server = createRoutegoMcpServer({ service: service({ edit }) });
+    await initialize(server);
+
+    const response = await server.handleLine(
+      JSON.stringify({
+        jsonrpc: "2.0",
+        id: "edit-path",
+        method: "tools/call",
+        params: { name: "routego_edit", arguments: input }
+      })
+    );
+    const toolResult = resultValue(response) as McpToolResult;
+    const text = structuredText(toolResult);
+    const artifact = (text["finalArtifacts"] as Array<Record<string, unknown>>)[0]!;
+    expect(edit).toHaveBeenCalledTimes(1);
+    expect(artifact).toMatchObject({
+      id: "artifact-edit",
+      path: "/synthetic/output/edit.png",
+      phase: "final",
+      mimeType: "image/png",
+      providerImageId: "provider-artifact-edit"
+    });
+    expect(artifact).not.toHaveProperty("display");
+    expect(JSON.stringify(text)).not.toContain("data:image");
+    expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
+  });
+
+  it("projects path-bearing and pathless batch artifacts without fabricating a path", async () => {
+    const generateInput = request("Batch path-bearing image");
+    const editInput = editRequest("Batch pathless edit");
+    const batchResult = routegoBatchResultSchema.parse({
+      schemaVersion: 1,
+      requestId: "request-mcp-batch",
+      status: "succeeded",
+      concurrency: 2,
+      items: [
+        {
+          id: "task-path",
+          result: imageResult(generateInput, {
+            artifactId: "artifact-batch-path",
+            path: "/synthetic/output/batch.png",
+            requestId: "request-batch-path"
+          })
+        },
+        {
+          id: "task-pathless",
+          result: imageResult(editInput, {
+            artifactId: "artifact-batch-pathless",
+            requestId: "request-batch-pathless"
+          })
+        }
+      ]
+    });
+    const batch = vi.fn(async () => batchResult);
+    const server = createRoutegoMcpServer({ service: service({ batch }) });
+    await initialize(server);
+
+    const response = await server.handleLine(
+      JSON.stringify({
+        jsonrpc: "2.0",
+        id: "batch-projection",
+        method: "tools/call",
+        params: {
+          name: "routego_batch",
+          arguments: {
+            tasks: [
+              { id: "task-path", operation: generateInput },
+              { id: "task-pathless", operation: editInput }
+            ],
+            concurrency: 2
+          }
+        }
+      })
+    );
+    const toolResult = resultValue(response) as McpToolResult;
+    const text = structuredText(toolResult);
+    const items = text["items"] as Array<{ result: { finalArtifacts: Array<Record<string, unknown>> } }>;
+    const pathArtifact = items[0]!.result.finalArtifacts[0]!;
+    const pathlessArtifact = items[1]!.result.finalArtifacts[0]!;
+    expect(batch).toHaveBeenCalledTimes(1);
+    expect(pathArtifact["path"]).toBe("/synthetic/output/batch.png");
+    expect(pathlessArtifact).not.toHaveProperty("path");
+    expect(pathArtifact).not.toHaveProperty("display");
+    expect(pathlessArtifact).not.toHaveProperty("display");
+    expect(pathlessArtifact).toMatchObject({
+      id: "artifact-batch-pathless",
+      phase: "final",
+      mimeType: "image/png",
+      providerImageId: "provider-artifact-batch-pathless"
+    });
+    expect(JSON.stringify(text)).not.toContain("data:image");
+    expect(toolResult.content.slice(1)).toEqual([
+      { type: "image", data: PNG_BASE64, mimeType: "image/png" },
+      { type: "image", data: PNG_BASE64, mimeType: "image/png" }
+    ]);
+  });
+
+  it("preserves failure facts while recursively redacting the structured error boundary", async () => {
+    const generate = vi.fn(async (input: ImageOperationRequest) => failedImageResult(input));
+    const server = createRoutegoMcpServer({ service: service({ generate }) });
+    await initialize(server);
+
+    const response = await server.handleLine(
+      JSON.stringify({
+        jsonrpc: "2.0",
+        id: "failed-result",
+        method: "tools/call",
+        params: {
+          name: "routego_generate",
+          arguments: { kind: "generate", prompt: "Synthetic failed result" }
+        }
+      })
+    );
+    const toolResult = resultValue(response) as McpToolResult;
+    const text = structuredText(toolResult);
+    const rendered = JSON.stringify(text);
+    expect(toolResult.isError).toBe(true);
+    expect(toolResult.content).toHaveLength(1);
+    expect(text).toMatchObject({
+      status: "failed",
+      execution: { receivedAnyOutput: false, mayHaveBilled: false },
+      error: {
+        code: "invalid_response",
+        category: "protocol",
+        stage: "stream",
+        retryDisposition: "never",
+        receivedAnyOutput: false,
+        mayHaveBilled: false
+      }
+    });
+    expect(rendered).not.toContain("synthetic-secret");
+    expect(rendered).not.toContain("token=synthetic");
+    expect(rendered).not.toContain("C:\\Users\\synthetic");
+    expect(rendered).not.toContain("/home/synthetic");
+    expect(rendered).not.toContain(PNG_BASE64);
+    expect(rendered).not.toContain("dataUrl");
   });
 
   it("fails closed on invalid input or service output and never dispatches Studio-only names", async () => {
     const generate = vi.fn(async (_input: ImageOperationRequest) => ({ invalid: true }));
     const diagnostics: unknown[] = [];
     const server = createRoutegoMcpServer({
-      service: service(generate),
+      service: service({ generate }),
       logger: (value) => {
         diagnostics.push(value);
       }
@@ -243,14 +543,19 @@ describe("STDIO channel safety and lifecycle", () => {
     const diagnostics: unknown[] = [];
     let callCount = 0;
     const server = createRoutegoMcpServer({
-      service: service(async (input) => {
-        callCount += 1;
-        if (callCount === 2) {
-          throw new Error(
-            `Authorization: Bearer synthetic-secret data:image/png;base64,${PNG_BASE64}`
-          );
+      service: service({
+        generate: async (input: unknown) => {
+          callCount += 1;
+          if (callCount === 2) {
+            throw new Error(
+              `Authorization: Bearer synthetic-secret ` +
+              `https://relay.invalid/fail?token=logger-secret ` +
+              `C:\\Users\\synthetic\\image.png /home/synthetic/image.png ` +
+              `data:image/png;base64,${PNG_BASE64}`
+            );
+          }
+          return imageResult(input);
         }
-        return imageResult(input);
       }),
       write: (line) => {
         output.push(line);
@@ -287,6 +592,9 @@ describe("STDIO channel safety and lifecycle", () => {
     expect(JSON.parse(output[3]!).result).toEqual({});
     const renderedDiagnostics = JSON.stringify(diagnostics);
     expect(renderedDiagnostics).not.toContain("synthetic-secret");
+    expect(renderedDiagnostics).not.toContain("token=logger-secret");
+    expect(renderedDiagnostics).not.toContain("C:\\Users\\synthetic");
+    expect(renderedDiagnostics).not.toContain("/home/synthetic");
     expect(renderedDiagnostics).not.toContain(PNG_BASE64);
 
     server.shutdown();
@@ -299,7 +607,7 @@ describe("STDIO channel safety and lifecycle", () => {
   it("emits sanitized framing failures for invalid UTF-8 without forcing process exit", async () => {
     const output: string[] = [];
     const server = createRoutegoMcpServer({
-      service: service(async (input) => imageResult(input)),
+      service: service({ generate: async (input: unknown) => imageResult(input) }),
       write: (line) => {
         output.push(line);
       }

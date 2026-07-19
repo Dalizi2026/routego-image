@@ -60,6 +60,8 @@ const TOOL_TO_OPERATION = new Map<string, RoutegoOperation>(
   routegoOperationNames.map((operation) => [routegoOperationDefinitions[operation].toolName, operation])
 );
 
+const REDACTED_LOCAL_PATH = "[REDACTED_PATH]" as const;
+
 function inputJsonSchema(operation: RoutegoOperation): Record<string, unknown> {
   const generated = routegoOperationDefinitions[operation].inputSchema.toJSONSchema({
     target: "draft-07",
@@ -83,8 +85,30 @@ function toolDefinitions() {
   });
 }
 
+function redactLocalPathsInText(value: string): string {
+  return value
+    .replace(
+      /(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/]|\\\\)[^\s,;"']+/gu,
+      REDACTED_LOCAL_PATH
+    )
+    .replace(/(?<![A-Za-z0-9:/])\/[^\s,;"']+/gu, REDACTED_LOCAL_PATH);
+}
+
+function redactLocalPaths(value: unknown): unknown {
+  if (typeof value === "string") return redactLocalPathsInText(value);
+  if (Array.isArray(value)) return value.map(redactLocalPaths);
+  if (!isRecord(value)) return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, childValue]) => [key, redactLocalPaths(childValue)])
+  );
+}
+
+function redactMcpDiagnostic(value: unknown): unknown {
+  return redactLocalPaths(redactDiagnostic(value));
+}
+
 function errorToolResult(code: string, safeMessage: string, details?: unknown): McpToolResult {
-  const value = redactDiagnostic({
+  const value = redactMcpDiagnostic({
     error: {
       code,
       safeMessage,
@@ -138,10 +162,53 @@ function outputIsError(output: unknown): boolean {
   return record["status"] === "failed" || record["status"] === "cancelled" || record["error"] !== undefined;
 }
 
-function successToolResult(output: unknown): McpToolResult {
-  const sanitized = redactDiagnostic(output);
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function publicSuccessProjection(
+  value: unknown,
+  omitImagePayloads: boolean,
+  redactNestedErrors = true
+): unknown {
+  if (Array.isArray(value)) {
+    return value.map((item) => publicSuccessProjection(item, omitImagePayloads, redactNestedErrors));
+  }
+  if (!isRecord(value)) return value;
+
+  const projected: Record<string, unknown> = {};
+  for (const [key, childValue] of Object.entries(value)) {
+    if (omitImagePayloads && key === "dataUrl") continue;
+
+    const shouldRedactError = redactNestedErrors && key === "error";
+    const child = shouldRedactError ? redactMcpDiagnostic(childValue) : childValue;
+    const projectedChild = publicSuccessProjection(
+      child,
+      omitImagePayloads,
+      shouldRedactError ? false : redactNestedErrors
+    );
+
+    if (
+      omitImagePayloads &&
+      key === "display" &&
+      isRecord(projectedChild) &&
+      Object.keys(projectedChild).every(
+        (displayKey) => displayKey === "type" && projectedChild[displayKey] === "image"
+      )
+    ) {
+      continue;
+    }
+    projected[key] = projectedChild;
+  }
+  return projected;
+}
+
+function successToolResult(operation: RoutegoOperation, output: unknown): McpToolResult {
+  const omitImagePayloads =
+    operation === "generate" || operation === "edit" || operation === "batch";
+  const projected = publicSuccessProjection(output, omitImagePayloads);
   const images = finalImageContents(output);
-  const text = JSON.stringify(sanitized);
+  const text = JSON.stringify(projected);
   return {
     content: [{ type: "text", text }, ...images],
     ...(outputIsError(output) ? { isError: true } : {})
@@ -178,7 +245,7 @@ export class RoutegoMcpServer {
   async #diagnose(value: unknown): Promise<void> {
     if (this.#logger === undefined) return;
     try {
-      await this.#logger(redactDiagnostic(value));
+      await this.#logger(redactMcpDiagnostic(value));
     } catch {
       // Diagnostic sinks cannot affect protocol behavior.
     }
@@ -238,7 +305,7 @@ export class RoutegoMcpServer {
           )
         );
       }
-      return jsonRpcSuccess(requestId(request), successToolResult(parsedOutput.data));
+      return jsonRpcSuccess(requestId(request), successToolResult(operation, parsedOutput.data));
     } catch (error) {
       await this.#diagnose(error);
       return jsonRpcSuccess(
