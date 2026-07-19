@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-6-active-sole-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
+  "status": "generation-6-stopped-frozen-machine-transfer-non-completion-wip-task-4.3-product-locked",
   "controllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
   "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
@@ -12,14 +12,14 @@
   "startingCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
   "registrationCommit": "e25cdc12eb15318fc9b1c414ddbcda92d6270520",
   "incorporationCommit": "380e5936be0680b884a18f3b42a19e4fa299e438",
-  "currentHead": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
+  "currentHead": "34fd18aca083199028b8f9a54f8fc26f023711db",
   "gitCleanAtRegistration": true,
   "gitClean": true,
   "observableCompactions": 1,
   "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29",
-  "soleApplyOwner": true,
-  "frozen": false,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "frozen": true,
+  "applyAuthorized": false,
   "externalStateAuthorized": false,
   "sourceOwner": {
     "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
@@ -49,30 +49,30 @@
   "currentTask": {
     "id": "4.3",
     "capsule": ".codex/routego-program/tasks/integration-4.3.json",
-    "activationStatus": "paused-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
+    "activationStatus": "stopped-frozen-machine-transfer-awaiting-generation-7-independent-p1-review-task-4.3-product-locked",
     "started": true,
     "completionStatus": "incomplete-wip-checkpoint-preserved"
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-6.capsule.json",
-    "status": "accepted-source-archived-successor-sole-owner-activated",
+    "status": "source-generation-6-stopped-frozen-for-machine-transfer",
     "acceptanceCompactionLimit": 0,
     "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|2b62dac6d86c8ca0fef6b52eea81019ba5749430|pd-012-openspec-coherence-revision-accepted|17/29",
-    "messageType": "INTEGRATION_PD_012_OPENSPEC_COHERENCE_REVISION_COMMITTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|34fd18aca083199028b8f9a54f8fc26f023711db|machine-transfer-non-completion-wip-safety-checkpoint|17/29",
+    "messageType": "INTEGRATION_MACHINE_TRANSFER_WIP_CHECKPOINT_FROZEN",
     "completedTaskId": "4.2",
     "nextTaskId": "4.3",
-    "reportedHead": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
+    "reportedHead": "34fd18aca083199028b8f9a54f8fc26f023711db",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
-    "controllerAccepted": true,
+    "controllerAccepted": false,
     "handoffAccepted": true,
     "sourceFrozen": true,
     "observableCompactions": 1,
-    "checkpointSemantics": "Task 4.3 is incomplete. Controller G7 independently accepted the exact three-file operation-aware PD-012 OpenSpec coherence revision at 2b62dac6d86c8ca0fef6b52eea81019ba5749430 after strict validation and semantic review. Product work remains locked pending a separate exact two-file Creation correction authorization and later corrective acceptance."
+    "checkpointSemantics": "Task 4.3 is incomplete. The exact two-file Creation WIP at 34fd18aca083199028b8f9a54f8fc26f023711db is a frozen non-completion migration checkpoint and has not passed independent review of the three P1 leak classes."
   },
   "planDeviation": {
     "id": "PD-012",
@@ -91,7 +91,7 @@
     "planningAuthorized": true,
     "planningCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
     "planningAccepted": true,
-    "productCorrectionAuthorized": true,
+    "productCorrectionAuthorized": false,
     "taskResumeAuthorized": false
   },
   "latestTaskCompletion": {
