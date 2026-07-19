@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "d1f917d08cf997a84120e7e84a858de0520c68d1af577a5e06a57d5b62558fb0",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "generation": 7,
+  "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
+  "activationHead": "cce75e99fc01aae740e21eb5cc76bf5f12a22efc",
+  "openspecProgress": "17/29",
+  "currentTaskId": "4.3",
+  "taskLocked": true,
+  "reviewStatus": "failed-candidate-rejected-exact-two-file-root-correction-authorized",
+  "candidate": {
+    "base": "244e50084e575acfe5fa1fff6af20bfa9547cdf6",
+    "publicSuccessCorrection": "b2b1b556a0d66f4d9bdb912eade1109f046cecad",
+    "nonCompletionP1Checkpoint": "34fd18aca083199028b8f9a54f8fc26f023711db",
+    "files": [
+      "packages/creation/src/runtime/mcp/server.ts",
+      "packages/creation/test/mcp.test.ts"
+    ],
+    "unchangedThroughActivation": true
+  },
+  "classResults": [
+    {
+      "class": "path-leak",
+      "result": "failed",
+      "rootCause": "Diagnostic path detection depends on a limited key allowlist and preceding-character heuristic, so paths after colons, quotes or brackets and paths nested under arbitrary cause/message fields can reach logger or structured error output.",
+      "controllerReproduced": true
+    },
+    {
+      "class": "ordinary-numeric-byte-array-leak",
+      "result": "failed",
+      "rootCause": "Diagnostic byte-array removal depends on binary-looking keys, Buffer-shaped nested data and arbitrary-key number arrays can survive, and the public-success projection leaves unproved one-to-three-byte fragments.",
+      "controllerConfirmedBySourceFlow": true
+    },
+    {
+      "class": "free-string-image-payload-leak",
+      "result": "failed",
+      "rootCause": "Free-string removal allowlists three image subtypes and signatures, leaving GIF, SVG or custom image data URLs, parameterized data-URL markers and unknown-header long Base64.",
+      "controllerReproduced": true
+    }
+  ],
+  "commonRoot": "Recursive security boundaries use field-name, signature, MIME, length and punctuation heuristics instead of explicit projection-zone invariants. Tests mirror only known heuristic hits.",
+  "requiredCorrection": {
+    "allowedFiles": [
+      "packages/creation/src/runtime/mcp/server.ts",
+      "packages/creation/test/mcp.test.ts"
+    ],
+    "forbidden": "Integration task-4.3 files, Contracts or Foundation redactors, OpenSpec, dependencies, manifest, Studio, Library, root files and external state.",
+    "mustPreserve": "Validated final MCP image content, routego_open_studio current-call token, non-image public success fields, truthful existing public paths, pathless artifacts, exact seven tools and public phase partial|final.",
+    "taskResumeAuthorized": false
+  },
+  "executionDeviation": {
+    "status": "recorded-stopped-no-tracked-change",
+    "finding": "Reviewers invoked pnpm before the stop instruction arrived; pnpm fetched or installed 118 dependencies and later pnpm exec probes exited 1.",
+    "rootNodeModulesMtime": "2026-07-19 17:34:11 +0800",
+    "trackedGitClean": true,
+    "cleanupAttempted": false,
+    "furtherPackageManagerCommandsForbidden": true
+  },
+  "externalProductStateChanged": false,
+  "productOrOpenSpecChanged": false,
+  "controllerDisposition": "Candidate rejected. One coherent exact-two-file root correction is authorized; task 4.3 remains unchecked and product-locked pending independent Controller acceptance."
+}

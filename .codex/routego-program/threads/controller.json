@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-authoritative-controller-generation-8-integration-generation-7-independent-p1-review-task-4.3-product-locked",
+  "status": "active-authoritative-controller-generation-8-integration-generation-7-p1-review-failed-correction-authorized-task-4.3-product-locked",
   "threadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
   "worktree": "/Users/dalizi/Documents/routego-image-controller-g8",
   "branch": "codex/routego-controller-g8",
@@ -36,12 +36,14 @@
     "integrationGeneration7AcceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
     "integrationGeneration7GitClean": true,
     "integrationGeneration7ObservableCompactionsBeforeAcceptance": 0,
+    "integrationGeneration7P1Review": "failed-all-three-classes-candidate-rejected",
+    "integrationGeneration7P1Evidence": ".codex/routego-program/evidence/integration-generation-7-p1-review.json",
     "verification": "Controller G8 compaction 1 health audit confirmed authoritative role, Controller activation HEAD c36c62a987496c334e7ca1e8d5344b561c45e776, Integration retry-2 governance-only work, OpenSpec 17/29 and task 4.3 product lock. Integration G7 retry 2 then read 12 mandatory files at exactly 109930 normalized UTF-8 bytes, passed capsule validation at clean HEAD 92752bda589635460b0c48e297df4d9c8c920a92, remained at zero observable compactions before acceptance, and confirmed direct reporting plus read-back."
   },
   "currentOperation": {
     "id": "PD-012-task-4.3-creation-mcp-public-success-projection",
-    "state": "controller-generation-8-authoritative-integration-generation-7-independent-p1-review-task-4.3-product-locked",
-    "allowedNext": "Integration generation 7 may independently review only the three P1 leak classes against the preserved two-file Creation candidate. Task 4.3 remains locked until Controller G8 independently accepts the review and correction.",
+    "state": "controller-generation-8-authoritative-integration-generation-7-p1-review-failed-correction-authorized-task-4.3-product-locked",
+    "allowedNext": "Integration generation 7 may implement one coherent root correction in exactly packages/creation/src/runtime/mcp/server.ts and packages/creation/test/mcp.test.ts for all three failed P1 classes. Task 4.3 remains locked until Controller G8 independently accepts the corrected implementation.",
     "forbidden": [
       "Controller product or OpenSpec edits",
       "Integration task 4.3 edits before the exact two-file Creation corrective commit is independently accepted",
@@ -61,9 +63,9 @@
     "lastCompactionFingerprint": null,
     "soleApplyOwner": true,
     "applyAuthorized": true,
-    "authorizedScope": "independent-three-p1-security-review-only-task-4.3-product-locked",
+    "authorizedScope": "exact-two-file-p1-root-correction-task-4.3-product-locked",
     "frozen": false,
-    "status": "activated-sole-owner-independent-p1-review-task-4.3-product-locked",
+    "status": "activated-sole-owner-p1-review-failed-exact-two-file-correction-authorized-task-4.3-product-locked",
     "handoffAudit": {
       "messageType": "HANDOFF_ACCEPTED",
       "reportedStartupFiles": 12,
@@ -110,7 +112,7 @@
     "gitClean": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null,
-    "status": "activated-sole-owner-independent-p1-review-task-4.3-product-locked",
+    "status": "activated-sole-owner-p1-review-failed-exact-two-file-correction-authorized-task-4.3-product-locked",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-7.capsule.json"
   },
   "successor": {

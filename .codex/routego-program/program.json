@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-8-authoritative-integration-generation-7-activated-sole-owner-independent-p1-review-task-4.3-product-locked",
+  "status": "controller-generation-8-authoritative-integration-generation-7-p1-review-failed-exact-two-file-correction-authorized-task-4.3-product-locked",
   "projectPath": "/Users/dalizi/Documents/routego-image-integration-g7",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -55,7 +55,7 @@
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g8",
     "branch": "codex/routego-controller-g8",
     "verifiedHeadBeforeContainingCommit": "288f2db1b7588ba5a759a37eace4332e65ed485e",
-    "status": "authoritative-controller-generation-8-integration-generation-7-independent-p1-review-task-4.3-product-locked",
+    "status": "authoritative-controller-generation-8-integration-generation-7-p1-review-failed-correction-authorized-task-4.3-product-locked",
     "authoritative": true,
     "observableCompactions": 1,
     "lastCompactionFingerprint": "controller|routego-image-1.0|c36c62a987496c334e7ca1e8d5344b561c45e776|context-compaction-1-during-integration-generation-7-retry-2-registration-and-acceptance|17/29"
@@ -71,7 +71,7 @@
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
-    "authorizedScope": "independent-three-p1-security-review-only-task-4.3-product-locked",
+    "authorizedScope": "exact-two-file-p1-root-correction-task-4.3-product-locked",
     "gitClean": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -79,7 +79,7 @@
   "successor": {
     "lane": "integration",
     "generation": 7,
-    "status": "activated-sole-owner-independent-p1-review-task-4.3-product-locked",
+    "status": "activated-sole-owner-p1-review-failed-exact-two-file-correction-authorized-task-4.3-product-locked",
     "registrationAttempt": 2,
     "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
@@ -91,7 +91,7 @@
     "acceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
     "soleApplyOwner": true,
     "applyAuthorized": true,
-    "authorizedScope": "independent-three-p1-security-review-only-task-4.3-product-locked",
+    "authorizedScope": "exact-two-file-p1-root-correction-task-4.3-product-locked",
     "gitClean": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null,
@@ -119,9 +119,20 @@
       "capsule": ".codex/routego-program/tasks/integration-4.3.json",
       "locked": true,
       "activationAuthorized": false,
-      "reviewAuthorized": true,
+      "reviewAuthorized": false,
+      "correctionAuthorized": true,
       "started": true,
-      "pauseReason": "Integration generation 7 is activated only for independent review of the three P1 leak classes. Task 4.3 remains locked until Controller G8 independently accepts that review and the exact two-file Creation correction."
+      "pauseReason": "All three P1 reviews failed. Integration generation 7 may correct only the exact two Creation files; task 4.3 remains locked until Controller G8 independently accepts the corrected implementation."
+    },
+    "p1SecurityReview": {
+      "status": "failed-candidate-rejected",
+      "classes": ["path-leak", "ordinary-numeric-byte-array-leak", "free-string-image-payload-leak"],
+      "evidence": ".codex/routego-program/evidence/integration-generation-7-p1-review.json",
+      "correctionAllowedFiles": [
+        "packages/creation/src/runtime/mcp/server.ts",
+        "packages/creation/test/mcp.test.ts"
+      ],
+      "taskResumeAuthorized": false
     }
   },
   "latestDirectCheckpoint": {
@@ -175,11 +186,12 @@
     "continuityFallbackIntervalMinutes": 30
   },
   "currentBlockers": [
-    "All three P1 leak classes must pass independent review before task 4.3 can resume."
+    "The exact two-file Creation correction must repair all three common-root P1 failures and receive independent Controller acceptance before task 4.3 can resume."
   ],
   "currentRisks": [
     "Task 4.3 remains paused. The migration checkpoint at 34fd18aca083199028b8f9a54f8fc26f023711db is not a completed or accepted correction.",
     "Task 4.3 must preserve task 4.2 behavior and must not implement packaging, installation or real relay work.",
+    "P1 reviewers caused pnpm to fetch or install 118 local dependencies before the stop instruction arrived; tracked Git stayed clean and no cleanup was attempted.",
     "External approval gates 7.2, 8.2 and 9.1 remain closed without fresh explicit user approval."
   ],
   "externalApprovalGates": {
@@ -211,7 +223,7 @@
       "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
       "branch": "codex/routego-integration-g7",
       "acceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
-      "status": "activated-sole-owner-independent-p1-review-task-4.3-product-locked"
+      "status": "activated-sole-owner-p1-review-failed-exact-two-file-correction-authorized-task-4.3-product-locked"
     },
     "archivedSourceOwner": {
       "lane": "integration",

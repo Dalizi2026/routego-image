@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "32028d520913a2ad4cdee445024b9255ac65cce563b68dd2cd8fa7403ee602d5",
+  "contentSha256": "314a61b11e1274d7d2d8d1dd39c6281e4ade82ff7ee2a10243710c9b911d1fa3",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.3",
-  "status": "incomplete-wip-preserved-pd-012-candidate-under-independent-p1-review-task-4.3-product-locked",
+  "status": "incomplete-wip-preserved-pd-012-p1-review-failed-exact-two-file-correction-authorized-task-4.3-product-locked",
   "sourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -105,9 +105,9 @@
     "acceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
     "sourceOwnerArchived": true,
     "soleApplyOwner": true,
-    "applyAuthorized": false,
-    "reviewAuthorized": true,
-    "authorizedScope": "independent-three-p1-security-review-only-task-4.3-product-locked",
+    "applyAuthorized": true,
+    "reviewAuthorized": false,
+    "authorizedScope": "exact-two-file-p1-root-correction-task-4.3-product-locked",
     "started": true
   },
   "planDeviation": {
@@ -132,6 +132,8 @@
       "packages/creation/test/mcp.test.ts"
     ],
     "correctiveCodeAuthorized": true,
+    "p1ReviewStatus": "failed-all-three-classes-candidate-rejected",
+    "p1ReviewEvidence": ".codex/routego-program/evidence/integration-generation-7-p1-review.json",
     "taskResumeAuthorized": false,
     "requiredSequence": "The exact owner-only three-file PD-012 OpenSpec update is accepted at 2b62dac6d86c8ca0fef6b52eea81019ba5749430. Incorporate and validate the separate Controller authorization, then implement and commit exactly packages/creation/src/runtime/mcp/server.ts and packages/creation/test/mcp.test.ts. The four task-4.3 files remain locked until the corrective commit is independently accepted."
   },
