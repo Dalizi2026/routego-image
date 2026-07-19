@@ -355,7 +355,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
   const bootstrapResponse = await fetch(launchUrl, { redirect: "error" });
   if (bootstrapResponse.status !== 200) fail("Studio bootstrap did not load");
   const bootstrap = await bootstrapResponse.text();
-  const sessionToken = sessionTokenFromBootstrap(bootstrap);
+  const bootstrapSession = sessionTokenFromBootstrap(bootstrap);
   if (bootstrap.includes(launchUrl.searchParams.get("token"))) {
     fail("Studio bootstrap retained the one-time launch token");
   }
@@ -376,7 +376,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
 
   const status = await checkedJson(await fetch(
     new URL("/api/v1/status?refreshCapabilities=false", origin),
-    { headers: studioHeaders(origin, sessionToken) }
+    { headers: studioHeaders(origin, bootstrapSession) }
   ));
   if (status.configured !== false || status.service?.status !== "ready") {
     fail("Studio offline status is not ready and unconfigured");
@@ -384,7 +384,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
 
   const folders = await checkedJson(await fetch(
     new URL("/api/v1/library/folders", origin),
-    { headers: studioHeaders(origin, sessionToken) }
+    { headers: studioHeaders(origin, bootstrapSession) }
   ));
   const folderCollection = Array.isArray(folders) ? folders : folders.folders;
   if (!Array.isArray(folderCollection) ||
@@ -395,7 +395,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
   const pngSha256 = sha256(SYNTHETIC_PNG);
   const reserve = await checkedJson(await fetch(new URL("/api/v1/uploads/reserve", origin), {
     method: "POST",
-    headers: studioHeaders(origin, sessionToken, true),
+    headers: studioHeaders(origin, bootstrapSession, true),
     body: JSON.stringify({
       schemaVersion: 1,
       purpose: "image",
@@ -411,7 +411,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
   const staged = await checkedJson(await fetch(new URL(upload.binaryUpload.relativeUrl, origin), {
     method: "PUT",
     headers: {
-      ...studioHeaders(origin, sessionToken),
+      ...studioHeaders(origin, bootstrapSession),
       "content-type": "image/png",
       "content-length": String(SYNTHETIC_PNG.byteLength)
     },
@@ -422,7 +422,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
   }
   const finalized = await checkedJson(await fetch(new URL("/api/v1/uploads/finalize", origin), {
     method: "POST",
-    headers: studioHeaders(origin, sessionToken, true),
+    headers: studioHeaders(origin, bootstrapSession, true),
     body: JSON.stringify({ schemaVersion: 1, uploadResourceId: upload.uploadResourceId })
   }));
   if (finalized.status !== "succeeded" || finalized.resource?.status !== "finalized" ||
@@ -431,7 +431,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
   }
   const uploadStatus = await checkedJson(await fetch(new URL("/api/v1/uploads/status", origin), {
     method: "POST",
-    headers: studioHeaders(origin, sessionToken, true),
+    headers: studioHeaders(origin, bootstrapSession, true),
     body: JSON.stringify({ schemaVersion: 1, uploadResourceId: upload.uploadResourceId })
   }));
   if (uploadStatus.resource?.uploadResourceId !== upload.uploadResourceId ||
@@ -441,13 +441,13 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
 
   const missingResource = await fetch(
     new URL("/api/v1/resources/synthetic-missing-resource", origin),
-    { headers: studioHeaders(origin, sessionToken) }
+    { headers: studioHeaders(origin, bootstrapSession) }
   );
   if (missingResource.status !== 404) fail("Studio did not safely reject a missing resource");
 
   const streamResponse = await fetch(new URL("/api/v1/studio/creation/stream", origin), {
     method: "POST",
-    headers: studioHeaders(origin, sessionToken, true),
+    headers: studioHeaders(origin, bootstrapSession, true),
     body: JSON.stringify({
       schemaVersion: 1,
       kind: "generate",
@@ -470,7 +470,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
     fail("Studio stream did not return a protected final resource");
   }
   const protectedResponse = await fetch(new URL(protectedResource.relativeUrl, origin), {
-    headers: studioHeaders(origin, sessionToken)
+    headers: studioHeaders(origin, bootstrapSession)
   });
   const protectedBytes = new Uint8Array(await protectedResponse.arrayBuffer());
   if (protectedResponse.status !== 200 || sha256(protectedBytes) !== sha256(SYNTHETIC_PNG)) {
