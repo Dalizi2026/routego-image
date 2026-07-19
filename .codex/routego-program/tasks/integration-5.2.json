@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "4b68a74c92c9e376f79d22b55ade062e19f0c3f54afbeb5d8110e4716d7363e0",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "5.2",
+  "status": "locked-awaiting-integration-generation-8-handoff",
+  "sourceCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "f77f40a4466df42e16ecb9b970b6eb3a0b3133490263b6a6949047fcedb5cbc7",
+    "lineSha256": "debb5cccc754e8a757f136b272860b7fba515638eb13a5d9c150ab1c2a40ab2f",
+    "lineBytes": 1213
+  },
+  "dependencies": [
+    "5.1"
+  ],
+  "allowedFiles": [
+    "packages/integration/tsup.config.ts",
+    "packages/integration/package.json",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".gitignore",
+    "scripts/build-plugin-package.mjs",
+    "scripts/verify-plugin-package.mjs",
+    "THIRD_PARTY_NOTICES.md",
+    "licenses/pngjs-MIT.txt",
+    "packages/integration/test/package.test.ts"
+  ],
+  "allowedParentDirectoriesToCreate": [
+    "."
+  ],
+  "allowedFileMode": "create or modify exactly the ten task-5.2 files; all parent directories exist at the source commit",
+  "forbiddenFileGlobs": [
+    ".agents/**",
+    ".codex-plugin/**",
+    ".codex/routego-program/**",
+    "skills/**",
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/library/**",
+    "packages/mock-relay/**",
+    "packages/studio/src/**",
+    "packages/studio/test/**",
+    "openspec/**",
+    "dist/**",
+    "build/**",
+    "node_modules/**",
+    "**/binding.gyp"
+  ],
+  "requiredBehavior": [
+    "Build a self-contained Routego Image plugin staging artifact containing the accepted manifest, Skill and launcher, a bundled Integration runtime, hashed Studio assets, complete notices and the pinned pngjs MIT license.",
+    "Generate runtime/index.js and runtime/studio-assets.json exactly as required by the accepted task-5.1 launcher, with no unresolved workspace or package imports for Node.js 20.19+.",
+    "Build twice from the same source and verify equivalent content manifests and file hashes while explaining or rejecting every nondeterministic difference.",
+    "Use explicit allowlist and denylist verification to exclude node_modules, native addons, install scripts, unresolved externals, source checkout paths, source maps with local paths, credentials, config, user images, Library data, caches, reports and unrelated source.",
+    "Audit runtime dependencies, license provenance and pure-JavaScript constraints, and verify every declared plugin path and Studio asset route remains contained in the staged plugin root.",
+    "Keep all generated staging and artifact outputs ignored and uncommitted. Do not install the staged plugin, modify marketplace state, publish, release or start task 5.3."
+  ],
+  "verification": [
+    "openspec instructions apply --change integrate-routego-image-plugin --json",
+    "pnpm install --frozen-lockfile within the existing user-authorized installation boundary; no network without separate authorization",
+    "full workspace build in the required dependency order",
+    "two clean staged builds and equivalent content manifests",
+    "plugin-creator manifest validation against each staged artifact",
+    "Node.js 20.19+ bundled runtime import and offline-safe startup boundary",
+    "Studio hashed assets, Skill, manifest, launcher, notices and pngjs license present",
+    "dependency, license, native addon, install-script and unresolved-external audits",
+    "allowlist and denylist rejection for source maps, local paths, secrets, config, images, Library data, caches, reports, build residue and source checkout dependencies",
+    "node scripts/check-package-exports.mjs",
+    "node scripts/check-repository-safety.mjs",
+    "openspec validate --all --strict --no-interactive",
+    "git diff --check",
+    "exact ten-file implementation scope and uncommitted ignored artifact audit"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/plugin-packaging-installation/spec.md",
+      "sha256": "d9970d8be726dd77f694ba9cfbdd2f84f64d840add82a602bc6abef45c856c66",
+      "bytes": 4778,
+      "reason": "Canonical self-contained pure-JavaScript package, reproducibility, allowlist, notices and installation isolation boundaries."
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
+      "sha256": "7ea6069220347f8a434abf21b930ee026e5d7b9bb763b67bf4a50cbf0a3b9f15",
+      "bytes": 10937,
+      "reason": "Exact seven-tool runtime, plugin process and contained Studio static asset requirements."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "activation": {
+    "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
+    "controllerGeneration": 8,
+    "sourceIntegrationThreadId": "019f79a6-ba30-73e3-9875-33ba707af137",
+    "sourceIntegrationGeneration": 7,
+    "successorIntegrationGeneration": 8,
+    "acceptedTask5_1ImplementationCommit": "f3d3d67d264160736d8ce3812eb097c3ab509a22",
+    "acceptedTask5_1StateCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
+    "soleApplyOwner": false,
+    "applyAuthorized": false,
+    "authorizedScope": "handoff-audit-only-until-controller-activation"
+  },
+  "installationPolicy": {
+    "packageInstallationAuthorizedByUser": true,
+    "networkAuthorized": false,
+    "marketplaceAuthorized": false,
+    "targetPluginInstallationAuthorized": false
+  },
+  "knownRisks": [
+    "Task 5.2 is a large atomic packaging boundary and must start only in the zero-compaction Integration generation-8 successor.",
+    "Ignored dist directories from earlier direct verification remain present and uncommitted; the package scripts must use clean temporary staging and must not treat those directories as trusted source artifacts.",
+    "Temporary target installation, marketplace changes and fresh-process smoke remain task 5.3 or later and are not authorized here."
+  ],
+  "externalStateAuthorized": false
+}

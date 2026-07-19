@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "c1e5a7764bb4aef5af1387a2f2fb69957b19475159d7281230dd04969356ad31",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "generation": 7,
+  "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
+  "openspecProgress": "19/29",
+  "observableCompactions": 3,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|f5ce78632026f779bf38c793f50b5357301e6497|context-compaction-3-task-5.1-task-state-safety-checkpoint-before-task-5.2|19/29",
+  "gitClean": true,
+  "externalStateAuthorized": false,
+  "task": {
+    "taskId": "5.1",
+    "implementationCommit": "f3d3d67d264160736d8ce3812eb097c3ab509a22",
+    "implementationParent": "391ee9aabae29aee9351ca3b05fec027e04b72fc",
+    "taskStateCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
+    "files": [
+      ".codex-plugin/plugin.json",
+      "skills/routego-image/SKILL.md",
+      "scripts/start-routego-image.mjs",
+      "openspec/changes/integrate-routego-image-plugin/tasks.md"
+    ],
+    "verification": "Controller independently accepted plugin-creator manifest validation, skill-creator validation, JSON and UTF-8, exact seven tools, launcher syntax and bounded path-free failure, current-call and redaction scenarios, repository safety over 474 tracked files, strict OpenSpec 19/19, capsule validation, exact commit scope and clean Git.",
+    "residualRisk": "Task 5.2 owns generation, packaging and execution of runtime/index.js and runtime/studio-assets.json. No marketplace, installation target, external data or release state changed in task 5.1."
+  },
+  "handoff": {
+    "required": true,
+    "reason": "The third observable Integration compaction occurred at the task-state Git safety checkpoint. Task 5.2 is a new large packaging and reproducibility task and cannot start in generation 7.",
+    "nextGeneration": 8,
+    "nextTaskId": "5.2"
+  }
+}

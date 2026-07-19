@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "18cb233be27f579760d707da8a0e1d69477e245e622a89011d65ff2ec4292e65",
+  "contentSha256": "43d8e7cbbb957171a8ed47b1f132f4fb458eb60d96c2bb88afe9897555de276c",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "5.1",
-  "status": "activated-sole-owner-task-5.1-authorized",
+  "status": "completed-controller-accepted",
   "sourceCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -97,7 +97,11 @@
     "acceptedTask4_3StateCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
     "soleApplyOwner": true,
     "applyAuthorized": true,
-    "authorizedScope": "task-5.1-exact-three-file-implementation"
+    "authorizedScope": "task-5.1-exact-three-file-implementation",
+    "completed": true,
+    "implementationCommit": "f3d3d67d264160736d8ce3812eb097c3ab509a22",
+    "taskStateCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
+    "controllerAccepted": true
   },
   "knownRisks": [
     "Manifest validation must not introduce unsupported fields or declare absent app, hook or MCP companion files.",
