@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "3fefa5d0d5845fe121a2d5ebf17f0d4c2a72b376cfbcf73b9c944ad5a40f5265",
+  "capsuleSha256": "8c33d226b754d0d90ea49d84972ffd3ee0bd8edfb72a7e8d2c2c146aaa1a0f3a",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -18,12 +18,12 @@
     "handoffParent": "b2b1b556a0d66f4d9bdb912eade1109f046cecad"
   },
   "successor": {
-    "threadId": "pending",
+    "threadId": "019f799e-2c56-7982-99e4-c6943af9a7b4",
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
     "plannedBranch": "codex/routego-integration-g7",
     "startingCommit": "34fd18aca083199028b8f9a54f8fc26f023711db",
     "registrationStatus": "registered-awaiting-low-context-acceptance",
-    "registrationCommit": null,
+    "registrationCommit": "e14b9305f5e66351e7d49bbf8410eab8d9d8c294",
     "incorporationCommit": "3f629eaf12b54a2d334efec14310646a99c73e62",
     "registrationCommitSemantics": "The containing registration commit cannot self-reference its own SHA. The real thread ID is filled after task creation, before acceptance or activation."
   },
@@ -145,7 +145,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
-    "expectedNormalizedUtf8Bytes": 108395,
+    "expectedNormalizedUtf8Bytes": 108596,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
