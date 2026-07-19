@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "e03cb36eafa254bea58d95a1f6b6e8bb18970931cd73b2b983ffac160530a99f",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "5.3-cross-platform-install-smoke-correction-during-6.2",
+  "status": "activation-authorized-awaiting-integration-audit",
+  "detectedByTask": "6.2",
+  "sourceCommit": "6438caf9abc00e3bd2da6c432f0f78f233007731",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "b40260b934d4a957b2a6d89f468c61d258803844f4ac185e0808356c8a6bc09b",
+    "lineSha256": "488aefc8d17fe99e53c1ab01b47b77a3642cc3c178d87728da72ff7111f870bf",
+    "lineBytes": 1174
+  },
+  "allowedFiles": [
+    "scripts/smoke-plugin-install.mjs",
+    "packages/integration/test/install-smoke.test.ts"
+  ],
+  "allowedFileMode": "modify only the existing Task 5.3 smoke harness and its test to make the accepted fresh-process install smoke portable across Windows, Ubuntu and macOS",
+  "baselineFiles": [
+    {
+      "path": "scripts/smoke-plugin-install.mjs",
+      "sha256": "e8dada55d7c393cf60290d3d6e39737d61d21092d15acafb91ed84f36946db9a",
+      "bytes": 31297
+    },
+    {
+      "path": "packages/integration/test/install-smoke.test.ts",
+      "sha256": "53549598ab71ddcabbf2d317f611006b8784db43363a1af88c08f845a47f4c43",
+      "bytes": 6434
+    }
+  ],
+  "forbiddenFileGlobs": [
+    ".codex/routego-program/**",
+    "openspec/**",
+    ".github/**",
+    "packages/**/src/**",
+    "packages/**/test/**",
+    "scripts/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "forbiddenFileExceptions": [
+    "scripts/smoke-plugin-install.mjs",
+    "packages/integration/test/install-smoke.test.ts"
+  ],
+  "rootCause": "The Task 5.3 success test omits codexExecutable, so runPluginInstallSmoke defaults to the macOS-only /Applications/ChatGPT.app/Contents/Resources/codex path. Task 6.2 requires all tests on Windows, Ubuntu and macOS, making the accepted smoke contract non-portable.",
+  "requiredBehavior": [
+    "Provide a platform-portable explicit fresh-process command boundary for automated tests without relying on a system ChatGPT application path.",
+    "The portable test client must load and exercise the same strict-verified installed package copy rather than return static success fixtures.",
+    "Preserve Skill discovery, exact routego-image version, exact seven public MCP tools, offline status/tool calls, Studio bootstrap/static/API/upload/resource/stream and shared synthetic Library verification.",
+    "Preserve accepted artifact hash enforcement, source and node_modules independence, legacy HOME/CODEX_HOME immutability, failure cleanup and owned-root cleanup refusal.",
+    "Do not skip the success test, weaken assertions, create fake system paths or depend on platform-specific signals, permissions or shell execution."
+  ],
+  "verification": [
+    "focused install-smoke 5/5 on the current platform using the portable injected boundary",
+    "static cross-platform command and path audit for Windows, Ubuntu and macOS",
+    "Integration full tests and typecheck",
+    "accepted package strict verifier and wrong-hash rejection",
+    "repository safety and secret/path audits",
+    "fresh OpenSpec 22/29 with task 6.2 still first pending and strict 19/19",
+    "git diff --check and exact Task 5.3 two-file correction scope"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/plugin-packaging-installation/spec.md",
+      "sha256": "d9970d8be726dd77f694ba9cfbdd2f84f64d840add82a602bc6abef45c856c66",
+      "bytes": 4778
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/cross-platform-integration-verification/spec.md",
+      "sha256": "92e3a26498cf724f5580ab55961f95fa6ee8503fbca3ad2df9aba6296c4d429a",
+      "bytes": 5563
+    }
+  ],
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "integrationGeneration": 8,
+    "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "integrationBaseline": "6438caf9abc00e3bd2da6c432f0f78f233007731",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "task-5.3-cross-platform-install-smoke-correction-exact-two-files",
+    "authorizedFiles": [
+      "scripts/smoke-plugin-install.mjs",
+      "packages/integration/test/install-smoke.test.ts"
+    ],
+    "task6_2Held": true,
+    "started": false
+  },
+  "remoteCiExecutionAuthorized": false,
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "marketplaceAuthorized": false,
+  "realCredentialsOrUserDataAuthorized": false
+}
