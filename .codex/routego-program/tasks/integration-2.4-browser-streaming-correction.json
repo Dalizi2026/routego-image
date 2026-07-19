@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "c88a16b67021fd87b09678f8c452b25ed01cfe78363b9e1bfd5efe37e43967bb",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "2.4-correction-during-6.1",
+  "status": "activation-authorized-awaiting-integration-audit",
+  "sourceCommit": "a67191c71cf30df84bb586eb53eef4caf42898ee",
+  "origin": {
+    "owningTaskId": "2.4",
+    "detectedByTaskId": "6.1",
+    "acceptedOwningTaskImplementationCommit": "f9937d9f00a766af24e988b28187720cba6b5885",
+    "blocker": "The existing Studio browser gate proves that schema-valid started, partial and completed events reach the client, but React batches the workbench state updates so the required streaming panel is never rendered before the final result."
+  },
+  "allowedFiles": [
+    "packages/studio/src/features/creation/CreationWorkbench.tsx"
+  ],
+  "allowedFileMode": "modify exactly the owning Task 2.4 workbench composition file while preserving the three uncommitted Task 6.1 test files byte-for-byte",
+  "forbiddenFileGlobs": [
+    ".codex/routego-program/**",
+    "openspec/**",
+    "tests/browser/**",
+    "packages/studio/src/features/creation/stream.ts",
+    "packages/studio/src/features/creation/types.ts",
+    "packages/studio/src/features/creation/result.ts",
+    "packages/studio/test/**",
+    "packages/integration/**",
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/mock-relay/**",
+    "scripts/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "requiredBehavior": [
+    "A schema-valid started event must produce an observable data-stream-state=streaming workbench render before a later completed result replaces it.",
+    "Validated partial artifacts must remain renderable as they arrive, without buffering the entire stream into a final-only UI update.",
+    "The correction must preserve cancellation, failure-after-partial, terminal validation, reader cleanup and immutable protected-resource lifetime behavior.",
+    "Do not change the existing browser assertion, add timing sleeps, delay the server, weaken the SSE gate or create a second stream surface."
+  ],
+  "verification": [
+    "Studio typecheck, unit tests and build",
+    "existing authenticated streamed-success browser test repeated without assertion changes",
+    "complete existing Studio browser suite using a task-owned temporary verification copy and a free loopback port when 4173 is occupied",
+    "Integration focused Task 6.1 suite remains 16/16 and its three uncommitted files remain byte-for-byte unchanged",
+    "root typecheck, tests, build, seven-package exports and repository safety",
+    "fresh OpenSpec apply remains 21/29 and strict validation remains 19/19",
+    "git diff --check and exact one-file corrective implementation scope"
+  ],
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "integrationGeneration": 8,
+    "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "task-2.4-browser-streaming-render-correction-exact-one-file",
+    "authorizedFiles": [
+      "packages/studio/src/features/creation/CreationWorkbench.tsx"
+    ],
+    "task6_1Held": true,
+    "task6_1PreservedFiles": [
+      "packages/integration/test/end-to-end.test.ts",
+      "packages/integration/test/security.test.ts",
+      "packages/integration/test/fixtures.ts"
+    ],
+    "started": false
+  },
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "marketplaceAuthorized": false,
+  "realCredentialsOrUserDataAuthorized": false
+}
