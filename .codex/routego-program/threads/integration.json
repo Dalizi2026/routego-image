@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-8-task-5.2-implementation-committed-independent-verifier-correction-in-progress-library-gate-blocked",
+  "status": "generation-8-task-5.2-full-gate-passed-awaiting-task-state-checkpoint",
   "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
   "threadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
   "worktree": "/Users/dalizi/Documents/routego-image-integration-g8",
@@ -13,11 +13,11 @@
   "registrationAttempt": 1,
   "registrationCommit": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
   "incorporationCommit": "a3f5cd9d5b43085ad6b76503a2b78fe2399b001a",
-  "currentHead": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+  "currentHead": "3b2a938e8dacfb710480f7e6155bd1d791eee874",
   "gitCleanAtRegistration": true,
-  "gitClean": false,
-  "observableCompactions": 1,
-  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9|context-compaction-1-during-independent-package-verifier-correction|19/29",
+  "gitClean": true,
+  "observableCompactions": 2,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|7cb08c20767fdb03697924db8fa6a6c28df57a9a|context-compaction-2-health-audit-before-drive-adjacency-correction|19/29",
   "soleApplyOwner": true,
   "frozen": false,
   "applyAuthorized": true,
@@ -73,14 +73,18 @@
     "capsule": ".codex/routego-program/tasks/integration-5.2.json",
     "activationStatus": "sole-owner-task-5.2-authorized",
     "started": true,
-    "completionStatus": "implementation-committed-not-accepted-verifier-correction-and-library-gate-blocked",
+    "completionStatus": "implementation-accepted-full-gate-passed-awaiting-task-state-checkpoint",
     "implementationCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
     "packageVerifierCorrectionScope": [
       "scripts/verify-plugin-package.mjs",
       "packages/integration/test/package.test.ts"
     ],
     "libraryCorrectionDecision": ".codex/routego-program/deviations/PD-013-library-canonical-path-identity.md",
-    "libraryCorrectionThreadId": "019f7a81-775e-7063-bfd4-3e444e0b0354"
+    "libraryCorrectionThreadId": "019f7a81-775e-7063-bfd4-3e444e0b0354",
+    "packageVerifierCorrectionCommit": "0039d1875103157a41d62a08081f7cb3a57a1dca",
+    "libraryCorrectionCommit": "7e1e0f02a02f9b81ad4a709789ec038cae0d79c2",
+    "incorporationMergeCommit": "3b2a938e8dacfb710480f7e6155bd1d791eee874",
+    "implementationAccepted": true
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-8.capsule.json",
@@ -93,18 +97,18 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9|context-compaction-1-during-independent-package-verifier-correction|19/29",
-    "messageType": "CONTEXT_COMPACTION_1_HEALTH_AUDIT",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|3b2a938e8dacfb710480f7e6155bd1d791eee874|task-5.2-full-workspace-gate-passed-awaiting-task-state|19/29",
+    "messageType": "TASK_5_2_FULL_GATE_PASSED",
     "completedTaskId": "5.1",
     "nextTaskId": "5.2",
-    "reportedHead": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+    "reportedHead": "3b2a938e8dacfb710480f7e6155bd1d791eee874",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
     "sourceFrozen": false,
-    "observableCompactions": 1,
-    "checkpointSemantics": "First post-activation compaction health audit at committed task-5.2 implementation. Only the authorized package test red regressions are dirty; task 5.2 remains incomplete and Library correction is independently locked."
+    "observableCompactions": 2,
+    "checkpointSemantics": "Integration G8 verifier and Library corrections were independently accepted; merged full workspace gate passed, task 5.2 remains unchecked pending a separate task-state commit."
   },
   "planDeviation": {
     "id": "PD-012",
@@ -190,8 +194,8 @@
     "plannedBranch": "codex/routego-integration-g8",
     "startingCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
     "status": "activated-sole-owner-task-5.2-authorized",
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9|context-compaction-1-during-independent-package-verifier-correction|19/29",
+    "observableCompactions": 2,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|7cb08c20767fdb03697924db8fa6a6c28df57a9a|context-compaction-2-health-audit-before-drive-adjacency-correction|19/29",
     "soleApplyOwner": true,
     "applyAuthorized": true,
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-8.capsule.json"
