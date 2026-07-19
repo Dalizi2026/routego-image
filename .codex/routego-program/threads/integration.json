@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-7-sole-owner-p1-review-failed-exact-two-file-correction-authorized-task-4.3-product-locked",
+  "status": "generation-7-sole-owner-p1-correction-accepted-task-4.3-recovery-governance-pending",
   "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
   "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
   "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
@@ -21,7 +21,7 @@
   "soleApplyOwner": true,
   "frozen": false,
   "applyAuthorized": true,
-  "authorizedScope": "exact-two-file-p1-root-correction-task-4.3-product-locked",
+  "authorizedScope": "task-4.3-recovery-governance-only",
   "externalStateAuthorized": false,
   "sourceOwner": {
     "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
@@ -52,7 +52,7 @@
   "currentTask": {
     "id": "4.3",
     "capsule": ".codex/routego-program/tasks/integration-4.3.json",
-    "activationStatus": "sole-owner-p1-review-failed-exact-two-file-correction-authorized-task-4.3-product-locked",
+    "activationStatus": "sole-owner-p1-correction-accepted-task-4.3-recovery-governance-pending",
     "started": true,
     "completionStatus": "incomplete-wip-checkpoint-preserved"
   },
@@ -97,13 +97,15 @@
     "planningAuthorized": true,
     "planningCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
     "planningAccepted": true,
-    "productCorrectionAuthorized": true,
+    "productCorrectionAuthorized": false,
+    "productCorrectionAccepted": true,
+    "productCorrectionImplementationCommit": "57f1af97cf801b848ef89297654db6c0449f9d2a",
     "taskResumeAuthorized": false,
-    "p1ReviewStatus": "failed-all-three-classes-candidate-rejected",
+    "p1ReviewStatus": "accepted-all-three-classes-after-correction",
     "p1ReviewEvidence": ".codex/routego-program/evidence/integration-generation-7-p1-review.json"
   },
   "p1SecurityReview": {
-    "status": "failed-candidate-rejected-correction-authorized",
+    "status": "accepted-correction-task-4.3-recovery-governance-pending",
     "failedClasses": ["path-leak", "ordinary-numeric-byte-array-leak", "free-string-image-payload-leak"],
     "commonRoot": "heuristic field-name, signature, MIME, length and punctuation classifiers at recursive security boundaries",
     "evidence": ".codex/routego-program/evidence/integration-generation-7-p1-review.json",
@@ -111,6 +113,7 @@
       "packages/creation/src/runtime/mcp/server.ts",
       "packages/creation/test/mcp.test.ts"
     ],
+    "acceptedImplementationCommit": "57f1af97cf801b848ef89297654db6c0449f9d2a",
     "task4_3Locked": true,
     "executionDeviation": "pnpm fetched or installed 118 local dependencies before the stop instruction; tracked Git remained clean and no cleanup was attempted"
   },
