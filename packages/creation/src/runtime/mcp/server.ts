@@ -67,9 +67,9 @@ const TOOL_TO_OPERATION = new Map<string, RoutegoOperation>(
 const REDACTED_LOCAL_PATH = "[REDACTED_PATH]" as const;
 const OMIT_PROJECTED_FIELD = Symbol("omit-projected-field");
 const IMAGE_DATA_URL_PATTERN =
-  /data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/_=-]+/giu;
-const RAW_IMAGE_BASE64_PATTERN =
-  /(?:iVBORw0KGgo|\/9j\/|UklGR)[A-Za-z0-9+/_=-]{16,}/gu;
+  /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*;base64,[a-z0-9+/_-]+={0,2}/giu;
+const LONG_BASE64_TOKEN_PATTERN =
+  /(^|[^A-Za-z0-9+/_=-])([A-Za-z0-9+/_-]{64,}={0,2})(?=$|[^A-Za-z0-9+/_=-])/gu;
 
 function inputJsonSchema(operation: RoutegoOperation): Record<string, unknown> {
   const generated = routegoOperationDefinitions[operation].inputSchema.toJSONSchema({
@@ -113,21 +113,12 @@ function isPathDiagnosticKey(key: string | undefined): boolean {
   );
 }
 
-function isBinaryDiagnosticKey(key: string | undefined): boolean {
+function isOpaquePublicStringKey(key: string | undefined): boolean {
   const normalized = normalizedKey(key);
-  return (
-    normalized.includes("binary") ||
-    normalized === "buffer" ||
-    normalized.endsWith("buffer") ||
-    normalized === "bytes" ||
-    normalized.endsWith("bytes") ||
-    normalized === "bytearray" ||
-    normalized === "payloadbytes" ||
-    normalized === "rawbody"
-  );
+  return normalized === "sha256" || normalized.endsWith("id") || normalized.endsWith("ids");
 }
 
-function isNumericByteArray(value: unknown): value is readonly number[] {
+function isNumericByteArray(value: unknown): boolean {
   return (
     Array.isArray(value) &&
     value.length > 0 &&
@@ -137,20 +128,27 @@ function isNumericByteArray(value: unknown): value is readonly number[] {
 
 function containsLocalPath(value: string): boolean {
   const withoutWebUrls = value.replace(/https?:\/\/[^\s<>"']+/giu, "");
-  return /(?:^|[\s(=])["']?(?:file:\/\/+|[A-Za-z]:[\\/]|\\\\|\.{1,2}[\\/]|\/(?!\/)|[\p{L}\p{N}_.-]+[\\/])/iu.test(
-    withoutWebUrls
+  return (
+    /file:\/\/\/[^\r\n]*/iu.test(withoutWebUrls) ||
+    /[A-Za-z]:[\\/]/u.test(withoutWebUrls) ||
+    /\\\\[^\\\r\n]+\\/u.test(withoutWebUrls) ||
+    /(?:^|[\s"'([{:=,])(?:\.{1,2}|~)[\\/]/u.test(withoutWebUrls) ||
+    /(?:^|[\s"'([{:=,])\/(?!\/)/u.test(withoutWebUrls) ||
+    /(?:^|[\s"'([{:=,])[\p{L}\p{N}_.-]+[\\/][^\s<>"']+/iu.test(withoutWebUrls)
   );
 }
 
 function sanitizeDiagnosticProjection(value: unknown, key?: string): unknown {
   if (typeof value === "string") {
-    return isPathDiagnosticKey(key) || containsLocalPath(value) ? REDACTED_LOCAL_PATH : value;
+    const withoutImagePayloads = replaceImagePayloadsInText(value);
+    return isPathDiagnosticKey(key) || containsLocalPath(withoutImagePayloads)
+      ? REDACTED_LOCAL_PATH
+      : withoutImagePayloads;
   }
+  if (value instanceof ArrayBuffer || ArrayBuffer.isView(value)) return REDACTED_BINARY_DATA;
   if (Array.isArray(value)) {
-    if (isBinaryDiagnosticKey(key) && isNumericByteArray(value)) {
-      return REDACTED_BINARY_DATA;
-    }
-    return value.map((item) => sanitizeDiagnosticProjection(item, key));
+    if (isNumericByteArray(value)) return REDACTED_BINARY_DATA;
+    return value.map((item) => sanitizeDiagnosticProjection(item));
   }
   if (!isPlainRecord(value)) return value;
   return Object.fromEntries(
@@ -226,20 +224,25 @@ function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return prototype === Object.prototype || prototype === null;
 }
 
-function replaceImagePayloadsInText(value: string): string {
-  return value
-    .replace(IMAGE_DATA_URL_PATTERN, REDACTED_IMAGE_DATA)
-    .replace(RAW_IMAGE_BASE64_PATTERN, REDACTED_IMAGE_DATA);
+function replaceImagePayloadsInText(value: string, redactLongBase64 = true): string {
+  const withoutDataUrls = value.replace(IMAGE_DATA_URL_PATTERN, REDACTED_IMAGE_DATA);
+  if (!redactLongBase64) return withoutDataUrls;
+  return withoutDataUrls.replace(
+    LONG_BASE64_TOKEN_PATTERN,
+    (_match, prefix: string) => `${prefix}${REDACTED_IMAGE_DATA}`
+  );
 }
 
 function imageSuccessProjection(value: unknown, key?: string): unknown | typeof OMIT_PROJECTED_FIELD {
   if (key === "dataUrl") return OMIT_PROJECTED_FIELD;
   if (value instanceof ArrayBuffer || ArrayBuffer.isView(value)) return REDACTED_BINARY_DATA;
   if (Array.isArray(value)) {
-    if (isNumericByteArray(value) && value.length >= 4) return REDACTED_BINARY_DATA;
-    return value.map((item) => imageSuccessProjection(item));
+    if (isNumericByteArray(value)) return REDACTED_BINARY_DATA;
+    return value.map((item) => imageSuccessProjection(item, key));
   }
-  if (typeof value === "string") return replaceImagePayloadsInText(value);
+  if (typeof value === "string") {
+    return replaceImagePayloadsInText(value, !isOpaquePublicStringKey(key));
+  }
   if (!isPlainRecord(value)) return value;
 
   const projected: Record<string, unknown> = {};

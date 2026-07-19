@@ -22,6 +22,16 @@ import {
 } from "../src/runtime/mcp/index";
 
 const PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZVt8AAAAASUVORK5CYII=";
+const GIF_BASE64 = "R0lGODlhAQABAIAAAAUEBA==";
+const SVG_BASE64 = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiLz48L3N2Zz4=";
+const UNKNOWN_HEADER_BASE64 = "QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo0123456789abcd".repeat(2);
+const ORDINARY_LONG_TEXT =
+  "This is deliberately long ordinary prose with spaces and punctuation; it must remain readable after projection. " +
+  "This is deliberately long ordinary prose with spaces and punctuation; it must remain readable after projection.";
+const GIF_DATA_URL = `data:image/gif;base64,${GIF_BASE64}`;
+const SVG_DATA_URL = `data:image/svg+xml;charset=utf-8;base64,${SVG_BASE64}`;
+const CUSTOM_DATA_URL = `data:image/x-routego-synthetic;profile=test;base64,${UNKNOWN_HEADER_BASE64}`;
+const PARAMETERIZED_PNG_DATA_URL = `data:image/png;charset=utf-8;base64,${PNG_BASE64}`;
 
 function request(prompt = "MCP synthetic image"): ImageOperationRequest {
   return imageOperationRequestSchema.parse({ kind: "generate", prompt });
@@ -140,7 +150,9 @@ function failedImageResult(input: unknown) {
         `/home/Synthetic User/私密/image.png ../private folder/私密.png ` +
         `file:///C:/Users/Synthetic%20User/private/image.png ` +
         `file:///home/Synthetic%20User/private/image.png ` +
-        `data:image/png;base64,${PNG_BASE64}`,
+        `source:'file:///home/Synthetic%20User/punctuation/私密 image.png' ` +
+        `source:'../punctuation folder/私密 image.png' ` +
+        `${GIF_DATA_URL} ${SVG_DATA_URL} ${UNKNOWN_HEADER_BASE64}`,
       retryDisposition: "never",
       partialArtifacts: [],
       receivedAnyOutput: false,
@@ -156,7 +168,15 @@ function failedImageResult(input: unknown) {
         windowsFileUrl: "file:///C:/Users/Synthetic%20User/private/image.png",
         posixFileUrl: "file:///home/Synthetic%20User/private/image.png",
         bytes: [137, 80, 78, 71, 13, 10, 26, 10],
-        dataUrl: `data:image/png;base64,${PNG_BASE64}`
+        dataUrl: `data:image/png;base64,${PNG_BASE64}`,
+        arbitrary: {
+          note: "source:'C:\\Users\\Synthetic User\\punctuation\\私密 image.png'",
+          shortFragment: [137, 80, 78],
+          snapshot: [137, 80, 78, 71, 13, 10, 26, 10],
+          bufferShape: { type: "Buffer", data: [255, 216, 255, 224] },
+          imagePayload: CUSTOM_DATA_URL,
+          rawPayload: UNKNOWN_HEADER_BASE64
+        }
       }
     }
   });
@@ -343,6 +363,52 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(JSON.stringify(text)).not.toContain(PNG_BASE64);
     expect(JSON.stringify(text)).toContain("ordinary before [REDACTED_IMAGE_DATA] after");
     expect(JSON.stringify(text)).toContain("remains ordinary text around it");
+    expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
+  });
+
+  it("removes every image payload form while preserving ordinary text and business numbers", async () => {
+    const projectedInput = imageOperationRequestSchema.parse({
+      kind: "edit",
+      prompt:
+        `gif ${GIF_DATA_URL} svg ${SVG_DATA_URL} custom ${CUSTOM_DATA_URL} ` +
+        `parameterized ${PARAMETERIZED_PNG_DATA_URL} raw ${UNKNOWN_HEADER_BASE64} ` +
+        `ordinary ${ORDINARY_LONG_TEXT}`,
+      targetImage: {
+        path: "/synthetic/target.png",
+        label: `label ${SVG_DATA_URL}`
+      },
+      invariants: {
+        preserve: [`preserve ${CUSTOM_DATA_URL}`, `keep ${ORDINARY_LONG_TEXT}`]
+      }
+    });
+    const server = createRoutegoMcpServer({
+      service: service({ edit: async () => imageResult(projectedInput) })
+    });
+    await initialize(server);
+
+    const toolResult = resultValue(
+      await server.handleLine(
+        JSON.stringify({
+          jsonrpc: "2.0",
+          id: "all-image-payload-forms",
+          method: "tools/call",
+          params: { name: "routego_edit", arguments: editRequest() }
+        })
+      )
+    ) as McpToolResult;
+    const text = structuredText(toolResult);
+    const rendered = JSON.stringify(text);
+    expect(rendered).not.toContain("data:image");
+    expect(rendered).not.toContain(GIF_BASE64);
+    expect(rendered).not.toContain(SVG_BASE64);
+    expect(rendered).not.toContain(UNKNOWN_HEADER_BASE64);
+    expect(rendered).not.toContain(PNG_BASE64);
+    expect(rendered).toContain(ORDINARY_LONG_TEXT);
+    expect(text).toMatchObject({
+      requestedParams: { count: 1 },
+      execution: { attemptCount: 1, providerRequestCount: 1 },
+      finalArtifacts: [{ slot: 0, byteLength: 68, width: 1, height: 1, sha256: "a".repeat(64) }]
+    });
     expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
   });
 
@@ -635,8 +701,15 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(rendered).not.toContain("file:///");
     expect(rendered).not.toContain("..\\private folder");
     expect(rendered).not.toContain("../private folder");
+    expect(rendered).not.toContain("Synthetic%20User/punctuation");
     expect(rendered).not.toContain("137,80,78,71");
+    expect(rendered).not.toContain("137,80,78");
+    expect(rendered).not.toContain("255,216,255,224");
     expect(rendered).not.toContain(PNG_BASE64);
+    expect(rendered).not.toContain(GIF_BASE64);
+    expect(rendered).not.toContain(SVG_BASE64);
+    expect(rendered).not.toContain(UNKNOWN_HEADER_BASE64);
+    expect(rendered).not.toContain("data:image");
     expect(rendered).not.toContain("dataUrl");
     expect(rendered).toContain("[REDACTED_PATH]");
     expect(rendered).toContain("[REDACTED_BINARY_DATA]");
@@ -799,6 +872,114 @@ describe("STDIO channel safety and lifecycle", () => {
     expect(
       await server.handleLine(JSON.stringify({ jsonrpc: "2.0", id: 6, method: "ping" }))
     ).toMatchObject({ error: { code: -32000 } });
+  });
+
+  it("fails closed for arbitrary diagnostic keys, punctuation paths, byte shapes, and Error causes", async () => {
+    const diagnostics: unknown[] = [];
+    let callCount = 0;
+    const byteView = Uint8Array.from([82, 73, 70, 70]);
+    const cause = {
+      note: "source:'file:///home/Synthetic%20User/punctuation/私密 cause.png'",
+      snapshot: [137, 80, 78, 71, 13, 10, 26, 10],
+      shortFragment: [251, 250, 249],
+      bufferShape: { type: "Buffer", data: [255, 216, 255, 224] },
+      typedView: byteView,
+      arrayBuffer: byteView.buffer,
+      imagePayload: SVG_DATA_URL,
+      rawPayload: UNKNOWN_HEADER_BASE64
+    };
+    const server = createRoutegoMcpServer({
+      service: service({
+        generate: async () => {
+          callCount += 1;
+          if (callCount === 1) {
+            throw {
+              message: "source:'C:\\Users\\Synthetic User\\punctuation\\私密 image.png'",
+              unc: "source:['\\\\synthetic-server\\Private Share\\私密 image.png']",
+              posix: "source:(/home/Synthetic User/punctuation/私密 image.png)",
+              dot: "source:'./relative folder/私密 image.png'",
+              parent: "source:'../relative folder/私密 image.png'",
+              home: "source:'~/relative folder/私密 image.png'",
+              cause,
+              ordinary: ORDINARY_LONG_TEXT
+            };
+          }
+          throw new Error("source:'../relative folder/私密 error.png'", { cause });
+        }
+      }),
+      logger: (value) => {
+        diagnostics.push(value);
+      }
+    });
+    await initialize(server);
+
+    for (const id of ["plain-diagnostic", "error-cause"]) {
+      const result = resultValue(
+        await server.handleLine(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            id,
+            method: "tools/call",
+            params: { name: "routego_generate", arguments: request() }
+          })
+        )
+      ) as McpToolResult;
+      expect(result.isError).toBe(true);
+      expect(structuredText(result)).toMatchObject({
+        error: { code: "internal_contract", safeMessage: "The Routego Image service call failed safely." }
+      });
+    }
+
+    const rendered = JSON.stringify(diagnostics);
+    expect(diagnostics).toHaveLength(2);
+    expect(rendered).not.toContain("Synthetic User");
+    expect(rendered).not.toContain("synthetic-server");
+    expect(rendered).not.toContain("Private Share");
+    expect(rendered).not.toContain("Synthetic%20User/punctuation");
+    expect(rendered).not.toContain("relative folder");
+    expect(rendered).not.toContain("file:///");
+    expect(rendered).not.toContain("私密");
+    expect(rendered).not.toContain("137,80,78,71");
+    expect(rendered).not.toContain("251,250,249");
+    expect(rendered).not.toContain("255,216,255,224");
+    expect(rendered).not.toContain("82,73,70,70");
+    expect(rendered).not.toContain("data:image");
+    expect(rendered).not.toContain(SVG_BASE64);
+    expect(rendered).not.toContain(UNKNOWN_HEADER_BASE64);
+    expect(rendered).toContain(ORDINARY_LONG_TEXT);
+    expect(rendered).toContain("[REDACTED_PATH]");
+    expect(rendered).toContain("[REDACTED_BINARY_DATA]");
+    expect((await server.handleLine(JSON.stringify({ jsonrpc: "2.0", id: "still-serving", method: "ping" })))?.id)
+      .toBe("still-serving");
+  });
+
+  it("does not copy image payload text into framing diagnostics", async () => {
+    const diagnostics: unknown[] = [];
+    const output: string[] = [];
+    const server = createRoutegoMcpServer({
+      service: service({ generate: async (input: unknown) => imageResult(input) }),
+      logger: (value) => {
+        diagnostics.push(value);
+      },
+      write: (line) => {
+        output.push(line);
+      }
+    });
+    const encoded = new TextEncoder().encode(
+      `{"jsonrpc":"2.0","method":"ping","payload":"${GIF_DATA_URL}`
+    );
+    const invalidUtf8Frame = new Uint8Array(encoded.length + 2);
+    invalidUtf8Frame.set(encoded);
+    invalidUtf8Frame[encoded.length] = 0xff;
+    invalidUtf8Frame[encoded.length + 1] = 0x0a;
+    await server.handleChunk(invalidUtf8Frame);
+    expect(output).toHaveLength(1);
+    expect(JSON.parse(output[0]!)).toMatchObject({ error: { code: -32700 } });
+    const rendered = JSON.stringify(diagnostics);
+    expect(diagnostics).toHaveLength(1);
+    expect(rendered).not.toContain("data:image");
+    expect(rendered).not.toContain(GIF_BASE64);
+    expect(server.closed).toBe(false);
   });
 
   it("emits sanitized framing failures for invalid UTF-8 without forcing process exit", async () => {
