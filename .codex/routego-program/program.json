@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-8-activated-authoritative-integration-migration-checkpoint-frozen-task-4.3-product-locked",
-  "projectPath": "/Users/dalizi/Documents/routego-image-controller-g8",
+  "status": "controller-generation-8-authoritative-integration-generation-7-registered-awaiting-low-context-acceptance-task-4.3-product-locked",
+  "projectPath": "/Users/dalizi/Documents/routego-image-integration-g7",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
   "authoritySummary": {
@@ -68,7 +68,7 @@
     "branch": "codex/routego-integration-g6",
     "acceptedProductCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "currentHead": "34fd18aca083199028b8f9a54f8fc26f023711db",
-    "soleApplyOwner": false,
+    "soleApplyOwner": true,
     "frozen": true,
     "applyAuthorized": false,
     "gitClean": true,
@@ -77,19 +77,19 @@
   },
   "successor": {
     "lane": "integration",
-    "generation": 6,
-    "status": "stopped-frozen-machine-transfer-non-completion-wip-task-4.3-product-locked",
-    "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
-    "plannedBranch": "codex/routego-integration-g6",
-    "startingCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
-    "registrationCommit": "e25cdc12eb15318fc9b1c414ddbcda92d6270520",
-    "incorporationCommit": "380e5936be0680b884a18f3b42a19e4fa299e438",
-    "currentHead": "34fd18aca083199028b8f9a54f8fc26f023711db",
+    "generation": 7,
+    "status": "registered-awaiting-low-context-acceptance-task-4.3-product-locked",
+    "threadId": "pending",
+    "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
+    "plannedBranch": "codex/routego-integration-g7",
+    "startingCommit": "34fd18aca083199028b8f9a54f8fc26f023711db",
+    "registrationCommit": null,
+    "incorporationCommit": "3f629eaf12b54a2d334efec14310646a99c73e62",
+    "currentHead": "3f629eaf12b54a2d334efec14310646a99c73e62",
     "gitClean": true,
     "observableCompactions": 1,
     "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29",
-    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-6.capsule.json"
+    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-7.capsule.json"
   },
   "currentChange": {
     "id": "integrate-routego-image-plugin",
@@ -159,7 +159,8 @@
     "continuityFallbackIntervalMinutes": 30
   },
   "currentBlockers": [
-    "Integration generation 6 is frozen at the non-completion migration checkpoint; generation 7 must independently review all three P1 leak classes before task 4.3 can resume."
+    "Integration generation 7 must complete zero-compaction low-context handoff acceptance and receive sole-owner activation before independent P1 review begins.",
+    "All three P1 leak classes must pass independent review before task 4.3 can resume."
   ],
   "currentRisks": [
     "Task 4.3 remains paused. The migration checkpoint at 34fd18aca083199028b8f9a54f8fc26f023711db is not a completed or accepted correction.",
