@@ -17,7 +17,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 // @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
 import { buildPluginPackage } from "../../../scripts/build-plugin-package.mjs";
 // @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { ACCEPTED_ARTIFACT_MANIFEST_SHA256, cleanupOwnedTemporaryRoot, runPluginInstallSmoke } from "../../../scripts/smoke-plugin-install.mjs";
+import { ACCEPTED_ARTIFACT_MANIFEST_SHA256, INSTALLED_PACKAGE_ARGUMENT_PREFIX, cleanupOwnedTemporaryRoot, runPluginInstallSmoke } from "../../../scripts/smoke-plugin-install.mjs";
 
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
 const EXPECTED_TOOLS = [
@@ -81,6 +81,12 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
     try {
       result = await runPluginInstallSmoke({
         packageDirectory: packageRoot,
+        freshProcessCommand: {
+          executable: process.execPath,
+          arguments: [
+            `${INSTALLED_PACKAGE_ARGUMENT_PREFIX}scripts/start-routego-image.mjs`
+          ]
+        },
         temporaryParent: path.join(root, "smoke-roots")
       });
     } finally {

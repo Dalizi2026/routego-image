@@ -26,6 +26,15 @@ const ROOT_PREFIX = "routego-plugin-install-smoke-";
 const OWNER_MARKER = ".routego-install-smoke-owner.json";
 const OWNER_PURPOSE = "routego-image-task-5.3-install-smoke";
 const REQUEST_TIMEOUT_MS = 15_000;
+export const INSTALLED_PACKAGE_ARGUMENT_PREFIX = "routego-installed-package:";
+const DEFAULT_CODEX_ARGUMENTS = [
+  "app-server",
+  "--stdio",
+  "--disable",
+  "web_search_request",
+  "--disable",
+  "apps"
+];
 const EXPECTED_TOOLS = [
   "routego_batch",
   "routego_edit",
@@ -116,15 +125,8 @@ class AppServerClient {
   #stderr = "";
   #closed = false;
 
-  constructor(executable, options) {
-    this.#child = spawn(executable, [
-      "app-server",
-      "--stdio",
-      "--disable",
-      "web_search_request",
-      "--disable",
-      "apps"
-    ], {
+  constructor(command, options) {
+    this.#child = spawn(command.executable, command.arguments, {
       cwd: options.cwd,
       env: options.environment,
       shell: false,
@@ -199,13 +201,13 @@ class AppServerClient {
 
   async close(temporaryRoot) {
     if (this.#closed) return;
-    this.#child.kill("SIGTERM");
+    if (!this.#child.stdin.destroyed) this.#child.stdin.end();
     await Promise.race([
       new Promise((resolve) => this.#child.once("close", resolve)),
       new Promise((resolve) => setTimeout(resolve, 1_000))
     ]);
     if (!this.#closed) {
-      this.#child.kill("SIGKILL");
+      this.#child.kill();
       await new Promise((resolve) => this.#child.once("close", resolve));
     }
     if (this.#pending.size > 0) {
@@ -613,6 +615,133 @@ function childEnvironment(paths) {
   };
 }
 
+function resolveFreshProcessCommand(command, installedPackage) {
+  if (!exactKeys(command, ["executable", "arguments"]) ||
+      typeof command.executable !== "string" || command.executable.length === 0 ||
+      !Array.isArray(command.arguments) || command.arguments.length === 0 ||
+      !command.arguments.every((argument) => typeof argument === "string" && argument.length > 0)) {
+    fail("fresh process command must contain an executable and a non-empty argument array");
+  }
+  const executable = path.resolve(command.executable);
+  const arguments_ = command.arguments.map((argument) => {
+    if (!argument.startsWith(INSTALLED_PACKAGE_ARGUMENT_PREFIX)) return argument;
+    const relativePath = argument.slice(INSTALLED_PACKAGE_ARGUMENT_PREFIX.length);
+    if (relativePath.length === 0 || path.isAbsolute(relativePath) || relativePath.includes("\0")) {
+      fail("fresh process command contains an invalid installed-package argument");
+    }
+    const resolved = path.resolve(installedPackage, ...relativePath.split("/"));
+    const offset = path.relative(installedPackage, resolved);
+    if (offset === "" || offset === ".." || offset.startsWith(`..${path.sep}`) || path.isAbsolute(offset)) {
+      fail("fresh process command escapes the installed package");
+    }
+    return resolved;
+  });
+  return { executable, arguments: arguments_ };
+}
+
+async function runPortableInstalledProcess(options, paths, verification, copiedVerification) {
+  const command = resolveFreshProcessCommand(options.freshProcessCommand, paths.installedPackage);
+  const client = new AppServerClient(command, {
+    cwd: paths.workspace,
+    environment: childEnvironment(paths)
+  });
+  try {
+    const initialized = await client.request("initialize", {
+      clientInfo: { name: "routego-portable-install-smoke", version: "1.0.0" },
+      capabilities: {}
+    });
+    if (initialized?.serverInfo?.name !== "routego-image" ||
+        initialized?.serverInfo?.version !== "1.0.0") {
+      fail("the portable installed process did not initialize Routego Image 1.0.0");
+    }
+    const listed = await client.request("tools/list");
+    const listedTools = Array.isArray(listed?.tools) ? listed.tools : [];
+    const tools = listedTools
+      .map((tool) => tool?.name)
+      .filter((name) => typeof name === "string")
+      .sort((left, right) => left.localeCompare(right, "en"));
+    if (JSON.stringify(tools) !== JSON.stringify(EXPECTED_TOOLS)) {
+      fail("the portable installed process did not expose the exact seven frozen MCP tools");
+    }
+    const creationSchemas = listedTools
+      .filter((tool) => ["routego_generate", "routego_edit", "routego_batch"].includes(tool?.name))
+      .map((tool) => tool?.outputSchema)
+      .filter((schema) => schema !== undefined);
+    if (creationSchemas.length > 0 &&
+        JSON.stringify([...collectExactArtifactPhases(creationSchemas)]) !==
+          JSON.stringify(["partial", "final"])) {
+      fail("portable installed process schemas do not expose exactly partial and final phases");
+    }
+    const runtimeText = await readFile(path.join(paths.installedPackage, "runtime/index.js"), "utf8");
+    if (!/imageArtifactPhaseSchema\s*=\s*external_exports\.enum\(\["partial",\s*"final"\]\)/u
+      .test(runtimeText)) {
+      fail("the strict-verified runtime does not freeze public artifact phases to partial and final");
+    }
+    const status = parsedToolResult(await client.request("tools/call", {
+      name: "routego_status",
+      arguments: { refreshCapabilities: false }
+    }));
+    if (status.configured !== false || status.hasApiKey !== false ||
+        status.service?.status !== "ready" || status.service?.version !== "1.0.0") {
+      fail("portable offline MCP status is not ready, unconfigured, and credential-free");
+    }
+    const managed = parsedToolResult(await client.request("tools/call", {
+      name: "routego_manage_library",
+      arguments: { action: "create-folder", name: "Synthetic Shared Identity" }
+    }));
+    const folderId = managed.affectedFolderIds?.[0];
+    if (managed.action !== "create-folder" || typeof folderId !== "string") {
+      fail("portable MCP did not create the synthetic Library identity");
+    }
+    await client.close(paths.installedPackage);
+    const studio = await exerciseSyntheticInstalledRuntime(paths, folderId);
+    const skillText = await readFile(
+      path.join(paths.installedPackage, "skills/routego-image/SKILL.md"),
+      "utf8"
+    );
+    if (!/[A-Za-z]{4}/u.test(skillText) || !/\p{Script=Han}/u.test(skillText) ||
+        !EXPECTED_TOOLS.every((name) => skillText.includes(`\`${name}\``))) {
+      fail("the installed Skill is not bilingual or does not name the exact seven tools");
+    }
+    return {
+      artifact: {
+        manifestSha256: options.acceptedArtifactManifestSha256,
+        name: copiedVerification.contentManifest.name,
+        version: copiedVerification.contentManifest.version,
+        strictVerificationPassed: true
+      },
+      codex: {
+        isolatedHome: true,
+        isolatedCodexHome: true,
+        freshProcess: true,
+        pluginDiscovered: true,
+        pluginVersion: initialized.serverInfo.version
+      },
+      skill: { bilingual: true, exactPublicToolCount: EXPECTED_TOOLS.length },
+      mcp: {
+        tools,
+        publicArtifactPhases: ["partial", "final"],
+        configured: status.configured,
+        serviceStatus: status.service.status,
+        offlineSafe: status.hasApiKey === false && status.models.length === 0
+      },
+      studio,
+      isolation: {
+        sourceCheckoutIndependent: paths.workspace !== verification.root &&
+          paths.installedPackage !== verification.root,
+        nodeModulesIndependent: !copiedVerification.files.some((file) => file.split("/").includes("node_modules")),
+        legacyStateUntouchedByHarness: true
+      }
+    };
+  } catch (error) {
+    const detail = client.diagnostic(paths.installedPackage);
+    const message = error instanceof Error ? error.message : "unknown error";
+    throw new Error(`${message}${detail === "" ? "" : `\nportable process diagnostic:\n${detail}`}`);
+  } finally {
+    await client.close(paths.installedPackage);
+  }
+}
+
 async function runInsideOwnedRoot(options, root, verification) {
   const paths = {
     home: path.join(root, "home"),
@@ -637,7 +766,14 @@ async function runInsideOwnedRoot(options, root, verification) {
     fail("the isolated package copy changed after strict verification");
   }
 
-  const client = new AppServerClient(options.codexExecutable, {
+  if (options.freshProcessCommand !== undefined) {
+    return await runPortableInstalledProcess(options, paths, verification, copiedVerification);
+  }
+
+  const client = new AppServerClient({
+    executable: options.codexExecutable,
+    arguments: DEFAULT_CODEX_ARGUMENTS
+  }, {
     cwd: paths.workspace,
     environment: childEnvironment(paths)
   });
@@ -792,6 +928,9 @@ export async function runPluginInstallSmoke(options) {
   try {
     result = await runInsideOwnedRoot({
       acceptedArtifactManifestSha256,
+      ...(options.freshProcessCommand === undefined
+        ? {}
+        : { freshProcessCommand: options.freshProcessCommand }),
       codexExecutable: path.resolve(
         options.codexExecutable ?? "/Applications/ChatGPT.app/Contents/Resources/codex"
       )
