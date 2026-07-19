@@ -1,10 +1,15 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, realpath, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createExclusiveFile, resolveApprovedPath, sanitizeBaseName } from "../../src/fs/paths";
+import {
+  canonicalizePathIdentity,
+  createExclusiveFile,
+  resolveApprovedPath,
+  sanitizeBaseName
+} from "../../src/fs/paths";
 
 const roots: string[] = [];
 
@@ -42,6 +47,12 @@ describe("Library paths", () => {
     expect(path.basename(first.path)).toBe("结果.png");
     expect(path.basename(second.path)).toBe("结果-2.png");
     expect(await readFile(first.path, "utf8")).toBe("first");
+  });
+
+  it("resolves a requested path to its canonical filesystem identity", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "routego-library-identity-"));
+    roots.push(root);
+    await expect(canonicalizePathIdentity(root)).resolves.toBe(await realpath(root));
   });
 
   it("rejects traversal outside an approved root", () => {

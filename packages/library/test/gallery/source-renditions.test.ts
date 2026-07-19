@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { deflateSync } from "node:zlib";
@@ -496,6 +496,21 @@ describe("Library source/output operation graphs", () => {
       renditions: [
         { artifactId: "artifact-legacy-source", phase: "source", sourceRoot: legacyRoot, sourceRelativePath: "legacy.jpg" },
         { artifactId: "artifact-final", phase: "final", sourceRoot: harness.sourceRoot, sourceRelativePath: "final.png" }
+      ]
+    }))).rejects.toMatchObject({ code: "path_unsafe" });
+
+    const legacyAlias = path.join(harness.root, "legacy-alias");
+    await symlink(legacyRoot, legacyAlias, process.platform === "win32" ? "junction" : "dir");
+    const aliasProtectedAssets = new LibraryAssetStore({
+      indexStore: harness.indexStore,
+      homeDirectory: harness.home,
+      protectedRoots: [legacyAlias]
+    });
+    await expect(aliasProtectedAssets.ingestAsset(assetInput(harness.sourceRoot, {
+      assetId: "asset-canonical-protected",
+      renditions: [
+        { artifactId: "artifact-canonical-protected-source", phase: "source", sourceRoot: legacyRoot, sourceRelativePath: "legacy.jpg" },
+        { artifactId: "artifact-canonical-protected-final", phase: "final", sourceRoot: harness.sourceRoot, sourceRelativePath: "final.png" }
       ]
     }))).rejects.toMatchObject({ code: "path_unsafe" });
   });

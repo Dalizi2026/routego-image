@@ -1,5 +1,5 @@
 import path from "node:path";
-import { mkdir, open, type FileHandle } from "node:fs/promises";
+import { lstat, mkdir, open, realpath, type FileHandle } from "node:fs/promises";
 
 import {
   resolveContainedPath,
@@ -12,6 +12,96 @@ import { LibraryError, isNodeError } from "../errors";
 export interface ExclusiveFile {
   readonly path: string;
   readonly handle: FileHandle;
+}
+
+export interface PathIdentityFileSystem {
+  lstat(filePath: string): Promise<{ isDirectory(): boolean }>;
+  realpath(filePath: string): Promise<string>;
+}
+
+const defaultPathIdentityFileSystem: PathIdentityFileSystem = { lstat, realpath };
+
+function implementation(platform: PathPlatform): typeof path.win32 | typeof path.posix {
+  return platform === "win32" ? path.win32 : path.posix;
+}
+
+export function normalizePathIdentity(value: string, platform: PathPlatform): string {
+  const pathApi = implementation(platform);
+  const normalized = pathApi.normalize(pathApi.resolve(value));
+  return platform === "win32" ? normalized.toLocaleLowerCase("en-US") : normalized;
+}
+
+export function isPathIdentityContained(
+  root: string,
+  candidate: string,
+  platform: PathPlatform
+): boolean {
+  const pathApi = implementation(platform);
+  const relative = pathApi.relative(
+    normalizePathIdentity(root, platform),
+    normalizePathIdentity(candidate, platform)
+  );
+  return (
+    relative === "" ||
+    (relative !== ".." &&
+      !relative.startsWith(`..${pathApi.sep}`) &&
+      !pathApi.isAbsolute(relative))
+  );
+}
+
+export function pathIdentitiesOverlap(
+  left: string,
+  right: string,
+  platform: PathPlatform
+): boolean {
+  return (
+    isPathIdentityContained(left, right, platform) ||
+    isPathIdentityContained(right, left, platform)
+  );
+}
+
+export async function canonicalizePathIdentity(
+  value: string,
+  options: {
+    readonly platform?: PathPlatform;
+    readonly fileSystem?: PathIdentityFileSystem;
+  } = {}
+): Promise<string> {
+  const platform = options.platform ?? (process.platform === "win32" ? "win32" : "posix");
+  const pathApi = implementation(platform);
+  const fileSystem = options.fileSystem ?? defaultPathIdentityFileSystem;
+  let cursor = pathApi.resolve(value);
+  const missingSegments: string[] = [];
+
+  while (true) {
+    let metadata: { isDirectory(): boolean };
+    try {
+      metadata = await fileSystem.lstat(cursor);
+    } catch (error) {
+      if (!isNodeError(error, "ENOENT")) throw error;
+      const parent = pathApi.dirname(cursor);
+      if (parent === cursor) throw error;
+      missingSegments.unshift(pathApi.basename(cursor));
+      cursor = parent;
+      continue;
+    }
+
+    const canonical = await fileSystem.realpath(cursor);
+    if (missingSegments.length > 0 && !metadata.isDirectory()) {
+      throw new LibraryError("path_unsafe", "A canonical path ancestor is not a directory.");
+    }
+    return pathApi.resolve(canonical, ...missingSegments);
+  }
+}
+
+export async function canonicalizePathIdentities(
+  values: readonly string[],
+  options: {
+    readonly platform?: PathPlatform;
+    readonly fileSystem?: PathIdentityFileSystem;
+  } = {}
+): Promise<readonly string[]> {
+  return await Promise.all(values.map(async (value) => await canonicalizePathIdentity(value, options)));
 }
 
 export function resolveApprovedPath(options: {

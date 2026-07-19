@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
-import { lstat, realpath, unlink } from "node:fs/promises";
+import { lstat, unlink } from "node:fs/promises";
 
 import {
   executeLibraryMutationInputSchema,
@@ -28,7 +28,14 @@ import {
   writeTransactionJournal,
   type FileTransactionJournal
 } from "../fs/journal";
-import { resolveApprovedPath } from "../fs/paths";
+import {
+  canonicalizePathIdentities,
+  canonicalizePathIdentity,
+  isPathIdentityContained,
+  normalizePathIdentity,
+  pathIdentitiesOverlap,
+  resolveApprovedPath
+} from "../fs/paths";
 import { ImageLibraryIndexStore, type ImageLibraryIndexContext } from "./index-store";
 import {
   referencedBlobPaths,
@@ -82,22 +89,15 @@ function pathApi(platform: NodeJS.Platform): typeof path.win32 | typeof path.pos
 }
 
 function normalizedPath(value: string, platform: NodeJS.Platform): string {
-  const selectedPath = pathApi(platform);
-  const normalized = selectedPath.normalize(selectedPath.resolve(value));
-  return platform === "win32" ? normalized.toLocaleLowerCase("en-US") : normalized;
+  return normalizePathIdentity(value, platformKind(platform));
 }
 
 function isContained(root: string, candidate: string, platform: NodeJS.Platform): boolean {
-  const selectedPath = pathApi(platform);
-  const relative = selectedPath.relative(root, candidate);
-  return (
-    relative === "" ||
-    (!selectedPath.isAbsolute(relative) && relative !== ".." && !relative.startsWith(`..${selectedPath.sep}`))
-  );
+  return isPathIdentityContained(root, candidate, platformKind(platform));
 }
 
 function overlaps(left: string, right: string, platform: NodeJS.Platform): boolean {
-  return isContained(left, right, platform) || isContained(right, left, platform);
+  return pathIdentitiesOverlap(left, right, platformKind(platform));
 }
 
 function safeDate(now: () => Date): Date {
@@ -274,26 +274,22 @@ export class LibraryMutationStore {
 
   async #assertCanonicalRootDoesNotAliasProtectedData(): Promise<void> {
     let canonicalRoot: string;
+    const platform = platformKind(this.#platform);
     try {
-      canonicalRoot = await realpath(this.#indexStore.paths.root);
+      canonicalRoot = await canonicalizePathIdentity(this.#indexStore.paths.root, { platform });
     } catch (error) {
       if (isNodeError(error, "ENOENT")) return;
       throw new LibraryError("path_unsafe", "The Image Library mutation root is unavailable.", {
         cause: error
       });
     }
-    const lexicalRoot = normalizedPath(this.#indexStore.paths.root, this.#platform);
     const canonicalComparable = normalizedPath(canonicalRoot, this.#platform);
-    if (isContained(lexicalRoot, canonicalComparable, this.#platform)) return;
-    if (
-      this.#protectedRoots.some((protectedRoot) =>
-        overlaps(
-          canonicalComparable,
-          normalizedPath(protectedRoot, this.#platform),
-          this.#platform
-        )
-      )
-    ) {
+    const [canonicalAllowedDefault, canonicalProtectedRoots] = await Promise.all([
+      canonicalizePathIdentity(this.#allowedDefaultRoot, { platform }),
+      canonicalizePathIdentities(this.#protectedRoots, { platform })
+    ]);
+    if (canonicalComparable === normalizedPath(canonicalAllowedDefault, this.#platform)) return;
+    if (canonicalProtectedRoots.some((root) => overlaps(canonicalComparable, root, this.#platform))) {
       throw new LibraryError(
         "path_unsafe",
         "The Image Library mutation root resolves to protected legacy data."
@@ -767,7 +763,10 @@ export class LibraryMutationStore {
   }
 
   async #cleanupDeletePaths(relativePaths: readonly string[]): Promise<void> {
-    const canonicalRoot = await realpath(this.#indexStore.paths.root).catch((error: unknown) => {
+    const platform = platformKind(this.#platform);
+    const canonicalRoot = await canonicalizePathIdentity(this.#indexStore.paths.root, {
+      platform
+    }).catch((error: unknown) => {
       throw new LibraryError("path_unsafe", "The Image Library root is unavailable for cleanup.", {
         cause: error
       });
@@ -792,7 +791,7 @@ export class LibraryMutationStore {
       if (!metadata.isFile() || metadata.isSymbolicLink()) {
         throw new LibraryError("path_unsafe", "A deletion journal points to an unsafe file.");
       }
-      const canonicalCandidate = await realpath(candidate);
+      const canonicalCandidate = await canonicalizePathIdentity(candidate, { platform });
       if (!isContained(canonicalRoot, canonicalCandidate, this.#platform)) {
         throw new LibraryError("path_unsafe", "A deletion journal escapes the Image Library root.");
       }
