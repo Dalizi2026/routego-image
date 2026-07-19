@@ -1,0 +1,29 @@
+{
+  "name": "routego-image",
+  "version": "1.0.0",
+  "description": "Create, edit, organize, and review images with the local Routego Image runtime.",
+  "author": {
+    "name": "Routego Image"
+  },
+  "skills": "./skills/",
+  "mcpServers": {
+    "routego-image": {
+      "command": "node",
+      "args": ["./scripts/start-routego-image.mjs"],
+      "cwd": "."
+    }
+  },
+  "interface": {
+    "displayName": "Routego Image",
+    "shortDescription": "Local image creation, editing, Library, and Studio workflows.",
+    "longDescription": "Generate and edit images, run independent batches, manage the Routego Library, and continue work in the loopback-only Routego Image Studio.",
+    "developerName": "Routego Image",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "Check Routego status, then generate an image from my prompt.",
+      "编辑这张图片，并保留我指定的内容。",
+      "Open Routego Image Studio for the current session."
+    ]
+  }
+}
