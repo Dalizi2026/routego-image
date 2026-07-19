@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-6-pre-handoff-integration-generation-6-task-4.3-pd-012-planning-authorized-product-locked",
+  "status": "controller-generation-7-authoritative-pd-012-exact-two-file-creation-correction-authorized-integration-task-4.3-product-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -49,16 +49,16 @@
     "externalStateAuthorized": false
   },
   "controller": {
-    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "generation": 6,
+    "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "generation": 7,
     "role": "program-controller",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
-    "branch": "codex/routego-controller-g6",
-    "verifiedHeadBeforeContainingCommit": "a0b4b62620ef9c2ce7db5879b92d1c2698e7953a",
-    "status": "authoritative-pre-handoff-task-4.3-pd-012-planning-boundary",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
+    "branch": "codex/routego-controller-g7",
+    "verifiedHeadBeforeContainingCommit": "2aa21f5e2d175f92b330665563dcb9af5fd6ecfb",
+    "status": "authoritative-controller-generation-7-pd-012-exact-two-file-creation-correction-authorized",
     "authoritative": true,
-    "observableCompactions": 4,
-    "lastCompactionFingerprint": "controller|routego-image-1.0|e25cdc12eb15318fc9b1c414ddbcda92d6270520|context-compaction-4-during-integration-g6-activation-after-audit-only-acceptance|17/29"
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null
   },
   "applyOwner": {
     "lane": "integration",
@@ -67,28 +67,28 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
     "branch": "codex/routego-integration-g6",
     "acceptedProductCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
-    "currentHead": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
+    "currentHead": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
     "gitClean": true,
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29"
   },
   "successor": {
     "lane": "integration",
     "generation": 6,
-    "status": "active-sole-owner-task-4.3-wip-checkpoint-pd-012-planning-authorized-product-locked",
+    "status": "active-sole-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
     "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
     "plannedBranch": "codex/routego-integration-g6",
     "startingCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
     "registrationCommit": "e25cdc12eb15318fc9b1c414ddbcda92d6270520",
     "incorporationCommit": "380e5936be0680b884a18f3b42a19e4fa299e438",
-    "currentHead": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
+    "currentHead": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
     "gitClean": true,
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null,
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-6.capsule.json"
   },
   "currentChange": {
@@ -105,14 +105,14 @@
       "locked": true,
       "activationAuthorized": true,
       "started": true,
-      "pauseReason": "PD-012 owner-only OpenSpec update and separately accepted Creation common-root correction required before task 4.3 resumes"
+      "pauseReason": "PD-012 exact two-file Creation common-root correction is authorized after clean governance incorporation; task 4.3 remains paused until the correction is independently accepted"
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|4f9cce26f6608c25679cd4b3639c72b52d65b59c|task-4.3-non-completion-wip-pd-012|17/29",
-    "messageType": "INTEGRATION_TASK_4_3_WIP_CHECKPOINT_COMMITTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|2b62dac6d86c8ca0fef6b52eea81019ba5749430|pd-012-openspec-coherence-revision-accepted|17/29",
+    "messageType": "INTEGRATION_PD_012_OPENSPEC_COHERENCE_REVISION_COMMITTED",
     "workerThreadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
-    "reportedHead": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
+    "reportedHead": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
     "completedTaskId": "4.2",
     "nextTaskId": "4.3",
     "openspecProgress": "17/29",
@@ -120,44 +120,49 @@
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
-    "safeCheckpoint": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
-    "observableCompactions": 0,
-    "checkpointSemantics": "Exact four-file task-4.3 WIP is preserved at 4f9cce26f6608c25679cd4b3639c72b52d65b59c as a non-completion checkpoint. Controller independently reproduced the Creation MCP public-success projection defect; task 4.3 is blocked while PD-012 authorizes only the exact three-file owner-only OpenSpec update."
+    "safeCheckpoint": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
+    "observableCompactions": 1,
+    "checkpointSemantics": "Controller G7 independently accepted the exact three-file operation-aware PD-012 OpenSpec coherence revision at 2b62dac6d86c8ca0fef6b52eea81019ba5749430 after strict validation, exact-scope review and public-schema semantic review. Task 4.3 remains incomplete and product work remains locked pending a separate exact two-file Creation correction authorization and later corrective acceptance."
   },
   "controllerSuccessor": {
     "lane": "controller",
     "role": "program-controller",
-    "generation": 6,
+    "generation": 7,
     "status": "activated-authoritative",
-    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
-    "plannedBranch": "codex/routego-controller-g6",
-    "startingCommit": "d871bbfc5827e7abe6404a42d4b0bceff63d550c",
-    "registrationCommit": "84698588f8693bf1392a786089427f43605a2914",
-    "currentHead": "a0b4b62620ef9c2ce7db5879b92d1c2698e7953a",
-    "acceptedHead": "0a687150fc4f4460a6ddddb803d0f0bd99fa47cc",
+    "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
+    "plannedBranch": "codex/routego-controller-g7",
+    "startingCommit": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
+    "registrationCommit": "e3011075146317423f80e2b5587ba8d281ee444d",
+    "currentHead": "87fc8297543bce78bb7f781d321003dff1dd395f",
+    "acceptedHead": "87fc8297543bce78bb7f781d321003dff1dd395f",
     "gitClean": true,
-    "observableCompactions": 4,
-    "lastCompactionFingerprint": "controller|routego-image-1.0|e25cdc12eb15318fc9b1c414ddbcda92d6270520|context-compaction-4-during-integration-g6-activation-after-audit-only-acceptance|17/29",
-    "handoffCapsule": ".codex/routego-program/handoffs/controller-generation-6.capsule.json"
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null,
+    "handoffCapsule": ".codex/routego-program/handoffs/controller-generation-7.capsule.json"
   },
   "controllerPredecessor": {
     "lane": "controller",
-    "generation": 5,
-    "threadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "generation": 6,
+    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
+    "branch": "codex/routego-controller-g6",
     "authorityRevoked": true,
-    "observableCompactions": 4
+    "observableCompactions": 5,
+    "lastCompactionFingerprint": "controller|routego-image-1.0|5230567298c8af902a87e70e32ed24a6dc9f9d3e|context-compaction-5-during-pd-012-owner-only-openspec-update-after-governance-incorporation|17/29"
   },
   "laneContinuityPolicy": {
-    "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "predecessorControllerThreadId": "019f751c-75c3-7e52-9af1-28db9dad4463",
+    "controllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "predecessorControllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
     "dynamicProgramResolutionRequired": true,
     "directReportingPrimary": true,
     "continuityFallbackIntervalMinutes": 30
   },
-  "currentBlockers": [],
+  "currentBlockers": [
+    "The exact two-file Creation correction is authorized after clean governance incorporation; task 4.3 remains locked until the corrective commit is independently accepted."
+  ],
   "currentRisks": [
-    "Task 4.3 is paused at clean non-completion WIP checkpoint 4f9cce26f6608c25679cd4b3639c72b52d65b59c until PD-012 planning and the exact Creation two-file correction are separately accepted.",
+    "Task 4.3 remains paused. PD-012 operation-aware projection planning is accepted at 2b62dac6d86c8ca0fef6b52eea81019ba5749430 and the exact Creation two-file correction is authorized after clean governance incorporation; corrective acceptance is still required.",
     "Task 4.3 must preserve task 4.2 behavior and must not implement packaging, installation or real relay work.",
     "External approval gates 7.2, 8.2 and 9.1 remain closed without fresh explicit user approval."
   ],
@@ -174,8 +179,8 @@
     "deduplicateWith": "latestDirectCheckpoint",
     "archiveOwnRuns": true,
     "promptVersion": "ARCHIVE_EARLY_V5",
-    "controllerSeedThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "controllerSeedWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
+    "controllerSeedThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "controllerSeedWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
     "normalListThreadsForbidden": true,
     "cleanupFinding": "V5 reads exact CODEX_THREAD_ID first and archives that own automation run as the second tool action before Controller reads, lease work, memory updates or final output; normal list_threads enumeration remains forbidden."
   },
@@ -190,7 +195,7 @@
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
       "branch": "codex/routego-integration-g6",
       "acceptedHead": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
-      "status": "sole-apply-owner-task-4.3-wip-preserved-pd-012-planning-authorized-product-locked"
+      "status": "sole-apply-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-wip-preserved-product-locked"
     },
     "archivedSourceOwner": {
       "lane": "integration",

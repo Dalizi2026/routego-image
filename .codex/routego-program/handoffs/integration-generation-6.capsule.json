@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "53a0265b3a26f720c49c4c9af0566a24265fd3bea9e1e901ef4668969df67397",
+  "capsuleSha256": "6d35aa53bcc00b3b7d92c4203d0b9bfab8d17ea6c00549bbd815c8eb4d374306",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,7 +22,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
     "plannedBranch": "codex/routego-integration-g6",
     "startingCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
-    "registrationStatus": "activated-sole-owner-task-4.3-wip-preserved-pd-012-planning-authorized-product-locked",
+    "registrationStatus": "activated-sole-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-wip-preserved-product-locked",
     "registrationCommit": "e25cdc12eb15318fc9b1c414ddbcda92d6270520",
     "incorporationCommit": "380e5936be0680b884a18f3b42a19e4fa299e438",
     "registrationCommitSemantics": "The Controller registration governance commit and successor incorporation commit are exact; the containing activation commit cannot self-reference its own SHA."
@@ -34,7 +34,7 @@
     "nextTaskId": "4.3",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.3.json",
-      "sha256": "95fe3fcc2c271297561112181235c37a58bdd04003e691a5ad70b0d15734e6db"
+      "sha256": "52f802f28175f6777b8df6019b62b0f187d0ae3be6cbc5f5511aa94809de9080"
     },
     "taskLocked": true,
     "sourceIsSoleApplyOwner": false,
@@ -45,8 +45,8 @@
     "acceptedPreviousTaskCheckpointCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
     "taskComplete": false,
     "safeCheckpoint": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
-    "observableCompactions": 0,
-    "continuation": "task-4.3-wip-preserved-pd-012-owner-only-openspec-update-authorized-product-locked"
+    "observableCompactions": 1,
+    "continuation": "pd-012-exact-two-file-creation-correction-authorized-task-4.3-wip-preserved-product-locked"
   },
   "planDeviation": {
     "id": "PD-012",
@@ -62,7 +62,9 @@
       "packages/creation/test/mcp.test.ts"
     ],
     "planningAuthorized": true,
-    "productCorrectionAuthorized": false,
+    "planningCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
+    "planningAccepted": true,
+    "productCorrectionAuthorized": true,
     "taskResumeAuthorized": false
   },
   "completedEvidence": [
@@ -95,7 +97,7 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": ["PD-012 owner-only OpenSpec planning must be committed and accepted before the exact Creation correction can be authorized."],
+    "blockers": ["The exact two-file Creation correction is authorized after clean governance incorporation; task 4.3 remains locked until the corrective commit is independently accepted."],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "taskBeyond4_3Locked": true,
@@ -108,8 +110,8 @@
   "context": {
     "sourceObservableCompactions": 4,
     "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|7ba03291adf26c28ac84abfe8cd5a8f5794ea089|context-compaction-4-during-task-4.2-lane-checkpoint-before-commit|17/29",
-    "successorObservableCompactions": 0,
-    "successorCompactionFingerprint": null,
+    "successorObservableCompactions": 1,
+    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29",
     "handoffAcceptanceCompactionLimit": 0,
     "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
     "auditFailure": "HANDOFF_AUDIT_FAILED"
@@ -143,8 +145,8 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "fallbackSourceCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
-    "expectedNormalizedUtf8Bytes": 104941,
+    "fallbackSourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
+    "expectedNormalizedUtf8Bytes": 109740,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
