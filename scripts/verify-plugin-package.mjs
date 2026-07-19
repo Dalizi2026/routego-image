@@ -253,7 +253,7 @@ function validateTextSecurity(relativePath, text, packageRoot) {
       /file:\/\/\/(?:Users|home|private\/var\/folders|var\/folders|tmp)\//u.test(textWithoutHttpUrls) ||
       /\/(?:Users|home)\/[A-Za-z0-9._-]+\//u.test(textWithoutHttpUrls) ||
       /\/(?:private\/var\/folders|var\/folders|tmp)\//u.test(textWithoutHttpUrls) ||
-      /(?<![A-Za-z0-9])[A-Za-z]:\/{1,2}[^\s<>"'`]+/u.test(textWithoutHttpUrls)) {
+      /[A-Za-z]:\/{1,2}(?!\/)[^\s<>"'`]+/u.test(textWithoutHttpUrls)) {
     fail(`a source checkout or local user path is embedded in ${relativePath}`);
   }
   const imageDataUrlPattern = /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[^,\\\s"'`]*)*,(?!\$\{)(?=[^\s"'`])/iu;

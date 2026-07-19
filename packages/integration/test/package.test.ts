@@ -220,7 +220,9 @@ describe("Routego Image plugin package", () => {
     ["bracket-prefixed macOS temp alias", "note]/var/folders/ab/build/source.ts"],
     ["brace-prefixed private macOS temp", "note}/private/var/folders/ab/build/source.ts"],
     ["parenthesis-prefixed Windows checkout", "note)D:/workspace/routego-image/source.ts"],
-    ["punctuation-prefixed Windows checkout", "note@E:\\workspace\\routego-image\\source.ts"]
+    ["punctuation-prefixed Windows checkout", "note@E:\\workspace\\routego-image\\source.ts"],
+    ["alphanumeric-adjacent Windows slash checkout", "noteD:/workspace/routego-image/source.ts"],
+    ["alphanumeric-adjacent Windows escaped checkout", "noteD:\\workspace\\routego-image\\source.ts"]
   ])("rejects a rehashed runtime containing a %s path", async (_label, localPath) => {
     const candidate = path.join(temporaryRoot, `path-${String(_label).replaceAll(" ", "-")}`, "routego-image");
     await cp(firstPackage, candidate, { recursive: true });
