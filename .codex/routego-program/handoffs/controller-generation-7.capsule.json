@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "capsuleType": "controller-successor-handoff",
+  "capsuleSha256": "215d38b3689fb7e13d30efe7d87df385fd14c1a2551d796d87a97d6237fa29eb",
+  "lane": "controller",
+  "role": "program-controller",
+  "program": "routego-image-1.0",
+  "generation": {
+    "source": 6,
+    "successor": 7
+  },
+  "source": {
+    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
+    "branch": "codex/routego-controller-g6",
+    "handoffCommit": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
+    "handoffParent": "a0b4b62620ef9c2ce7db5879b92d1c2698e7953a",
+    "observableCompactions": 5,
+    "lastCompactionFingerprint": "controller|routego-image-1.0|5230567298c8af902a87e70e32ed24a6dc9f9d3e|context-compaction-5-during-pd-012-owner-only-openspec-update-after-governance-incorporation|17/29",
+    "authoritative": true,
+    "preHandoff": true
+  },
+  "successor": {
+    "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
+    "plannedBranch": "codex/routego-controller-g7",
+    "startingCommit": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
+    "registrationStatus": "registered-awaiting-low-context-acceptance",
+    "registrationCommit": null,
+    "registrationCommitSemantics": "The containing Controller registration governance commit cannot self-reference its own SHA; the direct registration message supplies the exact full commit after creation."
+  },
+  "currentIntegration": {
+    "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
+    "generation": 6,
+    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
+    "branch": "codex/routego-integration-g6",
+    "activationGovernanceCommit": "a0b4b62620ef9c2ce7db5879b92d1c2698e7953a",
+    "activationIncorporationHead": "768bb0db6e44aaee29c645ef8e09ae5efc61c537",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "openspecProgress": "17/29",
+    "currentTaskId": "4.3",
+    "currentTaskState": "wip-preserved-pd-012-owner-only-openspec-update-committed-awaiting-controller-g7-review-product-locked",
+    "taskCapsule": {
+      "path": ".codex/routego-program/tasks/integration-4.3.json",
+      "sha256": "95fe3fcc2c271297561112181235c37a58bdd04003e691a5ad70b0d15734e6db"
+    },
+    "handoffCapsule": {
+      "path": ".codex/routego-program/handoffs/integration-generation-6.capsule.json",
+      "sha256": "53a0265b3a26f720c49c4c9af0566a24265fd3bea9e1e901ef4668969df67397"
+    }
+  },
+  "completedEvidence": [
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-2-tasks.json",
+      "sha256": "1c43569d3422f8bb1e25c1f8c77ec7c2339deda9615f2b1e21156e7b3ccacfb7"
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-3-tasks.json",
+      "sha256": "b896c776082284a397c7a656f7e7d49d18a21dbb2b12b866ecb1f5ff66d7a786"
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-4-tasks.json",
+      "sha256": "649ddf87b214c6f5a07916ee42a1080b1b561f71020483a075118004241b73ee"
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-5-tasks.json",
+      "sha256": "fe70521d9f1eecc3be50c3c2b461338672bb4e5e70f860a58523f8dd18e6e197"
+    }
+  ],
+  "authority": {
+    "summaryPath": ".codex/routego-program/authority-summary.md",
+    "summarySha256": "6387478ec031eb7aeddb0fa6ec90674114bf855113828f6305ad6d061c70e910",
+    "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+    "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
+  },
+  "gates": {
+    "blockers": [
+      "Controller G7 low-context acceptance and explicit Controller authority activation are pending.",
+      "PD-012 exact three-file owner-only OpenSpec planning checkpoint must be committed and independently accepted before the Creation correction is authorized."
+    ],
+    "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
+    "externalStateAuthorized": false,
+    "integrationTaskBeyond4_3Locked": true
+  },
+  "context": {
+    "sourceObservableCompactions": 5,
+    "sourceCompactionFingerprint": "controller|routego-image-1.0|5230567298c8af902a87e70e32ed24a6dc9f9d3e|context-compaction-5-during-pd-012-owner-only-openspec-update-after-governance-incorporation|17/29",
+    "successorObservableCompactions": 0,
+    "handoffAcceptanceCompactionLimit": 0,
+    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
+    "auditFailure": "HANDOFF_AUDIT_FAILED"
+  },
+  "reportingContract": {
+    "primary": "After every governance task, task group, safe checkpoint, blocker, deviation, handoff, activation or delivery, call real send_message_to_thread to the current Controller from program.json and then call read_thread to confirm receipt.",
+    "fallback": "routego-program-continuity ARCHIVE_EARLY_V5 reads exact CODEX_THREAD_ID first, archives that own run as its second tool action, then reads compact current state and deduplicates missed reports; it is missed-message fallback only.",
+    "fallbackIntervalMinutes": 30,
+    "finalAnswerAloneIsInsufficient": true,
+    "heartbeatInheritanceAssumed": false
+  },
+  "startup": {
+    "mandatoryFiles": [
+      "AGENTS.md",
+      ".codex/routego-program/authority-summary.md",
+      ".codex/routego-program/program.json",
+      ".codex/routego-program/threads/controller.json",
+      ".codex/routego-program/handoffs/controller-generation-7.capsule.json",
+      ".codex/routego-program/threads/integration.json",
+      ".codex/routego-program/tasks/integration-4.3.json",
+      ".codex/routego-program/handoffs/integration-generation-6.capsule.json",
+      ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+      ".codex/routego-program/deviations/PD-012-task-4.3-creation-mcp-public-success-projection.md"
+    ],
+    "maxFiles": 12,
+    "maxUtf8Bytes": 122880,
+    "byteCounting": "utf8-after-crlf-to-lf-normalization",
+    "expectedNormalizedUtf8Bytes": 75809,
+    "authoritySummaryMaxBytes": 16384,
+    "handoffCapsuleMaxBytes": 24576,
+    "directGovernanceMessageMaxBytes": 12288,
+    "programStateMaxBytes": 49152,
+    "laneStateMaxBytes": 32768,
+    "targetedEscalationOnly": true,
+    "fullAuditDefaultForbidden": true
+  },
+  "validator": {
+    "path": ".codex/routego-program/scripts/validate-controller-handoff-capsule.mjs",
+    "command": "node .codex/routego-program/scripts/validate-controller-handoff-capsule.mjs .codex/routego-program/handoffs/controller-generation-7.capsule.json"
+  },
+  "safety": {
+    "controllerGovernanceOnly": true,
+    "noProductOrOpenSpecEdits": true,
+    "noCredentialsAuthorizationValuesUserImagesRealLibraryRelayOrBillableRequests": true,
+    "noInstallMarketplaceDeployPublishMigrateDeleteOrRelease": true,
+    "sevenPublicToolsAndPublicPhaseFrozen": true
+  }
+}
