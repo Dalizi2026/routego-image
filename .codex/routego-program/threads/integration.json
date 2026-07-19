@@ -3,16 +3,17 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-7-registered-awaiting-low-context-acceptance-task-4.3-product-locked",
+  "status": "generation-7-retry-2-registered-awaiting-low-context-acceptance-task-4.3-product-locked",
   "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
-  "threadId": "019f799e-2c56-7982-99e4-c6943af9a7b4",
+  "threadId": "pending",
   "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
   "branch": "codex/routego-integration-g7",
   "generation": 7,
   "startingCommit": "34fd18aca083199028b8f9a54f8fc26f023711db",
-  "registrationCommit": "e14b9305f5e66351e7d49bbf8410eab8d9d8c294",
+  "registrationAttempt": 2,
+  "registrationCommit": null,
   "incorporationCommit": "3f629eaf12b54a2d334efec14310646a99c73e62",
-  "currentHead": "3f629eaf12b54a2d334efec14310646a99c73e62",
+  "currentHead": "d73178031fd92f460fb03e4f182778724b9aa206",
   "gitCleanAtRegistration": true,
   "gitClean": true,
   "observableCompactions": 0,
@@ -49,13 +50,13 @@
   "currentTask": {
     "id": "4.3",
     "capsule": ".codex/routego-program/tasks/integration-4.3.json",
-    "activationStatus": "registered-awaiting-low-context-acceptance-no-product-authority-task-4.3-product-locked",
+    "activationStatus": "retry-2-registered-awaiting-low-context-acceptance-no-product-authority-task-4.3-product-locked",
     "started": true,
     "completionStatus": "incomplete-wip-checkpoint-preserved"
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-7.capsule.json",
-    "status": "registered-awaiting-low-context-acceptance",
+    "status": "registered-retry-2-awaiting-low-context-acceptance",
     "acceptanceCompactionLimit": 0,
     "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
     "auditFailure": "HANDOFF_AUDIT_FAILED"
@@ -130,6 +131,15 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "externalApprovalGates": ["7.2", "8.2", "9.1"],
+  "failedHandoffAttempts": [
+    {
+      "attempt": 1,
+      "threadId": "019f799e-2c56-7982-99e4-c6943af9a7b4",
+      "actualHead": "e14b9305f5e66351e7d49bbf8410eab8d9d8c294",
+      "status": "rejected-handoff-audit-failed-never-activated",
+      "productOrOpenSpecTouched": false
+    }
+  ],
   "history": {
     "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",
     "sourcePath": ".codex/routego-program/threads/integration.json",

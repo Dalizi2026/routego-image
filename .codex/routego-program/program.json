@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-8-authoritative-integration-generation-7-registered-awaiting-low-context-acceptance-task-4.3-product-locked",
+  "status": "controller-generation-8-authoritative-integration-generation-7-retry-2-registered-awaiting-low-context-acceptance-task-4.3-product-locked",
   "projectPath": "/Users/dalizi/Documents/routego-image-integration-g7",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -78,18 +78,28 @@
   "successor": {
     "lane": "integration",
     "generation": 7,
-    "status": "registered-awaiting-low-context-acceptance-task-4.3-product-locked",
-    "threadId": "019f799e-2c56-7982-99e4-c6943af9a7b4",
+    "status": "registered-retry-2-awaiting-low-context-acceptance-task-4.3-product-locked",
+    "registrationAttempt": 2,
+    "threadId": "pending",
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
     "plannedBranch": "codex/routego-integration-g7",
     "startingCommit": "34fd18aca083199028b8f9a54f8fc26f023711db",
-    "registrationCommit": "e14b9305f5e66351e7d49bbf8410eab8d9d8c294",
+    "registrationCommit": null,
     "incorporationCommit": "3f629eaf12b54a2d334efec14310646a99c73e62",
-    "currentHead": "3f629eaf12b54a2d334efec14310646a99c73e62",
+    "currentHead": "d73178031fd92f460fb03e4f182778724b9aa206",
     "gitClean": true,
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29",
-    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-7.capsule.json"
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null,
+    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-7.capsule.json",
+    "failedHandoffAttempts": [
+      {
+        "attempt": 1,
+        "threadId": "019f799e-2c56-7982-99e4-c6943af9a7b4",
+        "actualHead": "e14b9305f5e66351e7d49bbf8410eab8d9d8c294",
+        "status": "rejected-never-activated",
+        "productOrOpenSpecTouched": false
+      }
+    ]
   },
   "currentChange": {
     "id": "integrate-routego-image-plugin",

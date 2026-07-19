@@ -346,7 +346,12 @@ if (program && lane) {
   const successorMatches = successorIsCurrent
     ? program.successor.threadId === capsule.successor.threadId &&
       program.successor.worktree === capsule.successor.worktree &&
-      program.successor.plannedBranch === capsule.successor.plannedBranch
+      program.successor.plannedBranch === capsule.successor.plannedBranch &&
+      program.successor.observableCompactions === 0 &&
+      lane.observableCompactions === 0 &&
+      program.successor.currentHead ===
+        capsule.successor.verifiedHeadBeforeContainingCommit &&
+      lane.currentHead === capsule.successor.verifiedHeadBeforeContainingCommit
     : program.successor.threadId === null && program.successor.worktree === null;
   if (
     program.currentChange.id !== capsule.change ||
