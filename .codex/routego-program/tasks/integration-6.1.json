@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "92c14b7ba320c0c7e90708982bbf5e9cbe951c153079ab1570a42fc827ce9126",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "6.1",
+  "status": "activation-authorized-awaiting-integration-audit",
+  "sourceCommit": "6400b3267d53e9212cfd3c07069a97fa9fd87c00",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "f98d18682a9ac41e6d594717e3f24f9ce2dc571ef089de2cb005ba17d00a3465",
+    "lineSha256": "69265fab15b2aa5ec9058a71c598388b12b0fea39cdb1fb7e1d4f14a84e00bcf",
+    "lineBytes": 1388
+  },
+  "dependencies": ["1.1", "1.2", "1.3", "1.4", "2.5", "3.5", "4.3", "5.3"],
+  "allowedFiles": [
+    "packages/integration/test/end-to-end.test.ts",
+    "packages/integration/test/security.test.ts",
+    "packages/integration/test/fixtures.ts"
+  ],
+  "allowedFileMode": "create or modify exactly the three task-6.1 offline Integration test files after Integration generation 8 passes its activation audit",
+  "forbiddenFileGlobs": [
+    ".codex/routego-program/**",
+    "openspec/**",
+    ".codex-plugin/**",
+    "skills/**",
+    "scripts/**",
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/mock-relay/**",
+    "packages/studio/**",
+    "packages/integration/src/**",
+    "packages/integration/package.json",
+    "packages/integration/tsconfig*.json",
+    "packages/integration/tsup.config.ts",
+    "packages/integration/vitest.config.ts",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "requiredBehavior": [
+    "Add deterministic offline production-composition end-to-end coverage for text, upload reference, direct edit, mask, degraded continuation and ordered partial batch flows.",
+    "Prove the Library source/output graph, exact 17+12+4=33 rendition bound, no extra chromakey role or identity, detail/retry/ZIP and contained project-copy behavior.",
+    "Exercise MCP, the exact authenticated Studio creation stream route and strict SSE started/partial/terminal state machine including adversarial framing, request, sequence, EOF and sentinel cases.",
+    "Verify immutable resource expiry at the earlier of registration plus five minutes or session expiry, including normal, near-expiry, exact-boundary, failure, disconnect, cancel, browser object-URL cleanup and immediate shutdown revocation.",
+    "Cover restart, recovery, error and security paths without real network, credentials, user data, relay, marketplace, installation or external state."
+  ],
+  "verification": [
+    "fresh OpenSpec apply instructions",
+    "repeated deterministic task-6.1 focused suite",
+    "Integration and root typecheck, build and tests",
+    "Studio browser suite using existing local binaries and synthetic fixtures only",
+    "seven workspace package exports and exact seven public MCP tools",
+    "public ImageArtifact partial|final phase freeze",
+    "17+12+4=33 and no-extra-chromakey-role assertions",
+    "valid and adversarial SSE state, request, sequence, EOF and sentinel cases",
+    "normal, near-expiry, exact-boundary, disconnect, cancel and shutdown resource lifetime cases",
+    "native, dependency, secret, path and repository safety audits",
+    "strict OpenSpec validation",
+    "git diff --check and exact three-file implementation scope"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/cross-platform-integration-verification/spec.md",
+      "sha256": "92e3a26498cf724f5580ab55961f95fa6ee8503fbca3ad2df9aba6296c4d429a",
+      "bytes": 5563,
+      "reason": "Offline production-composition, PD-005 regression, security and strict delivery gates."
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/integrated-local-routego-service/spec.md",
+      "sha256": "407767aa60450073079f03337e01760479ba50203063f31c45d6fdd1d2ee781c",
+      "bytes": 11560,
+      "reason": "Shared production service, durable graph, bounded chromakey, project copy and immutable session-capped resource lifetime."
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/studio-creation-workbench/spec.md",
+      "sha256": "b321161489908d9af1311ceb5d2ced4394f6a3805ffd71b840ccb7ce2b4fe98d",
+      "bytes": 5836,
+      "reason": "Authenticated fetch-stream state machine, partial preservation, cleanup and expiry behavior."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "integrationGeneration": 8,
+    "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "acceptedTask5_3ImplementationCommit": "d8d5edb6a4143db0dd41d09a68bbb74ca9822f74",
+    "acceptedTask5_3CorrectionCommit": "0548694d8184f39479e0f8cd39b401cf8877cf0e",
+    "acceptedTask5_3StateCommit": "6400b3267d53e9212cfd3c07069a97fa9fd87c00",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "task-6.1-exact-three-file-offline-e2e-tests",
+    "authorizedFiles": [
+      "packages/integration/test/end-to-end.test.ts",
+      "packages/integration/test/security.test.ts",
+      "packages/integration/test/fixtures.ts"
+    ],
+    "authorizationBaselineControllerHead": "ccbf5b36414da997132766ce07b4af9b333df712",
+    "started": false
+  },
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "marketplaceAuthorized": false,
+  "realCredentialsOrUserDataAuthorized": false
+}
