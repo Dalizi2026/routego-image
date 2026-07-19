@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "controller-successor-handoff",
-  "capsuleSha256": "9d3acbc64746ddb6e6310e269d9c38dd39d6f9b7e3f2fdeb384922915c77dfbe",
+  "capsuleSha256": "c6d2c6ee54441d1ac209309fd0290d5c02a294b302d57cff225e08ef58384243",
   "lane": "controller",
   "role": "program-controller",
   "program": "routego-image-1.0",
@@ -26,7 +26,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
     "plannedBranch": "codex/routego-controller-g7",
     "startingCommit": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
-    "registrationStatus": "activated-authoritative-controller-generation-7-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization",
+    "registrationStatus": "activated-authoritative-controller-generation-7-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
     "registrationCommit": "e3011075146317423f80e2b5587ba8d281ee444d",
     "acceptedHead": "e3011075146317423f80e2b5587ba8d281ee444d",
     "registrationCommitSemantics": "The accepted registration commit is recorded after the clean zero-compaction successor audit; the containing authority activation commit cannot self-reference its own SHA."
@@ -42,14 +42,14 @@
     "applyAuthorized": true,
     "openspecProgress": "17/29",
     "currentTaskId": "4.3",
-    "currentTaskState": "wip-preserved-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+    "currentTaskState": "wip-preserved-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.3.json",
-      "sha256": "ce6e8711d5543b7321865089a446458b66d6a98b5541e0005482d06ad5ce2585"
+      "sha256": "52f802f28175f6777b8df6019b62b0f187d0ae3be6cbc5f5511aa94809de9080"
     },
     "handoffCapsule": {
       "path": ".codex/routego-program/handoffs/integration-generation-6.capsule.json",
-      "sha256": "8c2a5c8ce397cfc24d1dd07e135586514ecfbe295d5f04c0165d2c88f5034f1c"
+      "sha256": "6d35aa53bcc00b3b7d92c4203d0b9bfab8d17ea6c00549bbd815c8eb4d374306"
     }
   },
   "completedEvidence": [
@@ -78,7 +78,7 @@
   },
   "gates": {
     "blockers": [
-      "PD-012 planning is accepted; a separate exact two-file Creation correction authorization and later corrective acceptance are required before task 4.3 resumes."
+      "The exact two-file Creation correction is authorized after clean governance incorporation; task 4.3 remains locked until the corrective commit is independently accepted."
     ],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
@@ -116,7 +116,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 78185,
+    "expectedNormalizedUtf8Bytes": 78311,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

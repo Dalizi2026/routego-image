@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-7-authoritative-integration-task-4.3-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+  "status": "controller-generation-7-authoritative-pd-012-exact-two-file-creation-correction-authorized-integration-task-4.3-product-locked",
   "projectPath": "C:\\Users\\MLTZ\\Documents\\生图插件",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -54,8 +54,8 @@
     "role": "program-controller",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
     "branch": "codex/routego-controller-g7",
-    "verifiedHeadBeforeContainingCommit": "87fc8297543bce78bb7f781d321003dff1dd395f",
-    "status": "authoritative-controller-generation-7-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization",
+    "verifiedHeadBeforeContainingCommit": "2aa21f5e2d175f92b330665563dcb9af5fd6ecfb",
+    "status": "authoritative-controller-generation-7-pd-012-exact-two-file-creation-correction-authorized",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -78,7 +78,7 @@
   "successor": {
     "lane": "integration",
     "generation": 6,
-    "status": "active-sole-owner-task-4.3-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+    "status": "active-sole-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
     "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
     "plannedBranch": "codex/routego-integration-g6",
@@ -105,7 +105,7 @@
       "locked": true,
       "activationAuthorized": true,
       "started": true,
-      "pauseReason": "PD-012 planning is accepted; a separately authorized and accepted Creation common-root correction is required before task 4.3 resumes"
+      "pauseReason": "PD-012 exact two-file Creation common-root correction is authorized after clean governance incorporation; task 4.3 remains paused until the correction is independently accepted"
     }
   },
   "latestDirectCheckpoint": {
@@ -159,10 +159,10 @@
     "continuityFallbackIntervalMinutes": 30
   },
   "currentBlockers": [
-    "PD-012 planning is accepted; the exact two-file Creation correction remains locked until a separate Controller authorization commit is incorporated."
+    "The exact two-file Creation correction is authorized after clean governance incorporation; task 4.3 remains locked until the corrective commit is independently accepted."
   ],
   "currentRisks": [
-    "Task 4.3 remains paused. PD-012 operation-aware projection planning is accepted at 2b62dac6d86c8ca0fef6b52eea81019ba5749430; the exact Creation two-file correction still requires separate authorization and acceptance.",
+    "Task 4.3 remains paused. PD-012 operation-aware projection planning is accepted at 2b62dac6d86c8ca0fef6b52eea81019ba5749430 and the exact Creation two-file correction is authorized after clean governance incorporation; corrective acceptance is still required.",
     "Task 4.3 must preserve task 4.2 behavior and must not implement packaging, installation or real relay work.",
     "External approval gates 7.2, 8.2 and 9.1 remain closed without fresh explicit user approval."
   ],
@@ -195,7 +195,7 @@
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
       "branch": "codex/routego-integration-g6",
       "acceptedHead": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
-      "status": "sole-apply-owner-task-4.3-wip-preserved-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked"
+      "status": "sole-apply-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-wip-preserved-product-locked"
     },
     "archivedSourceOwner": {
       "lane": "integration",

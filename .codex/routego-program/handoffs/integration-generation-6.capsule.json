@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "8c2a5c8ce397cfc24d1dd07e135586514ecfbe295d5f04c0165d2c88f5034f1c",
+  "capsuleSha256": "6d35aa53bcc00b3b7d92c4203d0b9bfab8d17ea6c00549bbd815c8eb4d374306",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,7 +22,7 @@
     "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
     "plannedBranch": "codex/routego-integration-g6",
     "startingCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
-    "registrationStatus": "activated-sole-owner-task-4.3-wip-preserved-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+    "registrationStatus": "activated-sole-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-wip-preserved-product-locked",
     "registrationCommit": "e25cdc12eb15318fc9b1c414ddbcda92d6270520",
     "incorporationCommit": "380e5936be0680b884a18f3b42a19e4fa299e438",
     "registrationCommitSemantics": "The Controller registration governance commit and successor incorporation commit are exact; the containing activation commit cannot self-reference its own SHA."
@@ -34,7 +34,7 @@
     "nextTaskId": "4.3",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.3.json",
-      "sha256": "ce6e8711d5543b7321865089a446458b66d6a98b5541e0005482d06ad5ce2585"
+      "sha256": "52f802f28175f6777b8df6019b62b0f187d0ae3be6cbc5f5511aa94809de9080"
     },
     "taskLocked": true,
     "sourceIsSoleApplyOwner": false,
@@ -46,7 +46,7 @@
     "taskComplete": false,
     "safeCheckpoint": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
     "observableCompactions": 1,
-    "continuation": "task-4.3-wip-preserved-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked"
+    "continuation": "pd-012-exact-two-file-creation-correction-authorized-task-4.3-wip-preserved-product-locked"
   },
   "planDeviation": {
     "id": "PD-012",
@@ -64,7 +64,7 @@
     "planningAuthorized": true,
     "planningCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
     "planningAccepted": true,
-    "productCorrectionAuthorized": false,
+    "productCorrectionAuthorized": true,
     "taskResumeAuthorized": false
   },
   "completedEvidence": [
@@ -97,7 +97,7 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": ["PD-012 planning is accepted; a separate exact two-file Creation correction authorization and later corrective acceptance are required before task 4.3 resumes."],
+    "blockers": ["The exact two-file Creation correction is authorized after clean governance incorporation; task 4.3 remains locked until the corrective commit is independently accepted."],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "taskBeyond4_3Locked": true,
@@ -146,7 +146,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
-    "expectedNormalizedUtf8Bytes": 109671,
+    "expectedNormalizedUtf8Bytes": 109740,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

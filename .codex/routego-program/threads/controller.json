@@ -2,14 +2,14 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-authoritative-controller-generation-7-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+  "status": "active-authoritative-controller-generation-7-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
   "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
   "branch": "codex/routego-controller-g7",
   "startingCommit": "5230567298c8af902a87e70e32ed24a6dc9f9d3e",
   "registrationCommit": "e3011075146317423f80e2b5587ba8d281ee444d",
   "activationCommit": "87fc8297543bce78bb7f781d321003dff1dd395f",
-  "verifiedHeadBeforeContainingCommit": "87fc8297543bce78bb7f781d321003dff1dd395f",
+  "verifiedHeadBeforeContainingCommit": "2aa21f5e2d175f92b330665563dcb9af5fd6ecfb",
   "generation": 7,
   "authoritative": true,
   "observableCompactions": 0,
@@ -35,11 +35,12 @@
   },
   "currentOperation": {
     "id": "PD-012-task-4.3-creation-mcp-public-success-projection",
-    "state": "controller-generation-7-authoritative-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
-    "allowedNext": "Commit a separate exact-scope governance authorization for the Creation correction limited to packages/creation/src/runtime/mcp/server.ts and packages/creation/test/mcp.test.ts. Task 4.3 remains locked until that correction is independently accepted.",
+    "state": "controller-generation-7-authoritative-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
+    "allowedNext": "Integration G6 incorporates and validates the separate Controller authorization, then implements and commits exactly packages/creation/src/runtime/mcp/server.ts and packages/creation/test/mcp.test.ts. Task 4.3 remains locked until that corrective commit is independently accepted.",
     "forbidden": [
       "Controller product or OpenSpec edits",
-      "Integration task 4.3 or Creation product edits before the separate exact two-file corrective authorization is incorporated",
+      "Integration task 4.3 edits before the exact two-file Creation corrective commit is independently accepted",
+      "Any Creation product edit outside packages/creation/src/runtime/mcp/server.ts and packages/creation/test/mcp.test.ts",
       "Any OpenSpec artifact outside existing design.md, codex-plugin-runtime/spec.md and tasks.md",
       "External approval gates 7.2, 8.2 or 9.1 without fresh explicit user approval"
     ]
@@ -56,7 +57,7 @@
     "soleApplyOwner": true,
     "applyAuthorized": true,
     "frozen": false,
-    "status": "sole-apply-owner-task-4.3-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+    "status": "sole-apply-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
     "handoffAudit": {
       "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
       "reportedStartupFiles": 12,
@@ -99,7 +100,7 @@
     "gitClean": true,
     "observableCompactions": 1,
     "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29",
-    "status": "active-sole-owner-task-4.3-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+    "status": "active-sole-owner-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-6.capsule.json"
   },
   "successor": {

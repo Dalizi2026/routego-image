@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "ce6e8711d5543b7321865089a446458b66d6a98b5541e0005482d06ad5ce2585",
+  "contentSha256": "52f802f28175f6777b8df6019b62b0f187d0ae3be6cbc5f5511aa94809de9080",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.3",
-  "status": "incomplete-wip-preserved-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+  "status": "incomplete-wip-preserved-pd-012-exact-two-file-creation-correction-authorized-task-4.3-product-locked",
   "sourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -129,9 +129,9 @@
       "packages/creation/src/runtime/mcp/server.ts",
       "packages/creation/test/mcp.test.ts"
     ],
-    "correctiveCodeAuthorized": false,
+    "correctiveCodeAuthorized": true,
     "taskResumeAuthorized": false,
-    "requiredSequence": "The exact owner-only three-file PD-012 OpenSpec update is accepted at 2b62dac6d86c8ca0fef6b52eea81019ba5749430. Await a separate exact two-file Creation corrective authorization and acceptance before resuming the four task-4.3 files."
+    "requiredSequence": "The exact owner-only three-file PD-012 OpenSpec update is accepted at 2b62dac6d86c8ca0fef6b52eea81019ba5749430. Incorporate and validate the separate Controller authorization, then implement and commit exactly packages/creation/src/runtime/mcp/server.ts and packages/creation/test/mcp.test.ts. The four task-4.3 files remain locked until the corrective commit is independently accepted."
   },
   "unresolvedIssues": [],
   "knownRisks": [
