@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "3a176c7ca459fa8cfe937311066f44eb703d053a6282e7f1d6e50054e63fefae",
+  "contentSha256": "07ce32b26d7838b47762b4bfce04c3e811b703b0fc5dfa3ac908ed181e472e58",
   "lane": "library",
   "change": "integrate-routego-image-plugin",
   "taskId": "5.2",
-  "status": "registered-awaiting-zero-compaction-handoff-acceptance",
+  "status": "activated-isolated-library-canonical-path-identity-correction-owner",
   "sourceCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -94,9 +94,11 @@
     "integrationImplementationCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
     "registrationAttempt": 2,
     "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
+    "registrationCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
+    "acceptedHead": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
     "correctionSourceRetired": true,
-    "soleApplyOwner": false,
-    "applyAuthorized": false,
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
     "authorizedScope": "library-canonical-path-identity-exact-eleven-files"
   },
   "knownRisks": [

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "99153a14b5985f2fc2324de6664ec6b1454ccf6ed94da155693c9213e1dbeaf9",
+  "capsuleSha256": "f599513254d487d258759f246688b8193b2b8c4b2a5ab5632aa3dc91d1b58833",
   "lane": "library",
   "role": "isolated-library-correction-owner",
   "change": "integrate-routego-image-plugin",
@@ -20,11 +20,12 @@
     "worktree": "/Users/dalizi/Documents/routego-image-library-correction-g3",
     "plannedBranch": "codex/routego-library-correction-g3",
     "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "registrationStatus": "registered-awaiting-zero-compaction-handoff-acceptance",
+    "registrationStatus": "activated-isolated-library-canonical-path-identity-correction-owner",
     "registrationAttempt": 2,
-    "registrationCommit": null,
+    "registrationCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
     "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
-    "verifiedHeadBeforeContainingCommit": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
+    "verifiedHeadBeforeContainingCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
+    "acceptedHead": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
     "failedRegistrationAttempts": [
       {
         "attempt": 1,
@@ -41,16 +42,16 @@
     "nextTaskId": "5.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/library-correction-5.2.json",
-      "sha256": "3a176c7ca459fa8cfe937311066f44eb703d053a6282e7f1d6e50054e63fefae"
+      "sha256": "07ce32b26d7838b47762b4bfce04c3e811b703b0fc5dfa3ac908ed181e472e58"
     },
-    "taskLocked": true,
+    "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
     "sourceArchived": true,
     "correctionSourceRetired": true,
-    "successorApplyAuthorized": false,
+    "successorApplyAuthorized": true,
     "integrationApplyOwnerUnchanged": true,
     "integrationImplementationCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "continuation": "library-correction-handoff-audit-before-activation"
+    "continuation": "library-correction-activated-red-green-implementation"
   },
   "completedEvidence": [
     {
@@ -67,10 +68,10 @@
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
-    "blockers": ["Library generation 3 must pass zero-compaction handoff audit and separate activation before product edits."],
+    "blockers": [],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
-    "task5_2Locked": true,
+    "task5_2Locked": false,
     "networkAuthorized": false,
     "residualRisks": [
       "The correction must preserve final symlink, protected-root, containment, ownership and ZIP no-overwrite safety.",
@@ -112,7 +113,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "expectedNormalizedUtf8Bytes": 78394,
+    "expectedNormalizedUtf8Bytes": 78977,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
