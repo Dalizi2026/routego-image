@@ -329,6 +329,11 @@ try {
 }
 
 if (program && lane) {
+  const programSuccessor =
+    program.successor?.lane === capsule.lane
+      ? program.successor
+      : program.laneSuccessors?.[capsule.lane];
+  const correctionSourceRetired = capsule.currentState.correctionSourceRetired === true;
   const successorIsCurrent = /^(registered|accepted|activated)/.test(
     capsule.successor.registrationStatus,
   );
@@ -344,25 +349,25 @@ if (program && lane) {
       lane.sourceOwner?.branch === capsule.source.branch &&
       lane.soleApplyOwner === activated &&
       lane.applyAuthorized === activated &&
-      lane.sourceOwner?.soleApplyOwner === !activated &&
-      lane.sourceOwner?.archived === activated
+      lane.sourceOwner?.soleApplyOwner === (correctionSourceRetired ? false : !activated) &&
+      lane.sourceOwner?.archived === (correctionSourceRetired ? true : activated)
     : lane.change === capsule.change &&
       lane.generation === capsule.generation.source &&
       lane.threadId === capsule.source.threadId &&
       lane.worktree === capsule.source.worktree &&
       lane.branch === capsule.source.branch;
   const successorMatches = successorIsCurrent
-    ? program.successor.threadId === capsule.successor.threadId &&
-      program.successor.worktree === capsule.successor.worktree &&
-      program.successor.plannedBranch === capsule.successor.plannedBranch &&
-      program.successor.observableCompactions ===
+    ? programSuccessor?.threadId === capsule.successor.threadId &&
+      programSuccessor?.worktree === capsule.successor.worktree &&
+      programSuccessor?.plannedBranch === capsule.successor.plannedBranch &&
+      programSuccessor?.observableCompactions ===
         capsule.context.successorObservableCompactions &&
       lane.observableCompactions === capsule.context.successorObservableCompactions &&
       (activated || capsule.context.successorObservableCompactions === 0) &&
-      program.successor.currentHead ===
+      programSuccessor?.currentHead ===
         capsule.successor.verifiedHeadBeforeContainingCommit &&
       lane.currentHead === capsule.successor.verifiedHeadBeforeContainingCommit
-    : program.successor.threadId === null && program.successor.worktree === null;
+    : programSuccessor?.threadId === null && programSuccessor?.worktree === null;
   if (
     program.currentChange.id !== capsule.change ||
     program.currentChange.openspec.nextTaskId !== capsule.currentState.nextTaskId ||
@@ -413,6 +418,7 @@ if (taskCapsule && taskCapsule.ownershipFingerprint !== capsule.authority.owners
 }
 
 const successorActivated = capsule.successor.registrationStatus.startsWith("activated");
+const correctionSourceRetired = capsule.currentState.correctionSourceRetired === true;
 const taskLockGate =
   "task" + capsule.currentState.nextTaskId.replaceAll(".", "_") + "Locked";
 if (
@@ -426,7 +432,9 @@ if (
 if (
   successorActivated !== !capsule.currentState.taskLocked ||
   successorActivated !== capsule.currentState.successorApplyAuthorized ||
-  successorActivated === capsule.currentState.sourceIsSoleApplyOwner
+  (correctionSourceRetired
+    ? capsule.currentState.sourceIsSoleApplyOwner !== false
+    : successorActivated === capsule.currentState.sourceIsSoleApplyOwner)
 ) {
   fail("successor activation disagrees with task lock or apply ownership");
 } else {
