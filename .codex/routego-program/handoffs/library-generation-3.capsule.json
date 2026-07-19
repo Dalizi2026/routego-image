@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "de397a44faf7ff562d56e296f038cbb2e0f35c4568f5e473e1a2bd2453d760f9",
+  "capsuleSha256": "99153a14b5985f2fc2324de6664ec6b1454ccf6ed94da155693c9213e1dbeaf9",
   "lane": "library",
   "role": "isolated-library-correction-owner",
   "change": "integrate-routego-image-plugin",
@@ -21,10 +21,18 @@
     "plannedBranch": "codex/routego-library-correction-g3",
     "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
     "registrationStatus": "registered-awaiting-zero-compaction-handoff-acceptance",
-    "registrationAttempt": 1,
+    "registrationAttempt": 2,
     "registrationCommit": null,
-    "incorporationCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
-    "verifiedHeadBeforeContainingCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad"
+    "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
+    "verifiedHeadBeforeContainingCommit": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
+    "failedRegistrationAttempts": [
+      {
+        "attempt": 1,
+        "commit": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
+        "status": "controller-pre-dispatch-audit-failed-never-sent-never-activated",
+        "mismatch": "incorporation/currentHead/verifiedHead used an unreachable fabricated full SHA"
+      }
+    ]
   },
   "currentState": {
     "openspecTotal": 29,
@@ -33,7 +41,7 @@
     "nextTaskId": "5.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/library-correction-5.2.json",
-      "sha256": "0f330f64b2da645f0f237e4dfb9b3a6db22f7a0a6d90813c379b4b47f3ba5c1b"
+      "sha256": "3a176c7ca459fa8cfe937311066f44eb703d053a6282e7f1d6e50054e63fefae"
     },
     "taskLocked": true,
     "sourceIsSoleApplyOwner": false,
@@ -104,7 +112,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "expectedNormalizedUtf8Bytes": 77446,
+    "expectedNormalizedUtf8Bytes": 78394,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

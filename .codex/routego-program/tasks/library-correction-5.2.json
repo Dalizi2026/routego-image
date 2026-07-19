@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "0f330f64b2da645f0f237e4dfb9b3a6db22f7a0a6d90813c379b4b47f3ba5c1b",
+  "contentSha256": "3a176c7ca459fa8cfe937311066f44eb703d053a6282e7f1d6e50054e63fefae",
   "lane": "library",
   "change": "integrate-routego-image-plugin",
   "taskId": "5.2",
@@ -92,7 +92,8 @@
     "integrationGeneration": 8,
     "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
     "integrationImplementationCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "incorporationCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
+    "registrationAttempt": 2,
+    "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
     "correctionSourceRetired": true,
     "soleApplyOwner": false,
     "applyAuthorized": false,

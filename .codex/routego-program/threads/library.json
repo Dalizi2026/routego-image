@@ -10,9 +10,9 @@
   "branch": "codex/routego-library-correction-g3",
   "generation": 3,
   "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-  "registrationAttempt": 1,
-  "incorporationCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
-  "currentHead": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
+  "registrationAttempt": 2,
+  "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
+  "currentHead": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
   "gitClean": true,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
@@ -45,16 +45,23 @@
     "worktree": "/Users/dalizi/Documents/routego-image-library-correction-g3",
     "plannedBranch": "codex/routego-library-correction-g3",
     "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "registrationAttempt": 1,
+    "registrationAttempt": 2,
     "registrationCommit": null,
-    "incorporationCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
-    "currentHead": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
+    "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
+    "currentHead": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
     "status": "registered-awaiting-zero-compaction-handoff-acceptance",
     "observableCompactions": 0,
     "lastCompactionFingerprint": null,
     "soleApplyOwner": false,
     "applyAuthorized": false,
-    "handoffCapsule": ".codex/routego-program/handoffs/library-generation-3.capsule.json"
+    "handoffCapsule": ".codex/routego-program/handoffs/library-generation-3.capsule.json",
+    "failedRegistrationAttempts": [
+      {
+        "attempt": 1,
+        "commit": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
+        "status": "controller-pre-dispatch-audit-failed-never-sent-never-activated"
+      }
+    ]
   },
   "sourceOwner": {
     "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",

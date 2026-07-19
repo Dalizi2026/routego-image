@@ -108,16 +108,25 @@
       "worktree": "/Users/dalizi/Documents/routego-image-library-correction-g3",
       "plannedBranch": "codex/routego-library-correction-g3",
       "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+      "registrationAttempt": 2,
       "registrationCommit": null,
-      "incorporationCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
-      "currentHead": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
+      "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
+      "currentHead": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
       "soleApplyOwner": false,
       "applyAuthorized": false,
       "authorizedScope": "library-canonical-path-identity-exact-eleven-files",
       "gitClean": true,
       "observableCompactions": 0,
       "lastCompactionFingerprint": null,
-      "handoffCapsule": ".codex/routego-program/handoffs/library-generation-3.capsule.json"
+      "handoffCapsule": ".codex/routego-program/handoffs/library-generation-3.capsule.json",
+      "failedRegistrationAttempts": [
+        {
+          "attempt": 1,
+          "commit": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
+          "status": "controller-pre-dispatch-audit-failed-never-sent-never-activated",
+          "reason": "unreachable fabricated expansion of the planning commit short SHA"
+        }
+      ]
     }
   },
   "currentChange": {

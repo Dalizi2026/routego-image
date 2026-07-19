@@ -338,6 +338,38 @@ if (program && lane) {
     capsule.successor.registrationStatus,
   );
   const activated = capsule.successor.registrationStatus.startsWith("activated");
+  const registeredAwaitingAcceptance =
+    capsule.successor.registrationStatus.startsWith("registered");
+  if (
+    !Number.isInteger(capsule.successor.registrationAttempt) ||
+    capsule.successor.registrationAttempt < 1
+  ) {
+    fail("successor registrationAttempt is invalid");
+  }
+  if (
+    !/^[0-9a-f]{40}$/.test(capsule.successor.verifiedHeadBeforeContainingCommit ?? "") ||
+    !reachable(capsule.successor.verifiedHeadBeforeContainingCommit)
+  ) {
+    fail("successor verifiedHeadBeforeContainingCommit is unreachable");
+  } else if (registeredAwaitingAcceptance && !allowDirty) {
+    const actualContainingParent = git(["rev-parse", "HEAD^"]).trim();
+    if (actualContainingParent !== capsule.successor.verifiedHeadBeforeContainingCommit) {
+      fail("registered successor verified head must equal the containing commit parent");
+    } else {
+      pass("registered successor containing-parent relation");
+    }
+  } else if (registeredAwaitingAcceptance) {
+    pass("registered successor containing-parent relation deferred for allow-dirty precommit validation");
+  }
+  if (
+    capsule.successor.incorporationCommit !== null &&
+    (!/^[0-9a-f]{40}$/.test(capsule.successor.incorporationCommit ?? "") ||
+      !reachable(capsule.successor.incorporationCommit))
+  ) {
+    fail("successor incorporationCommit is unreachable");
+  } else if (capsule.successor.incorporationCommit !== null) {
+    pass("successor incorporation commit");
+  }
   const laneIdentityMatches = successorIsCurrent
     ? lane.change === capsule.change &&
       lane.generation === capsule.generation.successor &&
