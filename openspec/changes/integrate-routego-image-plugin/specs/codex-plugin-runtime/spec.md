@@ -11,6 +11,21 @@ The plugin runtime SHALL run the long-lived STDIO MCP lifecycle over the compose
 - **WHEN** a client attempts to call an Integration or Studio operation as a tool
 - **THEN** MCP SHALL return tool-not-found without dispatching it
 
+### Requirement: Public MCP success projection remains schema-valid and image-payload safe
+After validating a service success result against its frozen public output schema, the MCP runtime SHALL serialize structured text through a public-success projection rather than diagnostic/error redaction. The projection SHALL preserve every schema-defined public field, including current-call public result paths and the fresh one-time `routego_open_studio` launch token. Generate, edit, and batch structured text MUST omit or replace image data URLs and binary payloads, while validated final images SHALL remain available as MCP image content. Structured errors, caught exceptions, framing failures, logger output, Authorization values, credentials, arbitrary diagnostic URLs, and binary diagnostic data SHALL remain recursively redacted.
+
+#### Scenario: Codex opens Studio from MCP content
+- **WHEN** `routego_open_studio` returns a validated fresh loopback launch URL
+- **THEN** MCP structured text SHALL still satisfy `routegoOpenStudioResultSchema`, contain the one-time token required for immediate bootstrap, and preserve no unrelated diagnostic query or credential
+
+#### Scenario: Generate, edit, or batch returns image display data
+- **WHEN** a validated success result contains final image data URLs and optional partial image data
+- **THEN** structured text SHALL contain no image Base64 or bytes, validated final images SHALL be emitted through MCP image content, and all other schema-defined public success fields SHALL remain intact
+
+#### Scenario: Failure contains a credential or arbitrary URL query
+- **WHEN** an invalid output, thrown error, framing failure, or logger diagnostic contains Authorization, credentials, a data URL, bytes, or an arbitrary query-bearing URL
+- **THEN** the error and diagnostic boundaries SHALL recursively redact those values without applying that diagnostic transformation to a validated public success result
+
 ### Requirement: Routego Image Skill is thin, relocatable, and secret safe
 The Skill SHALL map user intent to the seven MCP tools, distinguish variants from independent batch tasks, inspect status/capability evidence before dependent operations, display only current-call validated paths/content, and use plugin-relative/runtime-provided resources. It MUST NOT hardcode a personal plugin directory, request a complete key in chat, run legacy scripts, scan output folders, or fabricate success.
 

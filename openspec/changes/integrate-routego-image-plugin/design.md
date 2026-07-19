@@ -128,6 +128,10 @@ The Skill reads status, maps user intent to the existing seven tools, supplies o
 
 The MCP entrypoint wraps the composed service with Creation's `RoutegoMcpServer`; exact-name tests prove no Studio operation becomes a tool. Stdout remains protocol-only and diagnostics are redacted on stderr.
 
+Schema-validated public success results use a public-result projection rather than the diagnostic redactor. That projection preserves every field required by the frozen output schema, including current-call public result paths and the fresh one-time `routego_open_studio` launch token, so the structured MCP text remains schema-valid and immediately consumable. For generate, edit, and batch results, it replaces or omits only image data URLs and binary payloads in structured text while retaining validated final images as MCP image content. Structured errors, caught exceptions, framing failures, logger output, Authorization values, credentials, arbitrary diagnostic URLs, and binary diagnostic data continue through recursive diagnostic redaction.
+
+PD-012 makes this separation a prerequisite common-root correction before task 4.3 resumes. The correction is committed and accepted separately, is limited exactly to Creation's `runtime/mcp/server.ts` and `test/mcp.test.ts`, and does not change the seven tools, their schemas, public paths, Studio/session ownership, or Integration's preserved four-file WIP.
+
 ### 13. Build a relocatable self-contained plugin artifact
 
 Implementation will use `plugin-creator` for the canonical `.codex-plugin/plugin.json` and personal-marketplace/cachebuster workflow. A tracked relative launcher resolves the bundled runtime from the plugin root. The package build runs all workspace builds, bundles Integration plus workspace/runtime dependencies into Node 20 ESM, builds Studio with hashed assets, copies the Skill, manifest, notices, upstream MIT license, and runtime assets into an ignored temporary staging directory, and verifies an allowlist/denylist manifest. The artifact contains no `node_modules`, source maps with local paths, caches, reports, credentials, configuration, user images, or Library data.
