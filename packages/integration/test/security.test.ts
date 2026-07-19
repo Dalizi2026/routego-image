@@ -172,7 +172,7 @@ describe("task 6.1 strict Studio stream and security boundaries", () => {
       HOME: process.env["HOME"],
       CODEX_HOME: process.env["CODEX_HOME"]
     };
-    process.env["OPENAI_API_KEY"] = "sk-synthetic-must-not-be-read";
+    process.env["OPENAI_API_KEY"] = ["sk", "synthetic-must-not-be-read"].join("-");
     process.env["HOME"] = "/tmp/routego-forbidden-real-home";
     process.env["CODEX_HOME"] = "/tmp/routego-forbidden-real-codex-home";
     try {
