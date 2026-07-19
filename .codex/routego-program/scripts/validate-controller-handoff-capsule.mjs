@@ -222,21 +222,23 @@ if (program && controller) {
 
 if (program && integration && taskCapsule && integrationCapsule) {
   const current = capsule.currentIntegration;
+  const expectedSoleApplyOwner = current.sourceFrozen !== true;
+  const expectedApplyAuthorized = current.sourceFrozen !== true;
   const integrationMatches =
     program.applyOwner.threadId === current.threadId &&
     program.applyOwner.generation === current.generation &&
     program.applyOwner.worktree === current.worktree &&
     program.applyOwner.branch === current.branch &&
     program.applyOwner.currentHead === current.activationIncorporationHead &&
-    program.applyOwner.soleApplyOwner === true &&
-    program.applyOwner.applyAuthorized === true &&
+    program.applyOwner.soleApplyOwner === expectedSoleApplyOwner &&
+    program.applyOwner.applyAuthorized === expectedApplyAuthorized &&
     integration.threadId === current.threadId &&
     integration.generation === current.generation &&
     integration.worktree === current.worktree &&
     integration.branch === current.branch &&
     integration.currentHead === current.activationIncorporationHead &&
-    integration.soleApplyOwner === true &&
-    integration.applyAuthorized === true &&
+    integration.soleApplyOwner === expectedSoleApplyOwner &&
+    integration.applyAuthorized === expectedApplyAuthorized &&
     integration.currentTask.id === current.currentTaskId;
   if (!integrationMatches) {
     fail("current Integration owner mismatch");
@@ -370,7 +372,9 @@ const sensitiveText = capsule.startup.mandatoryFiles
   .map((file) => readFileSync(resolve(root, file), "utf8"))
   .join("\n");
 if (
-  /data:image\/[a-z0-9.+-]+;base64,/i.test(sensitiveText) ||
+  /data:image\/[a-z0-9][a-z0-9.+-]*;base64,[a-z0-9+/]{16,}={0,2}/i.test(
+    sensitiveText,
+  ) ||
   /Authorization\s*[:=]\s*(?:Bearer\s+)?[A-Za-z0-9._~-]{16,}/i.test(
     sensitiveText,
   ) ||
