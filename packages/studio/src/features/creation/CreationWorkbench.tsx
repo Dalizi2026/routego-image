@@ -8,6 +8,7 @@ import {
   type DragEvent,
   type KeyboardEvent
 } from "react";
+import { flushSync } from "react-dom";
 
 import type {
   ReadSettingsResult,
@@ -1226,7 +1227,11 @@ export function CreationWorkbench({
       signal: controller.signal,
       onState: (state) => {
         if (mountedRef.current && activeStreamRef.current === controller) {
-          setSubmission(state);
+          if (state.status === "streaming") {
+            flushSync(() => setSubmission(state));
+          } else {
+            setSubmission(state);
+          }
         }
       }
     });
