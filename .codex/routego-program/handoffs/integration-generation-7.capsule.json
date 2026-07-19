@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "b3ffaecd73eb4efcbe9f41437355ec5b27fffc908233be567a5e8af273f50edc",
+  "capsuleSha256": "1e0f9ed05c09c69a0168943b0b578723c95aa63541ea358ce2b8ee6baa7c935b",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -18,15 +18,15 @@
     "handoffParent": "b2b1b556a0d66f4d9bdb912eade1109f046cecad"
   },
   "successor": {
-    "threadId": "pending",
+    "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
     "plannedBranch": "codex/routego-integration-g7",
     "startingCommit": "34fd18aca083199028b8f9a54f8fc26f023711db",
     "registrationStatus": "registered-retry-2-awaiting-low-context-acceptance",
     "registrationAttempt": 2,
-    "registrationCommit": null,
+    "registrationCommit": "dc521df5b10659ed6d3a34a5c66cc29202ad83e0",
     "incorporationCommit": "3f629eaf12b54a2d334efec14310646a99c73e62",
-    "verifiedHeadBeforeContainingCommit": "d73178031fd92f460fb03e4f182778724b9aa206",
+    "verifiedHeadBeforeContainingCommit": "dc521df5b10659ed6d3a34a5c66cc29202ad83e0",
     "registrationCommitSemantics": "Attempt 2 is a clean replacement for the rejected first successor. The containing registration commit cannot self-reference its own SHA; the real thread ID is filled after task creation, before acceptance or activation."
   },
   "currentState": {
@@ -160,7 +160,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
-    "expectedNormalizedUtf8Bytes": 109729,
+    "expectedNormalizedUtf8Bytes": 109930,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
