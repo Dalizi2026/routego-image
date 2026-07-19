@@ -231,11 +231,19 @@ if (taskCapsule) {
     (taskCapsule.allowedParentDirectoriesToCreate ?? []).map(normalizePath),
   );
   for (const newParent of allowedParentDirectoriesToCreate) {
-    const existingAncestor = dirname(newParent);
-    try {
-      git(["cat-file", "-e", taskCapsule.sourceCommit + ":" + existingAncestor]);
-    } catch {
-      fail("declared new allowed parent has missing ancestor: " + existingAncestor);
+    let existingAncestor = dirname(newParent);
+    let existingAncestorFound = existingAncestor === ".";
+    while (existingAncestor !== ".") {
+      try {
+        git(["cat-file", "-e", taskCapsule.sourceCommit + ":" + existingAncestor]);
+        existingAncestorFound = true;
+        break;
+      } catch {
+        existingAncestor = dirname(existingAncestor);
+      }
+    }
+    if (!existingAncestorFound && existingAncestor !== ".") {
+      fail("declared new allowed parent has no existing ancestor: " + newParent);
     }
     if (!taskCapsule.allowedFiles.some((allowed) => dirname(normalizePath(allowed)) === newParent)) {
       fail("declared new allowed parent is unused: " + newParent);
@@ -347,8 +355,10 @@ if (program && lane) {
     ? program.successor.threadId === capsule.successor.threadId &&
       program.successor.worktree === capsule.successor.worktree &&
       program.successor.plannedBranch === capsule.successor.plannedBranch &&
-      program.successor.observableCompactions === 0 &&
-      lane.observableCompactions === 0 &&
+      program.successor.observableCompactions ===
+        capsule.context.successorObservableCompactions &&
+      lane.observableCompactions === capsule.context.successorObservableCompactions &&
+      (activated || capsule.context.successorObservableCompactions === 0) &&
       program.successor.currentHead ===
         capsule.successor.verifiedHeadBeforeContainingCommit &&
       lane.currentHead === capsule.successor.verifiedHeadBeforeContainingCommit

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "18cb233be27f579760d707da8a0e1d69477e245e622a89011d65ff2ec4292e65",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "5.1",
+  "status": "activated-sole-owner-task-5.1-authorized",
+  "sourceCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "55f25d70a65e85056147e55df3ad85c2965f56877d7d97ca1ab1fde8c210b255",
+    "lineSha256": "74f1905bc35187c8112f10b381d02eada019eb94a34133f94efa05062967251d",
+    "lineBytes": 906
+  },
+  "dependencies": [
+    "4.3"
+  ],
+  "allowedFiles": [
+    ".codex-plugin/plugin.json",
+    "skills/routego-image/SKILL.md",
+    "scripts/start-routego-image.mjs"
+  ],
+  "allowedParentDirectoriesToCreate": [
+    ".codex-plugin",
+    "skills/routego-image"
+  ],
+  "allowedFileMode": "create or update exactly the three task-5.1 files; .codex-plugin and skills/routego-image are new plugin-owned directories while scripts already exists",
+  "forbiddenFileGlobs": [
+    ".agents/**",
+    ".codex/routego-program/**",
+    "packages/**",
+    "openspec/**",
+    "dist/**",
+    "build/**",
+    "node_modules/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "scripts/build-plugin-package.mjs",
+    "scripts/verify-plugin-package.mjs",
+    "THIRD_PARTY_NOTICES.md",
+    "licenses/**"
+  ],
+  "requiredBehavior": [
+    "Read and use the installed plugin-creator Skill before editing, while following this task's explicit prohibition on marketplace, cachebuster and reinstall execution.",
+    "Create the canonical routego-image version 1.0.0 manifest with only valid declared components and plugin-relative paths.",
+    "Create a plugin-relative Node launcher that locates its runtime from the plugin root without a developer home, source checkout or legacy plugin path.",
+    "Create a thin bilingual Routego Image Skill that maps user intent to exactly the seven frozen MCP tools, distinguishes variants from independent batch work, and checks status and capability evidence before dependent operations.",
+    "Present only validated paths or image content from the current call, preserve the current-call Studio launch discipline, and never request complete credentials in chat, scan output folders, invoke legacy scripts or fabricate success.",
+    "Do not build package artifacts, modify marketplace state, install or reinstall the plugin, change public tools, access external state or begin task 5.2."
+  ],
+  "verification": [
+    "openspec instructions apply --change integrate-routego-image-plugin --json",
+    "plugin-creator scripts/validate_plugin.py against the repository plugin root",
+    "plugin-creator skill validation for skills/routego-image/SKILL.md",
+    "JSON and UTF-8 validation",
+    "launcher plugin-relative root and no hardcoded home/source-checkout audit",
+    "Skill status, capability, variant, batch, edit, library, studio, current-call and redaction scenarios",
+    "exact seven public MCP names and no Studio-only operation",
+    "no marketplace, cachebuster, reinstall, legacy CLI/path or complete-key request",
+    "node scripts/check-repository-safety.mjs",
+    "openspec validate --all --strict --no-interactive",
+    "git diff --check",
+    "exact three-file implementation scope"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
+      "sha256": "7ea6069220347f8a434abf21b930ee026e5d7b9bb763b67bf4a50cbf0a3b9f15",
+      "bytes": 10937,
+      "reason": "Exact seven tools, thin secret-safe Skill, capability checks and current-call result discipline."
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/plugin-packaging-installation/spec.md",
+      "sha256": "d9970d8be726dd77f694ba9cfbdd2f84f64d840add82a602bc6abef45c856c66",
+      "bytes": 4778,
+      "reason": "Canonical routego-image 1.0.0 manifest and plugin-relative structure boundary."
+    }
+  ],
+  "workflow": {
+    "skill": "plugin-creator",
+    "skillPath": "/Users/dalizi/.codex/skills/.system/plugin-creator/SKILL.md",
+    "manifestReference": "/Users/dalizi/.codex/skills/.system/plugin-creator/references/plugin-json-spec.md",
+    "marketplaceExecutionAuthorized": false,
+    "cachebusterExecutionAuthorized": false,
+    "reinstallExecutionAuthorized": false
+  },
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "activation": {
+    "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
+    "controllerGeneration": 8,
+    "integrationThreadId": "019f79a6-ba30-73e3-9875-33ba707af137",
+    "integrationGeneration": 7,
+    "acceptedTask4_3ImplementationCommit": "4abf0dc004f91cb4bd6fc3a16f1fadafcf92f6b3",
+    "acceptedTask3_4GateCorrectionCommit": "012220a358559df4e14247cb674a8f09bf20aa2a",
+    "acceptedTask4_2GateCorrectionCommit": "4238ec2e5a5b2ffd9eef98e059990fac4a5d85f7",
+    "acceptedTask4_3StateCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "task-5.1-exact-three-file-implementation"
+  },
+  "knownRisks": [
+    "Manifest validation must not introduce unsupported fields or declare absent app, hook or MCP companion files.",
+    "The launcher must remain relocatable even though the repository runtime is not yet the self-contained task-5.2 package.",
+    "All package build, marketplace, installation and external-state operations remain explicitly out of scope."
+  ],
+  "externalStateAuthorized": false
+}

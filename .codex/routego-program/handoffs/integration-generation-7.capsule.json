@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "7048738893c282bc38cbfa2624ff9ab6bd7b3f7d84f5ce4e8768525c10efb66c",
+  "capsuleSha256": "46fe9ea6922909e82f4889b6b2e03d934333fff5043bacb62ddf96147c163968",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,37 +22,42 @@
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
     "plannedBranch": "codex/routego-integration-g7",
     "startingCommit": "34fd18aca083199028b8f9a54f8fc26f023711db",
-    "registrationStatus": "activated-sole-owner-task-4.3-resume-authorized-after-p1-correction",
+    "registrationStatus": "activated-sole-owner-task-5.1-authorized-after-task-4.3-acceptance",
     "registrationAttempt": 2,
     "registrationCommit": "dc521df5b10659ed6d3a34a5c66cc29202ad83e0",
     "incorporationCommit": "3f629eaf12b54a2d334efec14310646a99c73e62",
-    "verifiedHeadBeforeContainingCommit": "92752bda589635460b0c48e297df4d9c8c920a92",
-    "acceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
-    "registrationCommitSemantics": "Attempt 2 completed zero-compaction acceptance and activation. Controller independently accepted the exact-two-file P1 correction at 57f1af97cf801b848ef89297654db6c0449f9d2a and separately restored task-4.3 authority; this containing recovery-governance commit cannot self-reference its own SHA."
+    "verifiedHeadBeforeContainingCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+    "acceptedHead": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+    "registrationCommitSemantics": "Attempt 2 completed zero-compaction acceptance and activation. After task 4.3 and its gate corrections were independently accepted, this containing governance commit records the verifiable parent HEAD and activates the exact task-5.1 scope without self-referencing its own SHA."
   },
   "currentState": {
     "openspecTotal": 29,
-    "openspecCompleted": 17,
-    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1", "4.2"],
-    "nextTaskId": "4.3",
+    "openspecCompleted": 18,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1", "4.2", "4.3"],
+    "nextTaskId": "5.1",
     "taskCapsule": {
-      "path": ".codex/routego-program/tasks/integration-4.3.json",
-      "sha256": "edc3cac4b9d12763f60961c2450a3a17339e58d1989b14482ee11ec855f2c10d"
+      "path": ".codex/routego-program/tasks/integration-5.1.json",
+      "sha256": "18cb233be27f579760d707da8a0e1d69477e245e622a89011d65ff2ec4292e65"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
     "successorApplyAuthorized": true,
-    "successorAuthorizedScope": "task-4.3-four-file-implementation",
+    "successorAuthorizedScope": "task-5.1-exact-three-file-implementation",
     "acceptedPreviousTaskImplementationCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "acceptedHostCorrectionImplementationCommit": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
     "acceptedPreviousTaskStateCommit": "7ba03291adf26c28ac84abfe8cd5a8f5794ea089",
     "acceptedPreviousTaskCheckpointCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
     "taskComplete": false,
-    "safeCheckpoint": "34fd18aca083199028b8f9a54f8fc26f023711db",
+    "completedTask4_3": true,
+    "task4_3ImplementationCommit": "4abf0dc004f91cb4bd6fc3a16f1fadafcf92f6b3",
+    "task4_3GateCorrectionA": "012220a358559df4e14247cb674a8f09bf20aa2a",
+    "task4_3GateCorrectionB": "4238ec2e5a5b2ffd9eef98e059990fac4a5d85f7",
+    "task4_3StateCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+    "safeCheckpoint": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
     "checkpointParent": "b2b1b556a0d66f4d9bdb912eade1109f046cecad",
-    "checkpointSemantics": "NON_COMPLETION_WIP_SAFETY_CHECKPOINT_ONLY",
-    "observableCompactions": 0,
-    "continuation": "task-4.3-resume-authorized-after-p1-correction"
+    "checkpointSemantics": "TASK_4_3_COMPLETE_TASK_5_1_ACTIVATION_GOVERNANCE",
+    "observableCompactions": 2,
+    "continuation": "task-5.1-exact-three-file-implementation-authorized"
   },
   "planDeviation": {
     "id": "PD-012",
@@ -70,8 +75,7 @@
     "productCorrectionAuthorized": false,
     "productCorrectionAccepted": true,
     "productCorrectionCommit": "57f1af97cf801b848ef89297654db6c0449f9d2a",
-    "productCorrectionAccepted": false,
-    "taskResumeAuthorized": false
+    "taskResumeAuthorized": true
   },
   "completedEvidence": [
     {
@@ -93,6 +97,11 @@
       "path": ".codex/routego-program/evidence/integration-generation-5-tasks.json",
       "sha256": "fe70521d9f1eecc3be50c3c2b461338672bb4e5e70f860a58523f8dd18e6e197",
       "taskIds": ["4.2"]
+    },
+    {
+      "path": ".codex/routego-program/evidence/integration-generation-7-tasks.json",
+      "sha256": "b3f3c6e652b8ebe53eba911b76b576aaa6ac44ec2172473da5015c0a845a48ae",
+      "taskIds": ["4.3"]
     }
   ],
   "authority": {
@@ -106,17 +115,18 @@
     "blockers": [],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
-    "taskBeyond4_3Locked": true,
+    "taskBeyond5_1Locked": true,
     "residualRisks": [
-      "The preserved task-4.3 four-file checkpoint remains incomplete and must pass its full task verification before completion.",
-      "The accepted Creation correction must remain unchanged while task 4.3 resumes.",
+      "Task 5.1 is restricted to the canonical manifest, plugin-relative launcher and bilingual Skill.",
+      "The accepted task-4.3 implementation and security correction must remain unchanged.",
       "Packaging, installation, real relay acceptance and release remain later gated tasks."
     ]
   },
   "context": {
     "sourceObservableCompactions": 1,
     "sourceCompactionFingerprint": "integration|integrate-routego-image-plugin|34fd18aca083199028b8f9a54f8fc26f023711db|machine-transfer-non-completion-wip-safety-checkpoint|17/29",
-    "successorObservableCompactions": 0,
+    "successorObservableCompactions": 2,
+    "successorCompactionFingerprint": "integration|integrate-routego-image-plugin|0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b|context-compaction-2-after-task-4.3-task-state-before-task-5.1-activation|18/29",
     "handoffAcceptanceCompactionLimit": 0,
     "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
     "auditFailure": "HANDOFF_AUDIT_FAILED"
@@ -160,19 +170,19 @@
       ".codex/routego-program/program.json",
       ".codex/routego-program/threads/integration.json",
       ".codex/routego-program/handoffs/integration-generation-7.capsule.json",
-      ".codex/routego-program/tasks/integration-4.3.json",
+      ".codex/routego-program/tasks/integration-5.1.json",
       "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
-      "openspec/specs/creation-runtime-transports/spec.md",
-      "openspec/specs/local-service-boundaries/spec.md",
-      "openspec/specs/shared-image-contracts/spec.md",
-      ".codex/routego-program/deviations/PD-012-task-4.3-creation-mcp-public-success-projection.md",
-      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
+      "openspec/changes/integrate-routego-image-plugin/specs/plugin-packaging-installation/spec.md",
+      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+      "/Users/dalizi/.codex/skills/.system/plugin-creator/SKILL.md",
+      "/Users/dalizi/.codex/skills/.system/plugin-creator/references/plugin-json-spec.md",
+      "package.json"
     ],
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "fallbackSourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
-    "expectedNormalizedUtf8Bytes": 113473,
+    "fallbackSourceCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+    "expectedNormalizedUtf8Bytes": 94551,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

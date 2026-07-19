@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "edc3cac4b9d12763f60961c2450a3a17339e58d1989b14482ee11ec855f2c10d",
+  "contentSha256": "0d1bdb5d05cc6a07c26f878840befc46b4878d5addfb93d82e046fa8b74049c3",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.3",
-  "status": "incomplete-wip-preserved-pd-012-p1-correction-accepted-task-4.3-resume-authorized",
+  "status": "completed-controller-accepted",
   "sourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -110,7 +110,13 @@
     "authorizedScope": "task-4.3-four-file-implementation",
     "correctionAccepted": true,
     "correctionCommit": "57f1af97cf801b848ef89297654db6c0449f9d2a",
-    "started": true
+    "started": true,
+    "completed": true,
+    "implementationCommit": "4abf0dc004f91cb4bd6fc3a16f1fadafcf92f6b3",
+    "task3_4GateCorrectionCommit": "012220a358559df4e14247cb674a8f09bf20aa2a",
+    "task4_2GateCorrectionCommit": "4238ec2e5a5b2ffd9eef98e059990fac4a5d85f7",
+    "taskStateCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+    "controllerAccepted": true
   },
   "planDeviation": {
     "id": "PD-012",

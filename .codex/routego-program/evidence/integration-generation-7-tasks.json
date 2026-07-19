@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "b3f3c6e652b8ebe53eba911b76b576aaa6ac44ec2172473da5015c0a845a48ae",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "generation": 7,
+  "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
+  "sourceActivationHead": "4820bacdfa6a3b27a60dcbc74f7d906da295e2b7",
+  "taskStateCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+  "openspecProgress": "18/29",
+  "gitClean": true,
+  "observableCompactions": 2,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b|context-compaction-2-after-task-4.3-task-state-before-task-5.1-activation|18/29",
+  "externalStateAuthorized": false,
+  "tasks": [
+    {
+      "taskId": "4.3",
+      "implementationCommit": "4abf0dc004f91cb4bd6fc3a16f1fadafcf92f6b3",
+      "p1CorrectionCommit": "57f1af97cf801b848ef89297654db6c0449f9d2a",
+      "task3_4GateCorrectionCommit": "012220a358559df4e14247cb674a8f09bf20aa2a",
+      "task4_2GateCorrectionCommit": "4238ec2e5a5b2ffd9eef98e059990fac4a5d85f7",
+      "taskStateCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
+      "files": [
+        "packages/integration/src/runtime/mcp-process.ts",
+        "packages/integration/test/mcp-process.test.ts",
+        "packages/integration/src/composition/results.ts",
+        "packages/integration/test/results.test.ts",
+        "packages/integration/test/routes.test.ts",
+        "openspec/changes/integrate-routego-image-plugin/tasks.md"
+      ],
+      "verification": "Controller independently accepted Integration 191/191 tests, Integration typecheck, direct ESM and DTS build, seven workspace package exports, task-4.3 and Creation MCP regressions, strict OpenSpec 19/19, repository safety over 469 tracked files, exact commit ancestry and scopes, diff check, capsule validation and clean Git.",
+      "governanceCorrection": "The accepted P1 correction preserved operation-aware public success while failing closed on path, byte-array and free-string image payload leakage. Gate correction A canonicalized macOS output-directory identities without weakening containment. Gate correction B fixed only the task-4.2 disconnect test clock and deterministic cleanup assertion.",
+      "blockers": [],
+      "residualRisk": "Task 5.1 may create only the canonical manifest, plugin-relative launcher and bilingual Skill. Packaging, installation, marketplace, real relay acceptance and release remain later gated work."
+    }
+  ],
+  "relatedDecisions": [
+    ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+    ".codex/routego-program/deviations/PD-006-context-handoff-threshold.md",
+    ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
+    ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md",
+    ".codex/routego-program/deviations/PD-011-task-4.2-immutable-wip-promotion.md",
+    ".codex/routego-program/deviations/PD-012-task-4.3-creation-mcp-public-success-projection.md"
+  ]
+}
