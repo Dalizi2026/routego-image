@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "6d061683cffe2508b9e032ea4898bf99659aa14950a37eacf6ee7943243c97af",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "6.2",
+  "status": "activation-authorized-awaiting-integration-audit",
+  "sourceCommit": "24aea19efd5c782d06f1c7ea83694a6f8e61cfa6",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "b40260b934d4a957b2a6d89f468c61d258803844f4ac185e0808356c8a6bc09b",
+    "lineSha256": "f9b431bec729f4a7042cdec8ef5e5fe7c7370803a44a3abdfb70bcd196891a9f",
+    "lineBytes": 775
+  },
+  "dependencies": ["6.1"],
+  "dependencyCommits": {
+    "task6_1Implementation": "c911f26f90935a0d99d1983857591f7aa001ffaa",
+    "task6_1RepositorySafetyCorrection": "cba6a3fb9a914f6f977236109c32b8d3a3d2bdf8",
+    "task6_1TaskState": "24aea19efd5c782d06f1c7ea83694a6f8e61cfa6"
+  },
+  "allowedFiles": [
+    ".github/workflows/ci.yml",
+    "scripts/ci-plugin-smoke.mjs"
+  ],
+  "allowedFileMode": "create or modify exactly the two task-6.2 CI definition and local CI smoke files after Integration generation 8 passes its activation audit",
+  "forbiddenFileGlobs": [
+    ".codex/routego-program/**",
+    "openspec/**",
+    ".codex-plugin/**",
+    "skills/**",
+    "packages/**",
+    "tests/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "tsconfig.json",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "requiredBehavior": [
+    "Add one CI workflow with an explicit Windows, Ubuntu and macOS matrix using Node.js 20.19 or newer and frozen dependency installation semantics.",
+    "Run strict OpenSpec, repository safety, typecheck, build, all tests, exports and browser verification without credentials or privileged workflow permissions.",
+    "Build the plugin package reproducibly and run structural and runtime smoke checks only against task-owned temporary roots.",
+    "Keep package and smoke artifacts temporary, reject source checkout or node_modules dependence and preserve fail-closed artifact and security checks.",
+    "Do not execute remote CI, publish, deploy, install to a target, access a marketplace, use credentials or touch real user or external state."
+  ],
+  "verification": [
+    "fresh OpenSpec apply instructions showing 22/29 with task 6.2 first pending",
+    "strict OpenSpec validation 19/19",
+    "workflow YAML syntax and static permission audit",
+    "explicit Windows, Ubuntu and macOS Node.js 20.19+ matrix and cache review",
+    "local command parity using already-installed binaries only",
+    "temporary package reproducibility and structural/runtime smoke",
+    "root tests, typecheck, build, exports and browser gate definitions",
+    "native, dependency, credential, path and repository safety audits",
+    "git diff --check and exact two-file implementation scope"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/cross-platform-integration-verification/spec.md",
+      "sha256": "92e3a26498cf724f5580ab55961f95fa6ee8503fbca3ad2df9aba6296c4d429a",
+      "bytes": 5563,
+      "reason": "Cross-platform Node matrix, full offline gates, deterministic packaging and CI security boundaries."
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/plugin-packaging-installation/spec.md",
+      "sha256": "d9970d8be726dd77f694ba9cfbdd2f84f64d840add82a602bc6abef45c856c66",
+      "bytes": 4778,
+      "reason": "Self-contained package reproducibility, temporary installation smoke and source-dependency rejection."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "integrationGeneration": 8,
+    "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "acceptedTask6_1ImplementationCommit": "c911f26f90935a0d99d1983857591f7aa001ffaa",
+    "acceptedTask6_1CorrectionCommit": "cba6a3fb9a914f6f977236109c32b8d3a3d2bdf8",
+    "acceptedTask6_1StateCommit": "24aea19efd5c782d06f1c7ea83694a6f8e61cfa6",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "task-6.2-exact-two-file-cross-platform-ci",
+    "authorizedFiles": [
+      ".github/workflows/ci.yml",
+      "scripts/ci-plugin-smoke.mjs"
+    ],
+    "authorizationBaselineControllerHead": "4be673ceea01600dc5da0415e591af644a94372e",
+    "started": false
+  },
+  "remoteCiExecutionAuthorized": false,
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "marketplaceAuthorized": false,
+  "realCredentialsOrUserDataAuthorized": false,
+  "deploymentPublicationOrReleaseAuthorized": false
+}
