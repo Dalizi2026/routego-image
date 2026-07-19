@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "active-authoritative-controller-generation-8-integration-generation-7-p1-correction-accepted-task-4.3-recovery-governance-pending",
+  "status": "active-authoritative-controller-generation-8-integration-generation-7-task-4.3-reactivated-after-p1-correction",
   "threadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
   "worktree": "/Users/dalizi/Documents/routego-image-controller-g8",
   "branch": "codex/routego-controller-g8",
@@ -43,8 +43,8 @@
   },
   "currentOperation": {
     "id": "PD-012-task-4.3-creation-mcp-public-success-projection",
-    "state": "controller-generation-8-authoritative-integration-generation-7-p1-correction-accepted-task-4.3-recovery-governance-pending",
-    "allowedNext": "Create a separate task-4.3 recovery-governance commit. Until that commit is accepted, no task-4.3 implementation files may be changed and the task remains locked.",
+    "state": "controller-generation-8-authoritative-integration-generation-7-task-4.3-reactivated-after-p1-correction",
+    "allowedNext": "Integration generation 7 may resume and complete the preserved task-4.3 implementation in exactly its four authorized Integration files, preserving the accepted P1 correction and all frozen contracts.",
     "forbidden": [
       "Controller product or OpenSpec edits",
       "Integration task 4.3 edits before the exact two-file Creation corrective commit is independently accepted",
@@ -64,9 +64,9 @@
     "lastCompactionFingerprint": null,
     "soleApplyOwner": true,
     "applyAuthorized": true,
-    "authorizedScope": "task-4.3-recovery-governance-only",
+    "authorizedScope": "task-4.3-four-file-implementation",
     "frozen": false,
-    "status": "activated-sole-owner-p1-correction-accepted-task-4.3-recovery-governance-pending",
+    "status": "activated-sole-owner-task-4.3-resume-authorized-after-p1-correction",
     "handoffAudit": {
       "messageType": "HANDOFF_ACCEPTED",
       "reportedStartupFiles": 12,
@@ -113,7 +113,7 @@
     "gitClean": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null,
-    "status": "activated-sole-owner-p1-correction-accepted-task-4.3-recovery-governance-pending",
+    "status": "activated-sole-owner-task-4.3-resume-authorized-after-p1-correction",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-7.capsule.json"
   },
   "successor": {
