@@ -13,7 +13,7 @@
   "registrationAttempt": 1,
   "registrationCommit": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
   "incorporationCommit": "a3f5cd9d5b43085ad6b76503a2b78fe2399b001a",
-  "currentHead": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
+  "currentHead": "c27ab2bbbb974939efe9aa96114622a78b2a7033",
   "gitCleanAtRegistration": true,
   "gitClean": true,
   "observableCompactions": 0,

@@ -412,6 +412,36 @@ if (taskCapsule && taskCapsule.ownershipFingerprint !== capsule.authority.owners
   fail("ownership fingerprint mismatch");
 }
 
+const successorActivated = capsule.successor.registrationStatus.startsWith("activated");
+const taskLockGate =
+  "task" + capsule.currentState.nextTaskId.replaceAll(".", "_") + "Locked";
+if (
+  taskLockGate in capsule.gates &&
+  capsule.gates[taskLockGate] !== capsule.currentState.taskLocked
+) {
+  fail("task lock gate disagrees with current task lock state");
+} else {
+  pass("task lock gate consistency");
+}
+if (
+  successorActivated !== !capsule.currentState.taskLocked ||
+  successorActivated !== capsule.currentState.successorApplyAuthorized ||
+  successorActivated === capsule.currentState.sourceIsSoleApplyOwner
+) {
+  fail("successor activation disagrees with task lock or apply ownership");
+} else {
+  pass("successor activation/task ownership consistency");
+}
+if (
+  taskCapsule?.activation &&
+  (taskCapsule.activation.soleApplyOwner !== successorActivated ||
+    taskCapsule.activation.applyAuthorized !== successorActivated)
+) {
+  fail("task capsule activation disagrees with handoff activation");
+} else {
+  pass("task capsule activation consistency");
+}
+
 const budgets = {
   authoritySummary: 16 * 1024,
   handoffCapsule: 24 * 1024,
