@@ -291,6 +291,25 @@ describe("task 3.4 public output preflight", () => {
     });
   });
 
+  it("accepts a requested filesystem alias for the approved canonical directory", async () => {
+    const root = await createRoot("preflight-alias");
+    const requested = path.join(root, "approved-output");
+    await mkdir(requested, { recursive: true });
+    const canonical = await realpathForTest(requested);
+    const approveOutputDirectory = vi.fn(async () => canonical);
+
+    const plan = await preflightPublicOutputDestination(
+      request({ saveToLibrary: false, outputDir: requested }),
+      { approveOutputDirectory }
+    );
+
+    expect(approveOutputDirectory).toHaveBeenCalledWith(requested);
+    expect(plan).toMatchObject({
+      requestedOutputDirectory: requested,
+      approvedDirectory: canonical
+    });
+  });
+
   it("rejects an approval callback that silently redirects to another directory", async () => {
     const root = await createRoot("preflight-redirect");
     const requested = path.join(root, "requested");

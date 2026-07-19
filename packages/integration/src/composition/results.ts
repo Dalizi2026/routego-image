@@ -222,8 +222,7 @@ async function verifyApprovedDirectory(directory: string): Promise<string> {
   }
   if (
     !metadata.isDirectory() ||
-    metadata.isSymbolicLink() ||
-    normalizePathForComparison(canonical) !== normalizePathForComparison(directory)
+    metadata.isSymbolicLink()
   ) {
     throw new ResultCompositionError(
       "output-directory-unsafe",
@@ -260,10 +259,13 @@ export async function preflightPublicOutputDestination(
       "The requested public output directory was not approved."
     );
   }
-  const approvedDirectory = await verifyApprovedDirectory(approved);
+  const [requestedDirectory, approvedDirectory] = await Promise.all([
+    verifyApprovedDirectory(request.data.outputDir),
+    verifyApprovedDirectory(approved)
+  ]);
   if (
     normalizePathForComparison(approvedDirectory) !==
-    normalizePathForComparison(request.data.outputDir)
+    normalizePathForComparison(requestedDirectory)
   ) {
     throw new ResultCompositionError(
       "output-directory-unsafe",
