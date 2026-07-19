@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "1e0f9ed05c09c69a0168943b0b578723c95aa63541ea358ce2b8ee6baa7c935b",
+  "capsuleSha256": "7fe76789988222b481867d3638c68828a2ea2600f542c0cbf5588d4a93b83183",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,12 +22,13 @@
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
     "plannedBranch": "codex/routego-integration-g7",
     "startingCommit": "34fd18aca083199028b8f9a54f8fc26f023711db",
-    "registrationStatus": "registered-retry-2-awaiting-low-context-acceptance",
+    "registrationStatus": "activated-sole-owner-independent-p1-review-task-4.3-product-locked",
     "registrationAttempt": 2,
     "registrationCommit": "dc521df5b10659ed6d3a34a5c66cc29202ad83e0",
     "incorporationCommit": "3f629eaf12b54a2d334efec14310646a99c73e62",
-    "verifiedHeadBeforeContainingCommit": "dc521df5b10659ed6d3a34a5c66cc29202ad83e0",
-    "registrationCommitSemantics": "Attempt 2 is a clean replacement for the rejected first successor. The containing registration commit cannot self-reference its own SHA; the real thread ID is filled after task creation, before acceptance or activation."
+    "verifiedHeadBeforeContainingCommit": "92752bda589635460b0c48e297df4d9c8c920a92",
+    "acceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
+    "registrationCommitSemantics": "Attempt 2 completed zero-compaction acceptance. The containing activation commit cannot self-reference its own SHA; activation authorizes only independent review of the three P1 leak classes while task 4.3 remains product-locked."
   },
   "currentState": {
     "openspecTotal": 29,
@@ -36,11 +37,12 @@
     "nextTaskId": "4.3",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.3.json",
-      "sha256": "52f802f28175f6777b8df6019b62b0f187d0ae3be6cbc5f5511aa94809de9080"
+      "sha256": "32028d520913a2ad4cdee445024b9255ac65cce563b68dd2cd8fa7403ee602d5"
     },
     "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
-    "successorApplyAuthorized": false,
+    "sourceIsSoleApplyOwner": false,
+    "successorApplyAuthorized": true,
+    "successorAuthorizedScope": "independent-three-p1-security-review-only-task-4.3-product-locked",
     "acceptedPreviousTaskImplementationCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
     "acceptedHostCorrectionImplementationCommit": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
     "acceptedPreviousTaskStateCommit": "7ba03291adf26c28ac84abfe8cd5a8f5794ea089",
@@ -97,7 +99,6 @@
   },
   "gates": {
     "blockers": [
-      "Integration G7 must complete zero-compaction acceptance before activation.",
       "The three P1 leak classes must pass independent review before the Creation correction can be accepted and task 4.3 resumed."
     ],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
@@ -160,7 +161,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
-    "expectedNormalizedUtf8Bytes": 109930,
+    "expectedNormalizedUtf8Bytes": 110582,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

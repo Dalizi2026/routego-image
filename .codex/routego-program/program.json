@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-8-authoritative-integration-generation-7-retry-2-registered-awaiting-low-context-acceptance-task-4.3-product-locked",
+  "status": "controller-generation-8-authoritative-integration-generation-7-activated-sole-owner-independent-p1-review-task-4.3-product-locked",
   "projectPath": "/Users/dalizi/Documents/routego-image-integration-g7",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -55,30 +55,31 @@
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g8",
     "branch": "codex/routego-controller-g8",
     "verifiedHeadBeforeContainingCommit": "288f2db1b7588ba5a759a37eace4332e65ed485e",
-    "status": "authoritative-controller-generation-8-integration-migration-checkpoint-frozen-task-4.3-product-locked",
+    "status": "authoritative-controller-generation-8-integration-generation-7-independent-p1-review-task-4.3-product-locked",
     "authoritative": true,
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "controller|routego-image-1.0|c36c62a987496c334e7ca1e8d5344b561c45e776|context-compaction-1-during-integration-generation-7-retry-2-registration-and-acceptance|17/29"
   },
   "applyOwner": {
     "lane": "integration",
-    "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
-    "generation": 6,
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
-    "branch": "codex/routego-integration-g6",
+    "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
+    "generation": 7,
+    "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
+    "branch": "codex/routego-integration-g7",
     "acceptedProductCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
-    "currentHead": "34fd18aca083199028b8f9a54f8fc26f023711db",
+    "currentHead": "92752bda589635460b0c48e297df4d9c8c920a92",
     "soleApplyOwner": true,
-    "frozen": true,
-    "applyAuthorized": false,
+    "frozen": false,
+    "applyAuthorized": true,
+    "authorizedScope": "independent-three-p1-security-review-only-task-4.3-product-locked",
     "gitClean": true,
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29"
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null
   },
   "successor": {
     "lane": "integration",
     "generation": 7,
-    "status": "registered-retry-2-awaiting-low-context-acceptance-task-4.3-product-locked",
+    "status": "activated-sole-owner-independent-p1-review-task-4.3-product-locked",
     "registrationAttempt": 2,
     "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
@@ -86,7 +87,11 @@
     "startingCommit": "34fd18aca083199028b8f9a54f8fc26f023711db",
     "registrationCommit": "dc521df5b10659ed6d3a34a5c66cc29202ad83e0",
     "incorporationCommit": "3f629eaf12b54a2d334efec14310646a99c73e62",
-    "currentHead": "dc521df5b10659ed6d3a34a5c66cc29202ad83e0",
+    "currentHead": "92752bda589635460b0c48e297df4d9c8c920a92",
+    "acceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "independent-three-p1-security-review-only-task-4.3-product-locked",
     "gitClean": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null,
@@ -114,8 +119,9 @@
       "capsule": ".codex/routego-program/tasks/integration-4.3.json",
       "locked": true,
       "activationAuthorized": false,
+      "reviewAuthorized": true,
       "started": true,
-      "pauseReason": "The cross-computer Integration checkpoint is frozen and unaccepted. Task 4.3 remains paused until Integration generation 7 independently verifies and Controller G8 accepts the exact two-file Creation correction."
+      "pauseReason": "Integration generation 7 is activated only for independent review of the three P1 leak classes. Task 4.3 remains locked until Controller G8 independently accepts that review and the exact two-file Creation correction."
     }
   },
   "latestDirectCheckpoint": {
@@ -169,7 +175,6 @@
     "continuityFallbackIntervalMinutes": 30
   },
   "currentBlockers": [
-    "Integration generation 7 must complete zero-compaction low-context handoff acceptance and receive sole-owner activation before independent P1 review begins.",
     "All three P1 leak classes must pass independent review before task 4.3 can resume."
   ],
   "currentRisks": [
@@ -201,28 +206,28 @@
     "allActiveOwnersAcknowledged": true,
     "activeApplyOwner": {
       "lane": "integration",
+      "generation": 7,
+      "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
+      "worktree": "/Users/dalizi/Documents/routego-image-integration-g7",
+      "branch": "codex/routego-integration-g7",
+      "acceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
+      "status": "activated-sole-owner-independent-p1-review-task-4.3-product-locked"
+    },
+    "archivedSourceOwner": {
+      "lane": "integration",
       "generation": 6,
       "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
       "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
       "branch": "codex/routego-integration-g6",
-      "acceptedHead": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
-      "status": "authority-revoked-stopped-frozen-machine-transfer-non-completion-wip-task-4.3-product-locked"
-    },
-    "archivedSourceOwner": {
-      "lane": "integration",
-      "generation": 5,
-      "threadId": "019f76b1-7601-7960-80ce-d6b056c896bd",
-      "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\f651\\生图插件",
-      "branch": "codex/routego-integration-g5",
-      "acceptedHead": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
-      "observableCompactions": 4,
-      "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|7ba03291adf26c28ac84abfe8cd5a8f5794ea089|context-compaction-4-during-task-4.2-lane-checkpoint-before-commit|17/29",
-      "status": "authority-revoked-frozen-pending-controller-task-archive"
+      "acceptedHead": "34fd18aca083199028b8f9a54f8fc26f023711db",
+      "observableCompactions": 1,
+      "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|34fd18aca083199028b8f9a54f8fc26f023711db|machine-transfer-non-completion-wip-safety-checkpoint|17/29",
+      "status": "authority-revoked-archived-frozen-source-owner-after-generation-7-activation"
     },
     "applyOwnerReceipt": {
-      "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
-      "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
-      "head": "380e5936be0680b884a18f3b42a19e4fa299e438",
+      "threadId": "019f79a6-ba30-73e3-9875-33ba707af137",
+      "messageType": "HANDOFF_ACCEPTED",
+      "head": "92752bda589635460b0c48e297df4d9c8c920a92",
       "gitClean": true,
       "observableCompactions": 0,
       "delivered": true,
