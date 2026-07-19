@@ -60,5 +60,5 @@ No Foundation, Integration, OpenSpec, dependency, manifest, package, Studio, Cre
 ## Boundaries
 
 - Task 5.2 remains unchecked and task 5.3 remains locked.
-- No network, installation, marketplace, target plugin install, credentials, real images, real relay/Library data, paid request, deployment, publication, migration, deletion, cleanup, or release is authorized.
+- The user-authorized workspace dependency installation may run only as `pnpm install --offline --frozen-lockfile`; it must reuse the local store, download zero packages and stop if anything is missing. Network, marketplace, target plugin installation, credentials, real images, real relay/Library data, paid request, deployment, publication, migration, deletion, cleanup, and release remain unauthorized.
 - Existing ignored build outputs remain uncommitted and are not trusted inputs.

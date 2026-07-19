@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "f599513254d487d258759f246688b8193b2b8c4b2a5ab5632aa3dc91d1b58833",
+  "capsuleSha256": "e7eaf823a6e198bb5dbcd1a0503c2f440bc817b60b2de12acd982dbfcc712e63",
   "lane": "library",
   "role": "isolated-library-correction-owner",
   "change": "integrate-routego-image-plugin",
@@ -24,7 +24,7 @@
     "registrationAttempt": 2,
     "registrationCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
     "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
-    "verifiedHeadBeforeContainingCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
+    "verifiedHeadBeforeContainingCommit": "6c849aff7ab3fc295d1d1d0680f294b7efc5c614",
     "acceptedHead": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
     "failedRegistrationAttempts": [
       {
@@ -42,7 +42,7 @@
     "nextTaskId": "5.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/library-correction-5.2.json",
-      "sha256": "07ce32b26d7838b47762b4bfce04c3e811b703b0fc5dfa3ac908ed181e472e58"
+      "sha256": "9f7ee8839f435a81418c54dbe393e292eb77c013aec132855fb9e2ecdea20aae"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
@@ -72,7 +72,10 @@
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "task5_2Locked": false,
+    "workspaceDependencyInstallationAuthorizedByUser": true,
+    "workspaceInstallationMode": "pnpm-offline-frozen-local-store-only-zero-downloads",
     "networkAuthorized": false,
+    "targetPluginInstallationAuthorized": false,
     "residualRisks": [
       "The correction must preserve final symlink, protected-root, containment, ownership and ZIP no-overwrite safety.",
       "Integration task 5.2 remains incomplete until both independent corrections and the full workspace gate pass."
@@ -113,7 +116,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "expectedNormalizedUtf8Bytes": 78977,
+    "expectedNormalizedUtf8Bytes": 80111,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "07ce32b26d7838b47762b4bfce04c3e811b703b0fc5dfa3ac908ed181e472e58",
+  "contentSha256": "9f7ee8839f435a81418c54dbe393e292eb77c013aec132855fb9e2ecdea20aae",
   "lane": "library",
   "change": "integrate-routego-image-plugin",
   "taskId": "5.2",
@@ -106,5 +106,13 @@
     "Integration generation 8 is concurrently correcting only its package verifier; file scopes do not overlap.",
     "Task 5.2 cannot complete until the Library correction and Integration verifier correction are both independently accepted and the full workspace gate is green."
   ],
+  "installationPolicy": {
+    "workspaceDependencyInstallationAuthorizedByUser": true,
+    "command": "pnpm install --offline --frozen-lockfile",
+    "localStoreOnly": true,
+    "zeroDownloadsRequired": true,
+    "networkAuthorized": false,
+    "targetPluginInstallationAuthorized": false
+  },
   "externalStateAuthorized": false
 }
