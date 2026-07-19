@@ -1,0 +1,84 @@
+name: Routego Image CI
+
+on:
+  push:
+    branches:
+      - main
+      - "codex/**"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    name: Integration (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+          - ubuntu-latest
+          - macos-latest
+        node:
+          - 20.19.0
+    env:
+      CI: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+          run_install: false
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - name: Install frozen dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate strict OpenSpec
+        run: pnpm dlx @fission-ai/openspec@1.6.0 validate --all --strict --no-interactive
+
+      - name: Check repository safety
+        run: pnpm safety
+
+      - name: Type-check workspace
+        run: pnpm typecheck
+
+      - name: Build workspace
+        run: pnpm build
+
+      - name: Run all tests
+        run: pnpm test
+
+      - name: Check package exports
+        run: pnpm check:exports
+
+      - name: Install Chromium and Linux browser dependencies
+        if: runner.os == 'Linux'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Install Chromium
+        if: runner.os != 'Linux'
+        run: pnpm exec playwright install chromium
+
+      - name: Run browser verification
+        run: pnpm test:browser
+
+      - name: Verify reproducible plugin package and temporary install
+        run: node scripts/ci-plugin-smoke.mjs
+
+      - name: Check tracked repository cleanliness
+        run: git diff --exit-code
+
+      - name: Check diff formatting
+        run: git diff --check
