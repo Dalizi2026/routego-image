@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "controller-successor-handoff",
-  "capsuleSha256": "455e1e4669a7f950a2aab6b81dfd08390dc72c3043ee3585026cdf1dd74b0112",
+  "capsuleSha256": "e2f15b9e532ada1be9c3fb83dc50050eeb40adecb5e0e5272f6adeaa2e41f13c",
   "lane": "controller",
   "role": "program-controller",
   "program": "routego-image-1.0",
@@ -17,17 +17,19 @@
     "handoffParent": "6e7ad6c17258949397b2050b5aa002daff799c73",
     "observableCompactions": 1,
     "lastCompactionFingerprint": "controller|routego-image-1.0|6e7ad6c17258949397b2050b5aa002daff799c73|context-compaction-1-during-machine-transfer-handoff-before-byte-budget-and-commit|17/29",
-    "authoritative": true,
-    "preHandoff": true
+    "wasAuthoritativeAtHandoff": true,
+    "authorityRevoked": true,
+    "preHandoffComplete": true
   },
   "successor": {
     "threadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g8",
     "plannedBranch": "codex/routego-controller-g8",
     "startingCommit": "a6fae7e9ea62205e61a8540d98bc45ae3f053cca",
-    "registrationStatus": "registered-accepted-awaiting-explicit-activation",
-    "registrationCommit": null,
-    "registrationCommitSemantics": "The containing registration commit cannot self-reference its own SHA. The user explicitly authorized this new-machine Controller transfer; authority changes only in the following activation commit."
+    "registrationStatus": "activated-authoritative-controller-generation-8-integration-migration-checkpoint-frozen-task-4.3-product-locked",
+    "registrationCommit": "288f2db1b7588ba5a759a37eace4332e65ed485e",
+    "acceptedHead": "288f2db1b7588ba5a759a37eace4332e65ed485e",
+    "registrationCommitSemantics": "The accepted registration commit is recorded after the clean zero-compaction successor audit; the containing authority activation commit cannot self-reference its own SHA."
   },
   "currentIntegration": {
     "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
@@ -82,7 +84,6 @@
   },
   "gates": {
     "blockers": [
-      "Controller G8 explicit authority activation is pending.",
       "Integration generation 7 must independently review the three P1 leak classes before task 4.3 can resume."
     ],
     "approvalRequiredTasks": ["7.2", "8.2", "9.1"],
@@ -124,7 +125,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 94637,
+    "expectedNormalizedUtf8Bytes": 94202,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

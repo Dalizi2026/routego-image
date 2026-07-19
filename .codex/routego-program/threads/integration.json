@@ -4,7 +4,7 @@
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
   "status": "generation-6-stopped-frozen-machine-transfer-non-completion-wip-task-4.3-product-locked",
-  "controllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+  "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
   "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
   "branch": "codex/routego-integration-g6",
@@ -106,8 +106,8 @@
     "externalStateTouched": false
   },
   "reportingContract": {
-    "currentControllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
-    "currentControllerGeneration": 7,
+    "currentControllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
+    "currentControllerGeneration": 8,
     "primary": "send_message_to_thread plus read_thread after every task/group/checkpoint/blocker/deviation/handoff/activation/delivery",
     "fallback": "routego-program-continuity ARCHIVE_EARLY_V5 records exact CODEX_THREAD_ID, archives that own run as the second tool action, then reads compact state and deduplicates missed reports",
     "acknowledgementRequiredBeforeAcceptance": true

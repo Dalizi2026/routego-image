@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-8-registered-accepted-awaiting-explicit-activation-integration-migration-checkpoint-frozen-task-4.3-product-locked",
+  "status": "controller-generation-8-activated-authoritative-integration-migration-checkpoint-frozen-task-4.3-product-locked",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g8",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -49,16 +49,16 @@
     "externalStateAuthorized": false
   },
   "controller": {
-    "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
-    "generation": 7,
+    "threadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
+    "generation": 8,
     "role": "program-controller",
-    "worktree": "/Users/dalizi/Documents/routego-image-1.0-recovered",
-    "branch": "codex/routego-controller-g7",
-    "verifiedHeadBeforeContainingCommit": "a6fae7e9ea62205e61a8540d98bc45ae3f053cca",
-    "status": "authoritative-pre-handoff-controller-generation-8-registered-accepted-awaiting-explicit-activation",
+    "worktree": "/Users/dalizi/Documents/routego-image-controller-g8",
+    "branch": "codex/routego-controller-g8",
+    "verifiedHeadBeforeContainingCommit": "288f2db1b7588ba5a759a37eace4332e65ed485e",
+    "status": "authoritative-controller-generation-8-integration-migration-checkpoint-frozen-task-4.3-product-locked",
     "authoritative": true,
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "controller|routego-image-1.0|6e7ad6c17258949397b2050b5aa002daff799c73|context-compaction-1-during-machine-transfer-handoff-before-byte-budget-and-commit|17/29"
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null
   },
   "applyOwner": {
     "lane": "integration",
@@ -128,14 +128,14 @@
     "lane": "controller",
     "role": "program-controller",
     "generation": 8,
-    "status": "registered-accepted-awaiting-explicit-activation",
+    "status": "activated-authoritative",
     "threadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g8",
     "plannedBranch": "codex/routego-controller-g8",
     "startingCommit": "a6fae7e9ea62205e61a8540d98bc45ae3f053cca",
-    "registrationCommit": null,
-    "currentHead": "a6fae7e9ea62205e61a8540d98bc45ae3f053cca",
-    "acceptedHead": null,
+    "registrationCommit": "288f2db1b7588ba5a759a37eace4332e65ed485e",
+    "currentHead": "288f2db1b7588ba5a759a37eace4332e65ed485e",
+    "acceptedHead": "288f2db1b7588ba5a759a37eace4332e65ed485e",
     "gitClean": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null,
@@ -143,23 +143,22 @@
   },
   "controllerPredecessor": {
     "lane": "controller",
-    "generation": 6,
-    "threadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\a70f\\生图插件",
-    "branch": "codex/routego-controller-g6",
+    "generation": 7,
+    "threadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "worktree": "/Users/dalizi/Documents/routego-image-1.0-recovered",
+    "branch": "codex/routego-controller-g7",
     "authorityRevoked": true,
-    "observableCompactions": 5,
-    "lastCompactionFingerprint": "controller|routego-image-1.0|5230567298c8af902a87e70e32ed24a6dc9f9d3e|context-compaction-5-during-pd-012-owner-only-openspec-update-after-governance-incorporation|17/29"
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "controller|routego-image-1.0|6e7ad6c17258949397b2050b5aa002daff799c73|context-compaction-1-during-machine-transfer-handoff-before-byte-budget-and-commit|17/29"
   },
   "laneContinuityPolicy": {
-    "controllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
-    "predecessorControllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
+    "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
+    "predecessorControllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
     "dynamicProgramResolutionRequired": true,
     "directReportingPrimary": true,
     "continuityFallbackIntervalMinutes": 30
   },
   "currentBlockers": [
-    "Controller generation 8 is registered and accepted but awaits the separate explicit authority activation commit.",
     "Integration generation 6 is frozen at the non-completion migration checkpoint; generation 7 must independently review all three P1 leak classes before task 4.3 can resume."
   ],
   "currentRisks": [
@@ -180,8 +179,8 @@
     "deduplicateWith": "latestDirectCheckpoint",
     "archiveOwnRuns": true,
     "promptVersion": "ARCHIVE_EARLY_V5",
-    "controllerSeedThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
-    "controllerSeedWorktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\340f\\生图插件",
+    "controllerSeedThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
+    "controllerSeedWorktree": "/Users/dalizi/Documents/routego-image-controller-g8",
     "normalListThreadsForbidden": true,
     "cleanupFinding": "V5 reads exact CODEX_THREAD_ID first and archives that own automation run as the second tool action before Controller reads, lease work, memory updates or final output; normal list_threads enumeration remains forbidden."
   },
