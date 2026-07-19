@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "9f7ee8839f435a81418c54dbe393e292eb77c013aec132855fb9e2ecdea20aae",
+  "lane": "library",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "5.2",
+  "status": "activated-isolated-library-canonical-path-identity-correction-owner",
+  "sourceCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "f77f40a4466df42e16ecb9b970b6eb3a0b3133490263b6a6949047fcedb5cbc7",
+    "lineSha256": "debb5cccc754e8a757f136b272860b7fba515638eb13a5d9c150ab1c2a40ab2f",
+    "lineBytes": 1213
+  },
+  "dependencies": ["5.1", "task-5.2-implementation-fbd254f"],
+  "allowedFiles": [
+    "packages/library/src/fs/paths.ts",
+    "packages/library/src/config/output-directory.ts",
+    "packages/library/src/service.ts",
+    "packages/library/src/gallery/assets.ts",
+    "packages/library/src/gallery/mutations.ts",
+    "packages/library/test/fs/paths.test.ts",
+    "packages/library/test/config/output-directory.test.ts",
+    "packages/library/test/conformance/service.test.ts",
+    "packages/library/test/gallery/assets.test.ts",
+    "packages/library/test/gallery/source-renditions.test.ts",
+    "packages/library/test/gallery/mutations.test.ts"
+  ],
+  "allowedParentDirectoriesToCreate": [],
+  "allowedFileMode": "modify exactly the eleven existing Library files",
+  "forbiddenFileGlobs": [
+    ".agents/**",
+    ".codex-plugin/**",
+    ".codex/routego-program/**",
+    "skills/**",
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/integration/**",
+    "packages/mock-relay/**",
+    "packages/studio/**",
+    "openspec/**",
+    "scripts/**",
+    "licenses/**",
+    "dist/**",
+    "build/**",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Use canonical filesystem identity for containment and protected-root security comparisons while preserving requested path spelling only for truthful public ZIP results.",
+    "Allow the macOS /var to /private/var operating-system alias for an otherwise approved owned directory without accepting a user-controlled final symlink or junction.",
+    "Reject lexical or canonical aliases into protected legacy roots for output directories, source renditions and destructive mutation roots.",
+    "Write ZIP output through a validated canonical directory, retain exclusive no-overwrite publication and return the requested directory spelling plus actual allocated filename.",
+    "Remove duplicated or inconsistent path-identity logic in the authorized Library boundary without weakening ownership, writability, containment or error handling."
+  ],
+  "verification": [
+    "red-then-green focused alias and protected-root regressions",
+    "all six affected Library test files",
+    "complete Library suite",
+    "Library typecheck and direct build",
+    "task-5.2 package focused regression after Controller incorporation",
+    "full workspace tests after Controller incorporation",
+    "repository safety, strict OpenSpec, git diff --check and exact scope audit"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/specs/local-provider-configuration/spec.md",
+      "sha256": "5030753b7af02310aee3a5dba59918c28c3f35433904b4d7d98dd80de590eadf",
+      "bytes": 5436,
+      "reason": "Canonical confirmed output directory validation, legacy-root and unsafe-symlink rejection."
+    },
+    {
+      "path": "openspec/specs/durable-image-library/spec.md",
+      "sha256": "fd6c83475768d097b1e37766702b39914e27eefb43156ac2850f91a24d964a82",
+      "bytes": 8058,
+      "reason": "Contained source-rendition, mutation and durable Library ownership behavior."
+    },
+    {
+      "path": "openspec/specs/library-portability/spec.md",
+      "sha256": "4969b33eb93b9c037ca55ec83111b7e401164d66043d11d021f92ec0c0bdd1e2",
+      "bytes": 5046,
+      "reason": "Safe non-overwriting ZIP export/import and public path result behavior."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "activation": {
+    "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
+    "controllerGeneration": 8,
+    "successorLibraryGeneration": 3,
+    "successorLibraryThreadId": "019f7a81-775e-7063-bfd4-3e444e0b0354",
+    "integrationGeneration": 8,
+    "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "integrationImplementationCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+    "registrationAttempt": 2,
+    "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
+    "registrationCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
+    "acceptedHead": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
+    "correctionSourceRetired": true,
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "library-canonical-path-identity-exact-eleven-files"
+  },
+  "knownRisks": [
+    "Path identity must distinguish a benign operating-system alias from an alias into protected data without weakening final symlink rejection.",
+    "Integration generation 8 is concurrently correcting only its package verifier; file scopes do not overlap.",
+    "Task 5.2 cannot complete until the Library correction and Integration verifier correction are both independently accepted and the full workspace gate is green."
+  ],
+  "installationPolicy": {
+    "workspaceDependencyInstallationAuthorizedByUser": true,
+    "command": "pnpm install --offline --frozen-lockfile",
+    "localStoreOnly": true,
+    "zeroDownloadsRequired": true,
+    "networkAuthorized": false,
+    "targetPluginInstallationAuthorized": false
+  },
+  "externalStateAuthorized": false
+}

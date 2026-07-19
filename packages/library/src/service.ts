@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { createReadStream } from "node:fs";
-import { lstat, mkdir, realpath, unlink, type FileHandle } from "node:fs/promises";
+import { lstat, mkdir, unlink, type FileHandle } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -59,7 +59,14 @@ import { createProtectedLegacyRoots, type PathPlatform } from "@routego-image/fo
 
 import { LibrarySettingsStore, type LibrarySettingsStoreOptions } from "./config/store";
 import { isNodeError, LibraryError } from "./errors";
-import { createExclusiveFile } from "./fs/paths";
+import {
+  canonicalizePathIdentities,
+  canonicalizePathIdentity,
+  createExclusiveFile,
+  isPathIdentityContained,
+  normalizePathIdentity,
+  pathIdentitiesOverlap
+} from "./fs/paths";
 import { LibraryAssetStore, type LibraryAssetStoreOptions } from "./gallery/assets";
 import { ImageLibraryIndexStore, type ImageLibraryIndexStoreOptions } from "./gallery/index-store";
 import {
@@ -165,74 +172,28 @@ function pathApi(platform: NodeJS.Platform): typeof path.win32 | typeof path.pos
 }
 
 function normalizedPath(value: string, platform: NodeJS.Platform): string {
-  const selectedPath = pathApi(platform);
-  const normalized = selectedPath.normalize(selectedPath.resolve(value));
-  return platform === "win32" ? normalized.toLocaleLowerCase("en-US") : normalized;
+  return normalizePathIdentity(value, platformKind(platform));
 }
 
 function isContained(root: string, candidate: string, platform: NodeJS.Platform): boolean {
-  const selectedPath = pathApi(platform);
-  const relative = selectedPath.relative(root, candidate);
-  return (
-    relative === "" ||
-    (!selectedPath.isAbsolute(relative) &&
-      relative !== ".." &&
-      !relative.startsWith(`..${selectedPath.sep}`))
-  );
+  return isPathIdentityContained(root, candidate, platformKind(platform));
 }
 
 function overlaps(left: string, right: string, platform: NodeJS.Platform): boolean {
-  return isContained(left, right, platform) || isContained(right, left, platform);
+  return pathIdentitiesOverlap(left, right, platformKind(platform));
 }
 
 async function canonicalizeThroughExistingAncestor(
   candidate: string,
   platform: NodeJS.Platform
 ): Promise<string> {
-  const selectedPath = pathApi(platform);
-  let cursor = selectedPath.resolve(candidate);
-  const missingSegments: string[] = [];
-  while (true) {
-    let metadata;
-    try {
-      metadata = await lstat(cursor);
-    } catch (error) {
-      if (!isNodeError(error, "ENOENT")) {
-        throw new LibraryError("path_unsafe", "The ZIP output path could not be inspected.", {
-          cause: error
-        });
-      }
-      const parent = selectedPath.dirname(cursor);
-      if (parent === cursor) {
-        throw new LibraryError("path_unsafe", "The ZIP output path has no existing ancestor.");
-      }
-      missingSegments.unshift(selectedPath.basename(cursor));
-      cursor = parent;
-      continue;
-    }
-
-    let canonical: string;
-    try {
-      canonical = await realpath(cursor);
-    } catch (error) {
-      throw new LibraryError("path_unsafe", "The ZIP output path could not be resolved safely.", {
-        cause: error
-      });
-    }
-    if (missingSegments.length > 0) {
-      const canonicalMetadata = await lstat(canonical).catch((error: unknown) => {
-        throw new LibraryError("path_unsafe", "The ZIP output ancestor is unavailable.", {
-          cause: error
-        });
-      });
-      if (!canonicalMetadata.isDirectory()) {
-        throw new LibraryError("path_unsafe", "The ZIP output ancestor is not a directory.");
-      }
-    } else if (!metadata.isDirectory() && !metadata.isSymbolicLink()) {
-      return canonical;
-    }
-    return selectedPath.resolve(canonical, ...missingSegments);
-  }
+  return await canonicalizePathIdentity(candidate, {
+    platform: platformKind(platform)
+  }).catch((error: unknown) => {
+    throw new LibraryError("path_unsafe", "The ZIP output path could not be resolved safely.", {
+      cause: error
+    });
+  });
 }
 
 async function writeAll(handle: FileHandle, chunk: Uint8Array): Promise<void> {
@@ -690,19 +651,29 @@ export class RoutegoLibraryService implements LibraryApplicationService {
     }
   }
 
-  async #resolvePublicOutputDirectory(absoluteOutputPath: string): Promise<string> {
+  async #resolvePublicOutputDirectory(absoluteOutputPath: string): Promise<{
+    readonly canonicalDirectory: string;
+    readonly requestedDirectory: string;
+  }> {
     const selectedPath = pathApi(this.#platform);
     this.#assertPublicOutputAllowed(absoluteOutputPath);
     const requestedDirectory = selectedPath.dirname(absoluteOutputPath);
     const requestedFileName = selectedPath.basename(absoluteOutputPath);
+    const requestedMetadata = await lstat(requestedDirectory).catch((error: unknown) => {
+      if (isNodeError(error, "ENOENT")) return undefined;
+      throw new LibraryError("path_unsafe", "The ZIP output path could not be inspected.", {
+        cause: error
+      });
+    });
+    if (requestedMetadata?.isSymbolicLink()) {
+      throw new LibraryError("path_unsafe", "The ZIP output directory cannot be a link.");
+    }
     const [projectedDirectory, canonicalLibraryRoot, canonicalProtectedRoots] = await Promise.all([
       canonicalizeThroughExistingAncestor(requestedDirectory, this.#platform),
       canonicalizeThroughExistingAncestor(this.indexStore.paths.root, this.#platform),
-      Promise.all(
-        this.#publicProtectedRoots.map(async (root) =>
-          canonicalizeThroughExistingAncestor(root, this.#platform)
-        )
-      )
+      canonicalizePathIdentities(this.#publicProtectedRoots, {
+        platform: platformKind(this.#platform)
+      })
     ]);
     this.#assertPublicOutputAllowed(
       selectedPath.join(projectedDirectory, requestedFileName),
@@ -716,11 +687,10 @@ export class RoutegoLibraryService implements LibraryApplicationService {
         cause: error
       });
     }
-    const canonicalDirectory = await realpath(projectedDirectory).catch((error: unknown) => {
-      throw new LibraryError("path_unsafe", "The ZIP output directory could not be resolved safely.", {
-        cause: error
-      });
-    });
+    const canonicalDirectory = await canonicalizeThroughExistingAncestor(
+      projectedDirectory,
+      this.#platform
+    );
     const metadata = await lstat(canonicalDirectory).catch((error: unknown) => {
       throw new LibraryError("path_unsafe", "The ZIP output directory is unavailable.", {
         cause: error
@@ -734,7 +704,7 @@ export class RoutegoLibraryService implements LibraryApplicationService {
       canonicalLibraryRoot,
       canonicalProtectedRoots
     );
-    return canonicalDirectory;
+    return { canonicalDirectory, requestedDirectory };
   }
 
   async #copyExportToPublicPath(
@@ -751,8 +721,10 @@ export class RoutegoLibraryService implements LibraryApplicationService {
       extension.toLocaleLowerCase("en-US") === ".zip"
         ? selectedPath.basename(absolute, extension)
         : selectedPath.basename(absolute);
+    const { canonicalDirectory, requestedDirectory } =
+      await this.#resolvePublicOutputDirectory(absolute);
     const output = await createExclusiveFile({
-      directory: await this.#resolvePublicOutputDirectory(absolute),
+      directory: canonicalDirectory,
       requestedBaseName,
       extension: ".zip"
     });
@@ -762,7 +734,7 @@ export class RoutegoLibraryService implements LibraryApplicationService {
       }
       await output.handle.sync();
       await output.handle.close();
-      return output.path;
+      return selectedPath.join(requestedDirectory, selectedPath.basename(output.path));
     } catch (error) {
       await output.handle.close().catch(() => undefined);
       await unlink(output.path).catch(() => undefined);

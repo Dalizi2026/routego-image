@@ -431,4 +431,25 @@ describe("@routego-image/library service composition", () => {
       code: "ENOENT"
     });
   });
+
+  it("rejects a public ZIP directory redirected through a final symlink or junction", async () => {
+    const source = await createHarness("zip-redirected-directory");
+    const seeded = await seedAsset(source, {
+      assetId: "asset-redirected-directory",
+      artifactId: "artifact-redirected-directory"
+    });
+    const actualRoot = path.join(source.root, "actual-output");
+    const redirectedRoot = path.join(source.root, "redirected-output");
+    await mkdir(actualRoot, { recursive: true });
+    await symlink(actualRoot, redirectedRoot, process.platform === "win32" ? "junction" : "dir");
+
+    await expect(
+      source.service.manageLibrary({
+        action: "export-zip",
+        assetIds: [seeded.assetId],
+        outputPath: path.join(redirectedRoot, "export.zip")
+      })
+    ).rejects.toMatchObject({ code: "path_unsafe" });
+    await expect(access(path.join(actualRoot, "export.zip"))).rejects.toMatchObject({ code: "ENOENT" });
+  });
 });

@@ -56,9 +56,46 @@ describe("strict output-directory validation", () => {
     const home = await mkdtemp(path.join(os.tmpdir(), "routego-default-home-"));
     roots.push(home);
     const selected = path.join(home, "Pictures", "routego-image", "library", "exports");
-    await expect(validateOutputDirectory(selected, { homeDirectory: home })).resolves.toBe(
-      await realpath(selected).catch(() => selected)
-    );
+    const canonical = await validateOutputDirectory(selected, { homeDirectory: home });
+    expect(canonical).toBe(await realpath(selected));
+  });
+
+  it("accepts a trusted requested alias but rejects a redirected canonical identity", async () => {
+    const requestedHome = "/var/folders/synthetic/home";
+    const canonicalHome = "/private/var/folders/synthetic/home";
+    const requestedOutput = path.posix.join(requestedHome, "results");
+    const canonicalOutput = path.posix.join(canonicalHome, "results");
+    const fileSystem = syntheticFileSystem({
+      realpath: async (value) =>
+        value === requestedHome
+          ? canonicalHome
+          : value === requestedOutput
+            ? canonicalOutput
+            : value
+    });
+
+    await expect(
+      validateOutputDirectory(requestedOutput, {
+        homeDirectory: requestedHome,
+        platform: "posix",
+        currentUid: 1_000,
+        protectedRoots: [],
+        fileSystem
+      })
+    ).resolves.toBe(canonicalOutput);
+
+    await expect(
+      validateOutputDirectory(requestedOutput, {
+        homeDirectory: requestedHome,
+        platform: "posix",
+        currentUid: 1_000,
+        protectedRoots: [],
+        fileSystem: syntheticFileSystem({
+          realpath: async (value) =>
+            value === requestedHome ? canonicalHome : "/private/var/folders/other/results"
+        })
+      })
+    ).rejects.toMatchObject({ code: "path_unsafe" });
   });
 
   it("rejects roots, traversal, URLs, unsafe Windows roots, and protected legacy paths", async () => {

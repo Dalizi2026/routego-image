@@ -12,6 +12,13 @@ import {
 import { createProtectedLegacyRoots, type PathPlatform } from "@routego-image/foundation";
 
 import { LibraryError, isNodeError } from "../errors";
+import {
+  canonicalizePathIdentities,
+  canonicalizePathIdentity,
+  isPathIdentityContained,
+  normalizePathIdentity,
+  pathIdentitiesOverlap
+} from "../fs/paths";
 
 export interface OutputDirectoryStat {
   readonly uid?: number;
@@ -44,29 +51,30 @@ function implementation(platform: PathPlatform): typeof path.win32 | typeof path
 }
 
 function normalized(value: string, platform: PathPlatform): string {
-  const pathApi = implementation(platform);
-  const resolved = pathApi.resolve(value);
-  const parsed = pathApi.parse(resolved);
-  let result = pathApi.normalize(resolved);
-  while (result.length > parsed.root.length && result.endsWith(pathApi.sep)) {
-    result = result.slice(0, -pathApi.sep.length);
-  }
-  return platform === "win32" ? result.toLowerCase() : result;
+  return normalizePathIdentity(value, platform);
 }
 
 function contains(parent: string, child: string, platform: PathPlatform): boolean {
-  const pathApi = implementation(platform);
-  const relative = pathApi.relative(parent, child);
-  return (
-    relative === "" ||
-    (relative !== ".." &&
-      !relative.startsWith(`..${pathApi.sep}`) &&
-      !pathApi.isAbsolute(relative))
-  );
+  return isPathIdentityContained(parent, child, platform);
 }
 
 function overlaps(left: string, right: string, platform: PathPlatform): boolean {
-  return contains(left, right, platform) || contains(right, left, platform);
+  return pathIdentitiesOverlap(left, right, platform);
+}
+
+function commonIdentityAnchor(
+  trustedPath: string,
+  candidate: string,
+  platform: PathPlatform
+): string {
+  const pathApi = implementation(platform);
+  let cursor = pathApi.resolve(trustedPath);
+  while (!contains(cursor, candidate, platform)) {
+    const parent = pathApi.dirname(cursor);
+    if (parent === cursor) return pathApi.parse(candidate).root;
+    cursor = parent;
+  }
+  return cursor;
 }
 
 function rejectLexicallyUnsafePath(value: string, platform: PathPlatform): void {
@@ -135,14 +143,18 @@ export function canonicalizeOutputDirectorySyntax(
 
 async function inspectExistingComponents(
   candidate: string,
+  trustedRoot: string,
   platform: PathPlatform,
   fileSystem: OutputDirectoryFileSystem,
   currentUid: number | undefined
 ): Promise<void> {
   const pathApi = implementation(platform);
   const parsed = pathApi.parse(candidate);
-  const segments = pathApi.relative(parsed.root, candidate).split(pathApi.sep).filter(Boolean);
-  let current = parsed.root;
+  const inspectionRoot = contains(trustedRoot, candidate, platform)
+    ? pathApi.resolve(trustedRoot)
+    : parsed.root;
+  const segments = pathApi.relative(inspectionRoot, candidate).split(pathApi.sep).filter(Boolean);
+  let current = inspectionRoot;
   let lastExisting: OutputDirectoryStat | undefined;
   for (const segment of segments) {
     current = pathApi.join(current, segment);
@@ -165,6 +177,44 @@ async function inspectExistingComponents(
     lastExisting.uid !== currentUid
   ) {
     throw new LibraryError("access_denied", "The selected output directory is not user-owned.");
+  }
+}
+
+async function assertCanonicalOutputIdentity(
+  candidate: string,
+  canonicalCandidate: string,
+  options: ValidateOutputDirectoryOptions,
+  platform: PathPlatform,
+  fileSystem: OutputDirectoryFileSystem
+): Promise<void> {
+  const pathApi = implementation(platform);
+  const home = pathApi.resolve(options.homeDirectory);
+  const identityAnchor = commonIdentityAnchor(home, candidate, platform);
+  const canonicalAnchor = await canonicalizePathIdentity(identityAnchor, { platform, fileSystem });
+  const expectedCanonical = pathApi.resolve(
+    canonicalAnchor,
+    pathApi.relative(identityAnchor, candidate)
+  );
+  if (normalized(canonicalCandidate, platform) !== normalized(expectedCanonical, platform)) {
+    throw new LibraryError("path_unsafe", "The selected output directory resolves through a link.");
+  }
+
+  const defaultDirectory = pathApi.resolve(
+    options.defaultDirectory ?? pathApi.join(home, "Pictures", "routego-image", "library")
+  );
+  const protectedRoots =
+    options.protectedRoots ?? createProtectedLegacyRoots(home, platform);
+  const [canonicalDefaultDirectory, canonicalProtectedRoots] = await Promise.all([
+    canonicalizePathIdentity(defaultDirectory, { platform, fileSystem }),
+    canonicalizePathIdentities(protectedRoots, { platform, fileSystem })
+  ]);
+  if (
+    !contains(canonicalDefaultDirectory, canonicalCandidate, platform) &&
+    canonicalProtectedRoots.some((protectedRoot) =>
+      overlaps(canonicalCandidate, protectedRoot, platform)
+    )
+  ) {
+    throw new LibraryError("path_unsafe", "The selected output directory is protected.");
   }
 }
 
@@ -196,11 +246,25 @@ export async function validateOutputDirectory(
   const fileSystem = options.fileSystem ?? defaultFileSystem;
   const pathApi = implementation(platform);
   const candidate = canonicalizeOutputDirectorySyntax(value, options);
-  const candidateNormalized = normalized(candidate, platform);
+  const home = pathApi.resolve(options.homeDirectory);
 
   const currentUid =
     platform === "posix" ? (options.currentUid ?? process.getuid?.()) : undefined;
-  await inspectExistingComponents(candidate, platform, fileSystem, currentUid);
+  await inspectExistingComponents(
+    candidate,
+    commonIdentityAnchor(home, candidate, platform),
+    platform,
+    fileSystem,
+    currentUid
+  );
+  const projectedCanonical = await canonicalizePathIdentity(candidate, { platform, fileSystem }).catch(
+    (error: unknown) => {
+      throw new LibraryError("access_denied", "The selected output directory cannot be canonicalized.", {
+        cause: error
+      });
+    }
+  );
+  await assertCanonicalOutputIdentity(candidate, projectedCanonical, options, platform, fileSystem);
   try {
     await fileSystem.mkdir(candidate, { recursive: true, mode: 0o700 });
   } catch {
@@ -214,9 +278,7 @@ export async function validateOutputDirectory(
   } catch {
     throw new LibraryError("access_denied", "The selected output directory cannot be canonicalized.");
   }
-  if (normalized(canonical, platform) !== candidateNormalized) {
-    throw new LibraryError("path_unsafe", "The selected output directory resolves through a link.");
-  }
+  await assertCanonicalOutputIdentity(candidate, canonical, options, platform, fileSystem);
 
   const probe = pathApi.join(
     canonical,

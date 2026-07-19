@@ -7,7 +7,6 @@ import {
   mkdir,
   open,
   readFile,
-  realpath,
   unlink
 } from "node:fs/promises";
 import { inflateSync } from "node:zlib";
@@ -34,7 +33,15 @@ import {
   writeTransactionJournal,
   type FileTransactionJournal
 } from "../fs/journal";
-import { createExclusiveFile, resolveApprovedPath, sanitizeBaseName } from "../fs/paths";
+import {
+  canonicalizePathIdentities,
+  canonicalizePathIdentity,
+  createExclusiveFile,
+  isPathIdentityContained,
+  pathIdentitiesOverlap,
+  resolveApprovedPath,
+  sanitizeBaseName
+} from "../fs/paths";
 import {
   IMAGE_LIBRARY_BLOB_TRANSACTION_KIND,
   ImageLibraryIndexStore,
@@ -166,28 +173,12 @@ function pathApi(platform: NodeJS.Platform): typeof path.win32 | typeof path.pos
   return platform === "win32" ? path.win32 : path.posix;
 }
 
-function normalizeComparable(value: string, platform: NodeJS.Platform): string {
-  const selectedPath = pathApi(platform);
-  const normalized = selectedPath.normalize(selectedPath.resolve(value));
-  return platform === "win32" ? normalized.toLocaleLowerCase("en-US") : normalized;
-}
-
 function isContained(root: string, candidate: string, platform: NodeJS.Platform): boolean {
-  const selectedPath = pathApi(platform);
-  const relative = selectedPath.relative(
-    normalizeComparable(root, platform),
-    normalizeComparable(candidate, platform)
-  );
-  return (
-    relative === "" ||
-    (relative !== ".." &&
-      !relative.startsWith(`..${selectedPath.sep}`) &&
-      !selectedPath.isAbsolute(relative))
-  );
+  return isPathIdentityContained(root, candidate, platformKind(platform));
 }
 
 function overlaps(left: string, right: string, platform: NodeJS.Platform): boolean {
-  return isContained(left, right, platform) || isContained(right, left, platform);
+  return pathIdentitiesOverlap(left, right, platformKind(platform));
 }
 
 function timestamp(value: Date, label: string): string {
@@ -666,9 +657,14 @@ export class LibraryAssetStore {
     }
   }
 
-  #isProtected(candidate: string): boolean {
-    if (isContained(this.#indexStore.paths.root, candidate, this.#platform)) return false;
-    return this.#protectedRoots.some((root) => overlaps(root, candidate, this.#platform));
+  async #isProtected(candidate: string): Promise<boolean> {
+    const platform = platformKind(this.#platform);
+    const [canonicalLibraryRoot, canonicalProtectedRoots] = await Promise.all([
+      canonicalizePathIdentity(this.#indexStore.paths.root, { platform }),
+      canonicalizePathIdentities(this.#protectedRoots, { platform })
+    ]);
+    if (isContained(canonicalLibraryRoot, candidate, this.#platform)) return false;
+    return canonicalProtectedRoots.some((root) => overlaps(root, candidate, this.#platform));
   }
 
   async #resolveSource(root: string, candidate: string): Promise<string> {
@@ -678,15 +674,19 @@ export class LibraryAssetStore {
       operation: "read",
       platform: platformKind(this.#platform)
     });
+    const platform = platformKind(this.#platform);
     const [canonicalRoot, canonicalCandidate] = await Promise.all([
-      realpath(root).catch(() => {
+      canonicalizePathIdentity(root, { platform }).catch(() => {
         throw new LibraryError("path_unsafe", "The approved image source root is unavailable.");
       }),
-      realpath(lexical).catch(() => {
+      canonicalizePathIdentity(lexical, { platform }).catch(() => {
         throw new LibraryError("not_found", "The image source does not exist.");
       })
     ]);
-    if (!isContained(canonicalRoot, canonicalCandidate, this.#platform) || this.#isProtected(canonicalCandidate)) {
+    if (
+      !isContained(canonicalRoot, canonicalCandidate, this.#platform) ||
+      (await this.#isProtected(canonicalCandidate))
+    ) {
       throw new LibraryError("path_unsafe", "The image source is outside an approved new-data root.");
     }
     return canonicalCandidate;
@@ -1197,8 +1197,12 @@ export class LibraryAssetStore {
     if (!rootMetadata.isDirectory() || rootMetadata.isSymbolicLink()) {
       throw new LibraryError("path_unsafe", "The project destination root is unsafe.");
     }
-    const canonicalRoot = await realpath(projectRoot);
-    if (this.#protectedRoots.some((root) => overlaps(root, canonicalRoot, this.#platform))) {
+    const platform = platformKind(this.#platform);
+    const [canonicalRoot, canonicalProtectedRoots] = await Promise.all([
+      canonicalizePathIdentity(projectRoot, { platform }),
+      canonicalizePathIdentities(this.#protectedRoots, { platform })
+    ]);
+    if (canonicalProtectedRoots.some((root) => overlaps(root, canonicalRoot, this.#platform))) {
       throw new LibraryError("path_unsafe", "The project destination resolves to protected legacy data.");
     }
     const directory = resolveApprovedPath({
@@ -1220,12 +1224,12 @@ export class LibraryAssetStore {
       if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
         throw new LibraryError("path_unsafe", "The project destination contains an unsafe component.");
       }
-      const canonicalCurrent = await realpath(current);
+      const canonicalCurrent = await canonicalizePathIdentity(current, { platform });
       if (!isContained(canonicalRoot, canonicalCurrent, this.#platform)) {
         throw new LibraryError("path_unsafe", "The project destination escapes through a symlink.");
       }
     }
-    return await realpath(current);
+    return await canonicalizePathIdentity(current, { platform });
   }
 
   async copyArtifactToProject(input: CopyLibraryArtifactInput): Promise<CopiedLibraryArtifact> {

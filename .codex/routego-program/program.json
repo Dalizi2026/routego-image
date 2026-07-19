@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-8-authoritative-integration-generation-8-activated-sole-owner-task-5.2-authorized",
+  "status": "controller-generation-8-authoritative-task-5.2-implementation-committed-verifier-correction-and-library-path-identity-blocked",
   "projectPath": "/Users/dalizi/Documents/routego-image-integration-g7",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -17,7 +17,8 @@
       ".codex/routego-program/deviations/PD-009-task-4.2-common-root-terminal-projection-fix.md",
       ".codex/routego-program/deviations/PD-010-task-4.2-http-backpressure-disconnect-cleanup.md",
       ".codex/routego-program/deviations/PD-011-task-4.2-immutable-wip-promotion.md",
-      ".codex/routego-program/deviations/PD-012-task-4.3-creation-mcp-public-success-projection.md"
+      ".codex/routego-program/deviations/PD-012-task-4.3-creation-mcp-public-success-projection.md",
+      ".codex/routego-program/deviations/PD-013-library-canonical-path-identity.md"
     ],
     "contextPolicy": {
       "observableOnly": true,
@@ -67,14 +68,14 @@
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g8",
     "branch": "codex/routego-integration-g8",
     "acceptedProductCommit": "f3d3d67d264160736d8ce3812eb097c3ab509a22",
-    "currentHead": "c27ab2bbbb974939efe9aa96114622a78b2a7033",
+    "currentHead": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
     "authorizedScope": "task-5.2-exact-ten-file-implementation",
-    "gitClean": true,
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null
+    "gitClean": false,
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9|context-compaction-1-during-independent-package-verifier-correction|19/29"
   },
   "successor": {
     "lane": "integration",
@@ -87,16 +88,47 @@
     "startingCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
     "registrationCommit": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
     "incorporationCommit": "a3f5cd9d5b43085ad6b76503a2b78fe2399b001a",
-    "currentHead": "c27ab2bbbb974939efe9aa96114622a78b2a7033",
+    "currentHead": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
     "acceptedHead": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
     "soleApplyOwner": true,
     "applyAuthorized": true,
     "authorizedScope": "task-5.2-exact-ten-file-implementation",
-    "gitClean": true,
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null,
+    "gitClean": false,
+    "observableCompactions": 1,
+    "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9|context-compaction-1-during-independent-package-verifier-correction|19/29",
     "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-8.capsule.json",
     "failedHandoffAttempts": []
+  },
+  "laneSuccessors": {
+    "library": {
+      "lane": "library",
+      "generation": 3,
+      "status": "activated-isolated-library-canonical-path-identity-correction-owner",
+      "threadId": "019f7a81-775e-7063-bfd4-3e444e0b0354",
+      "worktree": "/Users/dalizi/Documents/routego-image-library-correction-g3",
+      "plannedBranch": "codex/routego-library-correction-g3",
+      "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+      "registrationAttempt": 2,
+      "registrationCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
+      "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
+      "currentHead": "6c849aff7ab3fc295d1d1d0680f294b7efc5c614",
+      "acceptedHead": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
+      "authorizedScope": "library-canonical-path-identity-exact-eleven-files",
+      "gitClean": true,
+      "observableCompactions": 0,
+      "lastCompactionFingerprint": null,
+      "handoffCapsule": ".codex/routego-program/handoffs/library-generation-3.capsule.json",
+      "failedRegistrationAttempts": [
+        {
+          "attempt": 1,
+          "commit": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
+          "status": "controller-pre-dispatch-audit-failed-never-sent-never-activated",
+          "reason": "unreachable fabricated expansion of the planning commit short SHA"
+        }
+      ]
+    }
   },
   "currentChange": {
     "id": "integrate-routego-image-plugin",
@@ -122,8 +154,27 @@
       "task5_1ImplementationCommit": "f3d3d67d264160736d8ce3812eb097c3ab509a22",
       "task5_1TaskStateCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
       "task5_2ActivationAuthorized": true,
-      "task5_2Started": false,
-      "pauseReason": "Integration generation 8 completed the zero-compaction PD-008 handoff and is the sole apply owner for task 5.2. The task is authorized but not started."
+      "task5_2Started": true,
+      "task5_2ImplementationCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+      "task5_2ImplementationAccepted": false,
+      "packageVerifierCorrectionAuthorized": true,
+      "packageVerifierCorrectionInProgress": true,
+      "libraryCorrection": {
+        "decision": ".codex/routego-program/deviations/PD-013-library-canonical-path-identity.md",
+        "successorGeneration": 3,
+        "successorThreadId": "019f7a81-775e-7063-bfd4-3e444e0b0354",
+        "taskCapsule": ".codex/routego-program/tasks/library-correction-5.2.json",
+        "handoffCapsule": ".codex/routego-program/handoffs/library-generation-3.capsule.json",
+        "locked": false,
+        "activationAuthorized": true,
+        "workspaceDependencyInstallationAuthorized": true,
+        "installationMode": "pnpm-offline-frozen-local-store-only-zero-downloads",
+        "networkAuthorized": false,
+        "targetPluginInstallationAuthorized": false,
+        "handoffAcceptedHead": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
+        "observableCompactionsBeforeAcceptance": 0
+      },
+      "pauseReason": "Task 5.2 implementation is committed but not accepted. Integration must complete the independent verifier correction and Library generation 3 must correct the canonical path-identity common root before the full workspace gate can pass."
     },
     "p1SecurityReview": {
       "status": "accepted-all-three-classes",
@@ -139,10 +190,10 @@
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|06d1c0d4025ac72a4cef9fd3b9439689a9b8607f|generation-8-zero-compaction-handoff-accepted-task-5.2-awaiting-activation|19/29",
-    "messageType": "HANDOFF_ACCEPTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9|context-compaction-1-during-independent-package-verifier-correction|19/29",
+    "messageType": "CONTEXT_COMPACTION_1_HEALTH_AUDIT",
     "workerThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
-    "reportedHead": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
+    "reportedHead": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
     "completedTaskId": "5.1",
     "nextTaskId": "5.2",
     "openspecProgress": "19/29",
@@ -150,9 +201,9 @@
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
-    "safeCheckpoint": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
-    "observableCompactions": 0,
-    "checkpointSemantics": "Integration generation 8 accepted the handoff at zero observable compactions. Controller independently verified the receipt before sole-owner activation."
+    "safeCheckpoint": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+    "observableCompactions": 1,
+    "checkpointSemantics": "First post-activation compaction. Recovery audit confirmed the committed task-5.2 implementation and only the authorized package-verifier red-test file dirty; authority remains valid and task 5.2 remains incomplete."
   },
   "controllerSuccessor": {
     "lane": "controller",
@@ -188,10 +239,13 @@
     "directReportingPrimary": true,
     "continuityFallbackIntervalMinutes": 30
   },
-  "currentBlockers": [],
+  "currentBlockers": [
+    "Independent review found six package-verifier bypass classes; Integration generation 8 is correcting exactly the verifier and package test files.",
+    "Full workspace tests expose eight Library failures from the macOS /var versus /private/var canonical filesystem identity common root; isolated Library generation 3 correction remains locked pending handoff audit and activation."
+  ],
   "currentRisks": [
-    "Task 5.2 is a new large packaging and reproducibility task and cannot start in generation 7 after observable compaction 3.",
-    "Generation 8 must complete a zero-compaction PD-008 handoff before task 5.2 activation.",
+    "Task 5.2 implementation commit fbd254f is not accepted until its verifier correction, Library path-identity correction and full workspace gate pass.",
+    "Library path identity must distinguish benign operating-system aliases from aliases into protected legacy data without weakening symlink, containment, ownership or no-overwrite safety.",
     "P1 reviewers caused pnpm to fetch or install 118 local dependencies before the stop instruction arrived; tracked Git stayed clean and no cleanup was attempted.",
     "External approval gates 7.2, 8.2 and 9.1 remain closed without fresh explicit user approval."
   ],
