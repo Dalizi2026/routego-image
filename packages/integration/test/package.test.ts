@@ -164,6 +164,11 @@ describe("Routego Image plugin package", () => {
   it.each([
     ["percent-encoded SVG data URL", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E"],
     ["short Base64 image data URL", "data:image/png;base64,iVBORw0KGgo="],
+    ["short raw SVG data URL", "data:image/svg+xml,<svg></svg>"],
+    [
+      "parameterized raw SVG data URL adjacent to text",
+      "prefix];data:image/svg+xml;charset=utf-8,<svg/>;suffix"
+    ],
     ["96-character generic Base64 token", "A".repeat(96)]
   ])("rejects a rehashed runtime containing a %s", async (_label, payload) => {
     const candidate = path.join(temporaryRoot, `payload-${String(_label).replaceAll(" ", "-")}`, "routego-image");
@@ -185,7 +190,11 @@ describe("Routego Image plugin package", () => {
     const runtimePath = path.join(candidate, "runtime/index.js");
     const runtime = await readFile(runtimePath, "utf8");
     const safeValues = {
-      url: "https://example.com/assets/reference.png",
+      urls: [
+        "https://example.com/assets/reference.png",
+        "https://example.com/tmp/reference.png",
+        "https://example.com/var/folders/reference.png"
+      ],
       sha256: "a".repeat(64),
       identifier: "A".repeat(95)
     };
@@ -206,7 +215,12 @@ describe("Routego Image plugin package", () => {
     ["Unix temp", "/tmp/routego-build/source.ts"],
     ["file URL", "file:///private/var/folders/ab/build/source.ts"],
     ["non-C Windows checkout", "D:\\workspace\\routego-image\\source.ts"],
-    ["Windows slash checkout", "E:/workspace/routego-image/source.ts"]
+    ["Windows slash checkout", "E:/workspace/routego-image/source.ts"],
+    ["semicolon-prefixed Unix temp", "note;/tmp/routego-build/source.ts"],
+    ["bracket-prefixed macOS temp alias", "note]/var/folders/ab/build/source.ts"],
+    ["brace-prefixed private macOS temp", "note}/private/var/folders/ab/build/source.ts"],
+    ["parenthesis-prefixed Windows checkout", "note)D:/workspace/routego-image/source.ts"],
+    ["punctuation-prefixed Windows checkout", "note@E:\\workspace\\routego-image\\source.ts"]
   ])("rejects a rehashed runtime containing a %s path", async (_label, localPath) => {
     const candidate = path.join(temporaryRoot, `path-${String(_label).replaceAll(" ", "-")}`, "routego-image");
     await cp(firstPackage, candidate, { recursive: true });

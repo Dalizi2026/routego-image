@@ -248,14 +248,15 @@ function validateRuntimeImports(runtimeText) {
 function validateTextSecurity(relativePath, text, packageRoot) {
   const forbiddenRoots = [packageRoot, process.cwd()].map((root) => root.replaceAll("\\", "/"));
   const normalizedText = text.replaceAll("\\", "/");
-  if (forbiddenRoots.some((root) => root.length > 1 && normalizedText.includes(root)) ||
-      /file:\/\/\/(?:Users|home|private\/var\/folders|var\/folders|tmp)\//u.test(normalizedText) ||
-      /(?:^|["'\s(])\/(?:Users|home)\/[A-Za-z0-9._-]+\//mu.test(normalizedText) ||
-      /(?:^|["'\s(])\/(?:private\/var\/folders|var\/folders|tmp)\//mu.test(normalizedText) ||
-      /(?:^|["'\s(])[A-Za-z]:\/{1,2}[^\s"']+/mu.test(normalizedText)) {
+  const textWithoutHttpUrls = normalizedText.replace(/https?:\/\/[^\s<>"'`]+/giu, "");
+  if (forbiddenRoots.some((root) => root.length > 1 && textWithoutHttpUrls.includes(root)) ||
+      /file:\/\/\/(?:Users|home|private\/var\/folders|var\/folders|tmp)\//u.test(textWithoutHttpUrls) ||
+      /\/(?:Users|home)\/[A-Za-z0-9._-]+\//u.test(textWithoutHttpUrls) ||
+      /\/(?:private\/var\/folders|var\/folders|tmp)\//u.test(textWithoutHttpUrls) ||
+      /(?<![A-Za-z0-9])[A-Za-z]:\/{1,2}[^\s<>"'`]+/u.test(textWithoutHttpUrls)) {
     fail(`a source checkout or local user path is embedded in ${relativePath}`);
   }
-  const imageDataUrlPattern = /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*(?:;base64)?,(?!\$\{)(?:(?:%[0-9a-f]{2})|[a-z0-9+\/_~.!$&*=@?:-])+/iu;
+  const imageDataUrlPattern = /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[^,\\\s"'`]*)*,(?!\$\{)(?=[^\s"'`])/iu;
   const rawBase64Pattern = new RegExp(
     `(?:^|[^A-Za-z0-9+/])([A-Za-z0-9+/]{${MINIMUM_RAW_BASE64_PAYLOAD_CHARS},}={0,2})(?![A-Za-z0-9+/=])`,
     "mu"
