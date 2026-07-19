@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "029d7e53b6dfb6ae1683a8e04584425fdde0df160278de4218c0e1541b79fff5",
+  "contentSha256": "0f330f64b2da645f0f237e4dfb9b3a6db22f7a0a6d90813c379b4b47f3ba5c1b",
   "lane": "library",
   "change": "integrate-routego-image-plugin",
   "taskId": "5.2",
-  "status": "planned-awaiting-registration-and-zero-compaction-handoff",
+  "status": "registered-awaiting-zero-compaction-handoff-acceptance",
   "sourceCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -92,6 +92,7 @@
     "integrationGeneration": 8,
     "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
     "integrationImplementationCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
+    "incorporationCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
     "correctionSourceRetired": true,
     "soleApplyOwner": false,
     "applyAuthorized": false,

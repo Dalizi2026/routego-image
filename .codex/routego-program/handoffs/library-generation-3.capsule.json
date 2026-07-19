@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "44d541434a268bc52cbc35acecb57191fa3cb631617ccdeb7d0a36aeb487c45d",
+  "capsuleSha256": "de397a44faf7ff562d56e296f038cbb2e0f35c4568f5e473e1a2bd2453d760f9",
   "lane": "library",
   "role": "isolated-library-correction-owner",
   "change": "integrate-routego-image-plugin",
@@ -20,11 +20,11 @@
     "worktree": "/Users/dalizi/Documents/routego-image-library-correction-g3",
     "plannedBranch": "codex/routego-library-correction-g3",
     "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "registrationStatus": "planned-awaiting-registration",
+    "registrationStatus": "registered-awaiting-zero-compaction-handoff-acceptance",
     "registrationAttempt": 1,
     "registrationCommit": null,
-    "incorporationCommit": null,
-    "verifiedHeadBeforeContainingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9"
+    "incorporationCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad",
+    "verifiedHeadBeforeContainingCommit": "83dbd7ab8c97df44f1cf11ea74b65ae543c629ad"
   },
   "currentState": {
     "openspecTotal": 29,
@@ -33,7 +33,7 @@
     "nextTaskId": "5.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/library-correction-5.2.json",
-      "sha256": "029d7e53b6dfb6ae1683a8e04584425fdde0df160278de4218c0e1541b79fff5"
+      "sha256": "0f330f64b2da645f0f237e4dfb9b3a6db22f7a0a6d90813c379b4b47f3ba5c1b"
     },
     "taskLocked": true,
     "sourceIsSoleApplyOwner": false,
@@ -104,7 +104,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "expectedNormalizedUtf8Bytes": 77086,
+    "expectedNormalizedUtf8Bytes": 77446,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
