@@ -7,6 +7,8 @@ import {
 } from "@routego-image/creation";
 import type { RoutegoService } from "@routego-image/contracts";
 import {
+  REDACTED_BINARY_DATA,
+  REDACTED_IMAGE_DATA,
   redactDiagnostic,
   type LoopbackAddress
 } from "@routego-image/foundation";
@@ -47,6 +49,10 @@ import {
 
 const DEFAULT_SHUTDOWN_TIMEOUT_MS = 10_000;
 const REDACTED_LOCAL_PATH = "[REDACTED_PATH]";
+const IMAGE_DATA_URL_PATTERN =
+  /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*(?:;base64)?,(?:(?:%[0-9a-f]{2})|[a-z0-9+/_~.!$&*=@?:-])*/giu;
+const LONG_BASE64_TOKEN_PATTERN =
+  /(^|[^A-Za-z0-9+/_=-])([A-Za-z0-9+/_-]{64,}={0,2})(?=$|[^A-Za-z0-9+/_=-])/gu;
 
 export interface RoutegoMcpInput extends AsyncIterable<Uint8Array | string> {
   destroy?(error?: Error): unknown;
@@ -154,20 +160,34 @@ export class RoutegoMcpProcessShutdownError extends Error {
   }
 }
 
-function redactLocalPaths(value: string): string {
-  return value
-    .replace(/[A-Za-z]:\\(?:[^\\\s"'<>|]+\\)*[^\\\s"'<>|]*/gu, REDACTED_LOCAL_PATH)
+function isNumericByteArray(value: unknown): boolean {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => Number.isInteger(item) && item >= 0 && item <= 255)
+  );
+}
+
+function redactDiagnosticString(value: string): string {
+  const withoutImageData = value
+    .replace(IMAGE_DATA_URL_PATTERN, REDACTED_IMAGE_DATA)
     .replace(
-      /\/(?:Users|home|tmp|private\/tmp|var\/tmp|private\/var\/folders)\/[\w.@+%/=-]+/gu,
-      REDACTED_LOCAL_PATH
+      LONG_BASE64_TOKEN_PATTERN,
+      (_match, prefix: string) => `${prefix}${REDACTED_IMAGE_DATA}`
     );
+  const withoutWebUrls = withoutImageData.replace(/https?:\/\/[^\s<>"']+/giu, "");
+  return /[\\/]/u.test(withoutWebUrls) ? REDACTED_LOCAL_PATH : withoutImageData;
 }
 
 function redactProcessDiagnostic(value: unknown): unknown {
   const redacted = redactDiagnostic(value);
   const visit = (current: unknown): unknown => {
-    if (typeof current === "string") return redactLocalPaths(current);
-    if (Array.isArray(current)) return current.map(visit);
+    if (typeof current === "string") return redactDiagnosticString(current);
+    if (current instanceof ArrayBuffer || ArrayBuffer.isView(current)) return REDACTED_BINARY_DATA;
+    if (Array.isArray(current)) {
+      if (isNumericByteArray(current)) return REDACTED_BINARY_DATA;
+      return current.map(visit);
+    }
     if (current === null || typeof current !== "object") return current;
     if (current instanceof Date) return new Date(current.getTime());
     const output: Record<string, unknown> = {};
