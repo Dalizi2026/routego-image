@@ -32,6 +32,9 @@ const GIF_DATA_URL = `data:image/gif;base64,${GIF_BASE64}`;
 const SVG_DATA_URL = `data:image/svg+xml;charset=utf-8;base64,${SVG_BASE64}`;
 const CUSTOM_DATA_URL = `data:image/x-routego-synthetic;profile=test;base64,${UNKNOWN_HEADER_BASE64}`;
 const PARAMETERIZED_PNG_DATA_URL = `data:image/png;charset=utf-8;base64,${PNG_BASE64}`;
+const PERCENT_ENCODED_SVG_DATA_URL =
+  "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3C%2Fsvg%3E";
+const ORDINARY_WEB_URL = "https://example.invalid/docs/image.svg?view=ordinary";
 
 function request(prompt = "MCP synthetic image"): ImageOperationRequest {
   return imageOperationRequestSchema.parse({ kind: "generate", prompt });
@@ -152,7 +155,7 @@ function failedImageResult(input: unknown) {
         `file:///home/Synthetic%20User/private/image.png ` +
         `source:'file:///home/Synthetic%20User/punctuation/私密 image.png' ` +
         `source:'../punctuation folder/私密 image.png' ` +
-        `${GIF_DATA_URL} ${SVG_DATA_URL} ${UNKNOWN_HEADER_BASE64}`,
+        `${GIF_DATA_URL} ${SVG_DATA_URL} ${PERCENT_ENCODED_SVG_DATA_URL} ${UNKNOWN_HEADER_BASE64}`,
       retryDisposition: "never",
       partialArtifacts: [],
       receivedAnyOutput: false,
@@ -175,6 +178,7 @@ function failedImageResult(input: unknown) {
           snapshot: [137, 80, 78, 71, 13, 10, 26, 10],
           bufferShape: { type: "Buffer", data: [255, 216, 255, 224] },
           imagePayload: CUSTOM_DATA_URL,
+          percentImagePayload: PERCENT_ENCODED_SVG_DATA_URL,
           rawPayload: UNKNOWN_HEADER_BASE64
         }
       }
@@ -372,13 +376,19 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
       prompt:
         `gif ${GIF_DATA_URL} svg ${SVG_DATA_URL} custom ${CUSTOM_DATA_URL} ` +
         `parameterized ${PARAMETERIZED_PNG_DATA_URL} raw ${UNKNOWN_HEADER_BASE64} ` +
-        `ordinary ${ORDINARY_LONG_TEXT}`,
+        `percent before ${PERCENT_ENCODED_SVG_DATA_URL} after-percent ` +
+        `adjacent (${PERCENT_ENCODED_SVG_DATA_URL})after-adjacent ` +
+        `ordinary ${ORDINARY_LONG_TEXT} web ${ORDINARY_WEB_URL}`,
       targetImage: {
         path: "/synthetic/target.png",
-        label: `label ${SVG_DATA_URL}`
+        label: `percent ${PERCENT_ENCODED_SVG_DATA_URL} label-after`
       },
       invariants: {
-        preserve: [`preserve ${CUSTOM_DATA_URL}`, `keep ${ORDINARY_LONG_TEXT}`]
+        preserve: [
+          `preserve ${CUSTOM_DATA_URL}`,
+          `percent ${PERCENT_ENCODED_SVG_DATA_URL} invariant-after`,
+          `keep ${ORDINARY_LONG_TEXT}`
+        ]
       }
     });
     const server = createRoutegoMcpServer({
@@ -403,7 +413,13 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(rendered).not.toContain(SVG_BASE64);
     expect(rendered).not.toContain(UNKNOWN_HEADER_BASE64);
     expect(rendered).not.toContain(PNG_BASE64);
+    expect(rendered).not.toContain("%3Csvg");
     expect(rendered).toContain(ORDINARY_LONG_TEXT);
+    expect(rendered).toContain(ORDINARY_WEB_URL);
+    expect(rendered).toContain("after-percent");
+    expect(rendered).toContain(")after-adjacent");
+    expect(rendered).toContain("label-after");
+    expect(rendered).toContain("invariant-after");
     expect(text).toMatchObject({
       requestedParams: { count: 1 },
       execution: { attemptCount: 1, providerRequestCount: 1 },
@@ -709,6 +725,7 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(rendered).not.toContain(GIF_BASE64);
     expect(rendered).not.toContain(SVG_BASE64);
     expect(rendered).not.toContain(UNKNOWN_HEADER_BASE64);
+    expect(rendered).not.toContain("%3Csvg");
     expect(rendered).not.toContain("data:image");
     expect(rendered).not.toContain("dataUrl");
     expect(rendered).toContain("[REDACTED_PATH]");
@@ -886,6 +903,7 @@ describe("STDIO channel safety and lifecycle", () => {
       typedView: byteView,
       arrayBuffer: byteView.buffer,
       imagePayload: SVG_DATA_URL,
+      percentImagePayload: PERCENT_ENCODED_SVG_DATA_URL,
       rawPayload: UNKNOWN_HEADER_BASE64
     };
     const server = createRoutegoMcpServer({
@@ -900,6 +918,10 @@ describe("STDIO channel safety and lifecycle", () => {
               dot: "source:'./relative folder/私密 image.png'",
               parent: "source:'../relative folder/私密 image.png'",
               home: "source:'~/relative folder/私密 image.png'",
+              semicolon: "note;../semicolon folder/私密 image.png",
+              closingBracket: "note]../bracket folder/私密 image.png",
+              closingBrace: "note}C:\\private folder\\私密 image.png",
+              closingParen: "note)-/style folder/私密 image.png",
               cause,
               ordinary: ORDINARY_LONG_TEXT
             };
@@ -937,6 +959,10 @@ describe("STDIO channel safety and lifecycle", () => {
     expect(rendered).not.toContain("Private Share");
     expect(rendered).not.toContain("Synthetic%20User/punctuation");
     expect(rendered).not.toContain("relative folder");
+    expect(rendered).not.toContain("semicolon folder");
+    expect(rendered).not.toContain("bracket folder");
+    expect(rendered).not.toContain("private folder");
+    expect(rendered).not.toContain("style folder");
     expect(rendered).not.toContain("file:///");
     expect(rendered).not.toContain("私密");
     expect(rendered).not.toContain("137,80,78,71");
@@ -946,6 +972,7 @@ describe("STDIO channel safety and lifecycle", () => {
     expect(rendered).not.toContain("data:image");
     expect(rendered).not.toContain(SVG_BASE64);
     expect(rendered).not.toContain(UNKNOWN_HEADER_BASE64);
+    expect(rendered).not.toContain("%3Csvg");
     expect(rendered).toContain(ORDINARY_LONG_TEXT);
     expect(rendered).toContain("[REDACTED_PATH]");
     expect(rendered).toContain("[REDACTED_BINARY_DATA]");

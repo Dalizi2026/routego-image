@@ -67,7 +67,7 @@ const TOOL_TO_OPERATION = new Map<string, RoutegoOperation>(
 const REDACTED_LOCAL_PATH = "[REDACTED_PATH]" as const;
 const OMIT_PROJECTED_FIELD = Symbol("omit-projected-field");
 const IMAGE_DATA_URL_PATTERN =
-  /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*;base64,[a-z0-9+/_-]+={0,2}/giu;
+  /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*(?:;base64)?,(?:(?:%[0-9a-f]{2})|[a-z0-9+/_~.!$&*=@?:-])*/giu;
 const LONG_BASE64_TOKEN_PATTERN =
   /(^|[^A-Za-z0-9+/_=-])([A-Za-z0-9+/_-]{64,}={0,2})(?=$|[^A-Za-z0-9+/_=-])/gu;
 
@@ -128,14 +128,7 @@ function isNumericByteArray(value: unknown): boolean {
 
 function containsLocalPath(value: string): boolean {
   const withoutWebUrls = value.replace(/https?:\/\/[^\s<>"']+/giu, "");
-  return (
-    /file:\/\/\/[^\r\n]*/iu.test(withoutWebUrls) ||
-    /[A-Za-z]:[\\/]/u.test(withoutWebUrls) ||
-    /\\\\[^\\\r\n]+\\/u.test(withoutWebUrls) ||
-    /(?:^|[\s"'([{:=,])(?:\.{1,2}|~)[\\/]/u.test(withoutWebUrls) ||
-    /(?:^|[\s"'([{:=,])\/(?!\/)/u.test(withoutWebUrls) ||
-    /(?:^|[\s"'([{:=,])[\p{L}\p{N}_.-]+[\\/][^\s<>"']+/iu.test(withoutWebUrls)
-  );
+  return /[\\/]/u.test(withoutWebUrls);
 }
 
 function sanitizeDiagnosticProjection(value: unknown, key?: string): unknown {
