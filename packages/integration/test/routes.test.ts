@@ -619,6 +619,7 @@ describe("task 4.2 protected upload and resource routes", () => {
       },
       sessions,
       sessionContext,
+      now: () => new Date(BASE_NOW),
       resourceChunkBytes: 64 * 1024
     });
     const staticAssets = await StudioStaticAssetRegistry.load({
@@ -646,6 +647,15 @@ describe("task 4.2 protected upload and resource routes", () => {
           "x-routego-session": launch.session.sessionToken
         }
       }, (response) => {
+        try {
+          expect(response.statusCode).toBe(200);
+          expect(response.headers["content-type"]).toBe("image/png");
+          expect(response.headers["content-length"]).toBe(String(largeBytes.byteLength));
+        } catch (error) {
+          response.destroy();
+          reject(error);
+          return;
+        }
         response.once("data", () => {
           response.destroy();
           resolve();
@@ -657,8 +667,9 @@ describe("task 4.2 protected upload and resource routes", () => {
       });
       request.end();
     });
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    expect(closeLease).toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(closeLease).toHaveBeenCalledTimes(1);
+    });
   });
 });
 
