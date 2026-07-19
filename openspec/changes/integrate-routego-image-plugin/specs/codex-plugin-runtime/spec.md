@@ -11,16 +11,20 @@ The plugin runtime SHALL run the long-lived STDIO MCP lifecycle over the compose
 - **WHEN** a client attempts to call an Integration or Studio operation as a tool
 - **THEN** MCP SHALL return tool-not-found without dispatching it
 
-### Requirement: Public MCP success projection remains schema-valid and image-payload safe
-After validating a service success result against its frozen public output schema, the MCP runtime SHALL serialize structured text through a public-success projection rather than diagnostic/error redaction. The projection SHALL preserve every schema-defined public field, including current-call public result paths and the fresh one-time `routego_open_studio` launch token. Generate, edit, and batch structured text MUST omit or replace image data URLs and binary payloads, while validated final images SHALL remain available as MCP image content. Structured errors, caught exceptions, framing failures, logger output, Authorization values, credentials, arbitrary diagnostic URLs, and binary diagnostic data SHALL remain recursively redacted.
+### Requirement: Public MCP success projection is operation-aware and image-payload safe
+After validating a service success result against its frozen public output schema, the MCP runtime SHALL serialize structured text through an operation-aware public-success projection rather than diagnostic/error redaction. Non-image operation text SHALL preserve every schema-defined public field. Generate, edit, and batch SHALL instead use an image-payload-free metadata projection that preserves every non-payload public field, artifact metadata, relationship, failure fact, and real existing public path, while omitting `display.dataUrl`, binary payloads, and any display object left empty by that removal. The image metadata projection is not required to satisfy the original image-result schema when a valid pathless artifact loses its only payload field, and it MUST NOT fabricate a path, token, image, or success fact. Validated final images SHALL remain available as MCP image content. Structured errors, caught exceptions, framing failures, logger output, Authorization values, credentials, arbitrary diagnostic URLs, and binary diagnostic data SHALL remain recursively redacted.
 
 #### Scenario: Codex opens Studio from MCP content
 - **WHEN** `routego_open_studio` returns a validated fresh loopback launch URL
 - **THEN** MCP structured text SHALL still satisfy `routegoOpenStudioResultSchema`, contain the one-time token required for immediate bootstrap, and preserve no unrelated diagnostic query or credential
 
 #### Scenario: Generate, edit, or batch returns image display data
-- **WHEN** a validated success result contains final image data URLs and optional partial image data
-- **THEN** structured text SHALL contain no image Base64 or bytes, validated final images SHALL be emitted through MCP image content, and all other schema-defined public success fields SHALL remain intact
+- **WHEN** a validated success result contains a path-bearing image artifact and image display data
+- **THEN** structured text SHALL preserve its real public path and all non-payload metadata, contain no image data URL, Base64, bytes, or empty display object, and validated final bytes SHALL remain available through MCP image content
+
+#### Scenario: A valid image artifact is pathless and dataUrl-only
+- **WHEN** a validated generate, edit, or batch result contains an artifact with no path and only `display.dataUrl` as its original image locator
+- **THEN** structured text SHALL retain the pathless artifact's non-payload identity, phase, MIME, slot, metadata, relationships, and result facts without a data URL, Base64, bytes, empty display object, or fabricated path; a validated final image SHALL remain MCP image content, and this payload-free metadata projection SHALL NOT be required to pass the original image-result schema
 
 #### Scenario: Failure contains a credential or arbitrary URL query
 - **WHEN** an invalid output, thrown error, framing failure, or logger diagnostic contains Authorization, credentials, a data URL, bytes, or an arbitrary query-bearing URL
