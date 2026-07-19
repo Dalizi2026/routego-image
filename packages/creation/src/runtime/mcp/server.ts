@@ -6,7 +6,11 @@ import {
   type RoutegoOperation,
   type RoutegoService
 } from "@routego-image/contracts";
-import { redactDiagnostic } from "@routego-image/foundation";
+import {
+  REDACTED_BINARY_DATA,
+  REDACTED_IMAGE_DATA,
+  redactDiagnostic
+} from "@routego-image/foundation";
 
 import {
   JsonRpcFramingError,
@@ -61,6 +65,11 @@ const TOOL_TO_OPERATION = new Map<string, RoutegoOperation>(
 );
 
 const REDACTED_LOCAL_PATH = "[REDACTED_PATH]" as const;
+const OMIT_PROJECTED_FIELD = Symbol("omit-projected-field");
+const IMAGE_DATA_URL_PATTERN =
+  /data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/_=-]+/giu;
+const RAW_IMAGE_BASE64_PATTERN =
+  /(?:iVBORw0KGgo|\/9j\/|UklGR)[A-Za-z0-9+/_=-]{16,}/gu;
 
 function inputJsonSchema(operation: RoutegoOperation): Record<string, unknown> {
   const generated = routegoOperationDefinitions[operation].inputSchema.toJSONSchema({
@@ -85,30 +94,79 @@ function toolDefinitions() {
   });
 }
 
-function redactLocalPathsInText(value: string): string {
-  return value
-    .replace(
-      /(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/]|\\\\)[^\s,;"']+/gu,
-      REDACTED_LOCAL_PATH
-    )
-    .replace(/(?<![A-Za-z0-9:/])\/[^\s,;"']+/gu, REDACTED_LOCAL_PATH);
+function normalizedKey(key: string | undefined): string {
+  return key?.toLowerCase().replace(/[^a-z0-9]/gu, "") ?? "";
 }
 
-function redactLocalPaths(value: unknown): unknown {
-  if (typeof value === "string") return redactLocalPathsInText(value);
-  if (Array.isArray(value)) return value.map(redactLocalPaths);
-  if (!isRecord(value)) return value;
-  return Object.fromEntries(
-    Object.entries(value).map(([key, childValue]) => [key, redactLocalPaths(childValue)])
+function isPathDiagnosticKey(key: string | undefined): boolean {
+  const normalized = normalizedKey(key);
+  return (
+    normalized === "cwd" ||
+    normalized === "directory" ||
+    normalized === "dir" ||
+    normalized === "filename" ||
+    normalized === "root" ||
+    normalized.endsWith("path") ||
+    normalized.endsWith("paths") ||
+    normalized.endsWith("directory") ||
+    normalized.endsWith("filename")
   );
 }
 
-function redactMcpDiagnostic(value: unknown): unknown {
-  return redactLocalPaths(redactDiagnostic(value));
+function isBinaryDiagnosticKey(key: string | undefined): boolean {
+  const normalized = normalizedKey(key);
+  return (
+    normalized.includes("binary") ||
+    normalized === "buffer" ||
+    normalized.endsWith("buffer") ||
+    normalized === "bytes" ||
+    normalized.endsWith("bytes") ||
+    normalized === "bytearray" ||
+    normalized === "payloadbytes" ||
+    normalized === "rawbody"
+  );
+}
+
+function isNumericByteArray(value: unknown): value is readonly number[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => Number.isInteger(item) && item >= 0 && item <= 255)
+  );
+}
+
+function containsLocalPath(value: string): boolean {
+  const withoutWebUrls = value.replace(/https?:\/\/[^\s<>"']+/giu, "");
+  return /(?:^|[\s(=])["']?(?:file:\/\/+|[A-Za-z]:[\\/]|\\\\|\.{1,2}[\\/]|\/(?!\/)|[\p{L}\p{N}_.-]+[\\/])/iu.test(
+    withoutWebUrls
+  );
+}
+
+function sanitizeDiagnosticProjection(value: unknown, key?: string): unknown {
+  if (typeof value === "string") {
+    return isPathDiagnosticKey(key) || containsLocalPath(value) ? REDACTED_LOCAL_PATH : value;
+  }
+  if (Array.isArray(value)) {
+    if (isBinaryDiagnosticKey(key) && isNumericByteArray(value)) {
+      return REDACTED_BINARY_DATA;
+    }
+    return value.map((item) => sanitizeDiagnosticProjection(item, key));
+  }
+  if (!isPlainRecord(value)) return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([childKey, childValue]) => [
+      childKey,
+      sanitizeDiagnosticProjection(childValue, childKey)
+    ])
+  );
+}
+
+function sanitizeMcpDiagnostic(value: unknown): unknown {
+  return sanitizeDiagnosticProjection(redactDiagnostic(value));
 }
 
 function errorToolResult(code: string, safeMessage: string, details?: unknown): McpToolResult {
-  const value = redactMcpDiagnostic({
+  const value = sanitizeMcpDiagnostic({
     error: {
       code,
       safeMessage,
@@ -162,36 +220,37 @@ function outputIsError(output: unknown): boolean {
   return record["status"] === "failed" || record["status"] === "cancelled" || record["error"] !== undefined;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value) as unknown;
+  return prototype === Object.prototype || prototype === null;
 }
 
-function publicSuccessProjection(
-  value: unknown,
-  omitImagePayloads: boolean,
-  redactNestedErrors = true
-): unknown {
+function replaceImagePayloadsInText(value: string): string {
+  return value
+    .replace(IMAGE_DATA_URL_PATTERN, REDACTED_IMAGE_DATA)
+    .replace(RAW_IMAGE_BASE64_PATTERN, REDACTED_IMAGE_DATA);
+}
+
+function imageSuccessProjection(value: unknown, key?: string): unknown | typeof OMIT_PROJECTED_FIELD {
+  if (key === "dataUrl") return OMIT_PROJECTED_FIELD;
+  if (value instanceof ArrayBuffer || ArrayBuffer.isView(value)) return REDACTED_BINARY_DATA;
   if (Array.isArray(value)) {
-    return value.map((item) => publicSuccessProjection(item, omitImagePayloads, redactNestedErrors));
+    if (isNumericByteArray(value) && value.length >= 4) return REDACTED_BINARY_DATA;
+    return value.map((item) => imageSuccessProjection(item));
   }
-  if (!isRecord(value)) return value;
+  if (typeof value === "string") return replaceImagePayloadsInText(value);
+  if (!isPlainRecord(value)) return value;
 
   const projected: Record<string, unknown> = {};
   for (const [key, childValue] of Object.entries(value)) {
-    if (omitImagePayloads && key === "dataUrl") continue;
-
-    const shouldRedactError = redactNestedErrors && key === "error";
-    const child = shouldRedactError ? redactMcpDiagnostic(childValue) : childValue;
-    const projectedChild = publicSuccessProjection(
-      child,
-      omitImagePayloads,
-      shouldRedactError ? false : redactNestedErrors
-    );
+    const child = key === "error" ? sanitizeMcpDiagnostic(childValue) : childValue;
+    const projectedChild = imageSuccessProjection(child, key);
+    if (projectedChild === OMIT_PROJECTED_FIELD) continue;
 
     if (
-      omitImagePayloads &&
       key === "display" &&
-      isRecord(projectedChild) &&
+      isPlainRecord(projectedChild) &&
       Object.keys(projectedChild).every(
         (displayKey) => displayKey === "type" && projectedChild[displayKey] === "image"
       )
@@ -203,10 +262,22 @@ function publicSuccessProjection(
   return projected;
 }
 
+function nonImageSuccessProjection(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(nonImageSuccessProjection);
+  if (!isPlainRecord(value)) return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, childValue]) => [
+      key,
+      key === "error" ? sanitizeMcpDiagnostic(childValue) : nonImageSuccessProjection(childValue)
+    ])
+  );
+}
+
 function successToolResult(operation: RoutegoOperation, output: unknown): McpToolResult {
-  const omitImagePayloads =
-    operation === "generate" || operation === "edit" || operation === "batch";
-  const projected = publicSuccessProjection(output, omitImagePayloads);
+  const projected =
+    operation === "generate" || operation === "edit" || operation === "batch"
+      ? imageSuccessProjection(output)
+      : nonImageSuccessProjection(output);
   const images = finalImageContents(output);
   const text = JSON.stringify(projected);
   return {
@@ -245,7 +316,7 @@ export class RoutegoMcpServer {
   async #diagnose(value: unknown): Promise<void> {
     if (this.#logger === undefined) return;
     try {
-      await this.#logger(redactMcpDiagnostic(value));
+      await this.#logger(sanitizeMcpDiagnostic(value));
     } catch {
       // Diagnostic sinks cannot affect protocol behavior.
     }

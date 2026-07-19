@@ -4,9 +4,12 @@ import {
   imageOperationRequestSchema,
   imageOperationResultSchema,
   routegoBatchResultSchema,
+  routegoManageLibraryResultSchema,
   routegoOpenStudioResultSchema,
   routegoOperationDefinitions,
   routegoOperationNames,
+  routegoSearchLibraryResultSchema,
+  routegoStatusResultSchema,
   type ImageOperationRequest,
   type RoutegoService
 } from "@routego-image/contracts";
@@ -24,12 +27,19 @@ function request(prompt = "MCP synthetic image"): ImageOperationRequest {
   return imageOperationRequestSchema.parse({ kind: "generate", prompt });
 }
 
-function editRequest(prompt = "MCP synthetic edit"): ImageOperationRequest {
+function editRequest(
+  prompt = "MCP synthetic edit",
+  embeddedImagePayload?: string
+): ImageOperationRequest {
+  const payloadSuffix = embeddedImagePayload === undefined ? "" : ` ${embeddedImagePayload}`;
   return imageOperationRequestSchema.parse({
     kind: "edit",
     prompt,
-    targetImage: { path: "/synthetic/target.png" },
-    invariants: { preserve: ["Keep the synthetic subject identity."] }
+    targetImage: {
+      path: "/synthetic/target.png",
+      label: `Synthetic target${payloadSuffix}`
+    },
+    invariants: { preserve: [`Keep the synthetic subject identity.${payloadSuffix}`] }
   });
 }
 
@@ -125,7 +135,11 @@ function failedImageResult(input: unknown) {
       stage: "stream",
       safeMessage:
         `Authorization: Bearer synthetic-secret https://relay.invalid/error?token=synthetic ` +
-        `C:\\Users\\synthetic\\output.png /home/synthetic/output.png ` +
+        `C:\\Users\\Synthetic User\\私密\\image.png ` +
+        `\\\\synthetic-server\\Private Share\\私密 图.png ` +
+        `/home/Synthetic User/私密/image.png ../private folder/私密.png ` +
+        `file:///C:/Users/Synthetic%20User/private/image.png ` +
+        `file:///home/Synthetic%20User/private/image.png ` +
         `data:image/png;base64,${PNG_BASE64}`,
       retryDisposition: "never",
       partialArtifacts: [],
@@ -134,7 +148,14 @@ function failedImageResult(input: unknown) {
       details: {
         authorization: "Bearer synthetic-secret",
         endpoint: "https://relay.invalid/error?token=synthetic",
-        path: "C:\\Users\\synthetic\\output.png",
+        windowsPath: "C:\\Users\\Synthetic User\\私密\\image.png",
+        uncPath: "\\\\synthetic-server\\Private Share\\私密 图.png",
+        posixPath: "/home/Synthetic User/私密/image.png",
+        windowsRelativePath: "..\\private folder\\私密.png",
+        posixRelativePath: "../private folder/私密.png",
+        windowsFileUrl: "file:///C:/Users/Synthetic%20User/private/image.png",
+        posixFileUrl: "file:///home/Synthetic%20User/private/image.png",
+        bytes: [137, 80, 78, 71, 13, 10, 26, 10],
         dataUrl: `data:image/png;base64,${PNG_BASE64}`
       }
     }
@@ -249,8 +270,20 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
   });
 
   it("validates input, calls the service once, validates output, and returns text plus final image content", async () => {
-    const generate = vi.fn(async (input: ImageOperationRequest) =>
-      imageResult(input, { withPartial: true })
+    const embeddedDataUrl = `data:image/png;base64,${PNG_BASE64}`;
+    const projectedInput = imageOperationRequestSchema.parse({
+      kind: "generate",
+      prompt: `ordinary before ${embeddedDataUrl} after`,
+      references: [
+        {
+          path: "/synthetic/reference.png",
+          role: "reference",
+          label: `raw payload ${PNG_BASE64} remains ordinary text around it`
+        }
+      ]
+    });
+    const generate = vi.fn(async (_input: ImageOperationRequest) =>
+      imageResult(projectedInput, { withPartial: true })
     );
     const server = createRoutegoMcpServer({ service: service({ generate }) });
     await initialize(server);
@@ -278,6 +311,14 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(text).toMatchObject({
       requestId: "request-mcp-result",
       status: "succeeded",
+      requestedParams: {
+        prompt: "ordinary before [REDACTED_IMAGE_DATA] after",
+        references: [
+          {
+            label: "raw payload [REDACTED_IMAGE_DATA] remains ordinary text around it"
+          }
+        ]
+      },
       finalArtifacts: [
         {
           id: "artifact-mcp",
@@ -300,6 +341,8 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect((text["partialArtifacts"] as Array<Record<string, unknown>>)[0]).not.toHaveProperty("display");
     expect(JSON.stringify(text)).not.toContain("data:image");
     expect(JSON.stringify(text)).not.toContain(PNG_BASE64);
+    expect(JSON.stringify(text)).toContain("ordinary before [REDACTED_IMAGE_DATA] after");
+    expect(JSON.stringify(text)).toContain("remains ordinary text around it");
     expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
   });
 
@@ -334,8 +377,101 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(toolResult.content).toHaveLength(1);
   });
 
+  it("leaves representative status, search, and manage success text unchanged", async () => {
+    const fixtures = [
+      {
+        operation: "status",
+        toolName: "routego_status",
+        arguments: {},
+        output: routegoStatusResultSchema.parse({
+          schemaVersion: 1,
+          configured: false,
+          hasApiKey: false,
+          models: ["synthetic-model"],
+          capabilities: [],
+          defaults: {
+            size: "auto",
+            aspectRatio: "auto",
+            quality: "auto",
+            format: "png",
+            count: 1,
+            partialImages: 0,
+            transparentMode: "off",
+            moderation: "auto",
+            saveToLibrary: true
+          },
+          service: {
+            status: "ready",
+            version: "1.0.0",
+            nodeVersion: "v20.19.0",
+            uptimeSeconds: 12,
+            mcpAvailable: true,
+            httpAvailable: true,
+            studioAvailable: true
+          }
+        })
+      },
+      {
+        operation: "searchLibrary",
+        toolName: "routego_search_library",
+        arguments: {},
+        output: routegoSearchLibraryResultSchema.parse({
+          schemaVersion: 1,
+          items: [
+            {
+              id: "asset-public-path",
+              path: "C:\\Users\\Synthetic User\\图像\\result image.png",
+              prompt: "ordinary searchable prompt",
+              model: "synthetic-model",
+              kind: "generate",
+              mimeType: "image/png",
+              width: 1024,
+              height: 1024,
+              status: "succeeded",
+              folderIds: ["folder-public"],
+              createdAt: "2026-07-18T12:00:00.000Z"
+            }
+          ]
+        })
+      },
+      {
+        operation: "manageLibrary",
+        toolName: "routego_manage_library",
+        arguments: { action: "create-folder", name: "Synthetic Folder" },
+        output: routegoManageLibraryResultSchema.parse({
+          schemaVersion: 1,
+          action: "create-folder",
+          affectedAssetIds: [],
+          affectedFolderIds: ["folder-public"],
+          warnings: ["ordinary public warning"]
+        })
+      }
+    ] as const;
+
+    for (const fixture of fixtures) {
+      const server = createRoutegoMcpServer({
+        service: service({ [fixture.operation]: async () => fixture.output })
+      });
+      await initialize(server);
+      const response = await server.handleLine(
+        JSON.stringify({
+          jsonrpc: "2.0",
+          id: `non-image-${fixture.operation}`,
+          method: "tools/call",
+          params: { name: fixture.toolName, arguments: fixture.arguments }
+        })
+      );
+      const toolResult = resultValue(response) as McpToolResult;
+      expect(structuredText(toolResult)).toEqual(fixture.output);
+      expect(toolResult.content).toHaveLength(1);
+    }
+  });
+
   it("preserves a truthful image path while omitting its display payload", async () => {
-    const input = editRequest();
+    const input = editRequest(
+      `ordinary edit prompt data:image/png;base64,${PNG_BASE64} after`,
+      PNG_BASE64
+    );
     const edit = vi.fn(async (parsedInput: ImageOperationRequest) =>
       imageResult(parsedInput, {
         artifactId: "artifact-edit",
@@ -366,12 +502,27 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     });
     expect(artifact).not.toHaveProperty("display");
     expect(JSON.stringify(text)).not.toContain("data:image");
+    expect(JSON.stringify(text)).not.toContain(PNG_BASE64);
+    expect(text).toMatchObject({
+      requestedParams: {
+        prompt: "ordinary edit prompt [REDACTED_IMAGE_DATA] after",
+        targetImage: { label: "Synthetic target [REDACTED_IMAGE_DATA]" },
+        invariants: {
+          preserve: ["Keep the synthetic subject identity. [REDACTED_IMAGE_DATA]"]
+        }
+      }
+    });
     expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
   });
 
   it("projects path-bearing and pathless batch artifacts without fabricating a path", async () => {
-    const generateInput = request("Batch path-bearing image");
-    const editInput = editRequest("Batch pathless edit");
+    const generateInput = request(
+      `Batch path-bearing image data:image/png;base64,${PNG_BASE64} after`
+    );
+    const editInput = editRequest(
+      `Batch pathless edit data:image/png;base64,${PNG_BASE64} after`,
+      PNG_BASE64
+    );
     const batchResult = routegoBatchResultSchema.parse({
       schemaVersion: 1,
       requestId: "request-mcp-batch",
@@ -433,6 +584,9 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
       providerImageId: "provider-artifact-batch-pathless"
     });
     expect(JSON.stringify(text)).not.toContain("data:image");
+    expect(JSON.stringify(text)).not.toContain(PNG_BASE64);
+    expect(JSON.stringify(text)).toContain("Batch path-bearing image [REDACTED_IMAGE_DATA] after");
+    expect(JSON.stringify(text)).toContain("Batch pathless edit [REDACTED_IMAGE_DATA] after");
     expect(toolResult.content.slice(1)).toEqual([
       { type: "image", data: PNG_BASE64, mimeType: "image/png" },
       { type: "image", data: PNG_BASE64, mimeType: "image/png" }
@@ -474,10 +628,18 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     });
     expect(rendered).not.toContain("synthetic-secret");
     expect(rendered).not.toContain("token=synthetic");
-    expect(rendered).not.toContain("C:\\Users\\synthetic");
-    expect(rendered).not.toContain("/home/synthetic");
+    expect(rendered).not.toContain("Synthetic User");
+    expect(rendered).not.toContain("synthetic-server");
+    expect(rendered).not.toContain("Private Share");
+    expect(rendered).not.toContain("私密");
+    expect(rendered).not.toContain("file:///");
+    expect(rendered).not.toContain("..\\private folder");
+    expect(rendered).not.toContain("../private folder");
+    expect(rendered).not.toContain("137,80,78,71");
     expect(rendered).not.toContain(PNG_BASE64);
     expect(rendered).not.toContain("dataUrl");
+    expect(rendered).toContain("[REDACTED_PATH]");
+    expect(rendered).toContain("[REDACTED_BINARY_DATA]");
   });
 
   it("fails closed on invalid input or service output and never dispatches Studio-only names", async () => {
@@ -550,9 +712,27 @@ describe("STDIO channel safety and lifecycle", () => {
             throw new Error(
               `Authorization: Bearer synthetic-secret ` +
               `https://relay.invalid/fail?token=logger-secret ` +
-              `C:\\Users\\synthetic\\image.png /home/synthetic/image.png ` +
+              `C:\\Users\\Synthetic User\\私密\\image.png ` +
+              `\\\\synthetic-server\\Private Share\\私密 图.png ` +
+              `/home/Synthetic User/私密/image.png ../private folder/私密.png ` +
+              `file:///C:/Users/Synthetic%20User/private/server.ts ` +
+              `file:///home/Synthetic%20User/private/server.ts ` +
               `data:image/png;base64,${PNG_BASE64}`
             );
+          }
+          if (callCount === 3) {
+            throw {
+              message: "Binary diagnostic at ..\\private folder\\私密.bin",
+              stack: "Synthetic stack file:///home/Synthetic%20User/private/server.ts",
+              windowsPath: "C:\\Users\\Synthetic User\\私密\\image.png",
+              uncPath: "\\\\synthetic-server\\Private Share\\私密 图.png",
+              posixPath: "/home/Synthetic User/私密/image.png",
+              windowsRelativePath: "..\\private folder\\私密.png",
+              posixRelativePath: "../private folder/私密.png",
+              bytes: [137, 80, 78, 71, 13, 10, 26, 10],
+              binaryPayload: [255, 216, 255, 224],
+              typedBytes: Uint8Array.from([82, 73, 70, 70])
+            };
           }
           return imageResult(input);
         }
@@ -578,29 +758,46 @@ describe("STDIO channel safety and lifecycle", () => {
         method: "tools/call",
         params: { name: "routego_generate", arguments: { kind: "generate", prompt: "second" } }
       },
-      { jsonrpc: "2.0", id: 4, method: "ping" }
+      {
+        jsonrpc: "2.0",
+        id: 4,
+        method: "tools/call",
+        params: { name: "routego_generate", arguments: { kind: "generate", prompt: "third" } }
+      },
+      { jsonrpc: "2.0", id: 5, method: "ping" }
     ].map((line) => `${JSON.stringify(line)}\n`).join("");
     const bytes = new TextEncoder().encode(lines);
     await server.handleChunk(bytes.subarray(0, 31));
     await server.handleChunk(bytes.subarray(31));
     await server.finish();
 
-    expect(output).toHaveLength(4);
+    expect(output).toHaveLength(5);
     expect(output.every((line) => line.endsWith("\n") && JSON.parse(line).jsonrpc === "2.0")).toBe(true);
     expect(JSON.parse(output[1]!).result.isError).toBeUndefined();
     expect(JSON.parse(output[2]!).result.isError).toBe(true);
-    expect(JSON.parse(output[3]!).result).toEqual({});
+    expect(JSON.parse(output[3]!).result.isError).toBe(true);
+    expect(JSON.parse(output[4]!).result).toEqual({});
     const renderedDiagnostics = JSON.stringify(diagnostics);
     expect(renderedDiagnostics).not.toContain("synthetic-secret");
     expect(renderedDiagnostics).not.toContain("token=logger-secret");
-    expect(renderedDiagnostics).not.toContain("C:\\Users\\synthetic");
-    expect(renderedDiagnostics).not.toContain("/home/synthetic");
+    expect(renderedDiagnostics).not.toContain("Synthetic User");
+    expect(renderedDiagnostics).not.toContain("synthetic-server");
+    expect(renderedDiagnostics).not.toContain("Private Share");
+    expect(renderedDiagnostics).not.toContain("私密");
+    expect(renderedDiagnostics).not.toContain("file:///");
+    expect(renderedDiagnostics).not.toContain("..\\private folder");
+    expect(renderedDiagnostics).not.toContain("../private folder");
+    expect(renderedDiagnostics).not.toContain("137,80,78,71");
+    expect(renderedDiagnostics).not.toContain("255,216,255,224");
+    expect(renderedDiagnostics).not.toContain("82,73,70,70");
     expect(renderedDiagnostics).not.toContain(PNG_BASE64);
+    expect(renderedDiagnostics).toContain("[REDACTED_PATH]");
+    expect(renderedDiagnostics).toContain("[REDACTED_BINARY_DATA]");
 
     server.shutdown();
     expect(server.closed).toBe(true);
     expect(
-      await server.handleLine(JSON.stringify({ jsonrpc: "2.0", id: 5, method: "ping" }))
+      await server.handleLine(JSON.stringify({ jsonrpc: "2.0", id: 6, method: "ping" }))
     ).toMatchObject({ error: { code: -32000 } });
   });
 
