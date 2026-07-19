@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "95fe3fcc2c271297561112181235c37a58bdd04003e691a5ad70b0d15734e6db",
+  "contentSha256": "ce6e8711d5543b7321865089a446458b66d6a98b5541e0005482d06ad5ce2585",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.3",
-  "status": "incomplete-wip-preserved-pd-012-owner-only-openspec-update-authorized-product-locked",
-  "sourceCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
+  "status": "incomplete-wip-preserved-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
+  "sourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
-    "fileSha256": "82992208017a371ee53c30f57ee9c64c9069655cd70fa966ae1dbc1e3b1f0e12",
+    "fileSha256": "1d8734b2108fb1b7e5c82dba584cc77c71cb0fd0bcea5186f1ee30ac295f80e6",
     "lineSha256": "4e2ae1180c5e22eed19e09b8b07a250c53b818b91502f2cd483d72b1fa8b18d3",
     "lineBytes": 1050
   },
@@ -68,8 +68,8 @@
   "directSpecifications": [
     {
       "path": "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
-      "sha256": "d8c7ed766151976be5abf98a54e6d7954d47bc76fe8144d2d959ee66b2a5bd56",
-      "bytes": 8010,
+      "sha256": "7ea6069220347f8a434abf21b930ee026e5d7b9bb763b67bf4a50cbf0a3b9f15",
+      "bytes": 10937,
       "reason": "Plugin process, CLI, stdio framing, lifecycle coexistence and local runtime requirements."
     },
     {
@@ -121,13 +121,17 @@
       "openspec/changes/integrate-routego-image-plugin/tasks.md"
     ],
     "planningAuthorized": true,
+    "planningCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
+    "planningAccepted": true,
+    "planningAcceptedByControllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
+    "planningAcceptedByControllerGeneration": 7,
     "correctiveAllowedFiles": [
       "packages/creation/src/runtime/mcp/server.ts",
       "packages/creation/test/mcp.test.ts"
     ],
     "correctiveCodeAuthorized": false,
     "taskResumeAuthorized": false,
-    "requiredSequence": "Incorporate PD-012 governance, commit and obtain acceptance for the exact owner-only three-file OpenSpec update, then await a separate exact two-file Creation corrective authorization and acceptance before resuming the four task-4.3 files."
+    "requiredSequence": "The exact owner-only three-file PD-012 OpenSpec update is accepted at 2b62dac6d86c8ca0fef6b52eea81019ba5749430. Await a separate exact two-file Creation corrective authorization and acceptance before resuming the four task-4.3 files."
   },
   "unresolvedIssues": [],
   "knownRisks": [

@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-6-active-sole-owner-task-4.3-pd-012-planning-committed-awaiting-controller-g7-review-product-locked",
+  "status": "generation-6-active-sole-owner-task-4.3-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
   "controllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
   "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
@@ -12,11 +12,11 @@
   "startingCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
   "registrationCommit": "e25cdc12eb15318fc9b1c414ddbcda92d6270520",
   "incorporationCommit": "380e5936be0680b884a18f3b42a19e4fa299e438",
-  "currentHead": "768bb0db6e44aaee29c645ef8e09ae5efc61c537",
+  "currentHead": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
   "gitCleanAtRegistration": true,
   "gitClean": true,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|context-compaction-1-after-pd012-planning-review-rejection|17/29",
   "soleApplyOwner": true,
   "frozen": false,
   "applyAuthorized": true,
@@ -49,7 +49,7 @@
   "currentTask": {
     "id": "4.3",
     "capsule": ".codex/routego-program/tasks/integration-4.3.json",
-    "activationStatus": "paused-pd-012-owner-only-openspec-update-committed-awaiting-controller-g7-review-product-locked",
+    "activationStatus": "paused-pd-012-planning-accepted-awaiting-separate-creation-correction-authorization-product-locked",
     "started": true,
     "completionStatus": "incomplete-wip-checkpoint-preserved"
   },
@@ -61,18 +61,18 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|768bb0db6e44aaee29c645ef8e09ae5efc61c537|pd-012-owner-only-openspec-planning-committed|17/29",
-    "messageType": "INTEGRATION_PD_012_OPENSPEC_UPDATED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|2b62dac6d86c8ca0fef6b52eea81019ba5749430|pd-012-openspec-coherence-revision-accepted|17/29",
+    "messageType": "INTEGRATION_PD_012_OPENSPEC_COHERENCE_REVISION_COMMITTED",
     "completedTaskId": "4.2",
     "nextTaskId": "4.3",
-    "reportedHead": "768bb0db6e44aaee29c645ef8e09ae5efc61c537",
+    "reportedHead": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
-    "controllerAccepted": false,
+    "controllerAccepted": true,
     "handoffAccepted": true,
     "sourceFrozen": true,
-    "observableCompactions": 0,
-    "checkpointSemantics": "Task 4.3 is incomplete. Integration committed the exact three-file PD-012 owner-only OpenSpec planning update at 768bb0db6e44aaee29c645ef8e09ae5efc61c537 with strict validation. Product work remains locked until Controller G7 independently accepts planning and separately authorizes the Creation correction."
+    "observableCompactions": 1,
+    "checkpointSemantics": "Task 4.3 is incomplete. Controller G7 independently accepted the exact three-file operation-aware PD-012 OpenSpec coherence revision at 2b62dac6d86c8ca0fef6b52eea81019ba5749430 after strict validation and semantic review. Product work remains locked pending a separate exact two-file Creation correction authorization and later corrective acceptance."
   },
   "planDeviation": {
     "id": "PD-012",
@@ -89,8 +89,8 @@
       "packages/creation/test/mcp.test.ts"
     ],
     "planningAuthorized": true,
-    "planningCommit": "768bb0db6e44aaee29c645ef8e09ae5efc61c537",
-    "planningAccepted": false,
+    "planningCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
+    "planningAccepted": true,
     "productCorrectionAuthorized": false,
     "taskResumeAuthorized": false
   },
