@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "3baa1d49c5306577be33bfa2e186c19bace03a1458f5bdb5c1f52575401ac14e",
+  "capsuleSha256": "a6b01f0970de056442440d9971dad980f335cd036e3e22215f57db0a7d5237b0",
   "lane": "integration",
   "role": "openspec-propose-and-apply-owner",
   "change": "integrate-routego-image-plugin",
@@ -22,12 +22,12 @@
     "worktree": "/Users/dalizi/Documents/routego-image-integration-g8",
     "plannedBranch": "codex/routego-integration-g8",
     "startingCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
-    "registrationStatus": "registered-awaiting-low-context-acceptance",
+    "registrationStatus": "activated-sole-owner-task-5.2-authorized",
     "registrationAttempt": 1,
-    "registrationCommit": null,
+    "registrationCommit": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
     "incorporationCommit": "a3f5cd9d5b43085ad6b76503a2b78fe2399b001a",
-    "verifiedHeadBeforeContainingCommit": "a3f5cd9d5b43085ad6b76503a2b78fe2399b001a",
-    "acceptedHead": null,
+    "verifiedHeadBeforeContainingCommit": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
+    "acceptedHead": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
     "registrationCommitSemantics": "The containing registration commit cannot self-reference its own SHA. This capsule records the real successor identity and the clean verified HEAD immediately before that commit; task 5.2 remains locked until acceptance and separate activation."
   },
   "currentState": {
@@ -37,19 +37,19 @@
     "nextTaskId": "5.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-5.2.json",
-      "sha256": "9150dd00e30e3bc483c8b501a896e402a79f110f941a8cc7e8d082ef922c9f82"
+      "sha256": "591124d9e2f288897c87bc4606e6c4dc07828d306180f004ddd8103941875bc4"
     },
-    "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
+    "taskLocked": false,
+    "sourceIsSoleApplyOwner": false,
     "sourceApplyAuthorized": false,
-    "successorApplyAuthorized": false,
-    "successorAuthorizedScope": "handoff-audit-only-until-controller-activation",
+    "successorApplyAuthorized": true,
+    "successorAuthorizedScope": "task-5.2-exact-ten-file-implementation",
     "acceptedTask5_1ImplementationCommit": "f3d3d67d264160736d8ce3812eb097c3ab509a22",
     "acceptedTask5_1StateCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
     "safeCheckpoint": "f5ce78632026f779bf38c793f50b5357301e6497",
     "checkpointParent": "f3d3d67d264160736d8ce3812eb097c3ab509a22",
     "checkpointSemantics": "TASK_5_1_COMPLETE_CONTEXT_COMPACTION_3_GIT_SAFETY_CHECKPOINT",
-    "continuation": "create-and-audit-integration-generation-8-before-task-5.2"
+    "continuation": "task-5.2-authorized-not-started"
   },
   "completedEvidence": [
     {
@@ -142,7 +142,7 @@
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
     "fallbackSourceCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
-    "expectedNormalizedUtf8Bytes": 75069,
+    "expectedNormalizedUtf8Bytes": 75150,
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "9150dd00e30e3bc483c8b501a896e402a79f110f941a8cc7e8d082ef922c9f82",
+  "contentSha256": "591124d9e2f288897c87bc4606e6c4dc07828d306180f004ddd8103941875bc4",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "5.2",
-  "status": "locked-awaiting-integration-generation-8-handoff",
+  "status": "activated-sole-owner-task-5.2-authorized",
   "sourceCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -97,9 +97,12 @@
     "successorIntegrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
     "acceptedTask5_1ImplementationCommit": "f3d3d67d264160736d8ce3812eb097c3ab509a22",
     "acceptedTask5_1StateCommit": "f5ce78632026f779bf38c793f50b5357301e6497",
-    "soleApplyOwner": false,
-    "applyAuthorized": false,
-    "authorizedScope": "handoff-audit-only-until-controller-activation"
+    "registrationCommit": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
+    "acceptedHead": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
+    "observableCompactionsBeforeAcceptance": 0,
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "task-5.2-exact-ten-file-implementation"
   },
   "installationPolicy": {
     "packageInstallationAuthorizedByUser": true,
