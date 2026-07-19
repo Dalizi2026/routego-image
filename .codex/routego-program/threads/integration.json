@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "generation-6-active-sole-apply-owner-task-4.3-unlocked-not-started",
+  "status": "generation-6-active-sole-owner-task-4.3-wip-preserved-pd-012-planning-authorized-product-locked",
   "controllerThreadId": "019f764e-e4a7-7270-b06a-a846f2b0d932",
   "threadId": "019f7774-d842-7a20-b9a9-88322de1dc1c",
   "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\d0dd\\生图插件",
@@ -12,7 +12,7 @@
   "startingCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
   "registrationCommit": "e25cdc12eb15318fc9b1c414ddbcda92d6270520",
   "incorporationCommit": "380e5936be0680b884a18f3b42a19e4fa299e438",
-  "currentHead": "380e5936be0680b884a18f3b42a19e4fa299e438",
+  "currentHead": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
   "gitCleanAtRegistration": true,
   "gitClean": true,
   "observableCompactions": 0,
@@ -44,14 +44,14 @@
     "completedTasks": 17,
     "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1", "4.2"],
     "nextTaskId": "4.3",
-    "nextTaskLocked": false
+    "nextTaskLocked": true
   },
   "currentTask": {
     "id": "4.3",
     "capsule": ".codex/routego-program/tasks/integration-4.3.json",
-    "activationStatus": "unlocked-sole-owner-authorized-not-started",
-    "started": false,
-    "completionStatus": "not-started"
+    "activationStatus": "paused-pd-012-owner-only-openspec-update-authorized-product-locked",
+    "started": true,
+    "completionStatus": "incomplete-wip-checkpoint-preserved"
   },
   "handoff": {
     "capsule": ".codex/routego-program/handoffs/integration-generation-6.capsule.json",
@@ -61,18 +61,36 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|380e5936be0680b884a18f3b42a19e4fa299e438|generation-6-handoff-accepted-zero-compaction|17/29",
-    "messageType": "INTEGRATION_HANDOFF_ACCEPTED",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|4f9cce26f6608c25679cd4b3639c72b52d65b59c|task-4.3-non-completion-wip-pd-012|17/29",
+    "messageType": "INTEGRATION_TASK_4_3_WIP_CHECKPOINT_COMMITTED",
     "completedTaskId": "4.2",
     "nextTaskId": "4.3",
-    "reportedHead": "380e5936be0680b884a18f3b42a19e4fa299e438",
+    "reportedHead": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": true,
     "sourceFrozen": true,
     "observableCompactions": 0,
-    "checkpointSemantics": "Generation 6 registration incorporation 380e5936be0680b884a18f3b42a19e4fa299e438 passed the declared 12-file/97010-byte zero-compaction audit; Controller accepted the handoff, revoked generation 5 authority and explicitly activated generation 6 as sole owner for task 4.3."
+    "checkpointSemantics": "Task 4.3 is incomplete. Its exact four-file WIP is preserved at clean 4f9cce26f6608c25679cd4b3639c72b52d65b59c with the independently reproduced one-failed/181-passed Creation projection regression. Only the PD-012 three-file owner OpenSpec update is authorized; product work is locked."
+  },
+  "planDeviation": {
+    "id": "PD-012",
+    "decision": ".codex/routego-program/deviations/PD-012-task-4.3-creation-mcp-public-success-projection.md",
+    "rootCause": "Creation successToolResult applies diagnostic redaction after public output-schema validation and destroys the required routego_open_studio token query.",
+    "wipCheckpoint": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
+    "planningScope": [
+      "openspec/changes/integrate-routego-image-plugin/design.md",
+      "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
+      "openspec/changes/integrate-routego-image-plugin/tasks.md"
+    ],
+    "plannedCorrectionScope": [
+      "packages/creation/src/runtime/mcp/server.ts",
+      "packages/creation/test/mcp.test.ts"
+    ],
+    "planningAuthorized": true,
+    "productCorrectionAuthorized": false,
+    "taskResumeAuthorized": false
   },
   "latestTaskCompletion": {
     "taskId": "4.2",

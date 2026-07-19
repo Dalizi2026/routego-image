@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "77b0d555ae1385639b2d7119ecf7fd2fc837f23945910bd38ef2da7298cfd6bd",
+  "contentSha256": "95fe3fcc2c271297561112181235c37a58bdd04003e691a5ad70b0d15734e6db",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "4.3",
-  "status": "authorized-for-integration-generation-6-sole-apply-owner-not-started",
+  "status": "incomplete-wip-preserved-pd-012-owner-only-openspec-update-authorized-product-locked",
   "sourceCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
   "taskSource": {
     "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
@@ -106,7 +106,28 @@
     "sourceOwnerArchived": true,
     "soleApplyOwner": true,
     "applyAuthorized": true,
-    "started": false
+    "started": true
+  },
+  "planDeviation": {
+    "id": "PD-012",
+    "decision": ".codex/routego-program/deviations/PD-012-task-4.3-creation-mcp-public-success-projection.md",
+    "finding": "Creation MCP diagnostic redaction mutates an already validated public routego_open_studio URL and removes its required one-time token query.",
+    "wipCheckpointCommit": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
+    "wipCheckpointParent": "3ca84ef0868cf6e6e33a32686b76cd300547224e",
+    "wipCheckpointSemantics": "NON_COMPLETION_WIP_SAFETY_CHECKPOINT_ONLY",
+    "planningScope": [
+      "openspec/changes/integrate-routego-image-plugin/design.md",
+      "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
+      "openspec/changes/integrate-routego-image-plugin/tasks.md"
+    ],
+    "planningAuthorized": true,
+    "correctiveAllowedFiles": [
+      "packages/creation/src/runtime/mcp/server.ts",
+      "packages/creation/test/mcp.test.ts"
+    ],
+    "correctiveCodeAuthorized": false,
+    "taskResumeAuthorized": false,
+    "requiredSequence": "Incorporate PD-012 governance, commit and obtain acceptance for the exact owner-only three-file OpenSpec update, then await a separate exact two-file Creation corrective authorization and acceptance before resuming the four task-4.3 files."
   },
   "unresolvedIssues": [],
   "knownRisks": [
