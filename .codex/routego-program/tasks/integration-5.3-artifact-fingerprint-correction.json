@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "4ceccd1ac0cea3740da74938abd12aa5eb253b5b24bea917f8516527d6aecc4a",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "5.3-artifact-fingerprint-correction-during-6.1",
+  "status": "activation-authorized-awaiting-integration-audit",
+  "sourceCommit": "a0f4b3b0c1a051bf136d7aabd44dea701fe3f495",
+  "origin": {
+    "owningTaskId": "5.3",
+    "detectedByTaskId": "6.1",
+    "causedByAcceptedCorrectionTaskId": "2.4",
+    "acceptedTask2_4CorrectionCommit": "a0f4b3b0c1a051bf136d7aabd44dea701fe3f495",
+    "oldAcceptedArtifactManifestSha256": "2b3dc2d607cf6f82891cd3a1a3920e784196dc7d5627d8ad6b1c5ec9aeb2fee5",
+    "newDeterministicArtifactManifestSha256": "8d39ce981d4853416ea280cff8e8f093b9fd5a7cef486b1864a6cbdd11dd3430",
+    "controllerIndependentRebuilds": 2,
+    "controllerIndependentRebuildBytesIdentical": true
+  },
+  "allowedFiles": [
+    "scripts/smoke-plugin-install.mjs"
+  ],
+  "allowedFileMode": "modify exactly the frozen accepted artifact manifest SHA-256 constant after independently rebuilding the corrected self-contained package twice",
+  "forbiddenFileGlobs": [
+    ".codex/routego-program/**",
+    "openspec/**",
+    "tests/browser/**",
+    "packages/**",
+    "scripts/build-plugin-package.mjs",
+    "scripts/verify-plugin-package.mjs",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "requiredBehavior": [
+    "Update the accepted artifact manifest fingerprint only from the prior accepted package hash to the twice-reproduced corrected package hash.",
+    "Retain strict artifact-manifest byte hashing, verifyPluginPackage checks, exact Routego Image name/version checks and wrong-hash rejection.",
+    "Do not trust ignored build residue, bypass the fingerprint, derive acceptance from mutable runtime state, or weaken isolated fresh-Codex smoke assertions.",
+    "Preserve the accepted Task 2.4 correction commit and the three held Task 6.1 test files byte-for-byte."
+  ],
+  "verification": [
+    "build two new clean temporary plugin packages and require byte-identical artifact manifests with SHA-256 8d39ce981d4853416ea280cff8e8f093b9fd5a7cef486b1864a6cbdd11dd3430",
+    "focused install-smoke 5/5",
+    "Integration full tests including all install-smoke cases",
+    "Studio typecheck, unit tests, lib/app builds and unchanged browser 11/11 remain green",
+    "held Task 6.1 focused 16/16 and its three hashes remain unchanged",
+    "root typecheck, tests, build, seven-package exports and repository safety",
+    "fresh OpenSpec apply remains 21/29 and strict validation remains 19/19",
+    "git diff --check and exact one-file corrective implementation scope"
+  ],
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "integrationGeneration": 8,
+    "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "task-5.3-artifact-fingerprint-correction-exact-one-file",
+    "authorizedFiles": [
+      "scripts/smoke-plugin-install.mjs"
+    ],
+    "task6_1Held": true,
+    "task6_1PreservedFiles": [
+      "packages/integration/test/end-to-end.test.ts",
+      "packages/integration/test/security.test.ts",
+      "packages/integration/test/fixtures.ts"
+    ],
+    "started": false
+  },
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "marketplaceAuthorized": false,
+  "realCredentialsOrUserDataAuthorized": false
+}
