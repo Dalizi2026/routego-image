@@ -60,6 +60,8 @@ Same-origin browser `GET` requests commonly omit the CORS `Origin` header. The l
 
 The production composition will provide `serviceHealth` from the running MCP process and Integration HTTP lifecycle. MCP is available while this process serves requests; HTTP and Studio become available only while the loopback host is healthy. Explicit test/service overrides remain authoritative. The installed-package smoke will require `studioAvailable=true` after `routego_open_studio` so a reachable page cannot be rejected by stale default health.
 
+The first-run screen is a connection task, not a capability-debug dashboard. Its primary hierarchy will explain that Studio is used for local configuration while ordinary generation happens directly in Codex, then place API address mode/value, write-only API key, model, and active selection in one visible form. API base is the recommended choice when a provider gives a host/base URL; exact generation endpoint remains available when the provider supplies the complete route. Existing profiles without a key must enter replacement mode automatically. Model catalogue refresh is disabled when no models endpoint exists, and calibration/evidence plus routine defaults/output controls remain available behind clearly named secondary disclosure sections. No disclosure or first-run render performs provider traffic.
+
 Alternative considered: detect preview-specific request headers. Rejected because preview clients do not provide a stable cross-version contract and header heuristics would reproduce the bug in another host. Extending the launch window to the full API session lifetime was also rejected; only the existing short TTL is reusable.
 
 ## Risks / Trade-offs

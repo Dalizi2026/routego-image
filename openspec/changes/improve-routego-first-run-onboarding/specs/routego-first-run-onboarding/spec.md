@@ -75,3 +75,18 @@ The loopback runtime SHALL allow the same valid launch token to retrieve the no-
 #### Scenario: Open production Studio reports live availability
 - **WHEN** `routego_open_studio` has created a healthy loopback host and owning session in the production MCP process
 - **THEN** the authenticated status response SHALL report MCP, HTTP, and Studio availability as true so the Studio entrypoint can continue to Settings or Workbench
+
+### Requirement: First-run configuration is understandable and returns work to Codex
+The first-run Settings destination SHALL present one primary connection form containing a clearly explained API-address mode and value, write-only API key, effective generation model, and active-profile save action. It SHALL state that Studio is the local configuration and advanced-workbench surface while ordinary generation and editing are requested directly in Codex. Developer-oriented model refresh, capability probes, evidence, defaults, output, and multi-profile maintenance SHALL be secondary to the connection task.
+
+#### Scenario: Existing incomplete profile has no key
+- **WHEN** first-run Settings loads an existing profile whose redacted descriptor reports `hasApiKey=false`
+- **THEN** the write-only replacement input SHALL be visible immediately without requiring the user to discover a key-operation control
+
+#### Scenario: Provider has no models endpoint
+- **WHEN** the selected profile has no explicitly configured models endpoint
+- **THEN** Studio SHALL explain that the generation model should be entered directly and SHALL disable model catalogue refresh instead of sending a request that must fail
+
+#### Scenario: User reviews first-run configuration
+- **WHEN** the unconfigured Settings destination is rendered or an advanced section is disclosed
+- **THEN** no provider request, model refresh, capability probe, or generation SHALL occur until the user explicitly submits the corresponding action
