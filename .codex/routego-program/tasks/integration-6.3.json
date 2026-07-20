@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "40cecbf6d1ee5990f2e59d4dea4616d0c2d79e84c2713d8fe5d21c67005f8b9f",
+  "contentSha256": "49cce7b491d70f9aeb67975a9d6fde1ddba86fb4c916a0073ca1b9cf88270882",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "6.3",
@@ -44,7 +44,7 @@
   ],
   "requiredBehavior": [
     "Run the complete offline Integration conformance gate from an identity-marked task-owned clean verification copy of source commit 6c31e961ea63a1033294c1455915e5a58f87e34b.",
-    "Perform frozen dependency installation only as an offline local-store operation with zero downloads; if any package is absent from the local store, stop without fallback, fetch or network access.",
+    "Perform frozen dependency installation only as an offline operation against a task-owned copy of the local store with zero downloads; trust the already-reviewed frozen lockfile to skip pnpm's metadata-dependent supply-chain re-verification, while retaining all store-integrity, repository-safety, dependency and package audits; if any package is absent, stop without fallback, fetch or network access.",
     "Keep HOME, CODEX_HOME, temporary data, package output and browser state inside task-owned temporary roots and do not read or mutate real user, plugin, Library, credential or provider state.",
     "Run strict OpenSpec, repository safety, typecheck, dependency-ordered builds, every package test, exports, browser verification, two reproducible package builds and the fresh installed-process smoke without weakening assertions, thresholds, timeouts or test selection.",
     "Preflight the fixed browser loopback port; if an unrelated process owns it, use an identity-marked temporary copy and free loopback port while preserving authoritative file hashes and mtimes and leaving the external PID unchanged.",
@@ -54,7 +54,7 @@
   ],
   "verification": [
     "fresh OpenSpec apply instructions showing 23/29 with task 6.3 first pending",
-    "offline-only pnpm install --frozen-lockfile in the clean verification copy with zero downloads and fail-closed local-store evidence",
+    "pnpm install --offline --frozen-lockfile --trust-lockfile --store-dir <task-owned-copy>/pnpm-store/v11 in a freshly recreated clean verification copy, with zero downloads and fail-closed local-store evidence",
     "strict OpenSpec validation 19/19",
     "repository safety, complete typecheck and dependency-ordered build",
     "all seven package unit, contract and Integration suites plus seven package exports",
@@ -108,7 +108,7 @@
       "openspec/changes/integrate-routego-image-plugin/tasks.md",
       ".codex/routego-program/threads/integration.json"
     ],
-    "authorizationBaselineControllerHead": "b11dcb2d7f3799991892b6827d0b61ccfa3f2672",
+    "authorizationBaselineControllerHead": "a32d258b52cf25079caaaf16c4f123ce46879c26",
     "started": false
   },
   "ownerRecovery": {
@@ -120,9 +120,20 @@
     "candidateWaitingAcknowledged": true,
     "repositoryReadOrWriteBeforeActivation": false
   },
+  "offlineInstallCorrection": {
+    "observedCommand": "pnpm install --offline --frozen-lockfile --store-dir <task-owned-copy>/pnpm-store/v11",
+    "observedMaterialization": "118 reused, 118 added, 0 downloaded",
+    "observedFailure": "pnpm 11.9 supply-chain lockfile verification attempted registry metadata GETs that were denied; the process was interrupted at the retry boundary with exit 130",
+    "successfulNetworkRequests": 0,
+    "interruptedRootMustBeRemovedBeforeRetry": true,
+    "localSourceEvidence": "pnpm 11.9 documents --trust-lockfile as trusting an already-verified lockfile and skipping only the metadata-dependent minimumReleaseAge/trustPolicy re-verification step"
+  },
   "cleanVerificationCopyRequired": true,
   "offlineFrozenInstallationAuthorized": true,
-  "offlineFrozenInstallationCommand": "pnpm install --offline --frozen-lockfile",
+  "offlineFrozenInstallationCommand": "pnpm install --offline --frozen-lockfile --trust-lockfile --store-dir <task-owned-copy>/pnpm-store/v11",
+  "trustLockfileAuthorized": true,
+  "trustLockfileReason": "pnpm 11.9 otherwise re-applies supply-chain policy through registry metadata GETs even after 118/118 packages are materialized from the offline store; the frozen lockfile is the reviewed source-commit input and all independent safety, integrity, dependency and package gates remain required",
+  "taskOwnedStoreCopyRequired": true,
   "packageFetchAuthorized": false,
   "networkAuthorized": false,
   "remoteCiExecutionAuthorized": false,
