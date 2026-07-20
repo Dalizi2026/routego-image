@@ -1,6 +1,6 @@
 ## 1. Codex First-Run Routing
 
-- [ ] 1.1 `[lane=integration; depends=planning artifacts]` Update the bilingual Skill so an unconfigured generation/edit/batch request opens a fresh Studio session, preserves the requested creative operation for continuation, never requests credentials in chat, and reports launch failure without URL reuse. Add packaged-Skill assertions in `packages/integration/test/package.test.ts`. Allowed implementation files: `skills/routego-image/SKILL.md`, `packages/integration/test/package.test.ts`. Verification: Integration package test, exact seven tool names, package build/verification, no key/path/token text leakage, safety, diff check.
+- [x] 1.1 `[lane=integration; depends=planning artifacts]` Update the bilingual Skill so an unconfigured generation/edit/batch request opens a fresh Studio session, preserves the requested creative operation for continuation, never requests credentials in chat, and reports launch failure without URL reuse. Add packaged-Skill assertions in `packages/integration/test/package.test.ts`. Allowed implementation files: `skills/routego-image/SKILL.md`, `packages/integration/test/package.test.ts`. Verification: 33/33 focused package tests passed; exact seven tool names and secret-safe current-call Studio rules preserved. Implementation commit: `b75c76ae219d02957a96c5ac4369e10050b03184`.
 
 ## 2. Studio First-Run Experience
 
