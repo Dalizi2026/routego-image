@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "49cce7b491d70f9aeb67975a9d6fde1ddba86fb4c916a0073ca1b9cf88270882",
+  "contentSha256": "05504a775d3c254151a0194428756fccd6ffd026d20e40c7958dda2b067a9dd7",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "6.3",
@@ -97,8 +97,8 @@
   "activation": {
     "controllerGeneration": 9,
     "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
-    "integrationGeneration": 9,
-    "integrationThreadId": "019f7d5a-0e1d-7c33-b851-e32e4ef89cf8",
+    "integrationGeneration": 10,
+    "integrationThreadId": "019f7d7c-3351-7c31-a8b2-830c4e3114df",
     "acceptedTask6_2ImplementationCommit": "d180f14e0e959962a1dbc5b5e3c06c690d8e53c4",
     "acceptedTask6_2StateCommit": "6c31e961ea63a1033294c1455915e5a58f87e34b",
     "soleApplyOwner": true,
@@ -108,17 +108,35 @@
       "openspec/changes/integrate-routego-image-plugin/tasks.md",
       ".codex/routego-program/threads/integration.json"
     ],
-    "authorizationBaselineControllerHead": "a32d258b52cf25079caaaf16c4f123ce46879c26",
+    "authorizationBaselineControllerHead": "3ba80998ed45178c8c80b34cc44fb3c2cea33d7d",
     "started": false
   },
   "ownerRecovery": {
-    "sourceIntegrationGeneration": 8,
-    "sourceIntegrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "sourceIntegrationGeneration": 9,
+    "sourceIntegrationThreadId": "019f7d5a-0e1d-7c33-b851-e32e4ef89cf8",
     "sourceAuthorityRevoked": true,
-    "reason": "the source thread is not startable because its stored custom model provider is absent from the current Codex configuration",
+    "reason": "the source thread is irrecoverably waiting on an app approval prompt after requesting loopback escalation; Controller completed the exact read-only loopback gates without escalation",
     "recoveryMode": "same-directory completed-history fork using the current available Codex model provider",
     "candidateWaitingAcknowledged": true,
-    "repositoryReadOrWriteBeforeActivation": false
+    "repositoryReadOrWriteBeforeActivation": false,
+    "priorSourceIntegrationGeneration": 8,
+    "priorSourceIntegrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "priorSourceAuthorityRevoked": true,
+    "priorRecoveryReason": "the generation-8 source thread stored a model provider absent from the current Codex configuration"
+  },
+  "controllerSuppliedConformanceEvidence": {
+    "verificationRoot": "/var/folders/qr/6mq_b0jx4bn0rz9j50rhzlcr0000gn/T/routego-task-6-3-conformance-zIqIHM",
+    "sourceCommit": "6c31e961ea63a1033294c1455915e5a58f87e34b",
+    "offlineInstall": "118 resolved, 118 reused, 118 added, 0 downloaded; exit 0; no registry request or retry",
+    "workspaceTests": "819/819 passed across all seven packages",
+    "packageExports": "all seven packages passed",
+    "pluginSmoke": "two byte-equivalent packages; accepted artifact-manifest SHA 8d39ce981d4853416ea280cff8e8f093b9fd5a7cef486b1864a6cbdd11dd3430; strict temporary-install runtime smoke passed",
+    "browser": "11/11 passed plus streamed core journey repeated 2/2 on isolated loopback port 61369",
+    "browserPortOwner": "unrelated PID 35966 remained unchanged on 4173",
+    "browserTemporaryRootRemoved": true,
+    "authoritativeSourceUnchanged": true,
+    "networkOrFetchOccurred": false,
+    "evidenceAcceptanceRule": "successor must independently verify task-root identity, source HEAD, authoritative Git cleanliness, evidence assertions and cleanup; it may run remaining port-independent audits but must not request app escalation or rerun Controller-supplied localhost gates"
   },
   "offlineInstallCorrection": {
     "observedCommand": "pnpm install --offline --frozen-lockfile --store-dir <task-owned-copy>/pnpm-store/v11",
