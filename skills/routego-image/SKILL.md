@@ -22,9 +22,10 @@ Do not invent another `routego_*` tool or use Studio-only/internal operations.
 
 1. Clarify only missing creative or file-selection details. Never ask for a complete API key or authorization value in chat. 只补充询问缺失的创作或文件选择信息；绝不在对话中索取完整密钥或认证值。
 2. Before generation, editing, batch work, or capability-dependent advice, call `routego_status` with `refreshCapabilities: false`. Inspect `configured`, service health, the selected model, and the relevant capability evidence. 在生成、编辑、批处理或依赖能力的建议之前，先读取状态并核对配置、服务、模型及对应能力证据。
-3. Do not refresh capabilities or confirm a potentially billable probe unless the user explicitly approves that exact action in the current conversation. 未获得用户对本次操作的明确批准，不得刷新能力或确认可能计费的探测。
-4. If the required capability is unknown, unsupported, or degraded, state the verified limitation and stop that dependent operation. Do not imply support or fabricate success. 能力未知、不支持或降级时，说明已验证的限制并停止依赖操作，不得假装支持或伪造成功。
-5. Call the single matching public tool, then report its actual status, partial/final facts, failures, and billing/output-risk facts without hiding them. 调用唯一匹配的公共工具，并如实报告状态、部分/最终结果、失败及计费或输出风险。
+3. If status returns `configured: false`, do not ask for an API key, endpoint, or authorization value in chat. Call `routego_open_studio` once for the current request, present its exact fresh URL as the configuration action, explain that the existing creative request can continue after setup, and stop before any provider or potentially billable operation. If Studio launch fails, report only that current safe failure; never construct or reuse a URL. 若状态返回 `configured: false`，不得在对话中索取 API Key、端点或认证值。应为当前请求调用一次 `routego_open_studio`，把本次返回的新 URL 作为配置入口，说明配置后可继续原创作请求，并在任何提供方或潜在计费操作前停止。若 Studio 打开失败，只报告本次安全错误，不得拼接或复用旧 URL。
+4. Do not refresh capabilities or confirm a potentially billable probe unless the user explicitly approves that exact action in the current conversation. 未获得用户对本次操作的明确批准，不得刷新能力或确认可能计费的探测。
+5. If the required capability is unknown, unsupported, or degraded, state the verified limitation and stop that dependent operation. Do not imply support or fabricate success. 能力未知、不支持或降级时，说明已验证的限制并停止依赖操作，不得假装支持或伪造成功。
+6. Call the single matching public tool, then report its actual status, partial/final facts, failures, and billing/output-risk facts without hiding them. 调用唯一匹配的公共工具，并如实报告状态、部分/最终结果、失败及计费或输出风险。
 
 ## Variants and Batch / 变体与批处理
 
@@ -56,5 +57,6 @@ Do not invent another `routego_*` tool or use Studio-only/internal operations.
 ## Studio / 工作台
 
 - When the user asks for Studio, call `routego_open_studio` for the current request. Use the exact fresh URL from that call immediately. 用户要求打开 Studio 时，必须为当前请求调用工具，并立即使用本次返回的新 URL。
+- An unconfigured generation, edit, batch, or capability-dependent request also requires a fresh `routego_open_studio` call under Operating Flow step 3, even when the user did not explicitly name Studio. 未配置时，即使用户没有明确提到 Studio，生成、编辑、批处理或能力相关请求也必须按操作流程第 3 步打开一次新的 Studio。
 - Never reuse a Studio URL or token from an earlier call, persist it, expose it as a general credential, or construct one manually. 不得复用、持久化、当作通用凭证暴露或手工拼接旧的 Studio URL 或令牌。
 - A Studio launch result is success only when the current call validates it; otherwise report the current failure without substitution. 只有本次调用验证通过才算打开成功，否则如实报告当前失败，不得替换为旧结果。

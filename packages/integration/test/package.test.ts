@@ -97,6 +97,16 @@ describe("Routego Image plugin package", () => {
     expect(first.files).toContain("THIRD_PARTY_NOTICES.md");
     expect(first.files).toContain("licenses/pngjs-MIT.txt");
 
+    const packagedSkill = await readFile(
+      path.join(firstPackage, "skills/routego-image/SKILL.md"),
+      "utf8"
+    );
+    expect(packagedSkill).toContain("If status returns `configured: false`");
+    expect(packagedSkill).toContain("若状态返回 `configured: false`");
+    expect(packagedSkill).toContain("Call `routego_open_studio` once for the current request");
+    expect(packagedSkill).toContain("不得在对话中索取 API Key、端点或认证值");
+    expect(packagedSkill).toContain("never construct or reuse a URL");
+
     const logo = await readPng(firstPackage, "assets/logo.png");
     const composerIcon = await readPng(firstPackage, "assets/composer-icon.png");
     expect([logo.width, logo.height]).toEqual([512, 512]);
