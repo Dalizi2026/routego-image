@@ -20,7 +20,7 @@ import { pathToFileURL } from "node:url";
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 export const ACCEPTED_ARTIFACT_MANIFEST_SHA256 =
-  "b4446e70f99dccbf0b2f4dd30b938cdbe82e604d99ec3ad9d5189b6e8cc78fe0";
+  "6e977c145c581ddc083e7352799b8d2a5e7451b3505bc7ffd702bd900f2a058b";
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
@@ -348,6 +348,15 @@ function studioHeaders(origin, sessionToken, json = false) {
   };
 }
 
+function browserReadHeaders(sessionToken) {
+  return {
+    "sec-fetch-site": "same-origin",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-dest": "empty",
+    "x-routego-session": sessionToken
+  };
+}
+
 async function exerciseStudio(urlText, installedPackage, folderId) {
   const launchUrl = new URL(urlText);
   if (launchUrl.protocol !== "http:" || launchUrl.hostname !== "127.0.0.1" ||
@@ -391,7 +400,7 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
 
   const status = await checkedJson(await fetch(
     new URL("/api/v1/status?refreshCapabilities=false", origin),
-    { headers: studioHeaders(origin, bootstrapSession) }
+    { headers: browserReadHeaders(bootstrapSession) }
   ));
   if (status.configured !== false || status.service?.status !== "ready") {
     fail("Studio offline status is not ready and unconfigured");

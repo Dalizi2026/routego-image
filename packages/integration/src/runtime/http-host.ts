@@ -154,6 +154,32 @@ function header(request: RoutegoHttpRequest, name: string): string | undefined {
   return request.headers[name.toLowerCase()];
 }
 
+function withBrowserSameOrigin(
+  request: RoutegoHttpRequest,
+  expectedOrigin: string
+): RoutegoHttpRequest {
+  if (header(request, "origin") !== undefined || (header(request, "cookie") ?? "").trim() !== "") {
+    return request;
+  }
+  const fetchSite = (header(request, "sec-fetch-site") ?? "").trim().toLowerCase();
+  const fetchMode = (header(request, "sec-fetch-mode") ?? "").trim().toLowerCase();
+  const fetchDestination = (header(request, "sec-fetch-dest") ?? "").trim().toLowerCase();
+  const expectedHost = new URL(expectedOrigin).host.toLowerCase();
+  const presentedHost = (header(request, "host") ?? "").trim().toLowerCase();
+  if (
+    fetchSite !== "same-origin" ||
+    (fetchMode !== "cors" && fetchMode !== "same-origin") ||
+    fetchDestination !== "empty" ||
+    presentedHost !== expectedHost
+  ) {
+    return request;
+  }
+  return {
+    ...request,
+    headers: { ...request.headers, origin: expectedOrigin }
+  };
+}
+
 function safeJsonForInlineScript(value: unknown): string {
   return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
@@ -397,7 +423,7 @@ export class IntegrationLoopbackHttpHost {
         : { extensionHandler: this.#options.extensionHandler }),
       ...(this.#options.logger === undefined ? {} : { logger: this.#options.logger })
     });
-    return dispatcher.dispatch(request);
+    return dispatcher.dispatch(withBrowserSameOrigin(request, address.origin));
   }
 
   #bootstrap(request: RoutegoHttpRequest, method: string): RoutegoHttpResponse {

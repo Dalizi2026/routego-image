@@ -278,6 +278,18 @@ describe("IntegrationLoopbackHttpHost", () => {
         expect(accepted.headers.get("access-control-allow-credentials")).toBeNull();
         expect(await accepted.json()).toMatchObject({ configured: false });
 
+        const browserAccepted = await fetch(api, {
+          headers: {
+            "sec-fetch-site": "same-origin",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-dest": "empty",
+            "x-routego-session": first.session.sessionToken
+          }
+        });
+        expect(browserAccepted.status).toBe(200);
+        expect(browserAccepted.headers.get("access-control-allow-origin")).toBe(host.address!.origin);
+        expect(await browserAccepted.json()).toMatchObject({ configured: false });
+
         const preflight = await fetch(api, {
           method: "OPTIONS",
           headers: {
@@ -290,15 +302,55 @@ describe("IntegrationLoopbackHttpHost", () => {
         expect(preflight.headers.get("access-control-allow-origin")).toBe(host.address!.origin);
         expect(preflight.headers.get("access-control-allow-origin")).not.toBe("*");
 
-        for (const headers of [
-          { origin: host.address!.origin, "x-routego-session": first.session.launchToken },
-          { origin: "https://example.invalid", "x-routego-session": first.session.sessionToken },
-          { origin: host.address!.origin, "x-routego-session": first.session.sessionToken, cookie: "sid=forbidden" }
+        for (const { label, headers } of [
+          {
+            label: "launch token",
+            headers: { origin: host.address!.origin, "x-routego-session": first.session.launchToken }
+          },
+          {
+            label: "foreign origin",
+            headers: { origin: "https://example.invalid", "x-routego-session": first.session.sessionToken }
+          },
+          {
+            label: "cookie",
+            headers: { origin: host.address!.origin, "x-routego-session": first.session.sessionToken, cookie: "sid=forbidden" }
+          },
+          {
+            label: "missing browser metadata",
+            headers: { "x-routego-session": first.session.sessionToken }
+          },
+          {
+            label: "cross-site metadata",
+            headers: {
+              "sec-fetch-site": "cross-site",
+              "sec-fetch-mode": "cors",
+              "sec-fetch-dest": "empty",
+              "x-routego-session": first.session.sessionToken
+            }
+          }
         ]) {
           const denied = await fetch(api, { headers });
-          expect(denied.status).toBe(403);
+          expect(denied.status, label).toBe(403);
           expect(await denied.text()).not.toContain(first.session.sessionToken);
         }
+
+        const mismatchedHostStatus = await new Promise<number | undefined>((resolve, reject) => {
+          const request = httpRequest(api, {
+            headers: {
+              host: "evil.example",
+              "sec-fetch-site": "same-origin",
+              "sec-fetch-mode": "cors",
+              "sec-fetch-dest": "empty",
+              "x-routego-session": first.session.sessionToken
+            }
+          }, (response) => {
+            response.resume();
+            resolve(response.statusCode);
+          });
+          request.once("error", reject);
+          request.end();
+        });
+        expect(mismatchedHostStatus).toBe(403);
 
         const second = await host.openStudioSession();
         expect(second.result.reused).toBe(true);
