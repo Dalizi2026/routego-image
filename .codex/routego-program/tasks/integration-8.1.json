@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "d4173b6a6fa5804c9f00ff07eeea64dc5d7af98d46fb19d89720c06662998e0a",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "8.1",
+  "status": "materialized-awaiting-worker-health-and-controller-activation",
+  "sourceCommit": "a8b8292b787fd51d6b9c7d2cee218dc9df384b60",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "33f20495a136925d3d50b870c0516623b9c688cea8d57b51c50b36d1452830f9",
+    "lineSha256": "5c98619cd84297f2ae69f9015eccf0b902b7d49695f213db8ae11b22a185f283",
+    "lineBytes": 1053
+  },
+  "dependencies": ["7.1"],
+  "dependencyCommits": {
+    "task7_1Implementation": "81ae43022e9e6b880da41ca3c0f63b100d5042c9",
+    "task7_1TaskState": "c13303c206bf4c301710835ee7f0bc0f80505d68",
+    "task7_2Result": "f1da1a2288506d48f621bdc8e3429ad01fb98ac2",
+    "task7_2ControllerAcceptance": "f055e8006a3e2832695e82c03db092ba663d9262",
+    "task7_2IntegrationReadback": "a8b8292b787fd51d6b9c7d2cee218dc9df384b60"
+  },
+  "allowedFiles": [
+    "scripts/stage-routego-release.mjs",
+    "scripts/rollback-routego-release.mjs",
+    "docs/release/routego-image-1.0.md",
+    "packages/integration/test/release-workflow.test.ts"
+  ],
+  "allowedParentDirectoriesToCreate": ["docs/release"],
+  "forbiddenFileGlobs": [
+    ".codex-plugin/**",
+    ".github/**",
+    ".agents/**",
+    ".codex/**",
+    "openspec/**",
+    "packages/**/src/**",
+    "packages/**/test/**",
+    "!packages/integration/test/release-workflow.test.ts",
+    "scripts/**",
+    "!scripts/stage-routego-release.mjs",
+    "!scripts/rollback-routego-release.mjs",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "requiredBehavior": [
+    "Use the plugin-creator cachebuster policy and helper-driven marketplace name discovery in the documented release checklist; never hand-edit marketplace configuration.",
+    "Prepare but do not execute cachebuster updates, codex plugin add, marketplace changes, target installation replacement, deployment, publication or release.",
+    "Stage only an already built and verified package into a task-owned temporary root, require an exact accepted artifact-manifest hash, compute bounded content evidence, and refuse changed or unverified input.",
+    "Model the approved future switch as same-filesystem staged atomic renames with a dated rollback archive; never overwrite or delete the only recoverable prior plugin copy.",
+    "Require explicit release authorization binding the staged artifact, target, marketplace action, downtime, backup, rollback and publication scope before any non-dry-run mutation.",
+    "On post-switch verification failure, prepare automatic atomic restoration of the archived plugin and a fresh-task verification result; preserve evidence and stop if rollback also fails.",
+    "Keep legacy configuration, images and unrelated Library roots immutable by fingerprinting synthetic sentinels before and after every dry-run scenario.",
+    "Keep evidence redacted and path-bounded: no credentials, authorization headers, session tokens, user images, real HOME, real CODEX_HOME or unrestricted absolute paths.",
+    "Run all Task 8.1 verification only in identity-marked temporary directories and remove only roots bearing the task ownership marker."
+  ],
+  "verification": [
+    "fresh OpenSpec apply showing 26/29 with Task 8.1 first pending and strict validation 19/19",
+    "plugin-creator cachebuster helper dry validation and checklist consistency without marketplace or plugin mutation",
+    "focused temporary-directory simulations for stage, accepted-hash mismatch, partial write, atomic switch, fresh-task success, post-switch failure, rollback success and rollback failure preservation",
+    "legacy synthetic sentinel content, SHA-256 and mtime immutability across stage, switch, verification and rollback simulations",
+    "release evidence redaction, bounded relative identities, ownership-marker cleanup and refusal to touch unowned roots",
+    "node syntax, focused Integration tests, Integration typecheck, repository safety, git diff --check and exact four-file scope"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/plugin-release-and-rollback/spec.md",
+      "sha256": "45f140231ccb68f29726fecc86fc9a9610ec66a5898220bcc94758097f26ce42",
+      "bytes": 4898
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/design.md",
+      "sha256": "c18cea8279f73e6089726671dfd915237091120439a33166df7e91a073409f6a",
+      "bytes": 28797
+    }
+  ],
+  "implementationReferences": [
+    {
+      "path": "scripts/build-plugin-package.mjs",
+      "sha256": "92d69cca1652e8a17e10fd524766073c4f365f0e01c31f4f451450333ec6a829"
+    },
+    {
+      "path": "scripts/verify-plugin-package.mjs",
+      "sha256": "3dca0e3ad9ec5afafa4fc467987b62235b1eb48fa8085bb8baeacfac7ddfbe7d"
+    },
+    {
+      "path": "scripts/smoke-plugin-install.mjs",
+      "sha256": "20eda202ee0689d47feffd024685a101c81057c80c41c604a963173c4ced2ca8"
+    }
+  ],
+  "pluginCreator": {
+    "skillRead": true,
+    "installingAndUpdatingReferenceRead": true,
+    "cachebusterHelper": "/Users/dalizi/.codex/skills/.system/plugin-creator/scripts/update_plugin_cachebuster.py",
+    "marketplaceNameHelper": "/Users/dalizi/.codex/skills/.system/plugin-creator/scripts/read_marketplace_name.py",
+    "realHelperExecutionAuthorized": false
+  },
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "authorization": {
+    "userInstruction": "continue automatic development flow and restore OpenSpec tooling",
+    "interpretedScope": "prepare and verify the release and rollback workflow entirely offline without touching installed plugins, marketplaces or user state",
+    "networkOrFetchAuthorized": false,
+    "credentialReadAuthorized": false,
+    "externalStateAuthorized": false,
+    "realHomeOrCodexHomeAuthorized": false,
+    "targetPluginInstallationAuthorized": false,
+    "marketplaceMutationAuthorized": false,
+    "deploymentPublicationOrReleaseAuthorized": false
+  },
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "integrationGeneration": 11,
+    "integrationThreadId": "019f7d87-61ac-79e2-bd98-51c75be002e1",
+    "soleApplyOwner": false,
+    "applyAuthorized": false,
+    "workerHealthRequired": true,
+    "started": false
+  },
+  "networkAuthorized": false,
+  "packageInstallAuthorized": false,
+  "remoteCiExecutionAuthorized": false,
+  "externalStateAuthorized": false,
+  "realCredentialsOrUserDataAuthorized": false,
+  "marketplaceOrTargetInstallAuthorized": false,
+  "deploymentPublicationOrReleaseAuthorized": false
+}
