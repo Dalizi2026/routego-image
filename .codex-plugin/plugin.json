@@ -24,6 +24,8 @@
       "Check Routego status, then generate an image from my prompt.",
       "编辑这张图片，并保留我指定的内容。",
       "Open Routego Image Studio for the current session."
-    ]
+    ],
+    "composerIcon": "./assets/composer-icon.png",
+    "logo": "./assets/logo.png"
   }
 }

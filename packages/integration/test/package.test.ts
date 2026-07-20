@@ -6,6 +6,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 
+import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
@@ -18,6 +19,27 @@ const execFileAsync = promisify(execFile);
 
 interface ArtifactManifest {
   files: Array<{ path: string; bytes: number; sha256: string }>;
+}
+
+async function readPng(packageRoot: string, relativeFile: string): Promise<PNG> {
+  return PNG.sync.read(await readFile(path.join(packageRoot, ...relativeFile.split("/"))));
+}
+
+function cornerAlpha(png: PNG): number[] {
+  return [
+    png.data[3]!,
+    png.data[(png.width - 1) * 4 + 3]!,
+    png.data[((png.height - 1) * png.width) * 4 + 3]!,
+    png.data[(png.width * png.height - 1) * 4 + 3]!
+  ];
+}
+
+function foregroundRatio(png: PNG): number {
+  let foreground = 0;
+  for (let index = 3; index < png.data.length; index += 4) {
+    if (png.data[index]! > 12) foreground += 1;
+  }
+  return foreground / (png.width * png.height);
 }
 
 async function rewriteFileAndManifest(
@@ -69,8 +91,21 @@ describe("Routego Image plugin package", () => {
     expect(first.contentManifest).toEqual(second.contentManifest);
     expect(first.files).toContain("runtime/index.js");
     expect(first.files).toContain("runtime/studio-assets.json");
+    expect(first.files).toContain("assets/composer-icon.png");
+    expect(first.files).toContain("assets/logo.png");
     expect(first.files).toContain("THIRD_PARTY_NOTICES.md");
     expect(first.files).toContain("licenses/pngjs-MIT.txt");
+
+    const logo = await readPng(firstPackage, "assets/logo.png");
+    const composerIcon = await readPng(firstPackage, "assets/composer-icon.png");
+    expect([logo.width, logo.height]).toEqual([512, 512]);
+    expect([composerIcon.width, composerIcon.height]).toEqual([128, 128]);
+    expect(cornerAlpha(logo)).toEqual([0, 0, 0, 0]);
+    expect(cornerAlpha(composerIcon)).toEqual([0, 0, 0, 0]);
+    expect(foregroundRatio(logo)).toBeGreaterThan(0.25);
+    expect(foregroundRatio(logo)).toBeLessThan(0.35);
+    expect(foregroundRatio(composerIcon)).toBeGreaterThan(0.25);
+    expect(foregroundRatio(composerIcon)).toBeLessThan(0.35);
   });
 
   it("loads the bundled runtime without workspace or package imports", async () => {

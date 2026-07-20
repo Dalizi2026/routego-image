@@ -39,11 +39,15 @@ const ACCEPTED_PLUGIN_MANIFEST = {
       "Check Routego status, then generate an image from my prompt.",
       "编辑这张图片，并保留我指定的内容。",
       "Open Routego Image Studio for the current session."
-    ]
+    ],
+    composerIcon: "./assets/composer-icon.png",
+    logo: "./assets/logo.png"
   }
 };
 const EXACT_FILES = new Set([
   ".codex-plugin/plugin.json",
+  "assets/composer-icon.png",
+  "assets/logo.png",
   "skills/routego-image/SKILL.md",
   "scripts/start-routego-image.mjs",
   "runtime/index.js",

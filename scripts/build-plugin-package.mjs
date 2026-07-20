@@ -27,6 +27,8 @@ const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_REPOSITORY_ROOT = path.resolve(SCRIPT_DIRECTORY, "..");
 const STATIC_SOURCE_FILES = [
   [".codex-plugin/plugin.json", ".codex-plugin/plugin.json"],
+  ["assets/composer-icon.png", "assets/composer-icon.png"],
+  ["assets/logo.png", "assets/logo.png"],
   ["skills/routego-image/SKILL.md", "skills/routego-image/SKILL.md"],
   ["scripts/start-routego-image.mjs", "scripts/start-routego-image.mjs"],
   ["THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"],
