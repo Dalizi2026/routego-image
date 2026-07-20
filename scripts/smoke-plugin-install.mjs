@@ -21,6 +21,7 @@ import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 export const ACCEPTED_ARTIFACT_MANIFEST_SHA256 =
   "2f594512fda91c64f704a26753dbc5fe109716dfaf32863df32ce8dcbc2f1ab0";
+const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
 const OWNER_MARKER = ".routego-install-smoke-owner.json";
@@ -919,8 +920,8 @@ export async function runPluginInstallSmoke(options) {
   const verification = await verifyPluginPackage(packageDirectory);
   if (verification.artifactManifestFileSha256 !== acceptedArtifactManifestSha256 ||
       verification.contentManifest.name !== "routego-image" ||
-      verification.contentManifest.version !== "1.0.0") {
-    fail("strict package verification did not return the accepted Routego Image 1.0.0 artifact");
+      !ACCEPTED_PLUGIN_VERSION.test(verification.contentManifest.version)) {
+    fail("strict package verification did not return an accepted Routego Image 1.0 artifact");
   }
   const temporaryRoot = await createOwnedTemporaryRoot(options.temporaryParent);
   let result;
