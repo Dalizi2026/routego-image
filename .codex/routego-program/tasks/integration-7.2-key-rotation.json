@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "cdc37e37f8ddfef2c15fb95387ba5e09b880c4087d30a61eb5d6bb4b946833a1",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "7.2-key-rotation-amendment",
+  "status": "materialized-awaiting-controller-reactivation",
+  "sourceCommit": "836e64458f7a1ee1a5bf427c14e4a322777a47b3",
+  "parentCapsuleCommit": "4c2cac247fe4b2842fd679162b87007b74560fbf",
+  "userInstruction": "Failed requests do not consume successful capability quotas; alternate the distinct primary and backup credentials.",
+  "allowedFiles": [
+    "docs/acceptance/routego-image-real-relay-result.md",
+    "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    ".codex/routego-program/threads/integration.json"
+  ],
+  "allowedExternalRoots": [
+    "/Users/dalizi/Documents/Routego-Private-Relay-Test"
+  ],
+  "requiredBehavior": [
+    "Read both credentials only inside the private runner and verify they are present and distinct without printing or persisting either credential.",
+    "Use the backup credential for the next text-generation attempt because the corrected endpoint has already been attempted with the primary credential.",
+    "Alternate credential slots after every raw request while recording only primary or backup slot labels in private and redacted evidence.",
+    "Count only successful accepted outputs toward per-class success quotas; always count failed requests in raw request evidence, mayHaveBilled and the USD 10 cost-risk ceiling.",
+    "For a single-output case with no output, allow at most one attempt per credential slot. If both credential slots fail, stop the case and the run.",
+    "Never replay partial batch work, any request that produced output, or a request after the cost, expiry, cancellation or evidence gate closes.",
+    "Keep all credentials, full URLs, authorization headers, raw responses and image bytes outside the repository."
+  ],
+  "authorization": {
+    "confirmedAt": "2026-07-20T14:57:00+08:00",
+    "expiresAt": "2026-07-20T18:00:00+08:00",
+    "providerDisplayName": "lnm生图",
+    "profileId": "lnm",
+    "model": "gpt-image-2",
+    "endpointFingerprint": "20f9071f870fd7bf6a3a024dc04cb1996e0c5f1e96d2c17a30f5d8c1b2d11a8d",
+    "privateFormSha256": "00ec5c9101b838c67da354606a8cf4ca4a82dbb6141f2696ae3a98a23811f4d0",
+    "credentialSlots": ["primary", "backup"],
+    "credentialsVerifiedDistinct": true,
+    "successfulQuotaMaximumPerClass": [3, 3, 3, 3, 3, 3],
+    "requiredSuccessfulMatrix": [1, 1, 1, 1, 3, 1],
+    "priorRawRequestCount": 2,
+    "priorSuccessfulRequestCount": 0,
+    "priorReservedCostRiskUsd": 2.34,
+    "maximumNewRawRequests": 8,
+    "newPerRequestCostRiskUsd": 0.95,
+    "maximumNewReservedCostRiskUsd": 7.6,
+    "maximumCombinedReservedCostRiskUsd": 9.94,
+    "hardCostCeilingUsd": 10,
+    "credentialReadAuthorized": true,
+    "syntheticInputsAuthorized": true,
+    "potentialChargesAuthorized": true,
+    "networkAuthorized": true,
+    "credentialRotationAuthorized": true,
+    "failureConsumesSuccessfulQuota": false
+  },
+  "executionMode": "controller-direct-main-agent-recovery-under-current-user-instruction",
+  "workerRemainsFrozen": true,
+  "realUserLibraryAuthorized": false,
+  "realHomeOrCodexHomeAuthorized": false,
+  "installationMarketplaceDeploymentReleaseAuthorized": false
+}
