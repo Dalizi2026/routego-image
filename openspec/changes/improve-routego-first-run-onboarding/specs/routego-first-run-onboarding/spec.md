@@ -71,3 +71,7 @@ The loopback runtime SHALL allow the same valid launch token to retrieve the no-
 - **WHEN** a Studio API read omits `Origin` but presents the exact listener `Host`, same-origin Fetch Metadata with an empty destination, no cookie, and the valid owning API session token
 - **THEN** the loopback host SHALL authorize it as its exact own origin
 - **AND** an explicit foreign origin, cross-site or missing Fetch Metadata, mismatched host, cookie, or invalid token SHALL remain rejected
+
+#### Scenario: Open production Studio reports live availability
+- **WHEN** `routego_open_studio` has created a healthy loopback host and owning session in the production MCP process
+- **THEN** the authenticated status response SHALL report MCP, HTTP, and Studio availability as true so the Studio entrypoint can continue to Settings or Workbench

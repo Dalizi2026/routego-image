@@ -58,6 +58,8 @@ The bootstrap HTML injects the owning API session as a frozen `__ROUTEGO_STUDIO_
 
 Same-origin browser `GET` requests commonly omit the CORS `Origin` header. The loopback host will infer its own exact origin only when `Host` equals the active listener, `Sec-Fetch-Site` is `same-origin`, `Sec-Fetch-Dest` is `empty`, the fetch mode is `cors` or `same-origin`, cookies are absent, and the API session token is valid. Requests with an explicit foreign origin, cross-site Fetch Metadata, a mismatched host, missing browser metadata, cookies, or a bad token remain rejected. Installation smoke will exercise this browser-shaped request instead of manually adding `Origin`.
 
+The production composition will provide `serviceHealth` from the running MCP process and Integration HTTP lifecycle. MCP is available while this process serves requests; HTTP and Studio become available only while the loopback host is healthy. Explicit test/service overrides remain authoritative. The installed-package smoke will require `studioAvailable=true` after `routego_open_studio` so a reachable page cannot be rejected by stale default health.
+
 Alternative considered: detect preview-specific request headers. Rejected because preview clients do not provide a stable cross-version contract and header heuristics would reproduce the bug in another host. Extending the launch window to the full API session lifetime was also rejected; only the existing short TTL is reusable.
 
 ## Risks / Trade-offs
