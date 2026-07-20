@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "6699d0886ff3212e87f0cd983b6a9b78dc6d44dc756e80ab41e87c0280673916",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "7.2-zayuapi-provider-switch",
+  "status": "materialized-awaiting-controller-activation",
+  "sourceCommit": "c773c5cb22593dfa2101f01fc08200f6d6d32dea",
+  "parentCapsuleCommit": "847ad4d7d71c26e5f3ba94e03b733a5298bbeb37",
+  "userInstruction": "Try the user-provided zayuapi test-only credential at its normalized legacy API base endpoint; failed requests do not consume successful capability quotas.",
+  "allowedFiles": [
+    "docs/acceptance/routego-image-real-relay-result.md",
+    "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    ".codex/routego-program/threads/integration.json"
+  ],
+  "allowedExternalRoots": [
+    "/Users/dalizi/Documents/Routego-Private-Relay-Test"
+  ],
+  "requiredBehavior": [
+    "Read the single test-only credential only inside the private runner and never print or persist its value outside the private form.",
+    "Call only the exact normalized image-generation endpoint bound by the endpoint fingerprint; do not probe models, edits, responses or sibling endpoints.",
+    "Run text generation first with no automatic retry. Stop immediately without starting another matrix case if it produces no accepted image.",
+    "Only after text generation succeeds, run the remaining approved synthetic matrix in order within the raw-request and cost-risk ceilings.",
+    "Count only successful accepted outputs toward per-class success quotas; count every raw request in mayHaveBilled and the USD 10 cost-risk ceiling.",
+    "Allow at most ten minutes per case and never replay partial batch work or any request that produced output.",
+    "Keep the credential, full URL, authorization header, raw responses and image bytes outside the repository."
+  ],
+  "authorization": {
+    "confirmedAt": "2026-07-20T15:00:00+08:00",
+    "expiresAt": "2026-07-20T18:00:00+08:00",
+    "providerDisplayName": "zayuapi",
+    "profileId": "zayuapi-test",
+    "model": "gpt-image-2",
+    "endpointFingerprint": "3435fd43c547a9947b36fe2842b67bbd1b583f86df3f2421cd916126ceef961d",
+    "privateFormSha256": "dc37b985621394b3f570f7ea19560607dbae62190550b97f8129c2be6d2c3e1d",
+    "credentialSlots": ["test"],
+    "successfulQuotaMaximumPerClass": [3, 3, 3, 3, 3, 3],
+    "requiredSuccessfulMatrix": [1, 1, 1, 1, 3, 1],
+    "priorRawRequestCount": 3,
+    "priorSuccessfulRequestCount": 0,
+    "priorReservedCostRiskUsd": 3.29,
+    "maximumNewRawRequests": 8,
+    "newPerRequestCostRiskUsd": 0.8,
+    "maximumNewReservedCostRiskUsd": 6.4,
+    "maximumCombinedReservedCostRiskUsd": 9.69,
+    "hardCostCeilingUsd": 10,
+    "credentialReadAuthorized": true,
+    "syntheticInputsAuthorized": true,
+    "potentialChargesAuthorized": true,
+    "networkAuthorized": true,
+    "automaticRetryAuthorized": false,
+    "failureConsumesSuccessfulQuota": false
+  },
+  "executionMode": "controller-direct-main-agent-recovery-under-current-user-instruction",
+  "workerRemainsFrozen": true,
+  "realUserLibraryAuthorized": false,
+  "realHomeOrCodexHomeAuthorized": false,
+  "installationMarketplaceDeploymentReleaseAuthorized": false
+}
