@@ -77,15 +77,19 @@ The loopback runtime SHALL allow the same valid launch token to retrieve the no-
 - **THEN** the authenticated status response SHALL report MCP, HTTP, and Studio availability as true so the Studio entrypoint can continue to Settings or Workbench
 
 ### Requirement: First-run configuration is understandable and returns work to Codex
-The first-run Settings destination SHALL present one primary connection form containing a clearly explained API-address mode and value, write-only API key, effective generation model, and active-profile save action. It SHALL state that Studio is the local configuration and advanced-workbench surface while ordinary generation and editing are requested directly in Codex. Developer-oriented model refresh, capability probes, evidence, defaults, output, and multi-profile maintenance SHALL be secondary to the connection task.
+The first-run Settings destination SHALL present one primary connection form containing only the provider call endpoint, write-only API key, and an explicit connect-and-fetch-models action. Endpoint mode and candidate models-route derivation SHALL remain internal. After a successful refresh, Studio SHALL present a compact returned-model selector and finish action. It SHALL state that Studio is the local configuration surface while ordinary generation and editing are requested directly in Codex. Developer-oriented profiles, endpoint variants, probes, evidence, defaults, and output controls SHALL NOT appear in first run.
 
 #### Scenario: Existing incomplete profile has no key
 - **WHEN** first-run Settings loads an existing profile whose redacted descriptor reports `hasApiKey=false`
 - **THEN** the write-only replacement input SHALL be visible immediately without requiring the user to discover a key-operation control
 
-#### Scenario: Provider has no models endpoint
-- **WHEN** the selected profile has no explicitly configured models endpoint
-- **THEN** Studio SHALL explain that the generation model should be entered directly and SHALL disable model catalogue refresh instead of sending a request that must fail
+#### Scenario: User connects and fetches upstream models
+- **WHEN** the user supplies a valid call endpoint and key and explicitly selects connect-and-fetch-models
+- **THEN** Studio SHALL save the write-only connection, use the internally derived models route for one non-billable model refresh, and present returned models for selection without generating an image
+
+#### Scenario: Upstream model fetch fails safely
+- **WHEN** the explicitly requested model refresh fails or returns no models
+- **THEN** Studio SHALL preserve the saved connection, show a concise safe error and manual-model fallback, and SHALL NOT retry, probe capabilities, or generate an image
 
 #### Scenario: User reviews first-run configuration
 - **WHEN** the unconfigured Settings destination is rendered or an advanced section is disclosed
