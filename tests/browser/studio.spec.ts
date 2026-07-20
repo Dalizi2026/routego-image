@@ -18,6 +18,7 @@ import {
 } from "./harness";
 
 test.describe.configure({ mode: "serial" });
+test.use({ baseURL: STUDIO_BASE_URL });
 
 const localBrowserFallback = [
   process.env["PROGRAMFILES"] === undefined
@@ -422,7 +423,7 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
   await expect(page.getByText("正在显影工作区")).toBeVisible();
   await readyNavigation;
   await expect(page.getByRole("heading", { name: "把想法放进显影盘" })).toBeVisible();
-  await expect(page).toHaveURL("http://127.0.0.1:4173/");
+  await expect(page).toHaveURL(`${STUDIO_BASE_URL}/`);
   await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toBeVisible();
 
   await page.getByLabel("提示词").fill("保留语言切换前的草稿");

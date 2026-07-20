@@ -10,7 +10,11 @@ import type { Page, Request as PlaywrightRequest } from "@playwright/test";
 const execFileAsync = promisify(execFile);
 
 export const STUDIO_SESSION_TOKEN = "routego-studio-synthetic-session-token";
-export const STUDIO_BASE_URL = "http://127.0.0.1:4173";
+const configuredStudioPort = Number.parseInt(process.env["ROUTEGO_STUDIO_TEST_PORT"] ?? "", 10);
+const studioPort = Number.isInteger(configuredStudioPort) && configuredStudioPort > 0 && configuredStudioPort <= 65_535
+  ? configuredStudioPort
+  : 42_000 + (process.pid % 2_000);
+export const STUDIO_BASE_URL = `http://127.0.0.1:${studioPort}`;
 
 const repositoryRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -94,8 +98,20 @@ export async function startStudioServer(): Promise<StudioServer> {
   const command = process.platform === "win32" ? process.env["ComSpec"] ?? "cmd.exe" : "pnpm";
   const args =
     process.platform === "win32"
-      ? ["/d", "/s", "/c", "pnpm --filter @routego-image/studio dev"]
-      : ["--filter", "@routego-image/studio", "dev"];
+      ? [
+          "/d",
+          "/s",
+          "/c",
+          `pnpm --filter @routego-image/studio dev --port ${studioPort} --strictPort`
+        ]
+      : [
+          "--filter",
+          "@routego-image/studio",
+          "dev",
+          "--port",
+          String(studioPort),
+          "--strictPort"
+        ];
   const child = spawn(command, args, {
     cwd: repositoryRoot,
     env: {
