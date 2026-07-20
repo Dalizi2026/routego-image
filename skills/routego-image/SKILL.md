@@ -56,6 +56,7 @@ Do not invent another `routego_*` tool or use Studio-only/internal operations.
 
 ## Studio / 工作台
 
+- When the user asks to configure Routego Image or later change a provider, endpoint, model, API key, defaults, or output directory, call `routego_open_studio` for the current request and direct them to Settings. Do not ask them to paste a key or authorization value in chat. 用户首次配置或后续要求修改提供方、端点、模型、API Key、默认参数或输出目录时，必须为当前请求调用 `routego_open_studio` 并引导进入“设置”；不得要求用户在对话中粘贴密钥或认证值。
 - When the user asks for Studio, call `routego_open_studio` for the current request. Use the exact fresh URL from that call immediately. 用户要求打开 Studio 时，必须为当前请求调用工具，并立即使用本次返回的新 URL。
 - An unconfigured generation, edit, batch, or capability-dependent request also requires a fresh `routego_open_studio` call under Operating Flow step 3, even when the user did not explicitly name Studio. 未配置时，即使用户没有明确提到 Studio，生成、编辑、批处理或能力相关请求也必须按操作流程第 3 步打开一次新的 Studio。
 - Never reuse a Studio URL or token from an earlier call, persist it, expose it as a general credential, or construct one manually. 不得复用、持久化、当作通用凭证暴露或手工拼接旧的 Studio URL 或令牌。

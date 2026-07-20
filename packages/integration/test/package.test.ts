@@ -97,6 +97,16 @@ describe("Routego Image plugin package", () => {
     expect(first.files).toContain("THIRD_PARTY_NOTICES.md");
     expect(first.files).toContain("licenses/pngjs-MIT.txt");
 
+    const packagedManifest = JSON.parse(
+      await readFile(path.join(firstPackage, ".codex-plugin/plugin.json"), "utf8")
+    ) as { interface: { shortDescription: string; longDescription: string; defaultPrompt: string[] } };
+    expect(packagedManifest.interface.shortDescription.split("\n")).toHaveLength(2);
+    expect(packagedManifest.interface.longDescription.split("\n")).toHaveLength(2);
+    expect(packagedManifest.interface.defaultPrompt).toHaveLength(3);
+    expect(packagedManifest.interface.defaultPrompt.every((prompt) => prompt.split("\n").length === 2)).toBe(true);
+    expect(packagedManifest.interface.defaultPrompt[0]).toContain("配置 Routego Image");
+    expect(packagedManifest.interface.defaultPrompt[0]).toContain("Configure Routego Image");
+
     const packagedSkill = await readFile(
       path.join(firstPackage, "skills/routego-image/SKILL.md"),
       "utf8"
@@ -106,6 +116,8 @@ describe("Routego Image plugin package", () => {
     expect(packagedSkill).toContain("Call `routego_open_studio` once for the current request");
     expect(packagedSkill).toContain("不得在对话中索取 API Key、端点或认证值");
     expect(packagedSkill).toContain("never construct or reuse a URL");
+    expect(packagedSkill).toContain("later change a provider, endpoint, model, API key");
+    expect(packagedSkill).toContain("后续要求修改提供方、端点、模型、API Key");
 
     const logo = await readPng(firstPackage, "assets/logo.png");
     const composerIcon = await readPng(firstPackage, "assets/composer-icon.png");

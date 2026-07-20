@@ -30,15 +30,15 @@ const ACCEPTED_PLUGIN_MANIFEST = {
   },
   interface: {
     displayName: "Routego Image",
-    shortDescription: "Local image creation, editing, Library, and Studio workflows.",
-    longDescription: "Generate and edit images, run independent batches, manage the Routego Library, and continue work in the loopback-only Routego Image Studio.",
+    shortDescription: "本地图片生成、编辑、图库与 Studio 工作流。\nLocal image creation, editing, Library, and Studio workflows.",
+    longDescription: "生成和编辑图片、运行独立批次、管理图库并继续在本地 Studio 工作。\nGenerate and edit images, run independent batches, manage the Library, and continue in the local Studio.",
     developerName: "Routego Image",
     category: "Productivity",
     capabilities: ["Interactive", "Write"],
     defaultPrompt: [
-      "Check Routego status, then generate an image from my prompt.",
-      "编辑这张图片，并保留我指定的内容。",
-      "Open Routego Image Studio for the current session."
+      "配置 Routego Image\nConfigure Routego Image",
+      "生成或编辑一张图片\nGenerate or edit an image",
+      "打开 Routego Image Studio\nOpen Routego Image Studio"
     ],
     composerIcon: "./assets/composer-icon.png",
     logo: "./assets/logo.png"
