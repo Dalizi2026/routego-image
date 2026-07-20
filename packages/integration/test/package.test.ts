@@ -120,6 +120,8 @@ describe("Routego Image plugin package", () => {
     expect(packagedSkill).toContain("后续要求修改提供方、端点、模型、API Key");
     expect(packagedSkill).toContain("unknown `text-generation` evidence is an allowed baseline");
     expect(packagedSkill).toContain("不要为这条基础路径要求能力探测");
+    expect(packagedSkill).toContain("Do not add optional quality, size, aspect-ratio");
+    expect(packagedSkill).toContain("除非用户明确提出，否则不要自动加入质量、尺寸、宽高比");
     expect(packagedSkill).toContain("For edits, references, masks, and other capability-dependent operations");
 
     const logo = await readPng(firstPackage, "assets/logo.png");
