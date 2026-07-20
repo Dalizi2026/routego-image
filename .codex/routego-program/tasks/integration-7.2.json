@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "607d5e63dad20db7b2c5113ccc6edac5991ed17b331f6e6a9266fa897f6c5bbe",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "7.2",
+  "status": "materialized-awaiting-worker-health-and-controller-activation",
+  "sourceCommit": "c13303c206bf4c301710835ee7f0bc0f80505d68",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "d322de154f09cc130fc6fd6783da60eb38da47205c4f822ab34aa3c641da39ff",
+    "lineSha256": "835f2672bc8be06cda96a186d1078b463eba1527e363f5e87c8fe9bf3c654ae4",
+    "lineBytes": 1128
+  },
+  "dependencies": ["7.1"],
+  "dependencyCommits": {
+    "task7_1Capsule": "99ec9a708c890efa3fd56b45fbbe3835b380ccfd",
+    "task7_1Implementation": "81ae43022e9e6b880da41ca3c0f63b100d5042c9",
+    "task7_1TaskState": "c13303c206bf4c301710835ee7f0bc0f80505d68"
+  },
+  "allowedFiles": [
+    "docs/acceptance/routego-image-real-relay-result.md",
+    "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    ".codex/routego-program/threads/integration.json"
+  ],
+  "allowedFileMode": "create only the redacted result after execution; modify task and Integration state only after every approved case is truthfully classified",
+  "allowedExternalRoots": [
+    "/Users/dalizi/Documents/Routego-Private-Relay-Test"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/**",
+    "scripts/**",
+    ".github/**",
+    ".codex-plugin/**",
+    "skills/**",
+    "openspec/changes/integrate-routego-image-plugin/proposal.md",
+    "openspec/changes/integrate-routego-image-plugin/design.md",
+    "openspec/changes/integrate-routego-image-plugin/specs/**",
+    ".codex/routego-program/program.json",
+    ".codex/routego-program/threads/controller.json",
+    ".codex/routego-program/tasks/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "requiredBehavior": [
+    "Read the credential and exact HTTPS endpoint only from the approved mode-0600 private form; never print, copy into repository state or persist the credential, full endpoint, authorization header, raw provider body or image bytes.",
+    "Use only the exact configured endpoint with the single-endpoint-json transport. Do not derive, probe or call models, edits, responses or any sibling endpoint.",
+    "Execute no more than the narrower planned matrix counts 1,1,1,1,3,1 even though the user authorized up to three per class; enforce eight total requests and USD 10 as hard ceilings before every request.",
+    "Use only synthetic controlled prompts, references, edit targets and masks. Keep generated images and sensitive raw evidence outside the repository in the approved private root.",
+    "Allow the slow channel several minutes within a ten-minute outer wall-clock ceiling per case, but never automatically replay a timeout, partial response, billed failure or any output-producing request.",
+    "Record truthful supported, unsupported, degraded or transient capability evidence. Authentication, timeout, rate limit, server, moderation and isolated model failures remain transient.",
+    "Validate shared Codex and Studio Library identities and exact source relationships for saved operations without reading or mutating the real user Library, plugin installation or legacy data.",
+    "For transparency, use the approved simple synthetic subject. Chromakey success keeps exactly one output identity, adds no role and stays within 33 renditions; chromakey failure preserves the provider original under the same identity without claiming transparency.",
+    "Stop immediately on approval expiry or withdrawal, request or cost ceiling, credential or endpoint mismatch, unsafe evidence, unapproved capability, or any hard validation failure."
+  ],
+  "verification": [
+    "exact Controller and Integration identities, clean Git, Task 7.1 dependency, fresh OpenSpec 25/29 with Task 7.2 first pending and strict validation 19/19",
+    "private form mode 0600, evidence root mode 0700, immutable form and approval fingerprints, future expiry and exact provider/profile/model binding",
+    "exact endpoint only, single-endpoint-json request shape, no sibling endpoint derivation or models probe",
+    "per-request approval, remaining count, remaining cost, cancellation and expiry checks; no automatic replay",
+    "text, ordered two-reference, direct edit, mask-slot-zero, ordered partial batch and transparency outcomes",
+    "four-state capability evidence, actual transport and bounded response-shape facts, request count, mayHaveBilled and cost-risk evidence",
+    "shared Codex/Studio Library identity, exact source graph, one transparency identity, no extra role and 33-rendition bound",
+    "redaction audit, repository safety, exact allowed repository files, git diff --check and clean state after task delivery"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/real-relay-acceptance/spec.md",
+      "sha256": "10a2b76338285785b355953618d8ed381445a01842c9526c54c14e21ef983a28",
+      "bytes": 5385
+    },
+    {
+      "path": "docs/acceptance/routego-image-real-relay.md",
+      "sha256": "865d714b05477dd2d894fbf8188c8fd8da3e3c3fb6c5fe3de5a19d70c5ce35c4",
+      "bytes": 4286
+    },
+    {
+      "path": "scripts/run-real-relay-acceptance.mjs",
+      "sha256": "3be4f9e2bcc03793073824b0ce58d1a64e8da8cd227f2e115c0f0779fac18c3a",
+      "bytes": 22244
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "authorization": {
+    "userApprovalRecordedAt": "2026-07-20T14:20:29+08:00",
+    "expiresAt": "2026-07-20T18:00:00+08:00",
+    "providerDisplayName": "lnm生图",
+    "profileId": "lnm",
+    "model": "gpt-image-2",
+    "endpointScheme": "https",
+    "endpointFingerprint": "76f483c773fa695425c5db75ebe57faf45334dadc48f9f83b284720d1ca98655",
+    "privateFormPath": "/Users/dalizi/Documents/Routego-Private-Relay-Test/真实中继测试填写表.txt",
+    "privateFormSha256": "42a5f32876acb5d22f3acd9e4c6afad56b0dcf4824b48903097748156d20c3c6",
+    "approvalFingerprint": "894400076a65bfe45bbeb98cbda7d0d8f3437ddd0eac82dea7fcfe19d48837c7",
+    "approvedMaximumPerClass": [3, 3, 3, 3, 3, 3],
+    "executionMaximumPerClass": [1, 1, 1, 1, 3, 1],
+    "maximumTotalRequests": 8,
+    "maximumCostUsd": 10,
+    "evidenceLocationFingerprint": "948853647f9cd7ed2be9d399eaedae946b85caf12d19022e846b41fadefcf740",
+    "slowProviderAcknowledged": true,
+    "automaticRetryAuthorized": false,
+    "perCaseOuterWallClockCeilingMs": 600000,
+    "networkAuthorized": true,
+    "credentialReadAuthorized": true,
+    "syntheticInputsAuthorized": true,
+    "potentialChargesAuthorized": true,
+    "redactedEvidenceAuthorized": true
+  },
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "candidateIntegrationGeneration": 11,
+    "candidateIntegrationThreadId": "019f7d87-61ac-79e2-bd98-51c75be002e1",
+    "soleApplyOwner": false,
+    "applyAuthorized": false,
+    "workerHealthRequired": true,
+    "started": false
+  },
+  "externalStateAuthorized": false,
+  "realUserLibraryAuthorized": false,
+  "realHomeOrCodexHomeAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "marketplaceAuthorized": false,
+  "deploymentPublicationOrReleaseAuthorized": false
+}
