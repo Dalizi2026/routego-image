@@ -1,3 +1,5 @@
+import type { ReadSettingsResult } from "@routego-image/contracts";
+
 import type { MessageKey } from "../i18n";
 
 export const studioRoutes = ["workbench", "library", "trash", "settings"] as const;
@@ -27,6 +29,34 @@ export const initialStudioAppState: StudioAppState = {
   route: "workbench",
   notices: []
 };
+
+export interface FirstRunReadiness {
+  readonly hasActiveProfile: boolean;
+  readonly hasApiKey: boolean;
+  readonly hasModel: boolean;
+  readonly complete: boolean;
+}
+
+export function firstRunReadiness(settings: ReadSettingsResult): FirstRunReadiness {
+  const activeProfile = settings.profiles.find(
+    (profile) => profile.id === settings.activeProviderId && profile.isActive
+  );
+  const hasActiveProfile = activeProfile !== undefined;
+  const hasApiKey = activeProfile?.hasApiKey === true;
+  const hasModel =
+    (settings.defaults.model?.trim().length ?? 0) > 0 ||
+    (activeProfile?.defaultModel?.trim().length ?? 0) > 0;
+  return {
+    hasActiveProfile,
+    hasApiKey,
+    hasModel,
+    complete: hasActiveProfile && hasApiKey && hasModel
+  };
+}
+
+export function initialStudioRouteForSettings(settings: ReadSettingsResult): StudioRoute {
+  return firstRunReadiness(settings).complete ? "workbench" : "settings";
+}
 
 export function studioAppReducer(
   state: StudioAppState,

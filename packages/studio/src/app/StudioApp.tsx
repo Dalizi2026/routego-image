@@ -18,6 +18,7 @@ import { I18nProvider, useI18n, type MessageKey } from "../i18n";
 import "../styles/index.css";
 import {
   initialStudioAppState,
+  initialStudioRouteForSettings,
   studioAppReducer,
   type AppNotice,
   type StudioRoute
@@ -250,6 +251,7 @@ function StudioWorkspace({
   const { language, t, toggleLanguage } = useI18n();
   const [state, dispatch] = useReducer(studioAppReducer, {
     ...initialStudioAppState,
+    route: initialStudioRouteForSettings(settings),
     notices: noticesFor(service, settings)
   });
   const [creationHandoff, setCreationHandoff] = useState<CreationExternalHandoff>();
