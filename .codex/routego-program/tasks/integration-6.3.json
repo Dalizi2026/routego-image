@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "3faa6feb8f2079f72140c32d05641173f6b7e068167e1afac81b67161019b566",
+  "contentSha256": "40cecbf6d1ee5990f2e59d4dea4616d0c2d79e84c2713d8fe5d21c67005f8b9f",
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "taskId": "6.3",
@@ -97,8 +97,8 @@
   "activation": {
     "controllerGeneration": 9,
     "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
-    "integrationGeneration": 8,
-    "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "integrationGeneration": 9,
+    "integrationThreadId": "019f7d5a-0e1d-7c33-b851-e32e4ef89cf8",
     "acceptedTask6_2ImplementationCommit": "d180f14e0e959962a1dbc5b5e3c06c690d8e53c4",
     "acceptedTask6_2StateCommit": "6c31e961ea63a1033294c1455915e5a58f87e34b",
     "soleApplyOwner": true,
@@ -108,8 +108,17 @@
       "openspec/changes/integrate-routego-image-plugin/tasks.md",
       ".codex/routego-program/threads/integration.json"
     ],
-    "authorizationBaselineControllerHead": "74fe12ea4ba11b0a4d269afa2f1bae990326f922",
+    "authorizationBaselineControllerHead": "b11dcb2d7f3799991892b6827d0b61ccfa3f2672",
     "started": false
+  },
+  "ownerRecovery": {
+    "sourceIntegrationGeneration": 8,
+    "sourceIntegrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "sourceAuthorityRevoked": true,
+    "reason": "the source thread is not startable because its stored custom model provider is absent from the current Codex configuration",
+    "recoveryMode": "same-directory completed-history fork using the current available Codex model provider",
+    "candidateWaitingAcknowledged": true,
+    "repositoryReadOrWriteBeforeActivation": false
   },
   "cleanVerificationCopyRequired": true,
   "offlineFrozenInstallationAuthorized": true,
