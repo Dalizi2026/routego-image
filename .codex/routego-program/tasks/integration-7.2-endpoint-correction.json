@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "27a74336658a833d05756575baa6f9085c4b6d51fdddb11851767991a830a9af",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "7.2-endpoint-correction",
+  "status": "materialized-awaiting-controller-reactivation",
+  "sourceCommit": "e9f1496e30e16ea0fea032df9c4659aac470829f",
+  "parentCapsuleCommit": "6beab305aae5216296d5026858f720528f7b5182",
+  "reason": "The user-confirmed legacy API Base was previously treated as an exact endpoint; the audited legacy normalization identifies the complete generation endpoint without probing a sibling route.",
+  "allowedFiles": [
+    "docs/acceptance/routego-image-real-relay-result.md",
+    "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    ".codex/routego-program/threads/integration.json"
+  ],
+  "allowedExternalRoots": [
+    "/Users/dalizi/Documents/Routego-Private-Relay-Test"
+  ],
+  "requiredBehavior": [
+    "Use only the newly fingerprinted complete HTTPS generation endpoint from the mode-0600 private form.",
+    "Do not call the prior root endpoint again and do not derive or probe any models, edits, responses or other sibling endpoint.",
+    "Execute the exact narrower matrix 1,1,1,1,3,1 with no automatic retry and a ten-minute outer ceiling per case.",
+    "Count the prior stopped request and USD 1.25 risk reservation against the user's unchanged per-class and USD 10 ceilings.",
+    "Keep credentials, full URLs, authorization headers, raw responses and image bytes outside the repository in the approved private evidence root.",
+    "Stop on any transient or hard failure, approval expiry or withdrawal, request scope mismatch, cost ceiling or evidence safety failure."
+  ],
+  "authorization": {
+    "confirmedAt": "2026-07-20T14:45:00+08:00",
+    "expiresAt": "2026-07-20T18:00:00+08:00",
+    "providerDisplayName": "lnm生图",
+    "profileId": "lnm",
+    "model": "gpt-image-2",
+    "endpointMode": "user-confirmed-legacy-api-base-normalized-to-complete-generation-endpoint",
+    "endpointFingerprint": "20f9071f870fd7bf6a3a024dc04cb1996e0c5f1e96d2c17a30f5d8c1b2d11a8d",
+    "privateFormSha256": "00ec5c9101b838c67da354606a8cf4ca4a82dbb6141f2696ae3a98a23811f4d0",
+    "evidenceLocationFingerprint": "948853647f9cd7ed2be9d399eaedae946b85caf12d19022e846b41fadefcf740",
+    "approvedMaximumPerClass": [3, 3, 3, 3, 3, 3],
+    "newExecutionMaximumPerClass": [1, 1, 1, 1, 3, 1],
+    "priorRequestCount": 1,
+    "priorTextGenerationRequestCount": 1,
+    "maximumNewRequests": 8,
+    "maximumCombinedRequests": 9,
+    "priorReservedCostRiskUsd": 1.25,
+    "maximumNewReservedCostRiskUsd": 8.75,
+    "maximumCombinedCostRiskUsd": 10,
+    "credentialReadAuthorized": true,
+    "syntheticInputsAuthorized": true,
+    "potentialChargesAuthorized": true,
+    "networkAuthorized": true,
+    "automaticRetryAuthorized": false
+  },
+  "executionMode": "controller-direct-main-agent-recovery-under-current-user-instruction",
+  "workerRemainsFrozen": true,
+  "realUserLibraryAuthorized": false,
+  "realHomeOrCodexHomeAuthorized": false,
+  "installationMarketplaceDeploymentReleaseAuthorized": false
+}
