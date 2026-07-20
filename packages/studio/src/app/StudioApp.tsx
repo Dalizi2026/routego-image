@@ -249,6 +249,7 @@ function StudioWorkspace({
   readonly routeContent?: Partial<Record<StudioRoute, ReactNode>>;
 }) {
   const { language, t, toggleLanguage } = useI18n();
+  const firstRunSession = useRef(initialStudioRouteForSettings(settings) === "settings").current;
   const [state, dispatch] = useReducer(studioAppReducer, {
     ...initialStudioAppState,
     route: initialStudioRouteForSettings(settings),
@@ -295,6 +296,8 @@ function StudioWorkspace({
           gateway={gateway}
           settings={settings}
           onSettingsChange={onSettingsChange}
+          firstRunSession={firstRunSession}
+          onOpenWorkbench={() => dispatch({ type: "navigate", route: "workbench" })}
         />
       )
   } satisfies Partial<Record<Exclude<StudioRoute, "workbench">, ReactNode>>;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import {
   imageFormatSchema,
@@ -44,6 +44,24 @@ const copy = {
     eyebrow: "CONTROL ROOM / 04",
     title: "中转配置与能力校准",
     lead: "管理脱敏提供方资料、写入型密钥、生成默认值和明确确认的能力探测。敏感值不会进入诊断或持久浏览器状态。",
+    firstRunEyebrow: "FIRST RUN / LOCAL SETUP",
+    firstRunTitle: "完成首次连接",
+    firstRunLead: "填写服务商提供的完整生成端点和模型；只有旧版兼容服务才选择 API 基地址。密钥只在保存时写入。",
+    firstRunConnection: "提供方连接",
+    firstRunConnectionPending: "填写资料名称与生成端点",
+    firstRunConnectionReady: "活动资料已保存",
+    firstRunKey: "API Key",
+    firstRunKeyPending: "输入密钥并安全保存",
+    firstRunKeyReady: "密钥已配置，不会回显",
+    firstRunModel: "生成模型",
+    firstRunModelPending: "填写服务商支持的模型名称",
+    firstRunModelReady: "默认模型已设置",
+    firstRunActive: "当前提供方",
+    firstRunActivePending: "保存时勾选设为当前提供方",
+    firstRunActiveReady: "当前提供方已启用",
+    firstRunStart: "填写提供方资料",
+    firstRunComplete: "首次配置已完成",
+    firstRunOpenWorkbench: "进入工作台",
     active: "当前启用",
     inactive: "未启用",
     profiles: "提供方资料",
@@ -128,6 +146,24 @@ const copy = {
     eyebrow: "CONTROL ROOM / 04",
     title: "Relay configuration & capability calibration",
     lead: "Manage redacted provider profiles, write-only keys, generation defaults, and explicitly confirmed probes. Sensitive values never enter diagnostics or persistent browser state.",
+    firstRunEyebrow: "FIRST RUN / LOCAL SETUP",
+    firstRunTitle: "Complete the first connection",
+    firstRunLead: "Enter the complete generation endpoint and model supplied by your provider. Choose API base only for a legacy-compatible service. The key is write-only on save.",
+    firstRunConnection: "Provider connection",
+    firstRunConnectionPending: "Enter a profile name and generation endpoint",
+    firstRunConnectionReady: "Active profile saved",
+    firstRunKey: "API key",
+    firstRunKeyPending: "Enter the key and save it securely",
+    firstRunKeyReady: "Key configured and never displayed",
+    firstRunModel: "Generation model",
+    firstRunModelPending: "Enter a provider-supported model name",
+    firstRunModelReady: "Default model configured",
+    firstRunActive: "Active provider",
+    firstRunActivePending: "Select Make active when saving",
+    firstRunActiveReady: "Active provider enabled",
+    firstRunStart: "Fill provider profile",
+    firstRunComplete: "First-run setup complete",
+    firstRunOpenWorkbench: "Open Workbench",
     active: "Active",
     inactive: "Inactive",
     profiles: "Provider profiles",
@@ -255,7 +291,13 @@ function initialProbeDraft(settings: ReadSettingsResult): CapabilityProbeDraft {
   };
 }
 
-export function SettingsWorkspace({ gateway, settings, onSettingsChange }: SettingsWorkspaceProps) {
+export function SettingsWorkspace({
+  gateway,
+  settings,
+  onSettingsChange,
+  firstRunSession = false,
+  onOpenWorkbench
+}: SettingsWorkspaceProps) {
   const { language } = useI18n();
   const labels = copy[language];
   const registry = useCapabilityRegistry();
@@ -280,6 +322,22 @@ export function SettingsWorkspace({ gateway, settings, onSettingsChange }: Setti
   const [outputDraft, setOutputDraft] = useState<OutputDirectoryDraft>(createOutputDirectoryDraft);
   const [outputErrors, setOutputErrors] = useState<Readonly<Record<string, string>>>({});
   const [outputState, setOutputState] = useState<SettingsAsyncState>({ status: "idle" });
+  const profileNameRef = useRef<HTMLInputElement>(null);
+
+  const activeProfile = activeSettingsProfile(settings);
+  const setupProfile = activeProfile ?? settings.profiles[0];
+  const firstRunStatus = {
+    hasConnection: settings.profiles.length > 0,
+    hasApiKey: setupProfile?.hasApiKey === true,
+    hasModel:
+      (settings.defaults.model?.trim().length ?? 0) > 0 ||
+      (setupProfile?.defaultModel?.trim().length ?? 0) > 0,
+    hasActiveProfile: activeProfile !== undefined
+  };
+  const firstRunComplete =
+    activeProfile?.hasApiKey === true &&
+    ((settings.defaults.model?.trim().length ?? 0) > 0 ||
+      (activeProfile.defaultModel?.trim().length ?? 0) > 0);
 
   useEffect(() => {
     if (
@@ -502,6 +560,36 @@ export function SettingsWorkspace({ gateway, settings, onSettingsChange }: Setti
         </dl>
       </header>
 
+      {firstRunSession ? (
+        <section className="settings-first-run" aria-labelledby="settings-first-run-title">
+          <div className="settings-first-run__copy">
+            <p>{labels.firstRunEyebrow}</p>
+            <h2 id="settings-first-run-title">
+              {firstRunComplete ? labels.firstRunComplete : labels.firstRunTitle}
+            </h2>
+            <span>{labels.firstRunLead}</span>
+          </div>
+          <ol>
+            {[
+              [labels.firstRunConnection, firstRunStatus.hasConnection, labels.firstRunConnectionReady, labels.firstRunConnectionPending],
+              [labels.firstRunKey, firstRunStatus.hasApiKey, labels.firstRunKeyReady, labels.firstRunKeyPending],
+              [labels.firstRunModel, firstRunStatus.hasModel, labels.firstRunModelReady, labels.firstRunModelPending],
+              [labels.firstRunActive, firstRunStatus.hasActiveProfile, labels.firstRunActiveReady, labels.firstRunActivePending]
+            ].map(([title, ready, readyText, pendingText], index) => (
+              <li key={String(title)} data-state={ready ? "complete" : "pending"}>
+                <span aria-hidden="true">{index + 1}</span>
+                <div><strong>{title}</strong><small>{ready ? readyText : pendingText}</small></div>
+              </li>
+            ))}
+          </ol>
+          {firstRunComplete ? (
+            <button type="button" onClick={onOpenWorkbench}>{labels.firstRunOpenWorkbench}</button>
+          ) : (
+            <button type="button" onClick={() => profileNameRef.current?.focus()}>{labels.firstRunStart}</button>
+          )}
+        </section>
+      ) : null}
+
       <section className="settings-profiles" aria-labelledby="settings-profiles-title">
         <div className="settings-section-heading">
           <p>PROFILES / REDACTED</p>
@@ -522,10 +610,10 @@ export function SettingsWorkspace({ gateway, settings, onSettingsChange }: Setti
             ))}
           </nav>
 
-          <form className="settings-profile-editor" onSubmit={(event) => void saveProfile(event)}>
+          <form id="settings-profile-editor" className="settings-profile-editor" onSubmit={(event) => void saveProfile(event)}>
             <header><h3>{selectedProfile ? labels.editProfile : labels.newProfile}</h3><span>{profileDraft.profileId ?? "NEW"}</span></header>
             <div className="settings-form-grid">
-              <label><span>{labels.profileName}</span><input required maxLength={200} value={profileDraft.name} onChange={(event) => setProfileDraft((current) => ({ ...current, name: event.target.value }))} /><FieldError value={profileErrors["name"]} /></label>
+              <label><span>{labels.profileName}</span><input ref={profileNameRef} required maxLength={200} value={profileDraft.name} onChange={(event) => setProfileDraft((current) => ({ ...current, name: event.target.value }))} /><FieldError value={profileErrors["name"]} /></label>
               <label><span>{labels.defaultModel}</span><input list="settings-profile-models" value={profileDraft.defaultModel} onChange={(event) => setProfileDraft((current) => ({ ...current, defaultModel: event.target.value }))} /><FieldError value={profileErrors["defaultModel"]} /></label>
               <label><span>{labels.generationMode}</span><select value={profileDraft.generation.mode} onChange={(event) => setProfileDraft((current) => ({ ...current, generation: { ...current.generation, mode: event.target.value as ProviderProfileDraft["generation"]["mode"] } }))}><option value="exact-generation-endpoint">{labels.exactEndpoint}</option><option value="legacy-api-base">{labels.legacyBase}</option></select></label>
               <label className="settings-form-grid__wide"><span>{labels.generationEndpoint}</span><input required value={profileDraft.generation.value} onChange={(event) => setProfileDraft((current) => ({ ...current, generation: { ...current.generation, value: event.target.value, requiresReentry: false } }))} />{profileDraft.generation.requiresReentry ? <small>{labels.endpointReentry}</small> : null}<FieldError value={profileErrors["endpoints.generation"] ?? profileErrors["endpoints.generation.value"]} /></label>

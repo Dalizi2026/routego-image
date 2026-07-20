@@ -272,10 +272,11 @@ async function toWebRequest(request: PlaywrightRequest): Promise<Request> {
 
 export async function installDeterministicMock(
   page: Page,
-  fixtureByOperation: Partial<Record<MockServiceOperation, MockServiceFixture>> = {}
+  fixtureByOperation: Partial<Record<MockServiceOperation, MockServiceFixture>> = {},
+  options: { readonly initiallyConfigured?: boolean } = {}
 ): Promise<void> {
   const { createMockRoutegoService, createStudioMockHandler } = await loadMockModules();
-  const service = createMockRoutegoService({ fixtureByOperation });
+  const service = createMockRoutegoService({ fixtureByOperation, ...options });
   const handler = createStudioMockHandler({
     service: service as never,
     sessionToken: STUDIO_SESSION_TOKEN
@@ -300,10 +301,15 @@ export async function installSyntheticFaviconBoundary(page: Page): Promise<void>
   });
 }
 
-export async function openStudio(page: Page): Promise<void> {
+export async function openStudio(
+  page: Page,
+  options: { readonly firstRun?: boolean } = {}
+): Promise<void> {
   await installSyntheticFaviconBoundary(page);
   await page.goto(`/?token=${encodeURIComponent(STUDIO_SESSION_TOKEN)}`);
-  await page.getByRole("heading", { name: "把想法放进显影盘" }).waitFor();
+  await page.getByRole("heading", {
+    name: options.firstRun ? "中转配置与能力校准" : "把想法放进显影盘"
+  }).waitFor();
 }
 
 export const syntheticPng = {

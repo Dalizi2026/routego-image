@@ -155,6 +155,7 @@ export interface MockRoutegoServiceOptions {
   readonly fixtureByOperation?: Partial<Record<MockServiceOperation, MockServiceFixture>>;
   readonly requestId?: string;
   readonly timestamp?: string;
+  readonly initiallyConfigured?: boolean;
 }
 
 const MOCK_IMAGE_BASE64 =
@@ -202,12 +203,13 @@ export class MockRoutegoService implements LocalRoutegoService {
     if (options.requestId !== undefined) {
       identifierSchema.parse(options.requestId);
     }
+    const initiallyConfigured = options.initiallyConfigured ?? true;
     this.#settings = readSettingsResultSchema.parse({
       schemaVersion: 1,
-      activeProviderId: "mock-provider",
-      profiles: [this.#profile()],
+      ...(initiallyConfigured ? { activeProviderId: "mock-provider" } : {}),
+      profiles: initiallyConfigured ? [this.#profile()] : [],
       defaults: {
-        model: "mock-image-model",
+        ...(initiallyConfigured ? { model: "mock-image-model" } : {}),
         size: "auto",
         aspectRatio: "auto",
         quality: "auto",
@@ -970,20 +972,21 @@ export class MockRoutegoService implements LocalRoutegoService {
     if (this.#fixture("status") === "invalid-output") {
       return invalidOutput<RoutegoStatusResult>();
     }
+    const activeProfile = this.#settings.profiles.find(
+      (profile) => profile.id === this.#settings.activeProviderId && profile.isActive
+    );
+    const model = this.#settings.defaults.model ?? activeProfile?.defaultModel;
+    const configured = activeProfile?.hasApiKey === true && model !== undefined;
     return routegoStatusResultSchema.parse({
       schemaVersion: 1,
-      configured: true,
-      hasApiKey: true,
-      apiKeyPreview: "mock-present",
-      providerId: "mock-provider",
-      endpoint: describeProviderEndpoint(
-        "https://mock.invalid/v1/images/generations",
-        "exact-generation-endpoint"
-      ),
-      models: ["mock-image-model"],
+      configured,
+      hasApiKey: activeProfile?.hasApiKey ?? false,
+      ...(activeProfile?.apiKeyPreview === undefined ? {} : { apiKeyPreview: activeProfile.apiKeyPreview }),
+      ...(activeProfile === undefined ? {} : { providerId: activeProfile.id, endpoint: activeProfile.endpoints.generation }),
+      models: activeProfile?.models ?? [],
       capabilities: [],
       defaults: {
-        model: "mock-image-model",
+        ...(model === undefined ? {} : { model }),
         size: "auto",
         aspectRatio: "auto",
         quality: "auto",

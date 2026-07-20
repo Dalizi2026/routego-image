@@ -100,6 +100,101 @@
   text-align: right;
 }
 
+.settings-first-run {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(320px, 1.2fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: clamp(18px, 2.4vw, 26px);
+  border: 1px solid var(--amber-400);
+  border-left-width: 4px;
+  background: color-mix(in srgb, var(--amber-400) 6%, var(--ink-900));
+}
+
+.settings-first-run__copy > p,
+.settings-first-run__copy > h2,
+.settings-first-run__copy > span {
+  margin: 0;
+}
+
+.settings-first-run__copy > p {
+  color: var(--amber-400);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0;
+}
+
+.settings-first-run__copy > h2 {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+
+.settings-first-run__copy > span {
+  display: block;
+  margin-top: 8px;
+  color: var(--paper-300);
+  line-height: 1.6;
+}
+
+.settings-first-run ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settings-first-run li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+}
+
+.settings-first-run li > span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid var(--paper-500);
+  border-radius: 50%;
+  color: var(--paper-300);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+
+.settings-first-run li[data-state="complete"] > span {
+  border-color: var(--cyan-300);
+  color: var(--cyan-300);
+}
+
+.settings-first-run li strong,
+.settings-first-run li small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.settings-first-run li strong {
+  color: var(--paper-100);
+  font-size: 0.78rem;
+}
+
+.settings-first-run li small {
+  margin-top: 3px;
+  color: var(--paper-500);
+  font-size: 0.66rem;
+}
+
+.settings-first-run > button {
+  min-width: 150px;
+}
+
 .settings-profiles,
 .settings-models,
 .settings-probe,
@@ -568,6 +663,7 @@
 
 @media (max-width: 900px) {
   .settings-workspace__header,
+  .settings-first-run,
   .settings-profiles__layout,
   .settings-calibration-grid,
   .settings-output-grid {
@@ -599,6 +695,7 @@
   }
 
   .settings-form-grid,
+  .settings-first-run ol,
   .settings-probe-result dl,
   .settings-capability-ledger > div:last-child {
     grid-template-columns: 1fr;

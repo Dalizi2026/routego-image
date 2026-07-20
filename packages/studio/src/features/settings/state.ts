@@ -79,9 +79,9 @@ export function createProviderProfileDraft(
     edits: optionalEndpoint(profile?.endpoints.edits),
     responses: optionalEndpoint(profile?.endpoints.responses),
     defaultModel: profile?.defaultModel ?? "",
-    apiKeyOperation: "unchanged",
+    apiKeyOperation: profile === undefined ? "replace" : "unchanged",
     apiKeyReplacement: "",
-    setActive: profile?.isActive ?? false
+    setActive: profile?.isActive ?? true
   };
 }
 

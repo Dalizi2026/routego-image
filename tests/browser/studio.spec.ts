@@ -481,6 +481,49 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
   await rejectedPage.close();
 });
 
+test("first run opens secret-safe Settings and becomes ready only after a valid profile save", async ({ page }) => {
+  const audit = observeBrowserSecurity(page);
+  const replacementMarker = "synthetic-first-run-write-only-key";
+  await installDeterministicMock(page, {}, { initiallyConfigured: false });
+  await openStudio(page, { firstRun: true });
+
+  await expect(page.getByRole("button", { name: "设置" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("heading", { name: "完成首次连接" })).toBeVisible();
+  await expect(page.getByText("填写服务商提供的完整生成端点和模型")).toBeVisible();
+  await expect(page.getByRole("button", { name: "进入工作台" })).toHaveCount(0);
+  await expect(page.getByLabel("新 API Key")).toBeVisible();
+  await expect(page.getByLabel("保存后设为当前提供方")).toBeChecked();
+
+  const automaticOperations = audit.requests.filter((request) =>
+    new URL(request.url).pathname.startsWith("/api/v1/") &&
+    /refresh-models|probe|creation\/stream/u.test(new URL(request.url).pathname)
+  );
+  expect(automaticOperations).toEqual([]);
+
+  await page.getByRole("button", { name: "界面语言" }).click();
+  await expect(page.getByRole("heading", { name: "Complete the first connection" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Fill provider profile" })).toBeVisible();
+  await page.getByRole("button", { name: "Interface language" }).click();
+
+  await page.getByRole("button", { name: "填写提供方资料" }).click();
+  await expect(page.getByLabel("资料名称")).toBeFocused();
+  await page.getByLabel("资料名称").fill("首次本地中转");
+  await page.getByLabel("资料默认模型").fill("synthetic-image-model");
+  await page.getByRole("textbox", { name: "生成端点", exact: true }).fill("https://first-run.invalid/v1/images/generations");
+  await page.getByLabel("新 API Key").fill(replacementMarker);
+  await page.getByRole("button", { name: "保存提供方资料" }).click();
+
+  await expect(page.getByRole("heading", { name: "首次配置已完成" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "进入工作台" })).toBeVisible();
+  await expect(page.locator("body")).not.toContainText(replacementMarker);
+  await page.getByRole("button", { name: "进入工作台" }).click();
+  await expect(page.getByRole("heading", { name: "把想法放进显影盘" })).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  await expectSecurityClean(page, audit, { sensitiveMarkers: [replacementMarker] });
+});
+
 test("creation reports success, partial, failure, and degraded outcomes without automatic replay", async ({ context }) => {
   const scenarios = [
     { fixture: "success", title: "图像已生成" },

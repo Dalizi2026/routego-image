@@ -64,6 +64,14 @@ const settings: ReadSettingsResult = {
 };
 
 describe("secret-safe Settings state and request construction", () => {
+  it("starts a new profile in write-only setup mode without a secret value", () => {
+    expect(createProviderProfileDraft()).toMatchObject({
+      apiKeyOperation: "replace",
+      apiKeyReplacement: "",
+      setActive: true
+    });
+  });
+
   it("never hydrates an existing secret and requires re-entry for hidden endpoint queries", () => {
     const hiddenQueryProfile: ProviderProfileDescriptor = {
       ...profile,

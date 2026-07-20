@@ -56,6 +56,8 @@ export interface SettingsWorkspaceProps {
   readonly gateway: import("../../api").StudioGateway;
   readonly settings: ReadSettingsResult;
   readonly onSettingsChange: (settings: ReadSettingsResult) => void;
+  readonly firstRunSession?: boolean | undefined;
+  readonly onOpenWorkbench?: (() => void) | undefined;
 }
 
 export interface CapabilityProbePresentation {
