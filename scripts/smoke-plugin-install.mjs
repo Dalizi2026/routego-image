@@ -20,7 +20,7 @@ import { pathToFileURL } from "node:url";
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 export const ACCEPTED_ARTIFACT_MANIFEST_SHA256 =
-  "6e977c145c581ddc083e7352799b8d2a5e7451b3505bc7ffd702bd900f2a058b";
+  "977126b68e3409f86bfd20c714d96d2cc425cebda0b60c238000f4409d8f11ef";
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
@@ -402,8 +402,10 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
     new URL("/api/v1/status?refreshCapabilities=false", origin),
     { headers: browserReadHeaders(bootstrapSession) }
   ));
-  if (status.configured !== false || status.service?.status !== "ready") {
-    fail("Studio offline status is not ready and unconfigured");
+  if (status.configured !== false || status.service?.status !== "ready" ||
+      status.service?.mcpAvailable !== true || status.service?.httpAvailable !== true ||
+      status.service?.studioAvailable !== true) {
+    fail("Studio offline status is not ready, available, and unconfigured");
   }
 
   const folders = await checkedJson(await fetch(

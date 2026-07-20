@@ -537,6 +537,15 @@ export async function createProductionRoutegoMcpProcess(
       ephemeralResources,
       studioSession: () => lifecycle.studioSession(),
       openStudio: async (request) => await lifecycle.openStudio(request),
+      serviceHealth: () => ({
+        status: "ready",
+        version: "1.0.0",
+        nodeVersion: process.version,
+        uptimeSeconds: 0,
+        mcpAvailable: true,
+        httpAvailable: lifecycle.host?.isHealthy === true,
+        studioAvailable: lifecycle.host?.isHealthy === true
+      }),
       ...options.serviceOptions
     });
     return new RoutegoMcpProcess({
