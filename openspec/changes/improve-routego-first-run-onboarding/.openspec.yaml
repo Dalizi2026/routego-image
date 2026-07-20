@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-07-20
+goal: Unconfigured users can reach and complete provider setup without guessing
+  where or how to configure.
