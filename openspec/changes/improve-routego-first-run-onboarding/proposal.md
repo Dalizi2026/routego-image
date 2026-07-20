@@ -13,6 +13,7 @@ Routego Image correctly detects an unconfigured installation, but the Codex resp
 - Add a permanent configuration starter action to the Codex plugin details page and make its description and all three starter actions bilingual with Chinese and English on separate lines.
 - Make the short-lived Studio bootstrap URL tolerate Codex link-preview access before the user opens it, while keeping API authorization on the distinct in-memory session token.
 - Connect the secure bootstrap document to the Studio entrypoint by consuming its injected in-memory session before removing the launch URL, so the real packaged page can authenticate without retaining a token in the address bar.
+- Accept browser same-origin API reads that omit `Origin` only when the exact loopback `Host`, Fetch Metadata (`same-origin`/`empty`), and session token all match, while preserving cross-site and non-browser rejection.
 
 ## Capabilities
 

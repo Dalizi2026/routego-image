@@ -56,6 +56,8 @@ The current launch token is marked consumed by the first bootstrap GET. Codex li
 
 The bootstrap HTML injects the owning API session as a frozen `__ROUTEGO_STUDIO_SESSION__` global before loading the hashed Studio entry module. The Studio entrypoint will consume that injected object as its primary source, validate its token shape and expiry descriptor, and keep the URL-token helper only for deterministic development fixtures. This preserves the production rule that the API token never remains in the address bar while making the packaged server and browser entrypoints use the same handoff.
 
+Same-origin browser `GET` requests commonly omit the CORS `Origin` header. The loopback host will infer its own exact origin only when `Host` equals the active listener, `Sec-Fetch-Site` is `same-origin`, `Sec-Fetch-Dest` is `empty`, the fetch mode is `cors` or `same-origin`, cookies are absent, and the API session token is valid. Requests with an explicit foreign origin, cross-site Fetch Metadata, a mismatched host, missing browser metadata, cookies, or a bad token remain rejected. Installation smoke will exercise this browser-shaped request instead of manually adding `Origin`.
+
 Alternative considered: detect preview-specific request headers. Rejected because preview clients do not provide a stable cross-version contract and header heuristics would reproduce the bug in another host. Extending the launch window to the full API session lifetime was also rejected; only the existing short TTL is reusable.
 
 ## Risks / Trade-offs

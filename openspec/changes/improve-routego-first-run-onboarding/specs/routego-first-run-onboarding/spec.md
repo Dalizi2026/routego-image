@@ -66,3 +66,8 @@ The loopback runtime SHALL allow the same valid launch token to retrieve the no-
 - **WHEN** the no-store bootstrap document injects a valid `__ROUTEGO_STUDIO_SESSION__` object before loading the Studio entry module
 - **THEN** the Studio entrypoint SHALL create its in-memory API session from that object, remove any launch query from the visible URL, and SHALL NOT require the launch token to remain in the address bar
 - **AND** a malformed or expired injected object SHALL fail closed without making API requests
+
+#### Scenario: Same-origin browser read omits Origin
+- **WHEN** a Studio API read omits `Origin` but presents the exact listener `Host`, same-origin Fetch Metadata with an empty destination, no cookie, and the valid owning API session token
+- **THEN** the loopback host SHALL authorize it as its exact own origin
+- **AND** an explicit foreign origin, cross-site or missing Fetch Metadata, mismatched host, cookie, or invalid token SHALL remain rejected
