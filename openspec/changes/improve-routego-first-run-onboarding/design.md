@@ -24,7 +24,7 @@ The change crosses the Skill and Studio UI but does not require a schema, servic
 
 ### 1. Keep setup transport in the existing Studio tool and settings operations
 
-The Skill will branch immediately after the required status check. An unconfigured result calls `routego_open_studio` and presents only that current-call URL. This reuses the one-time loopback session and avoids adding a credential-bearing chat tool or configuration arguments to MCP.
+The Skill will branch immediately after the required status check. An unconfigured result calls `routego_open_studio` and presents only that current-call URL. Explicit configuration requests use the same fresh Studio path even when a profile already exists. This reuses the short-lived loopback launch and avoids adding a credential-bearing chat tool or configuration arguments to MCP.
 
 Alternative considered: add a `routego_configure` MCP tool. Rejected because it would expand the frozen seven-tool surface and encourage credentials in chat.
 
@@ -44,11 +44,24 @@ Alternative considered: a blocking modal wizard. Rejected because it would dupli
 
 Rendering onboarding performs no network/provider action beyond the existing local bootstrap reads. Model refresh, capability probes, and image operations remain explicit user commands. Password fields remain write-only and cleared at submission as before.
 
+### 5. Use plugin starter actions as the supported details-page configuration entry
+
+The plugin manifest supports at most three starter prompts and no custom credential form. The three prompts will become bilingual two-line actions for configuration, image creation/editing, and Studio opening. Configuration is deliberately routed into Studio Settings so the plugin page never handles a secret.
+
+Alternative considered: encode provider fields or a key in MCP server settings. Rejected because it would bypass the validated profile model and put credentials into a generic plugin configuration surface.
+
+### 6. Make launch bootstrap preview-tolerant within the existing short TTL
+
+The current launch token is marked consumed by the first bootstrap GET. Codex link preview performs that GET before the user's browser navigation, so the real open receives `session_invalid`. Launch authorization will instead remain valid until its existing short launch expiry and return the same API session token on repeated bootstrap GETs. The separate launch credential is still rejected for every API route, bootstrap stays `no-store`, the browser removes the query immediately, and expiry is never extended.
+
+Alternative considered: detect preview-specific request headers. Rejected because preview clients do not provide a stable cross-version contract and header heuristics would reproduce the bug in another host. Extending the launch window to the full API session lifetime was also rejected; only the existing short TTL is reusable.
+
 ## Risks / Trade-offs
 
 - [Risk] A profile with a key but an unusable endpoint can appear setup-complete because endpoint validity is provider-dependent. -> Mitigation: readiness relies on the strict persisted descriptor; actual support remains governed by capability evidence and transient errors.
 - [Risk] Users may confuse exact endpoint and legacy base modes. -> Mitigation: first-run copy names both modes and keeps exact endpoint selected by default without deriving paths.
 - [Risk] A dense Settings page can still feel complex. -> Mitigation: the first-run band lists only required readiness conditions and focuses the existing form; optional endpoints and probes remain visually secondary.
+- [Risk] A launch URL copied during its short TTL can bootstrap the same session more than once. -> Mitigation: it remains loopback-only, cryptographically random, short-lived, no-store, distinct from API authorization, and does not create or extend sessions on replay.
 
 ## Migration Plan
 

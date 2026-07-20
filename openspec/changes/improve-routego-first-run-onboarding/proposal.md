@@ -10,6 +10,8 @@ Routego Image correctly detects an unconfigured installation, but the Codex resp
 - Show a clear ready state after a usable active profile with a key exists, with a direct return to the workbench.
 - Preserve existing configured-user routing, provider contracts, credential storage, capability probes, and seven-tool public surface.
 - Add focused Skill/package and browser regression coverage for unconfigured, configured, bilingual, responsive, and secret-redaction paths.
+- Add a permanent configuration starter action to the Codex plugin details page and make its description and all three starter actions bilingual with Chinese and English on separate lines.
+- Make the short-lived Studio bootstrap URL tolerate Codex link-preview access before the user opens it, while keeping API authorization on the distinct in-memory session token.
 
 ## Capabilities
 
@@ -23,6 +25,6 @@ None.
 
 ## Impact
 
-- Affected code: `skills/routego-image/SKILL.md`, Studio application/settings components and styles, Studio/browser tests, and package verification assertions.
+- Affected code: plugin interface metadata, `skills/routego-image/SKILL.md`, Studio application/settings components and styles, loopback session/bootstrap handling, Studio/browser/runtime tests, and package verification assertions.
 - Public APIs and schemas remain unchanged; the plugin still exposes exactly seven MCP tools.
 - No new dependency, network request, automatic capability probe, credential migration, marketplace publication, or provider call is introduced.

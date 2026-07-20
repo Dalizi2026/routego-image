@@ -40,3 +40,24 @@ The onboarding flow MUST NOT store credentials in browser storage, render a comp
 - **WHEN** a user opens the unconfigured setup screen and switches between Chinese and English
 - **THEN** all setup labels SHALL update while no provider, model-refresh, capability-probe, or generation request is issued and no secret appears in rendered text, URL, storage, console, or diagnostics
 
+### Requirement: Plugin details expose bilingual ongoing configuration
+The Codex plugin details metadata SHALL use its three supported starter actions for configuration, image creation/editing, and Studio opening. The subtitle, long description, and every starter action SHALL contain Chinese and English on separate lines, and the configuration action SHALL open a fresh Studio Settings session for both first-time and later profile changes.
+
+#### Scenario: Existing user wants to change configuration
+- **WHEN** a user selects the configuration starter action after a profile already exists
+- **THEN** the Skill SHALL call `routego_open_studio` for the current request, direct the user to Settings, and SHALL NOT ask for or print a key in chat
+
+#### Scenario: Plugin details are displayed
+- **WHEN** Codex renders the plugin details page
+- **THEN** the visible description and each of the three supported starter actions SHALL provide a Chinese line followed by an English line, including one explicit configuration action
+
+### Requirement: Studio bootstrap tolerates safe link previews
+The loopback runtime SHALL allow the same valid launch token to retrieve the no-store bootstrap document more than once before the short launch-token expiry so that a Codex link preview cannot consume the user's launch. Every successful retrieval MUST return the same owning API session, and the launch token MUST remain invalid for API authorization and after its exact expiry.
+
+#### Scenario: Preview loads before the user opens Studio
+- **WHEN** a preview request retrieves a fresh Studio launch URL and the user opens the same URL before launch expiry
+- **THEN** both requests SHALL receive valid no-store bootstrap HTML for the same in-memory API session and the user-facing Studio SHALL load normally
+
+#### Scenario: Replayed launch is expired
+- **WHEN** the same launch URL is requested at or after its short launch-token expiry
+- **THEN** the runtime SHALL return `session_invalid` without issuing a new session, extending expiry, or exposing either token
