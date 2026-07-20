@@ -45,7 +45,6 @@ interface SessionRecord {
   readonly launchExpiresAtMs: number;
   readonly sessionToken: string;
   readonly launchToken: string;
-  launchConsumed: boolean;
 }
 
 function positiveInteger(name: string, value: number, maximum: number): number {
@@ -69,9 +68,10 @@ function descriptor(record: SessionRecord): StudioSessionDescriptor {
 
 /**
  * Owns the bounded set of sessions for one loopback listener. Launch tokens are
- * one-use URL credentials and are deliberately distinct from API session
+ * short-lived URL credentials and are deliberately distinct from API session
  * tokens, which exist only in the returned bootstrap document and browser
- * memory.
+ * memory. Repeated bootstrap reads return the same session so link previews do
+ * not consume the user's launch.
  */
 export class StudioSessionManager {
   readonly #maximumActiveSessions: number;
@@ -141,8 +141,7 @@ export class StudioSessionManager {
       expiresAtMs: now + this.#sessionTtlMs,
       launchExpiresAtMs: now + this.#launchTtlMs,
       sessionToken: generatedSessionValue,
-      launchToken,
-      launchConsumed: false
+      launchToken
     };
     this.#records.push(record);
     return {
@@ -153,20 +152,17 @@ export class StudioSessionManager {
     };
   }
 
-  /** Consumes a one-use launch token without invalidating its API session. */
-  consumeLaunchToken(candidate: string): ActivatedStudioSession | undefined {
+  /** Authorizes repeat bootstrap reads only during the short launch window. */
+  authorizeLaunchToken(candidate: string): ActivatedStudioSession | undefined {
     if (this.#closed) return undefined;
     const now = this.#now();
     this.#pruneExpired(now);
     const record = this.#findMatching(candidate, "launch");
     if (
-      record === undefined ||
-      record.launchConsumed ||
-      record.launchExpiresAtMs <= now
+      record === undefined || record.launchExpiresAtMs <= now
     ) {
       return undefined;
     }
-    record.launchConsumed = true;
     return { ...descriptor(record), sessionToken: record.sessionToken };
   }
 

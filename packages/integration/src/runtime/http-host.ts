@@ -415,7 +415,7 @@ export class IntegrationLoopbackHttpHost {
     if (tokens.length !== 1 || [...request.url.searchParams.keys()].length !== 1) {
       return jsonError(403, "session_invalid", "The Studio launch token is missing or no longer valid.");
     }
-    const activated = this.#sessions.consumeLaunchToken(tokens[0] ?? "");
+    const activated = this.#sessions.authorizeLaunchToken(tokens[0] ?? "");
     if (activated === undefined) {
       return jsonError(403, "session_invalid", "The Studio launch token is missing or no longer valid.");
     }

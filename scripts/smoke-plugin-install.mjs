@@ -20,7 +20,7 @@ import { pathToFileURL } from "node:url";
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 export const ACCEPTED_ARTIFACT_MANIFEST_SHA256 =
-  "fe3c23b15e51de882c9f1f502604943cdf04b666e27694dc17d7c9f152bf4171";
+  "f81290faedaf4a2ffc4923a1d1e27a4509dc34d9724d969bb6c3c4f811c853b7";
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
@@ -353,14 +353,21 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
   if (launchUrl.protocol !== "http:" || launchUrl.hostname !== "127.0.0.1" ||
       launchUrl.pathname !== "/" || launchUrl.searchParams.size !== 1 ||
       !launchUrl.searchParams.has("token")) {
-    fail("Studio launch URL is not a single-use IPv4 loopback URL");
+    fail("Studio launch URL is not a short-lived IPv4 loopback URL");
   }
+  const previewResponse = await fetch(launchUrl, { redirect: "error" });
+  if (previewResponse.status !== 200) fail("Studio link preview did not load");
+  const previewBootstrap = await previewResponse.text();
+  const previewSession = sessionTokenFromBootstrap(previewBootstrap);
   const bootstrapResponse = await fetch(launchUrl, { redirect: "error" });
   if (bootstrapResponse.status !== 200) fail("Studio bootstrap did not load");
   const bootstrap = await bootstrapResponse.text();
   const bootstrapSession = sessionTokenFromBootstrap(bootstrap);
+  if (bootstrapSession !== previewSession) {
+    fail("Studio preview and user open did not resolve to the same API session");
+  }
   if (bootstrap.includes(launchUrl.searchParams.get("token"))) {
-    fail("Studio bootstrap retained the one-time launch token");
+    fail("Studio bootstrap retained the short-lived launch token");
   }
   const origin = launchUrl.origin;
   const assetManifest = JSON.parse(

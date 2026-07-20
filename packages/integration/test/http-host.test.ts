@@ -142,15 +142,15 @@ describe("StudioSessionManager", () => {
     expect(manager.size).toBe(2);
     expect(() => manager.issue()).toThrow(/active session limit/u);
 
-    const activated = manager.consumeLaunchToken(first.launchToken);
+    const activated = manager.authorizeLaunchToken(first.launchToken);
     expect(activated).toMatchObject({ id: first.id, sessionToken: first.sessionToken });
-    expect(manager.consumeLaunchToken(first.launchToken)).toBeUndefined();
+    expect(manager.authorizeLaunchToken(first.launchToken)).toEqual(activated);
     expect(manager.authorizeSessionToken(first.launchToken)).toBeUndefined();
     expect(manager.authorizeSessionToken(first.sessionToken)?.id).toBe(first.id);
     expect(manager.authorizeSessionToken("synthetic-mismatched-token-that-is-long-enough")).toBeUndefined();
 
     now += 100;
-    expect(manager.consumeLaunchToken(second.launchToken)).toBeUndefined();
+    expect(manager.authorizeLaunchToken(second.launchToken)).toBeUndefined();
     expect(manager.authorizeSessionToken(second.sessionToken)?.id).toBe(second.id);
     now += 900;
     expect(manager.authorizeSessionToken(first.sessionToken)).toBeUndefined();
@@ -256,7 +256,10 @@ describe("IntegrationLoopbackHttpHost", () => {
         expect(sessionTokenFromBootstrap(html)).toBe(first.session.sessionToken);
         expect(html.indexOf("history.replaceState")).toBeLessThan(html.indexOf('type="module"'));
         expect(html).not.toContain(first.session.launchToken);
-        expect((await fetch(first.result.url)).status).toBe(403);
+        const openedAfterPreview = await fetch(first.result.url);
+        expect(openedAfterPreview.status).toBe(200);
+        expect(openedAfterPreview.headers.get("cache-control")).toContain("no-store");
+        expect(sessionTokenFromBootstrap(await openedAfterPreview.text())).toBe(first.session.sessionToken);
 
         const staticResponse = await fetch(`${host.address!.origin}/assets/app.ab12cd.js`);
         expect(staticResponse.status).toBe(200);
