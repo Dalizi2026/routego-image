@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "integrate-routego-image-plugin",
   "role": "openspec-propose-and-apply-owner",
-  "status": "task-7.2-real-relay-complete-awaiting-controller-acceptance",
+  "status": "task-7.2-controller-accepted-awaiting-task-8.1-preflight",
   "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
   "threadId": "019f7d87-61ac-79e2-bd98-51c75be002e1",
   "worktree": "/Users/dalizi/Documents/routego-image-integration-g8",
@@ -13,7 +13,7 @@
   "registrationAttempt": 1,
   "registrationCommit": "06d1c0d4025ac72a4cef9fd3b9439689a9b8607f",
   "incorporationCommit": "a3f5cd9d5b43085ad6b76503a2b78fe2399b001a",
-  "currentHead": "346b4ef82f3eff4b02fc749961e4555ac33b9186",
+  "currentHead": "f1da1a2288506d48f621bdc8e3429ad01fb98ac2",
   "task7_1CapsuleMaterializationCommit": "99ec9a708c890efa3fd56b45fbbe3835b380ccfd",
   "task7_2CapsuleMaterializationCommit": "6beab305aae5216296d5026858f720528f7b5182",
   "task7_2EndpointCorrectionCapsuleCommit": "4c2cac247fe4b2842fd679162b87007b74560fbf",
@@ -29,7 +29,7 @@
   "gitCleanAtRegistration": true,
   "gitClean": true,
   "observableCompactions": 0,
-  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|346b4ef82f3eff4b02fc749961e4555ac33b9186|task-7.2-real-relay-complete-awaiting-controller-acceptance|26/29",
+  "lastCompactionFingerprint": "integration|integrate-routego-image-plugin|f1da1a2288506d48f621bdc8e3429ad01fb98ac2|task-7.2-controller-accepted-awaiting-task-8.1-preflight|26/29",
   "soleApplyOwner": true,
   "frozen": true,
   "applyAuthorized": false,
@@ -114,7 +114,7 @@
     "completedTasks": 26,
     "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1", "4.2", "4.3", "5.1", "5.2", "5.3", "6.1", "6.2", "6.3", "7.1", "7.2"],
     "nextTaskId": "8.1",
-    "nextTaskLocked": true
+    "nextTaskLocked": false
   },
   "currentTask": {
     "id": "7.2",
@@ -202,19 +202,19 @@
     "auditFailure": "HANDOFF_AUDIT_FAILED"
   },
   "latestCheckpoint": {
-    "eventFingerprint": "integration|integrate-routego-image-plugin|346b4ef82f3eff4b02fc749961e4555ac33b9186|task-7.2-real-relay-complete-awaiting-controller-acceptance|26/29",
-    "messageType": "TASK_7_2_COMPLETION_DELIVERY",
+    "eventFingerprint": "integration|integrate-routego-image-plugin|f1da1a2288506d48f621bdc8e3429ad01fb98ac2|task-7.2-controller-accepted-awaiting-task-8.1-preflight|26/29",
+    "messageType": "TASK_7_2_ACCEPTANCE_READBACK",
     "completedTaskId": "7.2",
     "currentTaskId": "7.2",
     "nextTaskId": "8.1",
-    "reportedHead": "346b4ef82f3eff4b02fc749961e4555ac33b9186",
-    "controllerReceived": false,
-    "controllerReadBackConfirmed": false,
-    "controllerAccepted": false,
+    "reportedHead": "f1da1a2288506d48f621bdc8e3429ad01fb98ac2",
+    "controllerReceived": true,
+    "controllerReadBackConfirmed": true,
+    "controllerAccepted": true,
     "handoffAccepted": false,
     "sourceFrozen": true,
     "observableCompactions": 0,
-    "checkpointSemantics": "The exact zayuapi test profile completed the six-case matrix with eight new raw requests, six successful quota counts and USD 9.69 combined cost risk. Sanitized evidence passed the acceptance and safety validators; Task 7.2 is complete pending Controller acceptance."
+    "checkpointSemantics": "Controller independently accepted Task 7.2 result commit f1da1a2288506d48f621bdc8e3429ad01fb98ac2. OpenSpec is 26/29, Task 8.1 is first pending, and the Integration owner remains frozen until a separate preflight and activation commit."
   },
   "planDeviation": {
     "id": "PD-014",
