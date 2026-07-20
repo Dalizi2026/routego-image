@@ -20,7 +20,7 @@ import { pathToFileURL } from "node:url";
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 export const ACCEPTED_ARTIFACT_MANIFEST_SHA256 =
-  "f81290faedaf4a2ffc4923a1d1e27a4509dc34d9724d969bb6c3c4f811c853b7";
+  "b4446e70f99dccbf0b2f4dd30b938cdbe82e604d99ec3ad9d5189b6e8cc78fe0";
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
@@ -379,8 +379,13 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
   }
   for (const route of assetRoutes) {
     const response = await fetch(new URL(route, origin), { redirect: "error" });
-    if (response.status !== 200 || (await response.arrayBuffer()).byteLength === 0) {
+    const bytes = await response.arrayBuffer();
+    if (response.status !== 200 || bytes.byteLength === 0) {
       fail("a hashed Studio static asset did not load");
+    }
+    if (route === assetManifest.entryModuleRoute &&
+        !Buffer.from(bytes).toString("utf8").includes("__ROUTEGO_STUDIO_SESSION__")) {
+      fail("the packaged Studio entry does not consume the injected session bootstrap");
     }
   }
 

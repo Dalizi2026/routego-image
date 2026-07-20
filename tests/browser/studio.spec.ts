@@ -7,6 +7,7 @@ import {
   STUDIO_SESSION_TOKEN,
   installDeterministicMock,
   installSyntheticFaviconBoundary,
+  installSyntheticStudioBootstrap,
   observeBrowserSecurity,
   openStudio,
   startStudioServer,
@@ -419,7 +420,8 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
     await new Promise((resolve) => setTimeout(resolve, 120));
     await route.continue();
   });
-  const readyNavigation = page.goto(`/?token=${encodeURIComponent(STUDIO_SESSION_TOKEN)}`);
+  await installSyntheticStudioBootstrap(page);
+  const readyNavigation = page.goto("/");
   await expect(page.getByText("正在显影工作区")).toBeVisible();
   await readyNavigation;
   await expect(page.getByRole("heading", { name: "把想法放进显影盘" })).toBeVisible();
@@ -467,7 +469,8 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
   const rejectedPage = await context.newPage();
   const rejectedAudit = observeBrowserSecurity(rejectedPage);
   await installSyntheticFaviconBoundary(rejectedPage);
-  await rejectedPage.goto(`/?token=${encodeURIComponent(rejectedSessionToken)}`);
+  await installSyntheticStudioBootstrap(rejectedPage, rejectedSessionToken);
+  await rejectedPage.goto("/");
   await expect(rejectedPage.getByRole("heading", { name: "本地工作区无法载入" })).toBeVisible();
   await expect(rejectedPage.getByText("本地会话已失效或被拒绝。")).toBeVisible();
   await expect(rejectedPage.getByText("请关闭此页面，再从 Routego Image 重新打开 Studio。")).toBeVisible();

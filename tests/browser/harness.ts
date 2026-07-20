@@ -301,12 +301,28 @@ export async function installSyntheticFaviconBoundary(page: Page): Promise<void>
   });
 }
 
+export async function installSyntheticStudioBootstrap(
+  page: Page,
+  sessionToken = STUDIO_SESSION_TOKEN
+): Promise<void> {
+  await page.addInitScript(({ token }) => {
+    Object.defineProperty(globalThis, "__ROUTEGO_STUDIO_SESSION__", {
+      value: Object.freeze({
+        sessionToken: token,
+        expiresAt: new Date(Date.now() + 60_000).toISOString()
+      }),
+      configurable: false
+    });
+  }, { token: sessionToken });
+}
+
 export async function openStudio(
   page: Page,
   options: { readonly firstRun?: boolean } = {}
 ): Promise<void> {
   await installSyntheticFaviconBoundary(page);
-  await page.goto(`/?token=${encodeURIComponent(STUDIO_SESSION_TOKEN)}`);
+  await installSyntheticStudioBootstrap(page);
+  await page.goto("/");
   await page.getByRole("heading", {
     name: options.firstRun ? "中转配置与能力校准" : "把想法放进显影盘"
   }).waitFor();
