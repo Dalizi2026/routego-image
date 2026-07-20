@@ -197,10 +197,16 @@ async function createContentManifest(packageRoot) {
     const bytes = await readFile(path.join(packageRoot, ...file.split("/")));
     entries.push({ path: file, bytes: bytes.byteLength, sha256: sha256(bytes) });
   }
+  const pluginManifest = JSON.parse(
+    await readFile(path.join(packageRoot, ".codex-plugin/plugin.json"), "utf8")
+  );
+  if (typeof pluginManifest?.version !== "string" || pluginManifest.version.length === 0) {
+    throw new Error("The Codex plugin manifest must contain a non-empty version.");
+  }
   return {
     schemaVersion: 1,
     name: "routego-image",
-    version: "1.0.0",
+    version: pluginManifest.version,
     node: ">=20.19.0",
     files: entries
   };

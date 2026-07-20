@@ -18,6 +18,7 @@ const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
 const execFileAsync = promisify(execFile);
 
 interface ArtifactManifest {
+  version: string;
   files: Array<{ path: string; bytes: number; sha256: string }>;
 }
 
@@ -180,6 +181,9 @@ describe("Routego Image plugin package", () => {
     ["unknown manifest and server keys", (manifest: Record<string, any>) => {
       manifest["unexpected"] = true;
       manifest["mcpServers"]["routego-image"]["unexpected"] = true;
+    }],
+    ["an invalid cachebuster version", (manifest: Record<string, any>) => {
+      manifest["version"] = "1.0.0+codex.INVALID_token";
     }]
   ])("rejects a rehashed canonical manifest with %s", async (_label, mutate) => {
     const candidate = path.join(temporaryRoot, `manifest-${String(_label).replaceAll(" ", "-")}`, "routego-image");
@@ -194,6 +198,43 @@ describe("Routego Image plugin package", () => {
     );
 
     await expect(verifyPluginPackage(candidate)).rejects.toThrow(/accepted|canonical|manifest/u);
+  });
+
+  it("accepts an official cachebuster when both manifests use the same version", async () => {
+    const candidate = path.join(temporaryRoot, "cachebuster", "routego-image");
+    await cp(firstPackage, candidate, { recursive: true });
+    const version = "1.0.0+codex.local-20260720-g11";
+    const pluginManifestPath = path.join(candidate, ".codex-plugin/plugin.json");
+    const pluginManifest = JSON.parse(await readFile(pluginManifestPath, "utf8")) as Record<string, any>;
+    pluginManifest["version"] = version;
+    await rewriteFileAndManifest(
+      candidate,
+      ".codex-plugin/plugin.json",
+      `${JSON.stringify(pluginManifest, null, 2)}\n`
+    );
+    const artifactManifestPath = path.join(candidate, "artifact-manifest.json");
+    const artifactManifest = JSON.parse(await readFile(artifactManifestPath, "utf8")) as ArtifactManifest;
+    artifactManifest.version = version;
+    await writeFile(artifactManifestPath, `${JSON.stringify(artifactManifest, null, 2)}\n`, "utf8");
+
+    await expect(verifyPluginPackage(candidate)).resolves.toMatchObject({
+      contentManifest: { version }
+    });
+  });
+
+  it("rejects a cachebuster when the artifact and plugin versions differ", async () => {
+    const candidate = path.join(temporaryRoot, "cachebuster-mismatch", "routego-image");
+    await cp(firstPackage, candidate, { recursive: true });
+    const pluginManifestPath = path.join(candidate, ".codex-plugin/plugin.json");
+    const pluginManifest = JSON.parse(await readFile(pluginManifestPath, "utf8")) as Record<string, any>;
+    pluginManifest["version"] = "1.0.0+codex.local-20260720-g11";
+    await rewriteFileAndManifest(
+      candidate,
+      ".codex-plugin/plugin.json",
+      `${JSON.stringify(pluginManifest, null, 2)}\n`
+    );
+
+    await expect(verifyPluginPackage(candidate)).rejects.toThrow(/artifact-manifest|invalid shape/u);
   });
 
   it.each([

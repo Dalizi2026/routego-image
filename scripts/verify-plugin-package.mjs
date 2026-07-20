@@ -13,9 +13,9 @@ const MAXIMUM_FILE_BYTES = 24 * 1_024 * 1_024;
 const MAXIMUM_TOTAL_BYTES = 64 * 1_024 * 1_024;
 const PNGJS_LICENSE_SHA256 = "be75ef59c5cf59715588a17a82dff7dd3e83c4dba3c458676bb9311e05fbedc5";
 const MINIMUM_RAW_BASE64_PAYLOAD_CHARS = 96;
+const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 const ACCEPTED_PLUGIN_MANIFEST = {
   name: "routego-image",
-  version: "1.0.0",
   description: "Create, edit, organize, and review images with the local Routego Image runtime.",
   author: {
     name: "Routego Image"
@@ -145,9 +145,9 @@ async function readJson(root, relativePath) {
   return value;
 }
 
-function validateContentManifest(value) {
+function validateContentManifest(value, expectedVersion) {
   if (!plainObject(value) || value.schemaVersion !== 1 || value.name !== "routego-image" ||
-      value.version !== "1.0.0" || value.node !== ">=20.19.0" || !Array.isArray(value.files)) {
+      value.version !== expectedVersion || value.node !== ">=20.19.0" || !Array.isArray(value.files)) {
     fail("artifact-manifest.json has an invalid shape");
   }
   const entries = [];
@@ -170,9 +170,12 @@ function validateContentManifest(value) {
 }
 
 function validatePluginManifest(value) {
-  if (!isDeepStrictEqual(value, ACCEPTED_PLUGIN_MANIFEST)) {
+  const version = plainObject(value) ? value.version : undefined;
+  if (typeof version !== "string" || !ACCEPTED_PLUGIN_VERSION.test(version) ||
+      !isDeepStrictEqual(value, { ...ACCEPTED_PLUGIN_MANIFEST, version })) {
     fail("the Codex plugin manifest does not exactly match the accepted canonical manifest");
   }
+  return version;
 }
 
 function validateStudioManifest(value, fileSet) {
@@ -290,6 +293,7 @@ export async function verifyPluginPackage(packageDirectory) {
     if (!fileSet.has(required)) fail(`a required file is missing: ${required}`);
   }
 
+  const pluginVersion = validatePluginManifest(await readJson(root, ".codex-plugin/plugin.json"));
   const artifactManifestBytes = await boundedRead(path.join(root, ARTIFACT_MANIFEST));
   let artifactManifestValue;
   try {
@@ -297,7 +301,7 @@ export async function verifyPluginPackage(packageDirectory) {
   } catch {
     fail("artifact-manifest.json is not valid UTF-8 JSON");
   }
-  const contentManifest = validateContentManifest(artifactManifestValue);
+  const contentManifest = validateContentManifest(artifactManifestValue, pluginVersion);
   const expected = [...files]
     .filter((file) => file !== ARTIFACT_MANIFEST)
     .sort((left, right) => left.localeCompare(right, "en"));
@@ -312,7 +316,6 @@ export async function verifyPluginPackage(packageDirectory) {
     }
   }
 
-  validatePluginManifest(await readJson(root, ".codex-plugin/plugin.json"));
   validateStudioManifest(await readJson(root, "runtime/studio-assets.json"), fileSet);
   const runtimeText = (await boundedRead(path.join(root, "runtime/index.js"))).toString("utf8");
   validateRuntimeImports(runtimeText);
