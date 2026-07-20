@@ -118,6 +118,9 @@ describe("Routego Image plugin package", () => {
     expect(packagedSkill).toContain("never construct or reuse a URL");
     expect(packagedSkill).toContain("later change a provider, endpoint, model, API key");
     expect(packagedSkill).toContain("后续要求修改提供方、端点、模型、API Key");
+    expect(packagedSkill).toContain("unknown `text-generation` evidence is an allowed baseline");
+    expect(packagedSkill).toContain("不要为这条基础路径要求能力探测");
+    expect(packagedSkill).toContain("For edits, references, masks, and other capability-dependent operations");
 
     const logo = await readPng(firstPackage, "assets/logo.png");
     const composerIcon = await readPng(firstPackage, "assets/composer-icon.png");
