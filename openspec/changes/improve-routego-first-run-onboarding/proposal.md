@@ -15,7 +15,7 @@ Routego Image correctly detects an unconfigured installation, but the Codex resp
 - Connect the secure bootstrap document to the Studio entrypoint by consuming its injected in-memory session before removing the launch URL, so the real packaged page can authenticate without retaining a token in the address bar.
 - Accept browser same-origin API reads that omit `Origin` only when the exact loopback `Host`, Fetch Metadata (`same-origin`/`empty`), and session token all match, while preserving cross-site and non-browser rejection.
 - Report production MCP, HTTP, and Studio availability from the live process/lifecycle rather than the service's disconnected default health object.
-- Replace the developer-oriented first-run Settings presentation with a focused connection form containing only the provider's call endpoint, write-only API key, and an explicit connect-and-fetch-models action. Infer endpoint mode and the candidate models route internally, then let the user choose a returned model and finish. Tell the user to return to Codex for normal image requests; keep technical calibration and maintenance out of the first-run surface.
+- Replace the developer-oriented Settings presentation with a focused connection form containing only the provider's call endpoint, write-only API key, and an explicit connect-and-fetch-models action for both first use and later reconfiguration. Infer endpoint mode and the candidate models route internally, then let the user choose a returned model and finish. Tell the user to return to Codex for normal image requests; keep technical calibration and maintenance in a closed advanced disclosure.
 
 ## Capabilities
 
