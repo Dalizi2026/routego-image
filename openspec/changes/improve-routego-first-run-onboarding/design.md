@@ -54,6 +54,8 @@ Alternative considered: encode provider fields or a key in MCP server settings. 
 
 The current launch token is marked consumed by the first bootstrap GET. Codex link preview performs that GET before the user's browser navigation, so the real open receives `session_invalid`. Launch authorization will instead remain valid until its existing short launch expiry and return the same API session token on repeated bootstrap GETs. The separate launch credential is still rejected for every API route, bootstrap stays `no-store`, the browser removes the query immediately, and expiry is never extended.
 
+The bootstrap HTML injects the owning API session as a frozen `__ROUTEGO_STUDIO_SESSION__` global before loading the hashed Studio entry module. The Studio entrypoint will consume that injected object as its primary source, validate its token shape and expiry descriptor, and keep the URL-token helper only for deterministic development fixtures. This preserves the production rule that the API token never remains in the address bar while making the packaged server and browser entrypoints use the same handoff.
+
 Alternative considered: detect preview-specific request headers. Rejected because preview clients do not provide a stable cross-version contract and header heuristics would reproduce the bug in another host. Extending the launch window to the full API session lifetime was also rejected; only the existing short TTL is reusable.
 
 ## Risks / Trade-offs

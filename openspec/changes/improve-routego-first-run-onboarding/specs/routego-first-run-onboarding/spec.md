@@ -61,3 +61,8 @@ The loopback runtime SHALL allow the same valid launch token to retrieve the no-
 #### Scenario: Replayed launch is expired
 - **WHEN** the same launch URL is requested at or after its short launch-token expiry
 - **THEN** the runtime SHALL return `session_invalid` without issuing a new session, extending expiry, or exposing either token
+
+#### Scenario: Packaged Studio consumes the injected session
+- **WHEN** the no-store bootstrap document injects a valid `__ROUTEGO_STUDIO_SESSION__` object before loading the Studio entry module
+- **THEN** the Studio entrypoint SHALL create its in-memory API session from that object, remove any launch query from the visible URL, and SHALL NOT require the launch token to remain in the address bar
+- **AND** a malformed or expired injected object SHALL fail closed without making API requests
