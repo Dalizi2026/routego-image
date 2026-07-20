@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "11190151fff563f00fcdd90ba76bcbfb22b95f0ec52d31601ae499f2862007d2",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "7.1",
+  "status": "materialized-awaiting-controller-activation",
+  "sourceCommit": "d2e5860f3d06542fbde6f27614d423b47ef0671a",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "fe73249421b02272d00c252f202cd1b47d676177f7979e4d347d7b06692c5bae",
+    "lineSha256": "5e63bf85ccc2a689aca11cfdcfd07f32387a17a2b885b85dc6c29ccb12f5c437",
+    "lineBytes": 1065
+  },
+  "dependencies": ["6.3"],
+  "dependencyCommits": {
+    "task6_3VerifiedSource": "6c31e961ea63a1033294c1455915e5a58f87e34b",
+    "task6_3EvidenceCapsule": "89d49eec4ef17489b0976f3a94660a411a1b8f46",
+    "task6_3ControllerAcceptance": "6977b2ccef7678ff542e538656c782e1c385be38",
+    "task6_3TaskState": "d2e5860f3d06542fbde6f27614d423b47ef0671a"
+  },
+  "allowedFiles": [
+    "scripts/run-real-relay-acceptance.mjs",
+    "docs/acceptance/routego-image-real-relay.md",
+    "packages/integration/test/acceptance-harness.test.ts"
+  ],
+  "allowedParentDirectoriesToCreate": ["docs/acceptance"],
+  "forbiddenFileGlobs": [
+    "packages/**/src/**",
+    "packages/**/test/**",
+    "!packages/integration/test/acceptance-harness.test.ts",
+    ".github/**",
+    ".codex-plugin/**",
+    "openspec/**",
+    ".codex/routego-program/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "requiredBehavior": [
+    "Create an offline-only acceptance harness, checklist and redacted evidence validator for the exact text, two-reference, direct-edit, mask-slot-zero, partial-batch and transparency matrix.",
+    "Fail closed unless a current explicit approval binds the exact relay/profile, synthetic inputs, credential-use acknowledgement, request classes, request count, budget, expiry and evidence location.",
+    "Never derive or probe endpoints, read credentials, execute provider requests, persist raw provider bodies or image bytes, or claim Task 7.2 acceptance.",
+    "Enforce request and cost ceilings before each operation, stop without replay after withdrawal, cancellation, budget exhaustion or safety failure, and retain only completed redacted facts.",
+    "Validate four-state capability evidence, truthful unsupported/degraded/transient semantics, shared Codex/Studio Library identities, exact source relationships and release-blocking incomplete outcomes.",
+    "Validate transparency success and chromakey failure using one output identity per slot, no extra rendition or relationship role, the 33-item bound and provider-original fallback under the same identity."
+  ],
+  "verification": [
+    "fresh OpenSpec apply showing 24/29 with Task 7.1 first pending and strict validation 19/19",
+    "focused deterministic offline tests for missing, expired, narrow or over-budget approval refusal",
+    "synthetic offline dry run for the exact ordered matrix, request/cost accounting, cancellation and stop behavior",
+    "redaction and evidence-schema tests proving no credential, authorization header, raw provider body, endpoint path, image bytes or user data is retained",
+    "partial-batch, capability-state, shared-Library and transparency/chromakey identity and 33-bound assertions",
+    "Integration typecheck and focused/full tests, repository safety, node syntax, git diff --check and exact three-file scope"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/real-relay-acceptance/spec.md",
+      "sha256": "10a2b76338285785b355953618d8ed381445a01842c9526c54c14e21ef983a28",
+      "bytes": 5385,
+      "reason": "Defines explicit authorization, synthetic inputs, redacted evidence, truthful ordered matrix, four-state capability evidence, shared Library identity and fail-closed cleanup."
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/design.md",
+      "sha256": "c18cea8279f73e6089726671dfd915237091120439a33166df7e91a073409f6a",
+      "bytes": 28797,
+      "reason": "Separates the offline acceptance harness from approval-gated real-relay execution and release."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "authorization": {
+    "userInstruction": "continue automatic development flow",
+    "interpretedScope": "prepare and verify the approval-gated real-relay harness entirely offline without executing any real request",
+    "networkOrFetchAuthorized": false,
+    "realRelayOrPaidRequestAuthorized": false,
+    "credentialReadAuthorized": false,
+    "externalStateAuthorized": false
+  },
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "integrationGeneration": 11,
+    "integrationThreadId": "019f7d87-61ac-79e2-bd98-51c75be002e1",
+    "soleApplyOwner": false,
+    "applyAuthorized": false,
+    "authorizedScope": "task-7.1-exact-three-file-offline-acceptance-harness",
+    "started": false
+  },
+  "networkAuthorized": false,
+  "packageInstallAuthorized": false,
+  "remoteCiExecutionAuthorized": false,
+  "externalStateAuthorized": false,
+  "realCredentialsOrUserDataAuthorized": false,
+  "realProviderOrPaidRequestAuthorized": false,
+  "marketplaceOrTargetInstallAuthorized": false,
+  "deploymentPublicationOrReleaseAuthorized": false
+}
