@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "3faa6feb8f2079f72140c32d05641173f6b7e068167e1afac81b67161019b566",
+  "lane": "integration",
+  "change": "integrate-routego-image-plugin",
+  "taskId": "6.3",
+  "status": "activation-authorized-awaiting-integration-audit",
+  "sourceCommit": "6c31e961ea63a1033294c1455915e5a58f87e34b",
+  "taskSource": {
+    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    "fileSha256": "246ed71029e05303a38aa026fb9fec6776849efaa738096f256ce07fb145323c",
+    "lineSha256": "76e4fadb81200d22c32dd826a8b0d3b04a0db6af4aec26c2b592d08e832ee979",
+    "lineBytes": 1175
+  },
+  "dependencies": ["6.2"],
+  "dependencyCommits": {
+    "task6_2Implementation": "d180f14e0e959962a1dbc5b5e3c06c690d8e53c4",
+    "task6_2TaskState": "6c31e961ea63a1033294c1455915e5a58f87e34b"
+  },
+  "allowedFiles": [
+    "openspec/changes/integrate-routego-image-plugin/tasks.md",
+    ".codex/routego-program/threads/integration.json"
+  ],
+  "allowedFileMode": "modify only after every task-6.3 conformance gate passes against the immutable source commit; before that point repository writes are forbidden",
+  "forbiddenFileGlobs": [
+    "packages/**",
+    "scripts/**",
+    ".github/**",
+    ".codex-plugin/**",
+    "skills/**",
+    "tests/**",
+    "openspec/changes/integrate-routego-image-plugin/proposal.md",
+    "openspec/changes/integrate-routego-image-plugin/design.md",
+    "openspec/changes/integrate-routego-image-plugin/specs/**",
+    ".codex/routego-program/program.json",
+    ".codex/routego-program/threads/controller.json",
+    ".codex/routego-program/tasks/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "tsconfig.json",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "requiredBehavior": [
+    "Run the complete offline Integration conformance gate from an identity-marked task-owned clean verification copy of source commit 6c31e961ea63a1033294c1455915e5a58f87e34b.",
+    "Perform frozen dependency installation only as an offline local-store operation with zero downloads; if any package is absent from the local store, stop without fallback, fetch or network access.",
+    "Keep HOME, CODEX_HOME, temporary data, package output and browser state inside task-owned temporary roots and do not read or mutate real user, plugin, Library, credential or provider state.",
+    "Run strict OpenSpec, repository safety, typecheck, dependency-ordered builds, every package test, exports, browser verification, two reproducible package builds and the fresh installed-process smoke without weakening assertions, thresholds, timeouts or test selection.",
+    "Preflight the fixed browser loopback port; if an unrelated process owns it, use an identity-marked temporary copy and free loopback port while preserving authoritative file hashes and mtimes and leaving the external PID unchanged.",
+    "Verify the exact seven public tools, public partial|final phases, PD-005 graph and stream invariants, session-capped resource lifetime, cleanup, security, native dependency, package containment and exact repository scope requirements.",
+    "If any failure requires code, do not patch within Task 6.3; report the owning completed task and stop for a separate exact-scope correction capsule.",
+    "After all gates pass, record the immutable verified source and task-state SHAs only in the two allowed state files, keep Task 7.1 stopped and do not request or execute a real relay operation."
+  ],
+  "verification": [
+    "fresh OpenSpec apply instructions showing 23/29 with task 6.3 first pending",
+    "offline-only pnpm install --frozen-lockfile in the clean verification copy with zero downloads and fail-closed local-store evidence",
+    "strict OpenSpec validation 19/19",
+    "repository safety, complete typecheck and dependency-ordered build",
+    "all seven package unit, contract and Integration suites plus seven package exports",
+    "complete Playwright suite plus repeated streamed core journey, with approved free-port isolation when needed",
+    "two byte-equivalent plugin package builds, strict package verification and fresh installed-process MCP/Studio/Library smoke",
+    "exact seven tools, public partial|final phase, PD-005 17+12+4 graph, no extra chromakey role, source, ZIP and retry audits",
+    "exact authenticated stream route, first and unique started, request-ID and sequence consistency, terminal before EOF and no sentinel",
+    "registration-plus-five-minutes or session-expiry minimum, normal and near-expiry exact-boundary fetch, object-URL independence and shutdown cleanup",
+    "credential, real-state, native dependency, path, package containment, generated-residue and external-network audits",
+    "authoritative source hashes and mtimes, unrelated loopback PID, temporary root cleanup, git diff --check, exact two-file post-gate state scope and clean Git"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/cross-platform-integration-verification/spec.md",
+      "sha256": "92e3a26498cf724f5580ab55961f95fa6ee8503fbca3ad2df9aba6296c4d429a",
+      "bytes": 5563,
+      "reason": "Complete offline deterministic gate, exact public and PD-005 regression coverage, security audits and clean delivery requirement."
+    },
+    {
+      "path": "openspec/changes/integrate-routego-image-plugin/specs/plugin-packaging-installation/spec.md",
+      "sha256": "d9970d8be726dd77f694ba9cfbdd2f84f64d840add82a602bc6abef45c856c66",
+      "bytes": 4778,
+      "reason": "Reproducible self-contained package, temporary isolated installation, fresh process smoke and source-dependency rejection."
+    },
+    {
+      "path": ".codex/routego-program/deviations/PD-005-integration-source-rendition-and-studio-sse-gap.md",
+      "sha256": "021783f80ce8b2d2380ec63dbee4141b07ca7263f79dbd88f19b5c906ea18655",
+      "bytes": 7642,
+      "reason": "Exact source-rendition, 33-bound and Studio SSE corrective invariants required by Task 6.3."
+    }
+  ],
+  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
+  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "authorization": {
+    "userInstruction": "continue automatic development flow",
+    "interpretedScope": "offline frozen dependency installation only inside an identity-marked task-owned clean verification copy, using the local store with zero downloads and fail-closed cache handling",
+    "networkOrFetchAuthorized": false,
+    "realOrExternalStateAuthorized": false
+  },
+  "activation": {
+    "controllerGeneration": 9,
+    "controllerThreadId": "019f7abf-f45c-7511-b71c-7df0714f38dc",
+    "integrationGeneration": 8,
+    "integrationThreadId": "019f7a4b-26c8-7d03-b541-1e7ea194ade8",
+    "acceptedTask6_2ImplementationCommit": "d180f14e0e959962a1dbc5b5e3c06c690d8e53c4",
+    "acceptedTask6_2StateCommit": "6c31e961ea63a1033294c1455915e5a58f87e34b",
+    "soleApplyOwner": true,
+    "applyAuthorized": true,
+    "authorizedScope": "task-6.3-offline-clean-copy-conformance-and-post-gate-exact-two-file-state",
+    "authorizedFiles": [
+      "openspec/changes/integrate-routego-image-plugin/tasks.md",
+      ".codex/routego-program/threads/integration.json"
+    ],
+    "authorizationBaselineControllerHead": "74fe12ea4ba11b0a4d269afa2f1bae990326f922",
+    "started": false
+  },
+  "cleanVerificationCopyRequired": true,
+  "offlineFrozenInstallationAuthorized": true,
+  "offlineFrozenInstallationCommand": "pnpm install --offline --frozen-lockfile",
+  "packageFetchAuthorized": false,
+  "networkAuthorized": false,
+  "remoteCiExecutionAuthorized": false,
+  "externalStateAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "marketplaceAuthorized": false,
+  "realCredentialsOrUserDataAuthorized": false,
+  "realProviderOrPaidRequestAuthorized": false,
+  "deploymentPublicationOrReleaseAuthorized": false
+}
