@@ -2,30 +2,36 @@
 
 ## Result
 
-Task 7.2 is incomplete and release readiness remains blocked. The first approved text-generation request reached the exact configured endpoint, but the endpoint returned HTTP 405 and no image output. Execution stopped immediately without retrying or calling a derived path.
+Task 7.2 is incomplete and release readiness remains blocked. Two approved text-generation attempts were made under the same provider/profile/model and USD 10 ceiling:
+
+1. The original user-confirmed API Base was treated as an exact endpoint and returned HTTP 405.
+2. The audited legacy normalization was then bound to the complete generation endpoint. That endpoint accepted the POST route but returned HTTP 502 with no image output.
+
+Both attempts stopped immediately without automatic retry. No other matrix case was started.
 
 ## Approved binding
 
 - Provider: `lnm生图`
 - Profile: `lnm`
 - Model: `gpt-image-2`
-- Endpoint fingerprint: `76f483c773fa695425c5db75ebe57faf45334dadc48f9f83b284720d1ca98655`
+- Corrected endpoint fingerprint: `20f9071f870fd7bf6a3a024dc04cb1996e0c5f1e96d2c17a30f5d8c1b2d11a8d`
 - Approval expiry: `2026-07-20T18:00:00+08:00`
-- Planned request ceiling: 8
-- Cost-risk ceiling: USD 10
+- Approved maximum per class: `3,3,3,3,3,3`
+- Combined cost-risk ceiling: USD 10
 - Automatic retries: disabled
 
-The private form retained mode `0600` and SHA-256 `42a5f32876acb5d22f3acd9e4c6afad56b0dcf4824b48903097748156d20c3c6`. Raw evidence remained in the approved mode-`0700` private evidence root identified by fingerprint `948853647f9cd7ed2be9d399eaedae946b85caf12d19022e846b41fadefcf740`.
+The corrected private form retained mode `0600` and SHA-256 `00ec5c9101b838c67da354606a8cf4ca4a82dbb6141f2696ae3a98a23811f4d0`. Raw evidence remained in the approved mode-`0700` private evidence root identified by fingerprint `948853647f9cd7ed2be9d399eaedae946b85caf12d19022e846b41fadefcf740`.
 
-## Observed case
+## Observed attempts
 
-| Case | Requests | Outcome | Capability state | HTTP | Duration | Output |
-| --- | ---: | --- | --- | ---: | ---: | --- |
-| Text generation | 1 | transient failure | unknown | 405 | 747 ms | none |
+| Attempt | Endpoint binding | Requests | Outcome | Capability state | HTTP | Duration | Output |
+| --- | --- | ---: | --- | --- | ---: | ---: | --- |
+| 1 | Original exact root | 1 | transient failure | unknown | 405 | 747 ms | none |
+| 2 | Corrected complete generation endpoint | 1 | transient failure | unknown | 502 | 3,183 ms | none |
 
-The response body was non-JSON, 154 bytes, with SHA-256 `4a327e30d348f9975e50913c72d1bdb067f31f726722326c17c6af8d7f04b3a6`. These bounded facts do not expose the body or endpoint.
+The second response body was JSON, 71 bytes, with top-level `error` and SHA-256 `cdbe892a5c08e23afe6238edd233cb294646288c1001a9c1c73ad10591bb60d3`. These bounded facts do not expose the body or endpoint.
 
-The request reserved USD 1.25 of the approval as a conservative cost-risk envelope. The provider did not supply an invoice amount, so actual cost is unknown and `mayHaveBilled` remains true. No claim of unsupported image generation was made because one method rejection does not prove model capability.
+The combined requests reserve USD 2.34 of the approval as a conservative cost-risk envelope. The provider did not supply invoice amounts, so actual cost remains unknown and `mayHaveBilled` is true. HTTP 502 is a transient upstream/server failure and does not prove that `gpt-image-2` or any image-input capability is unsupported.
 
 ## Cases not executed
 
@@ -37,13 +43,13 @@ The following approved cases were not started:
 4. Three-request partial batch.
 5. Transparency degradation.
 
-No sibling endpoint, `/models`, `/images/edits`, `/responses`, or other inferred route was probed. There was no automatic replay.
+No `/models`, `/images/edits`, `/responses`, or other sibling endpoint was called. The first root endpoint was not replayed after its 405 response, and the corrected generation endpoint was not replayed after its 502 response.
 
 ## Evidence and safety
 
-- The sanitized evidence passed `validateAcceptanceEvidence` and `assertEvidenceSafe`.
-- The exact configured endpoint alone received one POST request.
+- Both sanitized records passed `validateAcceptanceEvidence` and `assertEvidenceSafe`.
+- The corrected run counted the earlier request and cost risk before sending its request.
 - No credential, authorization header, full endpoint, raw provider body, image bytes, data URL, or local path is stored in repository evidence.
 - No real user Library, HOME, CODEX_HOME, plugin installation, marketplace, deployment, publication, or release state was read or mutated.
 
-Task 7.2 must remain pending. A corrected complete image-generation endpoint changes the endpoint fingerprint and therefore requires a fresh form identity, capsule binding, and explicit user approval before another real request.
+Task 7.2 remains pending. Another real request requires a new current user instruction because the corrected endpoint has now produced a transient 502 and automatic retries are forbidden.
