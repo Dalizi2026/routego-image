@@ -51,8 +51,74 @@ const settings: ReadSettingsResult = {
   outputDirectory: { configured: true, display: "Pictures/routego-image" }
 };
 
+const incompleteSettings: ReadSettingsResult = {
+  schemaVersion: 1,
+  activeProviderId: "provider-incomplete",
+  profiles: [
+    {
+      id: "provider-incomplete",
+      name: "Incomplete relay",
+      endpoints: {
+        generation: {
+          mode: "exact-generation-endpoint",
+          origin: "https://relay.example.invalid",
+          pathname: "/",
+          hasQuery: false,
+          display: "https://relay.example.invalid/"
+        }
+      },
+      models: [],
+      hasApiKey: false,
+      isActive: true,
+      createdAt: "2026-07-18T00:00:00.000Z",
+      updatedAt: "2026-07-18T00:00:00.000Z"
+    }
+  ],
+  defaults: {
+    size: "auto",
+    aspectRatio: "auto",
+    quality: "auto",
+    format: "png",
+    count: 1,
+    partialImages: 0,
+    transparentMode: "off",
+    moderation: "auto",
+    saveToLibrary: true
+  },
+  outputDirectory: { configured: false }
+};
+
 describe("secret-safe Settings workspace markup", () => {
-  it("renders profile, refresh, probe, defaults, and redacted output controls without secrets", () => {
+  it("renders first run as endpoint, key, and explicit model fetch only", () => {
+    const markup = renderToStaticMarkup(
+      createElement(I18nProvider, {
+        initialLanguage: "en",
+        children: createElement(CapabilityProvider, {
+          providerId: incompleteSettings.activeProviderId,
+          snapshots: [],
+          children: createElement(SettingsWorkspace, {
+            gateway: {} as StudioGateway,
+            settings: incompleteSettings,
+            onSettingsChange: () => undefined,
+            firstRunSession: true
+          })
+        })
+      })
+    );
+
+    expect(markup).toContain("Configure once, then create directly in Codex");
+    expect(markup).toContain("Call endpoint");
+    expect(markup).toContain('type="password"');
+    expect(markup).toContain("Connect and fetch models");
+    expect(markup).toContain("https://relay.example.invalid/");
+    expect(markup).not.toContain("Profile name");
+    expect(markup).not.toContain("Generation endpoint mode");
+    expect(markup).not.toContain("Refresh models (non-billable)");
+    expect(markup).not.toContain("Capability probe");
+    expect(markup).not.toContain("Four-state capability evidence");
+  });
+
+  it("keeps repeat configuration simple and places specialist controls in a closed disclosure", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
         initialLanguage: "en",
@@ -69,12 +135,17 @@ describe("secret-safe Settings workspace markup", () => {
       })
     );
 
-    expect(markup).toContain("Relay configuration &amp; capability calibration");
+    expect(markup).toContain("Image API settings");
+    expect(markup).toContain("Call endpoint");
+    expect(markup).toContain('type="password"');
+    expect(markup).toContain("Connect and fetch models");
+    expect(markup).toContain('<details class="settings-advanced"><summary>');
+    expect(markup).toContain("Advanced settings");
+    expect(markup).not.toContain('<details class="settings-advanced" open=""');
     expect(markup).toContain("Refresh models (non-billable)");
     expect(markup).toContain("Potentially billable");
     expect(markup).toContain("Four-state capability evidence");
     expect(markup).toContain("Replace");
-    expect(markup).not.toContain('type="password"');
     expect(markup).toContain("hidden query data");
     expect(markup).toContain("Pictures/routego-image");
     expect(markup).toContain("synthetic-present");

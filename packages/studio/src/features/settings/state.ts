@@ -79,7 +79,7 @@ export function createProviderProfileDraft(
     edits: optionalEndpoint(profile?.endpoints.edits),
     responses: optionalEndpoint(profile?.endpoints.responses),
     defaultModel: profile?.defaultModel ?? "",
-    apiKeyOperation: profile === undefined ? "replace" : "unchanged",
+    apiKeyOperation: profile === undefined || !profile.hasApiKey ? "replace" : "unchanged",
     apiKeyReplacement: "",
     setActive: profile?.isActive ?? true
   };
@@ -90,6 +90,49 @@ export function clearApiKeyDraft(draft: ProviderProfileDraft): ProviderProfileDr
     ...draft,
     apiKeyOperation: "unchanged",
     apiKeyReplacement: ""
+  };
+}
+
+export function applySimpleConnectionEndpoint(
+  draft: ProviderProfileDraft,
+  callEndpoint: string
+): ProviderProfileDraft {
+  const value = callEndpoint.trim();
+  let endpoint: URL;
+  try {
+    endpoint = new URL(value);
+  } catch {
+    throw new SettingsFormError("请输入服务商提供的完整调用端点。", {
+      "endpoints.generation.value": "调用端点必须是完整的网址。"
+    });
+  }
+
+  const pathname = endpoint.pathname.replace(/\/+$/u, "") || "/";
+  const exactGenerationEndpoint = pathname.endsWith("/images/generations");
+  const modelsEndpoint = new URL(endpoint.href);
+  modelsEndpoint.search = "";
+  modelsEndpoint.hash = "";
+  if (exactGenerationEndpoint) {
+    modelsEndpoint.pathname = pathname.replace(/\/images\/generations$/u, "/models");
+  } else if (pathname.endsWith("/v1")) {
+    modelsEndpoint.pathname = `${pathname}/models`;
+  } else {
+    modelsEndpoint.pathname = `${pathname === "/" ? "" : pathname}/v1/models`;
+  }
+
+  return {
+    ...draft,
+    name: draft.name.trim() || endpoint.hostname,
+    generation: {
+      mode: exactGenerationEndpoint ? "exact-generation-endpoint" : "legacy-api-base",
+      value,
+      requiresReentry: false
+    },
+    models: {
+      value: modelsEndpoint.href,
+      requiresReentry: false
+    },
+    setActive: true
   };
 }
 

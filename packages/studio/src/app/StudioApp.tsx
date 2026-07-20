@@ -253,8 +253,9 @@ function StudioWorkspace({
   const [state, dispatch] = useReducer(studioAppReducer, {
     ...initialStudioAppState,
     route: initialStudioRouteForSettings(settings),
-    notices: noticesFor(service, settings)
+    notices: firstRunSession ? [] : noticesFor(service, settings)
   });
+  const firstRunSetupVisible = firstRunSession && state.route === "settings";
   const [creationHandoff, setCreationHandoff] = useState<CreationExternalHandoff>();
   const handoffSequenceRef = useRef(0);
   const handleCreationHandoff = useCallback((handoff: LibraryCreationHandoff) => {
@@ -310,11 +311,16 @@ function StudioWorkspace({
   }, [state.route]);
 
   return (
-    <div className="studio-shell" data-language={language}>
+    <div
+      className={`studio-shell${firstRunSetupVisible ? " studio-shell--setup" : ""}`}
+      data-language={language}
+    >
       <a className="skip-link" href="#studio-workspace">
         {t("app.skip")}
       </a>
-      <AppNavigation route={state.route} onNavigate={(route) => dispatch({ type: "navigate", route })} />
+      {firstRunSetupVisible ? null : (
+        <AppNavigation route={state.route} onNavigate={(route) => dispatch({ type: "navigate", route })} />
+      )}
       <header className="studio-header">
         <div className="studio-header__identity">
           <p>{t("app.brand")}</p>
@@ -336,11 +342,17 @@ function StudioWorkspace({
           </button>
         </div>
       </header>
-      <NoticeStack
-        notices={state.notices}
-        onDismiss={(id) => dispatch({ type: "dismiss-notice", id })}
-      />
-      <main id="studio-workspace" className="studio-workspace" ref={headingRef}>
+      {firstRunSetupVisible ? null : (
+        <NoticeStack
+          notices={state.notices}
+          onDismiss={(id) => dispatch({ type: "dismiss-notice", id })}
+        />
+      )}
+      <main
+        id="studio-workspace"
+        className={`studio-workspace${firstRunSetupVisible ? " studio-workspace--setup" : ""}`}
+        ref={headingRef}
+      >
         <section className="studio-workspace__primary" aria-live="polite">
           <div data-studio-route="workbench" hidden={state.route !== "workbench"}>
             {workbenchContent}
@@ -351,7 +363,7 @@ function StudioWorkspace({
             </div>
           )}
         </section>
-        <StatusLedger service={service} settings={settings} />
+        {firstRunSetupVisible ? null : <StatusLedger service={service} settings={settings} />}
       </main>
       <footer className="studio-footer">
         <span>ROUTEGO IMAGE / LOCAL PRODUCTION SURFACE</span>

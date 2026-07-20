@@ -460,7 +460,12 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
   });
   expect(mobileNavigation).toEqual({ position: "fixed", bottom: "0px" });
   await page.getByRole("button", { name: "Settings" }).click();
-  await expect(page.getByRole("heading", { name: "Relay configuration & capability calibration" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Image API settings" })).toBeVisible();
+  await expect(page.getByLabel("Call endpoint")).toBeVisible();
+  await expect(page.getByLabel("API Key")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Connect and fetch models" })).toBeVisible();
+  await expect(page.locator("details.settings-advanced")).not.toHaveAttribute("open", "");
+  await expect(page.getByRole("heading", { name: "Relay configuration & capability calibration" })).not.toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 
   await expectSecurityClean(page, audit);
@@ -484,18 +489,29 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
   await rejectedPage.close();
 });
 
-test("first run opens secret-safe Settings and becomes ready only after a valid profile save", async ({ page }) => {
+test("first run connects with endpoint and key, fetches models once, then returns work to Codex", async ({ page }) => {
   const audit = observeBrowserSecurity(page);
   const replacementMarker = "synthetic-first-run-write-only-key";
   await installDeterministicMock(page, {}, { initiallyConfigured: false });
   await openStudio(page, { firstRun: true });
 
-  await expect(page.getByRole("button", { name: "设置" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "完成首次连接" })).toBeVisible();
-  await expect(page.getByText("填写服务商提供的完整生成端点和模型")).toBeVisible();
+  await expect(page.getByText("这个页面只负责连接你的图片 API")).toBeVisible();
   await expect(page.getByRole("button", { name: "进入工作台" })).toHaveCount(0);
-  await expect(page.getByLabel("新 API Key")).toBeVisible();
-  await expect(page.getByLabel("保存后设为当前提供方")).toBeChecked();
+  await expect(page.getByLabel("调用端点")).toBeVisible();
+  await expect(page.getByLabel("API Key")).toBeVisible();
+  await expect(page.getByRole("button", { name: "连接并获取模型" })).toBeVisible();
+  await expect(page.getByText("能力探测")).toHaveCount(0);
+  await expect(page.getByText("生成默认值")).toHaveCount(0);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.getByRole("heading", { name: "完成首次连接" })).toBeVisible();
+  const desktopSetupBox = await page.locator(".settings-setup").boundingBox();
+  expect(desktopSetupBox?.width).toBeGreaterThan(600);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  await page.setViewportSize({ width: 1440, height: 900 });
 
   const automaticOperations = audit.requests.filter((request) =>
     new URL(request.url).pathname.startsWith("/api/v1/") &&
@@ -505,21 +521,32 @@ test("first run opens secret-safe Settings and becomes ready only after a valid 
 
   await page.getByRole("button", { name: "界面语言" }).click();
   await expect(page.getByRole("heading", { name: "Complete the first connection" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Fill provider profile" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Connect and fetch models" })).toBeVisible();
   await page.getByRole("button", { name: "Interface language" }).click();
 
-  await page.getByRole("button", { name: "填写提供方资料" }).click();
-  await expect(page.getByLabel("资料名称")).toBeFocused();
-  await page.getByLabel("资料名称").fill("首次本地中转");
-  await page.getByLabel("资料默认模型").fill("synthetic-image-model");
-  await page.getByRole("textbox", { name: "生成端点", exact: true }).fill("https://first-run.invalid/v1/images/generations");
-  await page.getByLabel("新 API Key").fill(replacementMarker);
-  await page.getByRole("button", { name: "保存提供方资料" }).click();
+  await page.getByLabel("调用端点").fill("https://first-run.invalid/");
+  await page.getByLabel("API Key").fill(replacementMarker);
+  await page.getByRole("button", { name: "连接并获取模型" }).click();
+  await expect(page.getByLabel("选择生图模型")).toHaveValue("mock-image-model");
+  await page.getByRole("button", { name: "完成配置" }).click();
 
   await expect(page.getByRole("heading", { name: "首次配置已完成" })).toBeVisible();
+  await expect(page.locator(".settings-setup__complete p")).toContainText("现在回到 Codex");
   await expect(page.getByRole("button", { name: "进入工作台" })).toBeVisible();
   await expect(page.locator("body")).not.toContainText(replacementMarker);
+
+  const requestedOperations = audit.requests
+    .map((request) => new URL(request.url).pathname)
+    .filter((pathname) =>
+      pathname.startsWith("/api/v1/") &&
+      (pathname === "/api/v1/settings/providers/refresh-models" ||
+        pathname === "/api/v1/settings/providers/capability-probe" ||
+        pathname.includes("/creation/stream"))
+    );
+  expect(requestedOperations).toEqual(["/api/v1/settings/providers/refresh-models"]);
+
   await page.getByRole("button", { name: "进入工作台" }).click();
+  await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "把想法放进显影盘" })).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
@@ -753,6 +780,7 @@ test("confirmed capability probes unlock reference upload, generation, target ed
   await expect(uploadInput(page, "参考图")).toBeDisabled();
 
   await page.getByRole("button", { name: "设置" }).click();
+  await page.getByText("高级设置", { exact: true }).click();
   await runCapabilityProbe(page, "single-image-input");
   await runCapabilityProbe(page, "target-edit");
   await runCapabilityProbe(page, "mask-edit");
@@ -949,6 +977,7 @@ test("Settings keeps API-key replacement write-only and returns only redacted st
   await installDeterministicMock(page);
   await openStudio(page);
   await page.getByRole("button", { name: "设置" }).click();
+  await page.getByText("高级设置", { exact: true }).click();
 
   const profileForm = page.locator("form.settings-profile-editor");
   await profileForm.getByLabel("替换", { exact: true }).check();

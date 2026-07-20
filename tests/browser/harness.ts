@@ -324,7 +324,7 @@ export async function openStudio(
   await installSyntheticStudioBootstrap(page);
   await page.goto("/");
   await page.getByRole("heading", {
-    name: options.firstRun ? "中转配置与能力校准" : "把想法放进显影盘"
+    name: options.firstRun ? "完成首次连接" : "把想法放进显影盘"
   }).waitFor();
 }
 

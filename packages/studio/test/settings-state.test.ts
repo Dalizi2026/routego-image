@@ -8,6 +8,7 @@ import type {
 
 import {
   SettingsFormError,
+  applySimpleConnectionEndpoint,
   activeSettingsProfile,
   buildCapabilityProbeInput,
   buildDefaultsSettingsInput,
@@ -69,6 +70,40 @@ describe("secret-safe Settings state and request construction", () => {
       apiKeyOperation: "replace",
       apiKeyReplacement: "",
       setActive: true
+    });
+  });
+
+  it("immediately exposes replacement mode for an existing profile without a key", () => {
+    const draft = createProviderProfileDraft({ ...profile, hasApiKey: false, apiKeyPreview: undefined });
+    expect(draft).toMatchObject({
+      profileId: profile.id,
+      apiKeyOperation: "replace",
+      apiKeyReplacement: ""
+    });
+  });
+
+  it("derives hidden generation and models routes from one user-facing call endpoint", () => {
+    const fromBase = applySimpleConnectionEndpoint(
+      createProviderProfileDraft(),
+      "https://relay.example.invalid/"
+    );
+    expect(fromBase).toMatchObject({
+      name: "relay.example.invalid",
+      generation: {
+        mode: "legacy-api-base",
+        value: "https://relay.example.invalid/"
+      },
+      models: { value: "https://relay.example.invalid/v1/models" },
+      setActive: true
+    });
+
+    const fromGeneration = applySimpleConnectionEndpoint(
+      createProviderProfileDraft(),
+      "https://relay.example.invalid/v1/images/generations"
+    );
+    expect(fromGeneration).toMatchObject({
+      generation: { mode: "exact-generation-endpoint" },
+      models: { value: "https://relay.example.invalid/v1/models" }
     });
   });
 

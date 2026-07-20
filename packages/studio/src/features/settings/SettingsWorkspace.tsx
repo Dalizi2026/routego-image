@@ -17,6 +17,7 @@ import { useI18n } from "../../i18n";
 import {
   SettingsFormError,
   activeSettingsProfile,
+  applySimpleConnectionEndpoint,
   buildCapabilityProbeInput,
   buildDefaultsSettingsInput,
   buildOutputDirectorySettingsInput,
@@ -46,7 +47,7 @@ const copy = {
     lead: "管理脱敏提供方资料、写入型密钥、生成默认值和明确确认的能力探测。敏感值不会进入诊断或持久浏览器状态。",
     firstRunEyebrow: "FIRST RUN / LOCAL SETUP",
     firstRunTitle: "完成首次连接",
-    firstRunLead: "填写服务商提供的完整生成端点和模型；只有旧版兼容服务才选择 API 基地址。密钥只在保存时写入。",
+    firstRunLead: "填写服务商给你的调用端点和 API Key，然后获取模型并选择一个即可。",
     firstRunConnection: "提供方连接",
     firstRunConnectionPending: "填写资料名称与生成端点",
     firstRunConnectionReady: "活动资料已保存",
@@ -62,6 +63,27 @@ const copy = {
     firstRunStart: "填写提供方资料",
     firstRunComplete: "首次配置已完成",
     firstRunOpenWorkbench: "进入工作台",
+    setupDirectTitle: "配置一次，之后直接在 Codex 生图",
+    setupDirectBody: "这个页面只负责连接你的图片 API。完成后关闭页面，回到 Codex 对话描述想要的图片即可；Studio 不是生图的必经入口。",
+    setupStepConnection: "连接图片 API",
+    setupStepCodex: "返回 Codex 直接创作",
+    callEndpoint: "调用端点",
+    callEndpointPlaceholder: "例如 https://api.example.com/",
+    callEndpointHelp: "粘贴服务商提供的 API 地址或完整生图调用端点，其他地址由插件自动处理。",
+    keyPlaceholder: "粘贴 API Key",
+    keyStoredPlaceholder: "已安全保存；留空表示不修改",
+    connectAndFetch: "连接并获取模型",
+    connectHelp: "只读取一次上游模型列表，不会生成图片，也不会自动重试。",
+    chooseModel: "选择生图模型",
+    finishSetup: "完成配置",
+    manualModel: "手动填写模型",
+    manualModelHelp: "上游没有返回模型列表。请填写服务商提供的模型名称后完成配置。",
+    setupReadyBody: "连接已经保存。现在回到 Codex，直接说“生成一张……”即可。",
+    modelRequired: "请选择或填写一个生图模型。",
+    settingsEyebrow: "SETTINGS / IMAGE API",
+    connectionTitle: "图片 API 配置",
+    advancedSettings: "高级设置",
+    advancedSettingsHelp: "多中转、能力探测、默认参数和输出目录",
     active: "当前启用",
     inactive: "未启用",
     profiles: "提供方资料",
@@ -83,7 +105,7 @@ const copy = {
     apiReplace: "替换",
     apiClear: "清除",
     apiReplacement: "新 API Key",
-    apiSafe: "现有密钥永不载入输入框。提交开始后，新值会立即清空。",
+    apiSafe: "密钥只写入本机配置，页面不会回显；提交后输入框立即清空。",
     setActive: "保存后设为当前提供方",
     saveProfile: "保存提供方资料",
     activate: "设为当前提供方",
@@ -148,7 +170,7 @@ const copy = {
     lead: "Manage redacted provider profiles, write-only keys, generation defaults, and explicitly confirmed probes. Sensitive values never enter diagnostics or persistent browser state.",
     firstRunEyebrow: "FIRST RUN / LOCAL SETUP",
     firstRunTitle: "Complete the first connection",
-    firstRunLead: "Enter the complete generation endpoint and model supplied by your provider. Choose API base only for a legacy-compatible service. The key is write-only on save.",
+    firstRunLead: "Enter the call endpoint and API key from your provider, then fetch and choose a model.",
     firstRunConnection: "Provider connection",
     firstRunConnectionPending: "Enter a profile name and generation endpoint",
     firstRunConnectionReady: "Active profile saved",
@@ -164,6 +186,27 @@ const copy = {
     firstRunStart: "Fill provider profile",
     firstRunComplete: "First-run setup complete",
     firstRunOpenWorkbench: "Open Workbench",
+    setupDirectTitle: "Configure once, then create directly in Codex",
+    setupDirectBody: "This page only connects your image API. When setup is complete, close it and describe the image in Codex; Studio is not required for normal generation.",
+    setupStepConnection: "Connect image API",
+    setupStepCodex: "Create directly in Codex",
+    callEndpoint: "Call endpoint",
+    callEndpointPlaceholder: "For example, https://api.example.com/",
+    callEndpointHelp: "Paste the API address or complete image-generation endpoint from your provider. Routego handles the other addresses internally.",
+    keyPlaceholder: "Paste API key",
+    keyStoredPlaceholder: "Stored securely; leave blank to keep it",
+    connectAndFetch: "Connect and fetch models",
+    connectHelp: "Reads the upstream model list once. It does not generate an image or retry automatically.",
+    chooseModel: "Choose image model",
+    finishSetup: "Finish setup",
+    manualModel: "Enter model manually",
+    manualModelHelp: "The upstream service did not return a model list. Enter the model name supplied by your provider.",
+    setupReadyBody: "The connection is saved. Return to Codex and ask it to generate an image.",
+    modelRequired: "Choose or enter an image model.",
+    settingsEyebrow: "SETTINGS / IMAGE API",
+    connectionTitle: "Image API settings",
+    advancedSettings: "Advanced settings",
+    advancedSettingsHelp: "Multiple relays, capability probes, defaults, and output directory",
     active: "Active",
     inactive: "Inactive",
     profiles: "Provider profiles",
@@ -185,7 +228,7 @@ const copy = {
     apiReplace: "Replace",
     apiClear: "Clear",
     apiReplacement: "New API key",
-    apiSafe: "The existing key is never loaded. A replacement is cleared as soon as submission starts.",
+    apiSafe: "The key is written only to local configuration, never displayed, and cleared from the field on submit.",
     setActive: "Make active after save",
     saveProfile: "Save provider profile",
     activate: "Make active",
@@ -310,6 +353,8 @@ export function SettingsWorkspace({
   const [profileState, setProfileState] = useState<SettingsAsyncState>({ status: "idle" });
   const [removeConfirmed, setRemoveConfirmed] = useState(false);
   const [modelState, setModelState] = useState<SettingsAsyncState>({ status: "idle" });
+  const [availableModels, setAvailableModels] = useState<readonly string[]>([]);
+  const [manualModelFallback, setManualModelFallback] = useState(false);
   const [probeDraft, setProbeDraft] = useState<CapabilityProbeDraft>(() =>
     initialProbeDraft(settings)
   );
@@ -325,19 +370,11 @@ export function SettingsWorkspace({
   const profileNameRef = useRef<HTMLInputElement>(null);
 
   const activeProfile = activeSettingsProfile(settings);
-  const setupProfile = activeProfile ?? settings.profiles[0];
-  const firstRunStatus = {
-    hasConnection: settings.profiles.length > 0,
-    hasApiKey: setupProfile?.hasApiKey === true,
-    hasModel:
-      (settings.defaults.model?.trim().length ?? 0) > 0 ||
-      (setupProfile?.defaultModel?.trim().length ?? 0) > 0,
-    hasActiveProfile: activeProfile !== undefined
-  };
   const firstRunComplete =
     activeProfile?.hasApiKey === true &&
     ((settings.defaults.model?.trim().length ?? 0) > 0 ||
       (activeProfile.defaultModel?.trim().length ?? 0) > 0);
+  const [setupFinished, setSetupFinished] = useState(firstRunSession && firstRunComplete);
 
   useEffect(() => {
     if (
@@ -400,6 +437,101 @@ export function SettingsWorkspace({
       onSettingsChange(next);
       setSelectedProfileId(result.profile.id);
       setProfileDraft(createProviderProfileDraft(result.profile));
+      setProfileState({ status: "success", message: labels.saved });
+    } catch (error) {
+      setProfileState({ status: "failure", safeMessage: safeMessage(error) });
+    }
+  };
+
+  const connectAndFetchModels = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    let connectionDraft: ProviderProfileDraft;
+    let input;
+    try {
+      connectionDraft = applySimpleConnectionEndpoint(
+        profileDraft,
+        profileDraft.generation.value
+      );
+      input = buildUpsertProviderProfileInput(connectionDraft);
+      setProfileErrors({});
+    } catch (error) {
+      setProfileState({ status: "failure", safeMessage: safeMessage(error) });
+      setProfileErrors(error instanceof SettingsFormError ? error.fields : {});
+      return;
+    }
+
+    setProfileDraft((current) => clearApiKeyDraft(current));
+    setProfileState({ status: "busy", operation: "connect-provider" });
+    setModelState({ status: "idle" });
+    setManualModelFallback(false);
+    setAvailableModels([]);
+
+    let saved;
+    try {
+      saved = await gateway.invoke("upsertProviderProfile", input);
+      const next = mergeUpsertProviderProfile(settings, saved);
+      onSettingsChange(next);
+      setSelectedProfileId(saved.profile.id);
+      setProfileDraft(createProviderProfileDraft(saved.profile));
+      setProfileState({ status: "success", message: labels.saved });
+    } catch (error) {
+      setProfileState({ status: "failure", safeMessage: safeMessage(error) });
+      return;
+    }
+
+    setModelState({ status: "busy", operation: "refresh-models" });
+    try {
+      const refreshed = await gateway.invoke("refreshModels", {
+        providerId: saved.profile.id
+      });
+      if (refreshed.status === "failed" || refreshed.models.length === 0) {
+        setManualModelFallback(true);
+        setModelState({
+          status: "failure",
+          safeMessage:
+            refreshed.error?.safeMessage ?? "The upstream service returned no image models."
+        });
+        return;
+      }
+      const withSavedProfile = mergeUpsertProviderProfile(settings, saved);
+      const next = mergeRefreshedModels(withSavedProfile, refreshed);
+      const refreshedProfile = next.profiles.find((profile) => profile.id === saved.profile.id);
+      onSettingsChange(next);
+      setAvailableModels(refreshed.models);
+      setProfileDraft({
+        ...createProviderProfileDraft(refreshedProfile ?? saved.profile),
+        defaultModel: refreshed.models[0] ?? ""
+      });
+      setModelState({ status: "success", message: labels.modelsUpdated });
+    } catch (error) {
+      setManualModelFallback(true);
+      setModelState({ status: "failure", safeMessage: safeMessage(error) });
+    }
+  };
+
+  const finishFirstRun = async () => {
+    if (profileDraft.defaultModel.trim() === "") {
+      setProfileErrors({ defaultModel: labels.modelRequired });
+      setProfileState({ status: "failure", safeMessage: labels.modelRequired });
+      return;
+    }
+    let input;
+    try {
+      input = buildUpsertProviderProfileInput(profileDraft);
+      setProfileErrors({});
+    } catch (error) {
+      setProfileState({ status: "failure", safeMessage: safeMessage(error) });
+      setProfileErrors(error instanceof SettingsFormError ? error.fields : {});
+      return;
+    }
+    setProfileState({ status: "busy", operation: "finish-setup" });
+    try {
+      const result = await gateway.invoke("upsertProviderProfile", input);
+      const next = mergeUpsertProviderProfile(settings, result);
+      onSettingsChange(next);
+      setSelectedProfileId(result.profile.id);
+      setProfileDraft(createProviderProfileDraft(result.profile));
+      setSetupFinished(true);
       setProfileState({ status: "success", message: labels.saved });
     } catch (error) {
       setProfileState({ status: "failure", safeMessage: safeMessage(error) });
@@ -547,8 +679,170 @@ export function SettingsWorkspace({
     }
   };
 
+  const hasStoredKey = selectedProfile?.hasApiKey === true;
+  const connectionBusy =
+    profileState.status === "busy" || modelState.status === "busy";
+  const keyMissing = !hasStoredKey && profileDraft.apiKeyReplacement.trim() === "";
+  const showFirstRunComplete = firstRunSession && setupFinished;
+  const simpleConnection = (
+      <section
+        className={`settings-setup${firstRunSession ? "" : " settings-setup--reconfigure"}`}
+        aria-labelledby="settings-setup-title"
+      >
+        <header className="settings-setup__intro">
+          <p>{firstRunSession ? labels.firstRunEyebrow : labels.settingsEyebrow}</p>
+          <h1 id="settings-setup-title" tabIndex={-1}>
+            {showFirstRunComplete
+              ? labels.firstRunComplete
+              : firstRunSession
+                ? labels.firstRunTitle
+                : labels.connectionTitle}
+          </h1>
+          <span>{labels.setupDirectBody}</span>
+        </header>
+
+        <ol className="settings-setup__steps" aria-label={labels.setupDirectTitle}>
+          <li data-state={showFirstRunComplete ? "complete" : "current"}>
+            <span aria-hidden="true">1</span>
+            <strong>{labels.setupStepConnection}</strong>
+          </li>
+          <li data-state={showFirstRunComplete ? "current" : "pending"}>
+            <span aria-hidden="true">2</span>
+            <strong>{labels.setupStepCodex}</strong>
+          </li>
+        </ol>
+
+        {showFirstRunComplete ? (
+          <section className="settings-setup__complete" aria-live="polite">
+            <span aria-hidden="true">✓</span>
+            <div>
+              <h2>{labels.setupDirectTitle}</h2>
+              <p>{labels.setupReadyBody}</p>
+              <code>{language === "zh" ? "生成一张雨夜霓虹街道的电影感照片" : "Generate a cinematic photo of a neon street at night"}</code>
+            </div>
+            <button type="button" onClick={onOpenWorkbench}>{labels.firstRunOpenWorkbench}</button>
+          </section>
+        ) : (
+          <form className="settings-setup__form" onSubmit={(event) => void connectAndFetchModels(event)}>
+            <div className="settings-setup__form-heading">
+              <span>01</span>
+              <div>
+                <h2>{labels.setupStepConnection}</h2>
+                <p>{labels.firstRunLead}</p>
+              </div>
+            </div>
+
+            <label className="settings-setup__field">
+              <span>{labels.callEndpoint}</span>
+              <input
+                ref={profileNameRef}
+                type="url"
+                required
+                autoComplete="url"
+                spellCheck={false}
+                placeholder={labels.callEndpointPlaceholder}
+                value={profileDraft.generation.value}
+                onChange={(event) => setProfileDraft((current) => ({
+                  ...current,
+                  generation: {
+                    ...current.generation,
+                    value: event.target.value,
+                    requiresReentry: false
+                  }
+                }))}
+              />
+              <small>{labels.callEndpointHelp}</small>
+              <FieldError value={profileErrors["endpoints.generation"] ?? profileErrors["endpoints.generation.value"]} />
+            </label>
+
+            <label className="settings-setup__field">
+              <span>API Key</span>
+              <input
+                type="password"
+                required={!hasStoredKey}
+                autoComplete="new-password"
+                placeholder={hasStoredKey ? labels.keyStoredPlaceholder : labels.keyPlaceholder}
+                value={profileDraft.apiKeyReplacement}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setProfileDraft((current) => ({
+                    ...current,
+                    apiKeyOperation: value === "" && hasStoredKey ? "unchanged" : "replace",
+                    apiKeyReplacement: value
+                  }));
+                }}
+              />
+              <small>{labels.apiSafe}</small>
+              <FieldError value={profileErrors["apiKey.value"]} />
+            </label>
+
+            <div className="settings-setup__connect">
+              <button
+                type="submit"
+                disabled={connectionBusy || profileDraft.generation.value.trim() === "" || keyMissing}
+              >
+                {connectionBusy ? labels.busy : labels.connectAndFetch}
+              </button>
+              <p>{labels.connectHelp}</p>
+            </div>
+
+            {availableModels.length > 0 ? (
+              <section className="settings-setup__model" aria-live="polite">
+                <label>
+                  <span>{labels.chooseModel}</span>
+                  <select
+                    value={profileDraft.defaultModel}
+                    onChange={(event) => setProfileDraft((current) => ({
+                      ...current,
+                      defaultModel: event.target.value
+                    }))}
+                  >
+                    {availableModels.map((model) => <option key={model} value={model}>{model}</option>)}
+                  </select>
+                </label>
+                <button type="button" disabled={profileState.status === "busy"} onClick={() => void finishFirstRun()}>
+                  {labels.finishSetup}
+                </button>
+              </section>
+            ) : null}
+
+            {manualModelFallback ? (
+              <section className="settings-setup__model settings-setup__model--fallback" aria-live="polite">
+                <label>
+                  <span>{labels.manualModel}</span>
+                  <input
+                    value={profileDraft.defaultModel}
+                    onChange={(event) => setProfileDraft((current) => ({
+                      ...current,
+                      defaultModel: event.target.value
+                    }))}
+                  />
+                  <small>{labels.manualModelHelp}</small>
+                  <FieldError value={profileErrors["defaultModel"]} />
+                </label>
+                <button type="button" disabled={profileState.status === "busy"} onClick={() => void finishFirstRun()}>
+                  {labels.finishSetup}
+                </button>
+              </section>
+            ) : null}
+
+            <StateMessage state={modelState.status === "idle" ? profileState : modelState} labels={labels} />
+          </form>
+        )}
+      </section>
+  );
+
+  if (firstRunSession) return simpleConnection;
+
   return (
-    <section className="settings-workspace">
+    <section className="settings-workspace settings-workspace--simple">
+      {simpleConnection}
+      <details className="settings-advanced">
+        <summary>
+          <span>{labels.advancedSettings}</span>
+          <small>{labels.advancedSettingsHelp}</small>
+        </summary>
+        <div className="settings-advanced__content">
       <header className="settings-workspace__header">
         <p>{labels.eyebrow}</p>
         <h1 tabIndex={-1}>{labels.title}</h1>
@@ -559,36 +853,6 @@ export function SettingsWorkspace({
           <div><dt>{labels.outputDirectory}</dt><dd>{settings.outputDirectory.configured ? settings.outputDirectory.display ?? labels.configured : labels.notConfigured}</dd></div>
         </dl>
       </header>
-
-      {firstRunSession ? (
-        <section className="settings-first-run" aria-labelledby="settings-first-run-title">
-          <div className="settings-first-run__copy">
-            <p>{labels.firstRunEyebrow}</p>
-            <h2 id="settings-first-run-title">
-              {firstRunComplete ? labels.firstRunComplete : labels.firstRunTitle}
-            </h2>
-            <span>{labels.firstRunLead}</span>
-          </div>
-          <ol>
-            {[
-              [labels.firstRunConnection, firstRunStatus.hasConnection, labels.firstRunConnectionReady, labels.firstRunConnectionPending],
-              [labels.firstRunKey, firstRunStatus.hasApiKey, labels.firstRunKeyReady, labels.firstRunKeyPending],
-              [labels.firstRunModel, firstRunStatus.hasModel, labels.firstRunModelReady, labels.firstRunModelPending],
-              [labels.firstRunActive, firstRunStatus.hasActiveProfile, labels.firstRunActiveReady, labels.firstRunActivePending]
-            ].map(([title, ready, readyText, pendingText], index) => (
-              <li key={String(title)} data-state={ready ? "complete" : "pending"}>
-                <span aria-hidden="true">{index + 1}</span>
-                <div><strong>{title}</strong><small>{ready ? readyText : pendingText}</small></div>
-              </li>
-            ))}
-          </ol>
-          {firstRunComplete ? (
-            <button type="button" onClick={onOpenWorkbench}>{labels.firstRunOpenWorkbench}</button>
-          ) : (
-            <button type="button" onClick={() => profileNameRef.current?.focus()}>{labels.firstRunStart}</button>
-          )}
-        </section>
-      ) : null}
 
       <section className="settings-profiles" aria-labelledby="settings-profiles-title">
         <div className="settings-section-heading">
@@ -645,6 +909,8 @@ export function SettingsWorkspace({
 
         <form className="settings-output-directory" onSubmit={(event) => void saveOutputDirectory(event)}><div className="settings-section-heading"><p>OUTPUT / REDACTED</p><h2>{labels.outputDirectory}</h2></div><p>{labels.outputLead}</p><div className="settings-output-directory__current"><span>{settings.outputDirectory.configured ? labels.configured : labels.notConfigured}</span><strong>{settings.outputDirectory.display ?? "—"}</strong></div><fieldset><legend>{labels.outputDirectory}</legend>{(["unchanged", "default", "clear", "replace"] as const).map((operation) => <label key={operation}><input type="radio" name="output-operation" checked={outputDraft.operation === operation} onChange={() => setOutputDraft({ operation, path: "", confirmLocalPath: false })} />{operation === "unchanged" ? labels.unchanged : operation === "default" ? labels.useDefault : operation === "clear" ? labels.clear : labels.replace}</label>)}</fieldset>{outputDraft.operation === "replace" ? <div className="settings-output-directory__replace"><label><span>{labels.localPath}</span><input autoComplete="off" spellCheck={false} value={outputDraft.path} onChange={(event) => setOutputDraft((current) => ({ ...current, path: event.target.value, confirmLocalPath: false }))} /><FieldError value={outputErrors["outputDirectory.path"]} /></label><label className="settings-check settings-check--warning"><input type="checkbox" checked={outputDraft.confirmLocalPath} onChange={(event) => setOutputDraft((current) => ({ ...current, confirmLocalPath: event.target.checked }))} />{labels.confirmPath}</label></div> : null}<button type="submit" disabled={outputDraft.operation === "replace" && !outputDraft.confirmLocalPath}>{labels.applyOutput}</button><StateMessage state={outputState} labels={labels} /></form>
       </div>
+        </div>
+      </details>
     </section>
   );
 }
