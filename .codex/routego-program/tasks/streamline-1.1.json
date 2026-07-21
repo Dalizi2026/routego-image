@@ -1,6 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "194dfdd724cd7c6c3e608c61cfeabf3cdb9efd6897dc8cee4ddc6e13e9ed50b4",
+  "contentSha256": "ed562f041ca2b43e045a72774c1c4bcc81cea585a7387782f12338c18b8e8383",
+  "hashSemantics": {
+    "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null",
+    "rawFileSha256RecordedAt": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json#currentState.taskCapsule.rawFileSha256"
+  },
   "lane": "streamline",
   "change": "streamline-routego-image-generation",
   "taskId": "1.1",
@@ -55,7 +59,7 @@
   "activation": {
     "controllerThreadId": "019f8275-18a6-7061-8a46-e177bf0bd3bc",
     "controllerGeneration": 12,
-    "workerThreadId": "pending",
+    "workerThreadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
     "workerGeneration": 1,
     "soleApplyOwner": false,
     "applyAuthorized": false

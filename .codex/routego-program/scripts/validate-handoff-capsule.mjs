@@ -99,8 +99,10 @@ function pathOverlap(allowed, forbidden) {
 }
 
 let capsule;
+let capsuleBytes;
 try {
-  capsule = readJson(capsulePath);
+  capsuleBytes = readFileSync(resolve(root, capsulePath));
+  capsule = JSON.parse(capsuleBytes.toString("utf8"));
 } catch (error) {
   console.error("[HANDOFF_AUDIT_FAILED] cannot read capsule: " + error.message);
   process.exit(1);
@@ -191,6 +193,15 @@ if (taskCapsule) {
     fail("handoff task capsule reference fingerprint mismatch");
   } else {
     pass("task capsule fingerprint");
+  }
+
+  if (capsule.hashSemantics !== undefined) {
+    const taskRawSha256 = sha256(readFileSync(resolve(root, taskCapsulePath)));
+    if (capsule.currentState.taskCapsule.rawFileSha256 !== taskRawSha256) {
+      fail("handoff task capsule raw file fingerprint mismatch");
+    } else {
+      pass("task capsule raw file fingerprint");
+    }
   }
 
   if (
@@ -594,6 +605,22 @@ if (capsule.capsuleSha256 !== capsuleCalculated) {
   fail("handoff capsule content fingerprint mismatch");
 } else {
   pass("handoff capsule fingerprint");
+}
+
+if (capsule.hashSemantics !== undefined) {
+  const rawFileSha256 = sha256(capsuleBytes);
+  const laneIntegrity = lane?.handoffCapsuleIntegrity;
+  const programIntegrity = program?.laneSuccessors?.[capsule.lane]?.handoffCapsuleIntegrity;
+  if (
+    laneIntegrity?.canonicalSha256 !== capsule.capsuleSha256 ||
+    programIntegrity?.canonicalSha256 !== capsule.capsuleSha256 ||
+    laneIntegrity?.rawFileSha256 !== rawFileSha256 ||
+    programIntegrity?.rawFileSha256 !== rawFileSha256
+  ) {
+    fail("handoff capsule canonical/raw integrity registration mismatch");
+  } else {
+    pass("handoff capsule canonical/raw integrity registration");
+  }
 }
 
 if (!capsule.reportingContract.primary.includes("send_message_to_thread") ||

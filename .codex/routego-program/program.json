@@ -55,19 +55,19 @@
     "role": "program-controller",
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
     "branch": "codex/routego-controller-g12",
-    "verifiedHeadBeforeContainingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "verifiedHeadBeforeContainingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
     "status": "authoritative-controller-generation-12-registering-streamline-apply-owner",
     "authoritative": true,
-    "observableCompactions": 1,
-    "lastCompactionFingerprint": "controller-g12|streamline-routego-image-generation|8abbd1632ea1b7a49a92fad917b3052e58e22b95|handoff-summary-observed-before-workflow-correction|0/33"
+    "observableCompactions": 2,
+    "lastCompactionFingerprint": "controller-g12|streamline-routego-image-generation|ac20892014fb7beb3bf053a903670d4d634d956a|context-compaction-2-registration-attempt-2-reconciliation|0/33"
   },
   "applyOwner": {
     "lane": "streamline",
-    "threadId": "pending",
+    "threadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
     "generation": 1,
-    "worktree": "pending",
-    "branch": "pending",
-    "startingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
+    "branch": "codex/routego-streamline-g1",
+    "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
     "registrationCommit": null,
     "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
     "taskCapsule": ".codex/routego-program/tasks/streamline-1.1.json",
@@ -125,15 +125,15 @@
     "streamline": {
       "lane": "streamline",
       "generation": 1,
-      "status": "registered-waiting-for-thread",
-      "threadId": "pending",
-      "worktree": "pending",
-      "plannedBranch": "pending",
-      "startingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
-      "registrationAttempt": 1,
+      "status": "registered-waiting-for-acceptance",
+      "threadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
+      "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
+      "plannedBranch": "codex/routego-streamline-g1",
+      "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
+      "registrationAttempt": 2,
       "registrationCommit": null,
       "incorporationCommit": null,
-      "currentHead": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+      "currentHead": "ac20892014fb7beb3bf053a903670d4d634d956a",
       "acceptedHead": null,
       "soleApplyOwner": false,
       "applyAuthorized": false,
@@ -141,7 +141,19 @@
       "gitClean": true,
       "observableCompactions": 0,
       "lastCompactionFingerprint": null,
-      "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json"
+      "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
+      "handoffCapsuleIntegrity": {
+        "canonicalSha256": "0be95687030e49f4ca275cf863e2e87d42f1da680d40b84874a4e9655aaf94cd",
+        "rawFileSha256": "4cfd2f222060e209304d1718aefa5fe2466f32f890e0a3800ef485b9c7a32cdc"
+      },
+      "failedRegistrationAttempts": [
+        {
+          "attempt": 1,
+          "head": "ac20892014fb7beb3bf053a903670d4d634d956a",
+          "event": "HANDOFF_AUDIT_FAILED",
+          "reason": "Canonical JSON self-hashes were interpreted as raw file hashes; worker made no changes and was not activated."
+        }
+      ]
     },
     "library": {
       "lane": "library",
@@ -211,10 +223,10 @@
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "controller-g12|streamline-routego-image-generation|8abbd1632ea1b7a49a92fad917b3052e58e22b95|workflow-deviation-reverted-registration-pending|0/33",
-    "messageType": "STREAMLINE_REGISTRATION_PENDING",
-    "workerThreadId": null,
-    "reportedHead": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "eventFingerprint": "controller-g12|streamline-routego-image-generation|ac20892014fb7beb3bf053a903670d4d634d956a|registration-attempt-1-audit-failed-attempt-2-prepared|0/33",
+    "messageType": "HANDOFF_AUDIT_FAILED_REGISTRATION_ATTEMPT_2_PREPARED",
+    "workerThreadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
+    "reportedHead": "ac20892014fb7beb3bf053a903670d4d634d956a",
     "completedTaskId": null,
     "nextTaskId": "1.1",
     "openspecProgress": "0/33",
@@ -222,9 +234,9 @@
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
     "handoffAccepted": false,
-    "safeCheckpoint": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
-    "observableCompactions": 1,
-    "checkpointSemantics": "Controller-direct implementation and task-state commits were reverted. Formal streamline lane registration is pending and product scope remains locked."
+    "safeCheckpoint": "ac20892014fb7beb3bf053a903670d4d634d956a",
+    "observableCompactions": 2,
+    "checkpointSemantics": "Registration attempt 1 failed before activation because canonical self-hash semantics were ambiguous. Attempt 2 records canonical and raw hashes separately; product scope remains locked pending independent acceptance."
   },
   "controllerSuccessor": {
     "lane": "controller",
