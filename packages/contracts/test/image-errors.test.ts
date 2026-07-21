@@ -7,6 +7,7 @@ import {
   routegoServiceErrorSchema
 } from "../src/index";
 import {
+  createEditRequest,
   createGenerateRequest,
   TEST_IMAGE_DATA_URL,
   TEST_TIMESTAMP
@@ -44,12 +45,25 @@ describe("image operation contracts", () => {
     expect(imageOperationRequestSchema.safeParse({ ...variants, count: 5 }).success).toBe(false);
   });
 
+  it("accepts a fully described edit and binds mask semantics to its target", () => {
+    const edit = createEditRequest({
+      maskPath: "C:\\Users\\测试 用户\\Masks\\mask alpha.png",
+      supportingImages: [
+        { path: "/tmp/supporting image.png", role: "supporting", label: "服装参考" }
+      ]
+    });
+    expect(edit.kind).toBe("edit");
+    expect(edit.maskPath).toContain("mask alpha.png");
+    expect(edit.targetImage?.id).toBe("target-0");
+  });
+
   it.each([
-    { kind: "edit", prompt: "removed edit operation" },
-    { kind: "generate", prompt: "removed target", targetImage: { path: "/tmp/target.png" } },
+    {
+      kind: "edit",
+      prompt: "missing target",
+      invariants: { preserve: ["subject"] }
+    },
     { kind: "generate", prompt: "mask without target", maskPath: "/tmp/mask.png" },
-    { kind: "generate", prompt: "removed invariants", invariants: { preserve: ["subject"] } },
-    { kind: "generate", prompt: "removed continuation", previousResponseId: "response-1" },
     { kind: "generate", prompt: "bad count", count: 0 },
     { kind: "generate", prompt: "bad compression", format: "jpeg", compression: 101 },
     { kind: "generate", prompt: "PNG compression", format: "png", compression: 50 },
@@ -59,24 +73,19 @@ describe("image operation contracts", () => {
     expect(imageOperationRequestSchema.safeParse(value).success).toBe(false);
   });
 
-  it("accepts five ordered references and rejects a sixth", () => {
-    const references = Array.from({ length: 5 }, (_, index) => ({
+  it("rejects more than sixteen ordered physical image inputs", () => {
+    const references = Array.from({ length: 16 }, (_, index) => ({
       id: `reference-${index}`,
       path: `/tmp/reference-${index}.png`,
       role: "reference" as const
     }));
     expect(
       imageOperationRequestSchema.safeParse({
-        kind: "generate",
-        prompt: "five references",
-        references
-      }).success
-    ).toBe(true);
-    expect(
-      imageOperationRequestSchema.safeParse({
-        kind: "generate",
-        prompt: "too many references",
-        references: [...references, { path: "/tmp/reference-5.png", role: "reference" }]
+        kind: "edit",
+        prompt: "too many",
+        references,
+        targetImage: { path: "/tmp/target.png" },
+        invariants: { preserve: ["subject"] }
       }).success
     ).toBe(false);
   });

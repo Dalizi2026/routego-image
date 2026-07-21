@@ -20,6 +20,22 @@ export function createGenerateRequest(
   });
 }
 
+export function createEditRequest(
+  overrides: Record<string, unknown> = {}
+): ImageOperationRequest {
+  return imageOperationRequestSchema.parse({
+    kind: "edit",
+    prompt: "把天空改成日落 🌇",
+    targetImage: { id: "target-0", path: "/Users/test user/图片/source image.png" },
+    invariants: {
+      allowedChanges: ["天空颜色"],
+      preserve: ["主体与构图"],
+      forbiddenChanges: ["不要修改文字\r\nKeep text unchanged"]
+    },
+    ...overrides
+  });
+}
+
 export function createSuccessResult(
   request: ImageOperationRequest = createGenerateRequest()
 ): ImageOperationResult {
