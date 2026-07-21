@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "ed562f041ca2b43e045a72774c1c4bcc81cea585a7387782f12338c18b8e8383",
+  "contentSha256": "b68cd83435f8376639abfa3a8c29b5d186483999b45fd6d62e44ff9f0a7ce292",
   "hashSemantics": {
     "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null",
     "rawFileSha256RecordedAt": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json#currentState.taskCapsule.rawFileSha256"
@@ -8,7 +8,7 @@
   "lane": "streamline",
   "change": "streamline-routego-image-generation",
   "taskId": "1.1",
-  "status": "registered-locked",
+  "status": "active-authorized",
   "sourceCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -61,8 +61,8 @@
     "controllerGeneration": 12,
     "workerThreadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
     "workerGeneration": 1,
-    "soleApplyOwner": false,
-    "applyAuthorized": false
+    "soleApplyOwner": true,
+    "applyAuthorized": true
   },
   "knownRisks": [
     "Downstream packages still reference edit-aware types and are outside task 1.1; do not silently broaden file scope.",
