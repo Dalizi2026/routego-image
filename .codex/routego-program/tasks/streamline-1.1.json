@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "194dfdd724cd7c6c3e608c61cfeabf3cdb9efd6897dc8cee4ddc6e13e9ed50b4",
+  "lane": "streamline",
+  "change": "streamline-routego-image-generation",
+  "taskId": "1.1",
+  "status": "registered-locked",
+  "sourceCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "fe03c57712c4001f86c246f07a12bf5cf2c7d2e110d1d0c92805b871915885d8",
+    "lineSha256": "5c7c91f82c27aef1455c2a2073e49a06910f571c2e59cf61e21364f04f191e6d"
+  },
+  "dependencies": [],
+  "allowedFiles": [
+    "packages/contracts/src/image.ts",
+    "packages/contracts/test/image-errors.test.ts",
+    "packages/contracts/test/fixtures.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "allowedFileMode": "update only the exact task 1.1 contract, fixtures, focused tests and post-implementation task-state checkbox",
+  "forbiddenFileGlobs": [
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/integration/**",
+    "packages/studio/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".codex-plugin/**",
+    "plugin/**",
+    "dist/**",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Read fresh OpenSpec apply instructions and confirm task 1.1 is the first pending task.",
+    "Do not modify product or OpenSpec state until Controller G12 sends sole-owner activation after LANE_ACCEPTED.",
+    "Make the public image request generation-only and limit ordered references to five.",
+    "Strictly reject edit kind, target, mask, edit invariants and continuation identifiers before file or network access.",
+    "Preserve legacy-only parsing shapes only where required by the later migration design; do not keep a callable edit operation.",
+    "Run the focused test, inspect diff scope and secrets, commit implementation, then separately record the full implementation SHA and check task 1.1."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/contracts exec vitest run test/image-errors.test.ts",
+    "git diff --check",
+    "exact allowed-file scope and no credentials/user images/generated artifacts"
+  ],
+  "directSpecifications": [
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md", "sha256": "aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529", "reason": "Generation-only request, five-reference limit and strict removed-field behavior."},
+    {"path": "openspec/changes/streamline-routego-image-generation/design.md", "sha256": "e252fa8eafdacb6099740cb47ef16c3906ef4162172d02bd5f7fe7ebb5fe87ed", "reason": "Contract-first vertical removal and migration compatibility boundary."}
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-1.1-exact-contract-files",
+  "activation": {
+    "controllerThreadId": "019f8275-18a6-7061-8a46-e177bf0bd3bc",
+    "controllerGeneration": 12,
+    "workerThreadId": "pending",
+    "workerGeneration": 1,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
+  },
+  "knownRisks": [
+    "Downstream packages still reference edit-aware types and are outside task 1.1; do not silently broaden file scope.",
+    "If the focused task cannot leave contracts in a valid import state within allowed files, report PLAN_DEVIATION before editing downstream files."
+  ],
+  "externalStateAuthorized": false
+}

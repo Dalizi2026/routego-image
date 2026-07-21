@@ -5,7 +5,7 @@
 ## 产品与公共契约
 
 - 目标是可正式使用的 Routego Image 1.0，不得擅自降级为 MVP、原型或临时实现。
-- 七个公共 MCP 工具固定为：routego_status、routego_generate、routego_edit、routego_batch、routego_search_library、routego_manage_library、routego_open_studio。
+- 当前已安装版本仍有 routego_edit；未合并的 streamline-routego-image-generation 目标契约将其替换为只读 routego_prepare_regeneration，总数仍为七个。只有新 change 独立验收、合并、同步和归档后，目标契约才成为已部署事实。
 - 公共 ImageArtifact.phase 固定为 partial | final。Library 内部 source rendition 不扩大公共 phase。
 - 公共契约指纹：1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c。
 - 需求或公共契约变化必须先 PLAN_DEVIATION、OpenSpec update 和 Controller 确认；实现便利不是偏离理由。
@@ -44,9 +44,9 @@
 
 ## 双路径回报
 
-- 主链：当前 apply owner 每完成任务、任务组、安全 checkpoint、阻塞、偏差、handoff、activation 或 delivery，立即 send_message_to_thread 到 program.json 当前 Controller，并 read_thread 确认。
+- 主链：当前 apply owner 每完成任务、任务组、安全 checkpoint、阻塞、偏差、handoff、activation 或 delivery，立即 send_message_to_thread 到 Controller G12 线程 019f8275-18a6-7061-8a46-e177bf0bd3bc，并 read_thread 确认。
 - 兜底：routego-program-continuity 每 30 分钟只检查紧凑状态中的漏报，以 latestDirectCheckpoint 去重并归档自己的运行任务。
-- task 创建、registration、acceptance、Controller/sole-owner activation 必须重复确认低上下文、无损 evidence、预算和双路径回报。final 标签不算送达，heartbeat 不自动继承。
+- task 创建、registration、acceptance、Controller/sole-owner activation 必须重复确认低上下文、无损 evidence、预算和双路径回报。final 标签不算送达，heartbeat 不自动继承。Controller G12 只调度和独立验收，不代替 streamline apply-owner 写产品实现或勾选其任务。
 
 ## 外部授权和安全
 

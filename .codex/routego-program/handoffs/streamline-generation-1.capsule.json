@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "capsuleType": "successor-handoff",
+  "capsuleSha256": "846ef69a68ecb51ad83ca794b6c02d9f4b7b31d2c7ba47294123e9a1b3f7deed",
+  "lane": "streamline",
+  "role": "openspec-apply-owner-candidate",
+  "change": "streamline-routego-image-generation",
+  "generation": {"source": 0, "successor": 1},
+  "source": {
+    "threadId": "019f8275-18a6-7061-8a46-e177bf0bd3bc",
+    "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "acceptedProductCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "handoffCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "handoffParent": "902c5744f6b4a5641e4ec8faa713f44fcb1fa163"
+  },
+  "successor": {
+    "threadId": "pending",
+    "worktree": "pending",
+    "plannedBranch": "pending",
+    "startingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "registrationStatus": "registered-waiting-for-thread",
+    "registrationAttempt": 1,
+    "verifiedHeadBeforeContainingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "incorporationCommit": null
+  },
+  "currentState": {
+    "openspecTotal": 33,
+    "openspecCompleted": 0,
+    "completedTaskIds": [],
+    "nextTaskId": "1.1",
+    "taskCapsule": {"path": ".codex/routego-program/tasks/streamline-1.1.json", "sha256": "194dfdd724cd7c6c3e608c61cfeabf3cdb9efd6897dc8cee4ddc6e13e9ed50b4"},
+    "taskLocked": true,
+    "sourceIsSoleApplyOwner": true,
+    "successorApplyAuthorized": false,
+    "continuation": "wait-for-controller-registration-and-sole-owner-activation"
+  },
+  "completedEvidence": [
+    {"path": ".codex/routego-program/evidence/streamline-planning.json", "sha256": "17253c5ce253472a36b26bc6261a0a3f221fe810d5688cbb7a900da12c0abaa7", "taskIds": ["planning"]}
+  ],
+  "authority": {
+    "summaryPath": ".codex/routego-program/authority-summary.md",
+    "summarySha256": "6578c407ef90e89e2b22ace83f72860492b0dc5cd72a5bc748d68435a1430982",
+    "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+    "ownershipFingerprint": "streamline-task-1.1-exact-contract-files",
+    "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
+  },
+  "gates": {
+    "blockers": [],
+    "approvalRequiredTasks": ["6.1", "7.4"],
+    "externalStateAuthorized": false,
+    "networkAuthorized": false,
+    "dependencyInstallationAuthorized": false,
+    "realLibraryMigrationAuthorized": false,
+    "targetPluginInstallationAuthorized": false
+    ,"task1_1Locked": true
+  },
+  "context": {
+    "sourceObservableCompactions": 0,
+    "sourceCompactionFingerprint": null,
+    "successorObservableCompactions": 0,
+    "handoffAcceptanceCompactionLimit": 0,
+    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
+    "auditFailure": "HANDOFF_AUDIT_FAILED"
+  },
+  "git": {"sourceClean": true, "expectedSuccessorClean": true},
+  "reportingContract": {
+    "primary": "After every task, group, checkpoint, blocker, deviation, handoff, activation or delivery, call send_message_to_thread to Controller G12 thread 019f8275-18a6-7061-8a46-e177bf0bd3bc and then read_thread to confirm receipt.",
+    "fallback": "Continuity automation is missed-message fallback only and cannot approve work or modify governance.",
+    "fallbackIntervalMinutes": 30,
+    "finalAnswerAloneIsInsufficient": true,
+    "heartbeatInheritanceAssumed": false
+  },
+  "startup": {
+    "mandatoryFiles": [
+      "AGENTS.md",
+      ".codex/routego-program/authority-summary.md",
+      ".codex/routego-program/program.json",
+      ".codex/routego-program/threads/streamline.json",
+      ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
+      ".codex/routego-program/tasks/streamline-1.1.json",
+      "openspec/changes/streamline-routego-image-generation/tasks.md",
+      "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "openspec/changes/streamline-routego-image-generation/design.md",
+      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md"
+    ],
+    "maxFiles": 10,
+    "maxUtf8Bytes": 122880,
+    "byteCounting": "utf8-after-crlf-to-lf-normalization",
+    "expectedNormalizedUtf8Bytes": 80214,
+    "fallbackSourceCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "authoritySummaryMaxBytes": 16384,
+    "handoffCapsuleMaxBytes": 24576,
+    "directGovernanceMessageMaxBytes": 12288,
+    "programStateMaxBytes": 49152,
+    "laneStateMaxBytes": 32768,
+    "targetedEscalationOnly": true,
+    "fullAuditDefaultForbidden": true,
+    "escalationTriggers": ["capsule, Git, OpenSpec or state inconsistency", "task scope cannot compile without downstream contract changes", "focused validation failure requiring root-cause expansion"],
+    "fullAuditTriggers": ["final Integration conformance", "main spec sync or archive", "release or rollback", "failed targeted recovery", "explicit user request"],
+    "contextBudgetFailure": "Any observable compaction before LANE_ACCEPTED requires HANDOFF_CONTEXT_BUDGET_FAILED and no activation."
+  },
+  "safety": {
+    "noProductEditsBeforeExplicitActivation": true,
+    "noCredentialsAuthorizationValuesUserImagesRealLibraryRelayOrBillableRequests": true,
+    "noMarketplaceDeployPublishMigrateDeleteOrRelease": true
+  }
+}

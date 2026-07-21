@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "lane": "streamline",
+  "change": "streamline-routego-image-generation",
+  "role": "openspec-apply-owner",
+  "status": "registered-waiting-for-thread",
+  "threadId": "pending",
+  "worktree": "pending",
+  "branch": "pending",
+  "startingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+  "currentHead": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+  "generation": 1,
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "lastHealthAudit": "pending",
+  "successorThreadId": null,
+  "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
+  "currentTaskCapsule": ".codex/routego-program/tasks/streamline-1.1.json",
+  "openspecProgress": "0/33",
+  "lastCompletedTask": null,
+  "currentTask": null,
+  "nextTask": "1.1",
+  "applyOwner": false,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
+  "sourceOwner": {
+    "threadId": "019f8275-18a6-7061-8a46-e177bf0bd3bc",
+    "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "soleApplyOwner": true,
+    "archived": false
+  },
+  "ownership": {
+    "owned": ["packages/contracts/**", "openspec/changes/streamline-routego-image-generation/tasks.md"],
+    "readOnly": ["openspec/changes/streamline-routego-image-generation/proposal.md", "openspec/changes/streamline-routego-image-generation/design.md", "openspec/changes/streamline-routego-image-generation/specs/**"],
+    "forbiddenWithoutDeviation": ["packages/creation/**", "packages/foundation/**", "packages/library/**", "packages/integration/**", "packages/studio/**", "package.json", "pnpm-lock.yaml"]
+  },
+  "blockers": [],
+  "residualRisks": [
+    "U-2-Netp and ONNX Runtime acquisition remains blocked pending explicit user authorization.",
+    "Real Library migration and installed-plugin replacement remain unauthorized.",
+    "Existing integrate-routego-image-plugin Task 9.1 remains independently blocked by Windows/Ubuntu CI evidence."
+  ]
+}
