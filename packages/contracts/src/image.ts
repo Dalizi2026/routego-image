@@ -9,7 +9,7 @@ import {
 } from "./common";
 import { providerTransportSchema } from "./provider";
 
-export const imageOperationKindSchema = z.enum(["generate", "edit"]);
+export const imageOperationKindSchema = z.literal("generate");
 
 export const referenceRoleSchema = z.enum([
   "reference",
@@ -34,6 +34,8 @@ export const referenceImageSchema = z
   })
   .strict();
 
+// Legacy-only shapes remain temporarily available to the Library migration parser.
+// They are not accepted by the generation operation contract.
 export const targetImageSchema = z
   .object({
     id: identifierSchema.optional(),
@@ -58,18 +60,11 @@ export const editInvariantsSchema = z
     forbiddenChanges: z.array(z.string().trim().min(1).max(500)).max(32).default([])
   })
   .strict()
-  .superRefine((value, context) => {
-    if (
-      value.allowedChanges.length === 0 &&
-      value.preserve.length === 0 &&
-      value.forbiddenChanges.length === 0
-    ) {
-      context.addIssue({
-        code: "custom",
-        message: "Edit invariants must record at least one allowed, preserved, or forbidden condition"
-      });
-    }
-  });
+  .refine(
+    (value) =>
+      value.allowedChanges.length > 0 || value.preserve.length > 0 || value.forbiddenChanges.length > 0,
+    "Edit invariants must record at least one legacy condition"
+  );
 
 export const imageSizeSchema = z.union([
   z.literal("auto"),
@@ -90,13 +85,9 @@ export const continuationActionSchema = z.enum(["auto", "generate", "edit"]);
 export const imageOperationRequestSchema = z
   .object({
     schemaVersion: routegoSchemaVersionSchema.default(1),
-    kind: imageOperationKindSchema,
+    kind: imageOperationKindSchema.default("generate"),
     prompt: nonEmptyTextSchema,
-    references: z.array(referenceImageSchema).max(16).default([]),
-    targetImage: targetImageSchema.optional(),
-    supportingImages: z.array(supportingImageSchema).max(15).default([]),
-    maskPath: filePathSchema.optional(),
-    invariants: editInvariantsSchema.optional(),
+    references: z.array(referenceImageSchema).max(5).default([]),
     size: imageSizeSchema.default("auto"),
     aspectRatio: aspectRatioSchema.default("auto"),
     quality: imageQualitySchema.default("auto"),
@@ -106,70 +97,11 @@ export const imageOperationRequestSchema = z
     partialImages: z.number().int().min(0).max(3).default(0),
     transparentMode: transparentModeSchema.default("off"),
     moderation: moderationSchema.default("auto"),
-    action: continuationActionSchema.default("auto"),
-    previousResponseId: identifierSchema.optional(),
-    imageIds: z.array(identifierSchema).max(16).default([]),
-    fileIds: z.array(identifierSchema).max(16).default([]),
     outputDir: filePathSchema.optional(),
     saveToLibrary: z.boolean().default(true)
   })
   .strict()
   .superRefine((value, context) => {
-    const totalImageInputs =
-      value.references.length + value.supportingImages.length + (value.targetImage ? 1 : 0);
-
-    if (totalImageInputs > 16) {
-      context.addIssue({
-        code: "too_big",
-        origin: "array",
-        maximum: 16,
-        inclusive: true,
-        path: ["references"],
-        message: "A request can contain at most 16 target/reference/supporting images"
-      });
-    }
-
-    if (value.kind === "edit") {
-      if (!value.targetImage) {
-        context.addIssue({
-          code: "custom",
-          path: ["targetImage"],
-          message: "Edit requests require exactly one target image"
-        });
-      }
-
-      if (!value.invariants) {
-        context.addIssue({
-          code: "custom",
-          path: ["invariants"],
-          message: "Edit requests must record edit invariants"
-        });
-      }
-    } else {
-      if (value.targetImage || value.supportingImages.length > 0 || value.maskPath || value.invariants) {
-        context.addIssue({
-          code: "custom",
-          message: "Generate requests use references and cannot include edit target/supporting/mask fields"
-        });
-      }
-    }
-
-    if (value.maskPath && !value.targetImage) {
-      context.addIssue({
-        code: "custom",
-        path: ["maskPath"],
-        message: "A mask always belongs to the first edit target"
-      });
-    }
-
-    if (value.action === "edit" && value.kind !== "edit") {
-      context.addIssue({
-        code: "custom",
-        path: ["action"],
-        message: "Continuation action edit requires an edit operation"
-      });
-    }
-
     if (value.compression !== undefined && value.format === "png") {
       context.addIssue({
         code: "custom",
