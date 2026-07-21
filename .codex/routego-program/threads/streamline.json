@@ -3,18 +3,24 @@
   "lane": "streamline",
   "change": "streamline-routego-image-generation",
   "role": "openspec-apply-owner",
-  "status": "registered-waiting-for-thread",
-  "threadId": "pending",
-  "worktree": "pending",
-  "branch": "pending",
-  "startingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
-  "currentHead": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+  "status": "registered-waiting-for-acceptance",
+  "threadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
+  "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
+  "branch": "codex/routego-streamline-g1",
+  "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
+  "currentHead": "ac20892014fb7beb3bf053a903670d4d634d956a",
   "generation": 1,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "lastHealthAudit": "pending",
+  "lastHealthAudit": "registration-attempt-1-audit-failed-on-ambiguous-hash-semantics; attempt-2-pending-independent-acceptance",
   "successorThreadId": null,
   "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
+  "handoffCapsuleIntegrity": {
+    "canonicalSha256": "0be95687030e49f4ca275cf863e2e87d42f1da680d40b84874a4e9655aaf94cd",
+    "rawFileSha256": "4cfd2f222060e209304d1718aefa5fe2466f32f890e0a3800ef485b9c7a32cdc",
+    "canonicalAlgorithm": "sha256 of recursively key-sorted UTF-8 JSON after setting capsuleSha256 to null",
+    "rawAlgorithm": "sha256 of file bytes exactly as stored in Git"
+  },
   "currentTaskCapsule": ".codex/routego-program/tasks/streamline-1.1.json",
   "openspecProgress": "0/33",
   "lastCompletedTask": null,
@@ -30,6 +36,14 @@
     "soleApplyOwner": true,
     "archived": false
   },
+  "failedRegistrationAttempts": [
+    {
+      "attempt": 1,
+      "head": "ac20892014fb7beb3bf053a903670d4d634d956a",
+      "event": "HANDOFF_AUDIT_FAILED",
+      "reason": "Worker interpreted canonical JSON self-hashes as raw file hashes; no product or governance files were modified in the worker lane."
+    }
+  ],
   "ownership": {
     "owned": ["packages/contracts/**", "openspec/changes/streamline-routego-image-generation/tasks.md"],
     "readOnly": ["openspec/changes/streamline-routego-image-generation/proposal.md", "openspec/changes/streamline-routego-image-generation/design.md", "openspec/changes/streamline-routego-image-generation/specs/**"],

@@ -1,7 +1,13 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "846ef69a68ecb51ad83ca794b6c02d9f4b7b31d2c7ba47294123e9a1b3f7deed",
+  "capsuleSha256": "0be95687030e49f4ca275cf863e2e87d42f1da680d40b84874a4e9655aaf94cd",
+  "hashSemantics": {
+    "capsuleSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting capsuleSha256 to null",
+    "referencedContentSha256": "canonical self-hash declared by the referenced JSON file",
+    "referencedRawFileSha256": "sha256 of the referenced file bytes exactly as stored in Git",
+    "capsuleRawFileSha256RecordedAt": ".codex/routego-program/threads/streamline.json#handoffCapsuleIntegrity.rawFileSha256"
+  },
   "lane": "streamline",
   "role": "openspec-apply-owner-candidate",
   "change": "streamline-routego-image-generation",
@@ -11,17 +17,17 @@
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
     "branch": "codex/routego-controller-g12",
     "acceptedProductCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
-    "handoffCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
-    "handoffParent": "902c5744f6b4a5641e4ec8faa713f44fcb1fa163"
+    "handoffCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
+    "handoffParent": "8abbd1632ea1b7a49a92fad917b3052e58e22b95"
   },
   "successor": {
-    "threadId": "pending",
-    "worktree": "pending",
-    "plannedBranch": "pending",
-    "startingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
-    "registrationStatus": "registered-waiting-for-thread",
-    "registrationAttempt": 1,
-    "verifiedHeadBeforeContainingCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "threadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
+    "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
+    "plannedBranch": "codex/routego-streamline-g1",
+    "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
+    "registrationStatus": "registered-waiting-for-acceptance",
+    "registrationAttempt": 2,
+    "verifiedHeadBeforeContainingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
     "incorporationCommit": null
   },
   "currentState": {
@@ -29,7 +35,11 @@
     "openspecCompleted": 0,
     "completedTaskIds": [],
     "nextTaskId": "1.1",
-    "taskCapsule": {"path": ".codex/routego-program/tasks/streamline-1.1.json", "sha256": "194dfdd724cd7c6c3e608c61cfeabf3cdb9efd6897dc8cee4ddc6e13e9ed50b4"},
+    "taskCapsule": {
+      "path": ".codex/routego-program/tasks/streamline-1.1.json",
+      "sha256": "ed562f041ca2b43e045a72774c1c4bcc81cea585a7387782f12338c18b8e8383",
+      "rawFileSha256": "8a0d232abf148987553e15917492594e637bf8bd8ff5112b44b5b227e24781e3"
+    },
     "taskLocked": true,
     "sourceIsSoleApplyOwner": true,
     "successorApplyAuthorized": false,
@@ -56,8 +66,8 @@
     ,"task1_1Locked": true
   },
   "context": {
-    "sourceObservableCompactions": 0,
-    "sourceCompactionFingerprint": null,
+    "sourceObservableCompactions": 2,
+    "sourceCompactionFingerprint": "controller-g12|streamline-routego-image-generation|ac20892014fb7beb3bf053a903670d4d634d956a|context-compaction-2-registration-attempt-2-reconciliation|0/33",
     "successorObservableCompactions": 0,
     "handoffAcceptanceCompactionLimit": 0,
     "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
@@ -87,7 +97,7 @@
     "maxFiles": 10,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 80214,
+    "expectedNormalizedUtf8Bytes": 83102,
     "fallbackSourceCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
