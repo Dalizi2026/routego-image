@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-registering-streamline-apply-owner",
+  "status": "controller-generation-12-streamline-generation-1-activated-task-1.1-authorized",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -56,7 +56,7 @@
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
     "branch": "codex/routego-controller-g12",
     "verifiedHeadBeforeContainingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-registering-streamline-apply-owner",
+    "status": "authoritative-controller-generation-12-streamline-generation-1-activated",
     "authoritative": true,
     "observableCompactions": 2,
     "lastCompactionFingerprint": "controller-g12|streamline-routego-image-generation|ac20892014fb7beb3bf053a903670d4d634d956a|context-compaction-2-registration-attempt-2-reconciliation|0/33"
@@ -68,17 +68,22 @@
     "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
     "branch": "codex/routego-streamline-g1",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "registrationCommit": null,
+    "registrationCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06",
     "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
     "taskCapsule": ".codex/routego-program/tasks/streamline-1.1.json",
     "change": "streamline-routego-image-generation",
     "nextTaskId": "1.1",
     "openspecProgress": "0/33",
-    "soleApplyOwner": false,
-    "frozen": true,
-    "applyAuthorized": false,
-    "authorizedScope": "none-waiting-for-lane-acceptance",
-    "authorizedFiles": [],
+    "soleApplyOwner": true,
+    "frozen": false,
+    "applyAuthorized": true,
+    "authorizedScope": "task-1.1-exact-contract-files",
+    "authorizedFiles": [
+      "packages/contracts/src/image.ts",
+      "packages/contracts/test/image-errors.test.ts",
+      "packages/contracts/test/fixtures.ts",
+      "openspec/changes/streamline-routego-image-generation/tasks.md"
+    ],
     "externalStateAuthorized": false,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -125,26 +130,26 @@
     "streamline": {
       "lane": "streamline",
       "generation": 1,
-      "status": "registered-waiting-for-acceptance",
+      "status": "activated-sole-owner-task-1.1-authorized",
       "threadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
       "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
       "plannedBranch": "codex/routego-streamline-g1",
       "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
       "registrationAttempt": 2,
-      "registrationCommit": null,
-      "incorporationCommit": null,
-      "currentHead": "ac20892014fb7beb3bf053a903670d4d634d956a",
-      "acceptedHead": null,
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
-      "authorizedScope": "none-waiting-for-lane-acceptance",
+      "registrationCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06",
+      "incorporationCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06",
+      "currentHead": "aa87b8e22819f420fac898b39d498b7ce1884e06",
+      "acceptedHead": "aa87b8e22819f420fac898b39d498b7ce1884e06",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
+      "authorizedScope": "task-1.1-exact-contract-files",
       "gitClean": true,
       "observableCompactions": 0,
       "lastCompactionFingerprint": null,
       "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
       "handoffCapsuleIntegrity": {
-        "canonicalSha256": "0be95687030e49f4ca275cf863e2e87d42f1da680d40b84874a4e9655aaf94cd",
-        "rawFileSha256": "4cfd2f222060e209304d1718aefa5fe2466f32f890e0a3800ef485b9c7a32cdc"
+        "canonicalSha256": "2009c692775931a16869d336684f6e916415aad291eccaecdd47a328e670e744",
+        "rawFileSha256": "27897d1db5461fb7899ccb6668f1558f6def83d86b066e27b63525a1c79bb765"
       },
       "failedRegistrationAttempts": [
         {
@@ -201,11 +206,16 @@
     "currentTask": {
       "id": "1.1",
       "capsule": ".codex/routego-program/tasks/streamline-1.1.json",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "started": false,
-      "authorizedScope": "none-waiting-for-lane-acceptance",
-      "authorizedFiles": []
+      "authorizedScope": "task-1.1-exact-contract-files",
+      "authorizedFiles": [
+        "packages/contracts/src/image.ts",
+        "packages/contracts/test/image-errors.test.ts",
+        "packages/contracts/test/fixtures.ts",
+        "openspec/changes/streamline-routego-image-generation/tasks.md"
+      ]
     },
     "previousWorkflowDeviation": {
       "implementationCommit": "6a253e7cb3243cb322121993184db540b93668b4e",
@@ -223,20 +233,20 @@
     }
   },
   "latestDirectCheckpoint": {
-    "eventFingerprint": "controller-g12|streamline-routego-image-generation|ac20892014fb7beb3bf053a903670d4d634d956a|registration-attempt-1-audit-failed-attempt-2-prepared|0/33",
-    "messageType": "HANDOFF_AUDIT_FAILED_REGISTRATION_ATTEMPT_2_PREPARED",
+    "eventFingerprint": "controller-g12|streamline-routego-image-generation|aa87b8e22819f420fac898b39d498b7ce1884e06|lane-accepted-registration-attempt-2-task-1.1-activation|0/33",
+    "messageType": "LANE_ACCEPTED_ACTIVATION_PREPARED",
     "workerThreadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
-    "reportedHead": "ac20892014fb7beb3bf053a903670d4d634d956a",
+    "reportedHead": "aa87b8e22819f420fac898b39d498b7ce1884e06",
     "completedTaskId": null,
     "nextTaskId": "1.1",
     "openspecProgress": "0/33",
     "controllerReceived": true,
     "controllerReadBackConfirmed": true,
     "controllerAccepted": true,
-    "handoffAccepted": false,
-    "safeCheckpoint": "ac20892014fb7beb3bf053a903670d4d634d956a",
+    "handoffAccepted": true,
+    "safeCheckpoint": "aa87b8e22819f420fac898b39d498b7ce1884e06",
     "observableCompactions": 2,
-    "checkpointSemantics": "Registration attempt 1 failed before activation because canonical self-hash semantics were ambiguous. Attempt 2 records canonical and raw hashes separately; product scope remains locked pending independent acceptance."
+    "checkpointSemantics": "Generation 1 accepted registration attempt 2 with zero observable compactions and a clean worktree. Controller activation authorizes only Task 1.1 exact files; external state remains unauthorized."
   },
   "controllerSuccessor": {
     "lane": "controller",

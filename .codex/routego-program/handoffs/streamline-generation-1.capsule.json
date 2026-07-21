@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "0be95687030e49f4ca275cf863e2e87d42f1da680d40b84874a4e9655aaf94cd",
+  "capsuleSha256": "2009c692775931a16869d336684f6e916415aad291eccaecdd47a328e670e744",
   "hashSemantics": {
     "capsuleSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting capsuleSha256 to null",
     "referencedContentSha256": "canonical self-hash declared by the referenced JSON file",
@@ -25,10 +25,10 @@
     "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
     "plannedBranch": "codex/routego-streamline-g1",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "registrationStatus": "registered-waiting-for-acceptance",
+    "registrationStatus": "activated-sole-owner-task-1.1-authorized",
     "registrationAttempt": 2,
-    "verifiedHeadBeforeContainingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "incorporationCommit": null
+    "verifiedHeadBeforeContainingCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06",
+    "incorporationCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06"
   },
   "currentState": {
     "openspecTotal": 33,
@@ -37,13 +37,13 @@
     "nextTaskId": "1.1",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/streamline-1.1.json",
-      "sha256": "ed562f041ca2b43e045a72774c1c4bcc81cea585a7387782f12338c18b8e8383",
-      "rawFileSha256": "8a0d232abf148987553e15917492594e637bf8bd8ff5112b44b5b227e24781e3"
+      "sha256": "b68cd83435f8376639abfa3a8c29b5d186483999b45fd6d62e44ff9f0a7ce292",
+      "rawFileSha256": "8965e9c208a3dc1334d3c2b7e77c59708106b7dad6ba157a9c183425b3d5a375"
     },
-    "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
-    "successorApplyAuthorized": false,
-    "continuation": "wait-for-controller-registration-and-sole-owner-activation"
+    "taskLocked": false,
+    "sourceIsSoleApplyOwner": false,
+    "successorApplyAuthorized": true,
+    "continuation": "execute-task-1.1-with-exact-authorized-scope"
   },
   "completedEvidence": [
     {"path": ".codex/routego-program/evidence/streamline-planning.json", "sha256": "17253c5ce253472a36b26bc6261a0a3f221fe810d5688cbb7a900da12c0abaa7", "taskIds": ["planning"]}
@@ -63,7 +63,7 @@
     "dependencyInstallationAuthorized": false,
     "realLibraryMigrationAuthorized": false,
     "targetPluginInstallationAuthorized": false
-    ,"task1_1Locked": true
+    ,"task1_1Locked": false
   },
   "context": {
     "sourceObservableCompactions": 2,
@@ -97,7 +97,7 @@
     "maxFiles": 10,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 83102,
+    "expectedNormalizedUtf8Bytes": 83693,
     "fallbackSourceCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
