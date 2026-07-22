@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "a48b50ce6d4a24def11d04d1357a1d5c91117b1a9054ce1ded91c0c416dd6f20",
+  "capsuleSha256": "3a77aea4b08a7954cbe546ed2c109c437802b106a5a7998d7201c58df3a7f494",
   "hashSemantics": {
     "capsuleSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting capsuleSha256 to null",
     "rawFileSha256RecordedAt": ".codex/routego-program/threads/streamline.json#handoffCapsuleIntegrity.rawFileSha256",
@@ -42,8 +42,8 @@
     "nextTaskId": "1.2",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/streamline-1.2.json",
-      "sha256": "1b7f70437860b2c04574db0c916871acae3087aa68b3ba146705d4bfb0f0a6da",
-      "rawFileSha256": "bb25efa0df4a862f2af441b7f30da40c180a157fb8f259b2c8cc1ac4904de0ce"
+      "sha256": "48fee3c4118cd15b7d62542cf6b51d62e9250387361322a4b19122fa1140f0d1",
+      "rawFileSha256": "0bb28053f2875022cde052b8538ad352f7e9f4ae095d022ccd18db94e55b4649"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
@@ -60,7 +60,7 @@
     },
     {
       "path": ".codex/routego-program/evidence/streamline-1.1.json",
-      "sha256": "e403efce1930bb67f61cf7c29114f01c1330d1b7faf03d101363f6984357945e",
+      "sha256": "a1f96905c4cb03537cedaf43df30612063b56baf53dd47762f869aa08ca2b553",
       "taskIds": [
         "1.1"
       ]
@@ -126,7 +126,7 @@
     "maxFiles": 11,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 87964,
+    "expectedNormalizedUtf8Bytes": 87957,
     "fallbackSourceCommit": "a1a90b7683eb9be437c4cd7e38adf8776f3c3b83",
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,

@@ -12,12 +12,12 @@
   "generation": 1,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "lastHealthAudit": "task-1.1-independently-accepted-and-task-1.2-authorized",
+  "lastHealthAudit": "task-1.1-accepted-task-1.2-authorized",
   "successorThreadId": null,
   "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
   "handoffCapsuleIntegrity": {
-    "canonicalSha256": "a48b50ce6d4a24def11d04d1357a1d5c91117b1a9054ce1ded91c0c416dd6f20",
-    "rawFileSha256": "b6f20374d8994b525e179850128de31d986d2fcdfca88526cbf1d935b8cd2834",
+    "canonicalSha256": "3a77aea4b08a7954cbe546ed2c109c437802b106a5a7998d7201c58df3a7f494",
+    "rawFileSha256": "22e1d12c6e4c6fc389f10a4d481e0ddab25df3dab4736322db3234e9c5db6260",
     "canonicalAlgorithm": "sha256 of recursively key-sorted UTF-8 JSON after setting capsuleSha256 to null",
     "rawAlgorithm": "sha256 of file bytes exactly as stored in Git"
   },
@@ -91,6 +91,6 @@
     "implementationCommit": "68d03b8522efaa0e42c5a1811a8685bcdd067576",
     "taskStateCommit": "a1a90b7683eb9be437c4cd7e38adf8776f3c3b83",
     "evidence": ".codex/routego-program/evidence/streamline-1.1.json",
-    "evidenceSha256": "b59ed9d2d7d53d23c385e09c0321c8ed961a1760eb21deb04022303954d6e53f"
+    "evidenceSha256": "a1f96905c4cb03537cedaf43df30612063b56baf53dd47762f869aa08ca2b553"
   }
 }
