@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-12-task-2.1-accepted-task-3.1-blocked-by-task-order-conflict",
+  "status": "authoritative-controller-generation-12-task-3.1-accepted-ready-for-tasks-2.2-and-3.2",
   "threadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
   "predecessorThreadId": "019f8275-18a6-7061-8a46-e177bf0bd3bc",
   "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
@@ -14,16 +14,15 @@
   "lastCompactionFingerprint": null,
   "lastHealthAudit": {
     "status": "passed",
-    "creationHead": "6417426c760eb2feb85e73a88e7711b5f4e6a618",
-    "openspecProgress": "5/33",
-    "acceptedTask": "2.1",
-    "readyTask": "2.2",
-    "activeTask": "3.1-user-approved-obsolete-test-cleanup",
-    "independentVerification": "Foundation 48 tests and exact Creation provider-request/executor 26 tests passed; scope and git diff --check passed."
+    "libraryHead": "2f04291f27487ef1083d56309ea96032612bb5d8",
+    "openspecProgress": "6/33",
+    "acceptedTask": "3.1",
+    "readyTasks": ["2.2", "3.2"],
+    "independentVerification": "Exact Library model and mutations tests passed 6/6; scope and git diff --check passed."
   },
   "currentOperation": {
-    "id": "task-3.1-user-approved-obsolete-test-cleanup",
-    "allowedNext": "The Library owner may finish Task 3.1 after removing only obsolete Trash/delete/restore/permanent-delete test cases in mutations.test.ts. Task 2.2 remains ready but is not dispatched yet.",
+    "id": "tasks-2.2-and-3.2-parallel-ready",
+    "allowedNext": "Separate Creation and Library owners may start Task 2.2 and Task 3.2 from the accepted 3.1 baseline.",
     "forbidden": [
       "Product code outside each task's exact owner scope",
       "package.json or pnpm-lock.yaml changes",
