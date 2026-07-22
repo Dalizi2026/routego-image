@@ -56,7 +56,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-project-local-task-4.1-locked",
+    "status": "authoritative-controller-generation-12-task-4.1-activated",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -105,17 +105,17 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "registered-locked-pending-visible-thread-zero-compaction-acceptance-in-existing-controller-worktree",
-      "taskRef": "pending",
-      "threadId": "pending",
+      "status": "activated-cross-lane-sole-apply-owner-task-4.1-zero-compaction-acceptance",
+      "taskRef": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
+      "threadId": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
       "generation": 1,
       "taskId": "4.1",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "6461a1428715c721257040589665b1f11aff5a99",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/integration-4.1.json", "sha256": "1e8ee24282986bd395825ee5be821d5b00785b714c29d616fd1fae3aeeff5f6b" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json", "sha256": "a1e5258f645fc7f1d111e4d59da44573d7e6c3639bb6bb1d1246d0052bb95c72", "rawFileSha256": "b25b19e56b3bded222af5aad232997872c2bb651c218751ef8be8a4efc4c92c5" },
-      "authorizedScope": "none-task-4.1-locked-pending-visible-integration-thread-zero-compaction-acceptance-in-existing-controller-worktree"
+      "currentHead": "5e5ab5df0a305590a558a86287a22e5b8047753b",
+      "taskCapsule": { "path": ".codex/routego-program/tasks/integration-4.1.json", "sha256": "7cf0358bb50a8ebac19c69e9101bd594770c0a346f31cb0678ffc637e9013e0d" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json", "sha256": "849a027d5672ba3da51357fe2c41e3c0da9be75ec18b2ccf542d7b29a6c225d8", "rawFileSha256": "643fb456cc23be47abde6fa3cde13bc00b1044ad2d7f19e30a6b82a21f6ce9fa" },
+      "authorizedScope": "task-4.1-exact-integration-public-regeneration-discovery-files"
     }
   },
   "laneSuccessors": {
@@ -140,13 +140,13 @@
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "threadId": "pending",
+      "threadId": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
       "generation": 1,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "6461a1428715c721257040589665b1f11aff5a99",
+      "currentHead": "5e5ab5df0a305590a558a86287a22e5b8047753b",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "a1e5258f645fc7f1d111e4d59da44573d7e6c3639bb6bb1d1246d0052bb95c72", "rawFileSha256": "b25b19e56b3bded222af5aad232997872c2bb651c218751ef8be8a4efc4c92c5" }
+      "handoffCapsuleIntegrity": { "canonicalSha256": "849a027d5672ba3da51357fe2c41e3c0da9be75ec18b2ccf542d7b29a6c225d8", "rawFileSha256": "643fb456cc23be47abde6fa3cde13bc00b1044ad2d7f19e30a6b82a21f6ce9fa" }
     }
   },
   "currentChange": {
@@ -161,21 +161,21 @@
     },
     "currentTask": {
       "id": "4.1",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": ["4.1"],
-      "authorizedScope": "Task 4.1 is locked current streamline Integration work. Its task capsule, successor capsule, and isolated streamlineIntegration state are registered; a real visible Integration thread must reuse the existing controller-g12 worktree, be clean, and pass zero-compaction handoff acceptance before explicit Controller activation. New directories and worktrees are prohibited without fresh user approval. The archived Library G3 and legacy integrate-routego-image-plugin Integration state cannot authorize this scope."
+      "authorizedScope": "Task 4.1 is activated only for Integration thread 019f8ad0-5d83-72f2-b26c-7cad6b488289 in the existing controller-g12 worktree. Exact task-capsule files only; no new directory, worktree, provider, network, credentials, real data, migration, deletion, deployment, release, or future task scope."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "creation-library-and-streamline-integration",
-    "event": "CONTROLLER_G12_PROJECT_LOCAL_RE_REGISTERED_TASK_4_1_LOCKED",
+    "event": "TASK_4_1_CONTROLLER_ACTIVATED_ZERO_COMPACTION",
     "implementationCommit": "24c1e8483a66262b9075fc3621b682878aef3ea3",
     "controllerMergeCommit": "30857ba5f495b39342af55347459a95f14dd4fff",
     "taskStateCommit": "9db7c998da60ea7bf4b0e4cb75b58c046a4a795a",
     "openspecProgress": "13/33",
     "nextTaskIds": ["4.1"],
-    "verification": "The project-local Controller G12 was re-registered after the prior Controller thread entered a system error outside the project. The Task 4.1 task/handoff capsules, controller and streamlineIntegration state now target the project-local Controller and passed the handoff validator while Git was clean. Task 4.1 remains locked pending a real visible Integration thread and zero-compaction acceptance in the existing controller-g12 worktree; no new directory or worktree is an authority path."
+    "verification": "Integration Task 4.1 handoff acceptance passed at zero observable compactions with clean Git and the handoff validator. The project-local Controller activated only the exact task-capsule Integration scope for the registered visible thread; implementation remains subject to per-checkpoint direct reporting and exact allowed files."
   },
   "currentBlockers": [],
   "approvedDeviations": [

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-12-project-local-task-4.1-locked",
+  "status": "authoritative-controller-generation-12-task-4.1-activated",
   "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "predecessorThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -18,11 +18,11 @@
     "openspecProgress": "13/33",
     "acceptedTask": "3.5",
     "readyTasks": ["4.1"],
-    "independentVerification": "Task 4.1 handoff validator passed with 12 startup files / 71665 normalized UTF-8 bytes and a clean Git worktree; the task remains locked."
+    "independentVerification": "Task 4.1 handoff acceptance passed with 12 startup files / 71449 normalized UTF-8 bytes, clean Git, zero observable compactions, and direct worker-to-Controller receipt confirmation."
   },
   "currentOperation": {
-    "id": "project-local-controller-re-registered-task-4.1-locked",
-    "allowedNext": "A future visible Integration thread may use only this existing controller-g12 worktree after Controller completes the locked Task 4.1 handoff acceptance; it may not create a worktree or directory.",
+    "id": "task-4.1-activated-exact-integration-scope",
+    "allowedNext": "Only registered Integration thread 019f8ad0-5d83-72f2-b26c-7cad6b488289 may implement Task 4.1 within integration-4.1.json exact allowed files; it must report every checkpoint directly to this Controller and confirm receipt.",
     "forbidden": [
       "Product code outside each task's exact owner scope",
       "package.json or pnpm-lock.yaml changes",
