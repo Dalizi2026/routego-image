@@ -75,15 +75,6 @@ function generateParameters(prompt: string, size: LibraryOperationParameters["si
   };
 }
 
-function editParameters(prompt: string): LibraryOperationParameters {
-  return {
-    ...generateParameters(prompt, "1536x1024"),
-    aspectRatio: "3:2",
-    partialImages: 1,
-    references: [{ assetId: "asset-a", role: "style", label: "Style" }]
-  };
-}
-
 const execution = {
   attemptCount: 1,
   providerRequestCount: 1,
@@ -119,7 +110,7 @@ async function createGallery() {
   await Promise.all(files.map((file) => writeFile(path.join(sourceRoot, file.name), file.bytes)));
   const assets = new LibraryAssetStore({ indexStore, protectedRoots: [] });
   const promptA = "Astronaut Cat";
-  const promptB = "Ocean Studio Edit";
+  const promptB = "Ocean Studio";
   const promptC = "Archive Portrait";
   await assets.ingestAssets([
     {
@@ -148,8 +139,8 @@ async function createGallery() {
       prompt: promptB,
       model: "model-two",
       status: "partial",
-      requestedParams: editParameters(promptB),
-      effectiveParams: editParameters(promptB),
+      requestedParams: generateParameters(promptB, "1536x1024"),
+      effectiveParams: generateParameters(promptB, "1536x1024"),
       execution,
       renditions: [
         {
@@ -223,7 +214,7 @@ describe("Library public and Studio query projections", () => {
     expect(second.items.map((item) => item.assetId)).toEqual(["asset-a"]);
     expect(new Set([...first.items, ...second.items].map((item) => item.assetId)).size).toBe(2);
 
-    const all = await service.searchStudioLibrary({ includeDeleted: true, limit: 10 });
+    const all = await service.searchStudioLibrary({ limit: 10 });
     expect(all.items.map((item) => item.assetId)).toEqual(["asset-b", "asset-a", "asset-c"]);
     expect(all.total).toBe(3);
     const filters = await Promise.all([
@@ -233,11 +224,11 @@ describe("Library public and Studio query projections", () => {
       service.searchStudioLibrary({ to: "2026-07-18T03:30:00.000Z" }),
       service.searchStudioLibrary({ kinds: ["generate"] }),
       service.searchStudioLibrary({ sizes: ["1536x1024"] }),
-      service.searchStudioLibrary({ statuses: ["partial"], includeDeleted: true }),
+      service.searchStudioLibrary({ statuses: ["partial"] }),
       service.searchStudioLibrary({ folderIds: ["folder-edits"] }),
-      service.searchStudioLibrary({ sort: "prompt-asc", includeDeleted: true }),
-      service.searchStudioLibrary({ sort: "prompt-desc", includeDeleted: true }),
-      service.searchStudioLibrary({ sort: "created-asc", includeDeleted: true })
+      service.searchStudioLibrary({ sort: "prompt-asc" }),
+      service.searchStudioLibrary({ sort: "prompt-desc" }),
+      service.searchStudioLibrary({ sort: "created-asc" })
     ]);
     expect(filters.map((result) => result.items.map((item) => item.assetId))).toEqual([
       ["asset-a"],
@@ -279,6 +270,20 @@ describe("Library public and Studio query projections", () => {
     await expect(
       service.searchStudioLibrary({ sort: "prompt-asc", cursor: mismatched })
     ).rejects.toMatchObject({ code: "invalid_request" } satisfies Partial<LibraryError>);
+  });
+
+  it("rejects stale Trash search filters without changing the index", async () => {
+    const { service, indexStore } = await createGallery();
+    const before = await indexStore.read();
+
+    await expect(service.searchStudioLibrary({ includeDeleted: true })).rejects.toMatchObject({
+      code: "invalid_request"
+    } satisfies Partial<LibraryError>);
+    await expect(service.searchLibrary({ statuses: ["deleted"] })).rejects.toMatchObject({
+      code: "invalid_request"
+    } satisfies Partial<LibraryError>);
+
+    expect(await indexStore.read()).toEqual(before);
   });
 
   it("keeps prompt-sort cursors bounded while sorting the complete long prompt", async () => {

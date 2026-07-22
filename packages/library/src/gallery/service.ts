@@ -11,6 +11,7 @@ import {
   type GetBrowserResourceResult,
   type ListFoldersInput,
   type ListFoldersResult,
+  type LibraryMutationRequest,
   type PreflightLibraryMutationInput,
   type PreflightLibraryMutationResult,
   type ReorderFoldersInput,
@@ -142,17 +143,32 @@ export class GalleryService
         "ZIP portability is not available in the current Library implementation."
       );
     }
-
     const assetIds = [...new Set(parsed.assetIds)];
-    const mutation =
-      parsed.action === "assign-folders" || parsed.action === "remove-folders"
-        ? { action: parsed.action, assetIds, folderIds: [...new Set(parsed.folderIds)] }
-        : { action: parsed.action, assetIds };
+    const action = String(parsed.action);
+    const mutation:
+      | Extract<LibraryMutationRequest, { readonly action: "assign-folders" | "remove-folders" }>
+      | Extract<LibraryMutationRequest, { readonly action: "mark" }>
+      | undefined =
+      action === "assign-folders" || action === "remove-folders"
+        ? {
+            action: action as "assign-folders" | "remove-folders",
+            assetIds,
+            folderIds: [...new Set((parsed as { readonly folderIds: readonly string[] }).folderIds)]
+          }
+        : action === "mark"
+          ? { action: "mark", assetIds }
+          : undefined;
+    if (mutation === undefined) {
+      throw new LibraryError(
+        "invalid_request",
+        "Trash, restore, and deletion are no longer Library operations; legacy cleanup requires confirmed migration."
+      );
+    }
     const preflight = await this.#mutations.preflight({ mutation });
     const execution = await this.#mutations.execute({
       preflightId: preflight.preflightId,
-      action: parsed.action,
-      confirmations: parsed.action === "permanent-delete" ? ["permanent-delete"] : []
+      action: mutation.action,
+      confirmations: []
     });
     const affectedAssetIds = execution.items.flatMap((item) =>
       item.status === "succeeded" && item.affectedAssetId ? [item.affectedAssetId] : []

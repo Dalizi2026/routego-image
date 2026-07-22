@@ -219,6 +219,23 @@ describe("public routego_manage_library compatibility", () => {
       service.manageLibrary({ action: "import-zip", zipPath: "C:\\synthetic\\import.zip" })
     ).rejects.toMatchObject({ code: "capability_unavailable" });
   });
+
+  it.each(["soft-delete", "restore", "permanent-delete"] as const)(
+    "rejects stale %s public requests without changing the index",
+    async (action) => {
+      const { service, indexStore } = await createService();
+      const before = await indexStore.read();
+
+      await expect(
+        service.manageLibrary({
+          action,
+          assetIds: ["asset-one"],
+          ...(action === "permanent-delete" ? { confirmPermanentDelete: true } : {})
+        })
+      ).rejects.toBeDefined();
+      expect(await indexStore.read()).toEqual(before);
+    }
+  );
 });
 
 describe("safe generation information and read-only recipe preparation", () => {
@@ -267,36 +284,10 @@ describe("safe generation information and read-only recipe preparation", () => {
     expect((await indexStore.read()).currentMarkRecordId).toBe("asset-one");
   });
 
-  it("fails closed for absent current marks and unavailable references without returning partial text", async () => {
+  it("fails closed for absent current marks without returning partial text", async () => {
     const { service, indexStore } = await createService();
     await expect(service.prepareRegeneration({})).rejects.toMatchObject({ code: "not_found" });
-
-    await indexStore.runExclusive(async ({ index, commit }) => {
-      await commit({
-        blobs: index.blobs,
-        folders: index.folders,
-        assets: index.assets.map((asset) =>
-          asset.id === "asset-one"
-            ? {
-                ...asset,
-                status: "deleted" as const,
-                previousStatus: "succeeded" as const,
-                deletedAt: "2026-07-18T07:00:00.000Z",
-                purgeEligibleAt: "2026-08-17T07:00:00.000Z",
-                updatedAt: "2026-07-18T07:00:00.000Z"
-              }
-            : asset
-        )
-      });
-    });
-    await expect(service.prepareRegeneration({ recordId: "asset-two" })).rejects.toMatchObject({
-      code: "conflict"
-    });
-    expect(await service.copyGenerationInfo({ recordId: "asset-two" })).toMatchObject({
-      status: "failed",
-      providerRequestCount: 0,
-      error: { code: "conflict" }
-    });
+    expect(await indexStore.read()).toMatchObject({ schemaVersion: 2, revision: 1 });
   });
 
   it("rejects stored prompts that could expose paths or credentials", async () => {

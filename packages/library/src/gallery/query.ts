@@ -173,7 +173,7 @@ function eligibleGeneration(index: ImageLibraryIndex, recordId: string): StoredL
   if (!asset) {
     throw new LibraryError("not_found", "The requested generation record does not exist.");
   }
-  if (asset.kind !== "generate" || asset.status === "deleted") {
+  if (asset.kind !== "generate") {
     throw new LibraryError("conflict", "The requested record is not an active generation record.");
   }
   primaryItem(index, asset);
@@ -262,7 +262,6 @@ export function prepareSafeGeneration(
 
 function matches(input: ParsedSearchInput, item: LibraryQueryItem): boolean {
   const asset = item.asset;
-  if (!input.includeDeleted && asset.status === "deleted") return false;
   if (
     input.query !== undefined &&
     !normalizedPrompt(asset.prompt).includes(normalizedPrompt(input.query))
@@ -289,6 +288,12 @@ export function queryLibraryIndex(
   input: RoutegoSearchLibraryInput
 ): LibraryQueryPage {
   const parsed = routegoSearchLibraryInputSchema.parse(input);
+  if (parsed.includeDeleted || parsed.statuses.includes("deleted")) {
+    throw new LibraryError(
+      "invalid_request",
+      "Trash browsing is no longer a Library operation; legacy cleanup requires confirmed migration."
+    );
+  }
   const cursor = parsed.cursor === undefined ? undefined : decodeCursor(parsed.cursor, parsed.sort);
   const filtered = index.assets
     .map((asset) => primaryItem(index, asset))

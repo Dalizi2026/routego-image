@@ -201,3 +201,18 @@ describe("current generation mark mutations", () => {
     expect((await indexStore.read()).currentMarkRecordId).toBe("asset-one");
   });
 });
+
+describe("removed Trash mutations", () => {
+  it.each(["soft-delete", "restore", "permanent-delete"] as const)(
+    "rejects stale %s requests before any index mutation",
+    async (action) => {
+      const { indexStore, mutations } = await createHarness();
+      const before = await indexStore.read();
+
+      await expect(
+        mutations.preflight({ mutation: { action, assetIds: ["asset-one"] } })
+      ).rejects.toMatchObject({ name: "ZodError" });
+      expect(await indexStore.read()).toEqual(before);
+    }
+  );
+});
