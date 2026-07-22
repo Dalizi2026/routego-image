@@ -112,9 +112,9 @@
       "taskId": "4.1",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "5f1f67caf4296925a4b5a914777bfb1adbbc8267",
+      "currentHead": "6461a1428715c721257040589665b1f11aff5a99",
       "taskCapsule": { "path": ".codex/routego-program/tasks/integration-4.1.json", "sha256": "1e8ee24282986bd395825ee5be821d5b00785b714c29d616fd1fae3aeeff5f6b" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json", "sha256": "f92eea6fa0eb6992415c463de605607923056a8fbec5a27736b524e64a547dc2", "rawFileSha256": "7f9bce7ec9681106c0e8688bb119f58deee2123fd8f8a9ad30b49081d3bf8a8e" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json", "sha256": "a1e5258f645fc7f1d111e4d59da44573d7e6c3639bb6bb1d1246d0052bb95c72", "rawFileSha256": "b25b19e56b3bded222af5aad232997872c2bb651c218751ef8be8a4efc4c92c5" },
       "authorizedScope": "none-task-4.1-locked-pending-visible-integration-thread-zero-compaction-acceptance-in-existing-controller-worktree"
     }
   },
@@ -144,9 +144,9 @@
       "generation": 1,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "5f1f67caf4296925a4b5a914777bfb1adbbc8267",
+      "currentHead": "6461a1428715c721257040589665b1f11aff5a99",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "f92eea6fa0eb6992415c463de605607923056a8fbec5a27736b524e64a547dc2", "rawFileSha256": "7f9bce7ec9681106c0e8688bb119f58deee2123fd8f8a9ad30b49081d3bf8a8e" }
+      "handoffCapsuleIntegrity": { "canonicalSha256": "a1e5258f645fc7f1d111e4d59da44573d7e6c3639bb6bb1d1246d0052bb95c72", "rawFileSha256": "b25b19e56b3bded222af5aad232997872c2bb651c218751ef8be8a4efc4c92c5" }
     }
   },
   "currentChange": {
