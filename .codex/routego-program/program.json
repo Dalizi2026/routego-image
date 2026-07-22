@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-authoritative-task-2.4-accepted-library-3.3-registered-locked",
+  "status": "controller-generation-12-authoritative-task-2.4-accepted-library-3.3-activated",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -82,17 +82,17 @@
       "authorizedScope": "task-2.4-accepted-merged-no-successor-product-task-active"
     },
     "library": {
-      "status": "registered-locked-awaiting-real-worktree-visible-thread-and-zero-compaction-handoff-acceptance",
-      "taskRef": "pending",
-      "threadId": "pending",
+      "status": "active-sole-apply-owner-zero-compaction-handoff-accepted",
+      "taskRef": "019f8a48-ee58-7f73-b362-947478c0c85a",
+      "threadId": "019f8a48-ee58-7f73-b362-947478c0c85a",
       "generation": 3,
       "taskId": "3.3",
       "branch": "codex/routego-library-g3",
       "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
       "currentHead": "34eafa28f04f3c68e3896173b00b20a0ba7a3438",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.3.json", "sha256": "04763e3a5b32e3648a6ed2c7bfa00f88a4b7b0671ffc4fe1d070706ed071e5b3" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-5.capsule.json", "sha256": "c6df85347ac3c48d6e213b9c51a1941c6b9f8117d0087b5bbd46ab1845c4788f", "rawFileSha256": "a3b50136ba609a27ef05db08e38959422d6f56da0b003ad72487a90a85a5d01d" },
-      "authorizedScope": "task-3.3-registered-locked-no-product-apply-before-controller-created-worktree-thread-and-zero-compaction-handoff-acceptance"
+      "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.3.json", "sha256": "0bcb04cb3629b59c8cda15c5fd32051c58c1a8a032d3d097bb4bab64d732a890" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-5.capsule.json", "sha256": "d37d1a4d23bbc4b9c96a2adf34cb1baa3380e8c3b7023086c50ba2a041d5cbcc", "rawFileSha256": "e239a228bb4d745909d5a6c6034f0fc0d7d8b4f9d3f675afcbd720a997d07dc5" },
+      "authorizedScope": "task-3.3-exact-library-migration-preflight-files-active-sole-owner"
     }
   },
   "laneSuccessors": {
@@ -106,13 +106,13 @@
       "handoffCapsuleIntegrity": { "canonicalSha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3", "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39" }
     },
     "library": {
-      "threadId": "pending",
+      "threadId": "019f8a48-ee58-7f73-b362-947478c0c85a",
       "generation": 3,
       "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
       "plannedBranch": "codex/routego-library-g3",
       "currentHead": "34eafa28f04f3c68e3896173b00b20a0ba7a3438",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "c6df85347ac3c48d6e213b9c51a1941c6b9f8117d0087b5bbd46ab1845c4788f", "rawFileSha256": "a3b50136ba609a27ef05db08e38959422d6f56da0b003ad72487a90a85a5d01d" }
+      "handoffCapsuleIntegrity": { "canonicalSha256": "d37d1a4d23bbc4b9c96a2adf34cb1baa3380e8c3b7023086c50ba2a041d5cbcc", "rawFileSha256": "e239a228bb4d745909d5a6c6034f0fc0d7d8b4f9d3f675afcbd720a997d07dc5" }
     }
   },
   "currentChange": {
@@ -127,21 +127,21 @@
     },
     "currentTask": {
       "id": "3.3",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": ["3.3"],
-      "authorizedScope": "Task 2.4 is accepted and merged. Task 3.3 is registered but locked until Controller creates its real worktree and visible thread and that successor passes zero-compaction handoff acceptance."
+      "authorizedScope": "Task 3.3 G3 completed zero-compaction handoff acceptance and is the sole active apply owner only within its exact capsule scope."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "creation-and-library",
-    "event": "TASK_2_4_ACCEPTED_TASK_3_3_REGISTERED_LOCKED",
+    "event": "TASK_3_3_G3_HANDOFF_ACCEPTED_AND_ACTIVATED",
     "implementationCommit": "8d595d50def843e37a97772df5b1f0bb05c21c9d",
     "controllerMergeCommit": "0d0d58561ba15f85aa3a290a3b0afe5eafab1c88",
     "taskStateCommit": "34eafa28f04f3c68e3896173b00b20a0ba7a3438",
     "openspecProgress": "10/33",
     "nextTaskIds": ["3.3"],
-    "verification": "Task 2.4 Foundation typecheck passed, Foundation tests passed 56/56, and Creation focused regressions passed 14/14. Creation's full suite retains five known out-of-scope old failures; Creation typecheck retains documented old edit/Trash contract debt including the existing executor FormData branch, so neither is claimed green. Task 3.3 is registered and locked pending a real worker worktree, visible thread, and zero-compaction handoff acceptance."
+    "verification": "Task 2.4 Foundation typecheck passed, Foundation tests passed 56/56, and Creation focused regressions passed 14/14. Creation's full suite retains five known out-of-scope old failures; Creation typecheck retains documented old edit/Trash contract debt including the existing executor FormData branch, so neither is claimed green. Library G3 Task 3.3 handoff acceptance passed validator 19 checks with zero observable compactions and clean Git; it is now the sole apply owner."
   },
   "currentBlockers": [],
   "approvedDeviations": [
