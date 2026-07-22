@@ -263,7 +263,7 @@ describe("Studio upload operation registry", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
-      "edit",
+      "prepareRegeneration",
       "batch",
       "searchLibrary",
       "manageLibrary",
@@ -272,7 +272,7 @@ describe("Studio upload operation registry", () => {
     expect(Object.values(routegoOperationDefinitions).map((item) => item.toolName)).toEqual([
       "routego_status",
       "routego_generate",
-      "routego_edit",
+      "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
       "routego_manage_library",

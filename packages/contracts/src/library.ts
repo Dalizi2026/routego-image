@@ -890,7 +890,7 @@ export const copyGenerationInfoResultSchema = z
           message: "Successful copy results require projection, clipboard text, and no error"
         });
       } else {
-        const forbidden = /(?:[A-Za-z]:[\\/]|\\\\[A-Za-z]|\/Users\/|\/home\/|file:|Bearer\s|api[_-]?key|sk-[A-Za-z0-9]{10,}|data:image\/|base64,)/iu;
+        const forbidden = /(?:[A-Za-z]:[\\/]|\\\\[A-Za-z]|\/(?:Users|home|tmp|var|private|opt)\/|file:|https?:\/\/|\/\/[A-Za-z0-9]|Authorization\s*:|Bearer\s|api[_-]?key|sk-[A-Za-z0-9]{10,}|data:image\/|base64,)/iu;
         if (forbidden.test(value.clipboardText)) {
           context.addIssue({
             code: "custom",
