@@ -29,6 +29,8 @@ handoff capsule 必须通过 `.codex/routego-program/scripts/validate-handoff-ca
 
 - Program Controller 只为 Foundation、Creation、Library、Studio、Integration 这类 OpenSpec change 负责人创建用户可见的顶层 Codex 新任务。
 - 顶层任务必须拥有独立 worktree、分支、线程状态文件、清晰标题，并在任务列表中置顶。
+- 同一 Lane 的唯一可见执行线程可在第 1、2 次可观察上下文压缩期间连续处理顺序 OpenSpec 任务；不得仅因任务顺序推进自动创建 successor 工作区或线程。
+- 每次范围切换仍须由 Controller 明确激活，并重新核对 task capsule、授权范围、唯一 owner、工作区 clean、完整性和启动预算；在该 in-thread scope acceptance 完成前，新任务保持锁定且不得写入。
 - 旧插件审计、上游审计、模块拆分、测试、审查等有界工作，默认由对应顶层任务在自己的线程内派发子代理。
 - 子代理不得再创建新的用户顶层任务，除非上下文交接协议明确要求创建继任任务。
 - 常规步骤、读取进度和非阻塞发现不回传 Program Controller；只回传真实阻塞、契约变更请求和最终交付。
@@ -68,14 +70,13 @@ handoff capsule 必须通过 `.codex/routego-program/scripts/validate-handoff-ca
 
 - 当前对话出现上下文压缩、checkpoint 或历史摘要时，先读取线程状态并记录新的事件指纹。
 - 第 1～2 次可观测压缩：完成健康审计；只有权威状态、change、HEAD、下一任务、契约、所有权和测试状态均可确认时才继续。
-- 第 3 次可观测压缩：必须立即执行低上下文无损交接（PD-014）；不得继续大型任务，不得等到第 5 次。
-- 第 4 次可观测压缩：进入预交接状态，只允许完成当前已开始的原子任务和交接准备，不得启动新的大型任务。
-- 第 5 次可观测压缩：只要仍有未完成工作，必须交给全新 Codex 任务和新 worktree。
+- 第 3 次可观测压缩：必须立即执行低上下文无损交接（PD-014），由 Controller 创建新的可见线程和独立 worktree；原线程不得继续大型任务，也不得等到第 4 或第 5 次。
+- 同一线程在第三次压缩后不得继续承担新的任务范围；新的继任线程从零重新计数，并在接管验收后成为唯一 apply owner。
 - 健康审计失败、无法准确确认权威状态或出现高风险外部条件时，无论压缩次数是否达到五次，都必须提前交接。
 - 交接前不得开始新的大型任务；在安全边界提交工作，并在 `.codex/routego-program/handoffs/` 写清单。
 - 继任任务必须从提交后的 branch/commit 创建，不使用携带完整旧历史的 fork。
 - 继任任务确认 commit、OpenSpec 状态和下一任务后，旧任务才允许归档。
-- 第 5 次可观测压缩或提前健康交接所创建的每一个继任任务，必须完整继承“直接回传主链 + 定时自动化兜底链”约束。Controller 必须在 task 创建提示、registration、handoff acceptance 和 sole-owner activation 中重复写明该约束。
+- 第 3 次可观测压缩或提前健康交接所创建的每一个继任任务，必须完整继承“直接回传主链 + 定时自动化兜底链”约束。Controller 必须在 task 创建提示、registration、handoff acceptance 和 sole-owner activation 中重复写明该约束。
 - 同一四个治理节点还必须重复确认：PD-008 分层读取、无损 history/evidence 引用、12 文件/120 KiB 启动预算和 acceptance 前零压缩门禁。
 - 继任任务的接管确认只有在其明确承诺：每个 OpenSpec 任务、任务组、安全检查点、阻塞、偏差、交接和交付完成后立即调用真实 `send_message_to_thread` 回传 Controller，并调用 `read_thread` 确认送达后才有效；仅输出 final 标签或等待自动化不算完成。
 - 若继任任务未确认上述回传契约，旧任务不得归档，继任任务不得成为唯一 apply-owner，也不得开始下一项产品任务。

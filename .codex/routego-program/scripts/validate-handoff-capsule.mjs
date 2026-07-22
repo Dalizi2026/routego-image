@@ -156,6 +156,26 @@ if (capsule.schemaVersion !== 1 || capsule.capsuleType !== "successor-handoff") 
   fail("capsule schemaVersion/capsuleType mismatch");
 }
 
+if (capsule.continuity !== undefined) {
+  const continuity = capsule.continuity;
+  if (
+    continuity.reuseSameLaneThreadUntilObservableCompactions !== 3 ||
+    continuity.inThreadScopeAcceptanceRequired !== true ||
+    continuity.newWorktreeForbiddenBeforeThirdCompaction !== true
+  ) {
+    fail("continuity policy mismatch");
+  } else if (
+    capsule.successor.threadId !== capsule.source.threadId ||
+    capsule.successor.worktree !== capsule.source.worktree ||
+    capsule.successor.plannedBranch !== capsule.source.branch ||
+    capsule.generation.successor !== capsule.generation.source
+  ) {
+    fail("same-lane continuity identity mismatch");
+  } else {
+    pass("same-lane continuity policy");
+  }
+}
+
 for (const commit of [
   capsule.source.acceptedProductCommit,
   capsule.source.handoffCommit,
