@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "012bb424389823c831ec2440eea5c962ba442368f4cfdfdc55441a580086ed19",
+  "event": "streamline-task-1.4-accepted",
+  "lane": "streamline",
+  "change": "streamline-routego-image-generation",
+  "taskId": "1.4",
+  "status": "accepted",
+  "implementationCommit": "2227a08e5bc07925bca90a0efcea31f6aebfeb28",
+  "taskStateCommit": "9895039edcaa75be3d8346d5ead2131da790fbdc",
+  "workerThreadId": "internal-streamline-task-1.4",
+  "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
+  "branch": "codex/routego-streamline-g1",
+  "tests": [
+    {
+      "command": "pnpm --filter @routego-image/contracts typecheck",
+      "result": "pass",
+      "retester": "controller-g12-independent"
+    },
+    {
+      "command": "pnpm --filter @routego-image/contracts test",
+      "result": "pass",
+      "passed": 126,
+      "retester": "controller-g12-independent"
+    },
+    {
+      "command": "git diff --check c096f9023d66125c03866cb71e3d4319570d8962 9895039edcaa75be3d8346d5ead2131da790fbdc",
+      "result": "pass",
+      "retester": "controller-g12-independent"
+    }
+  ],
+  "scopeExact": true,
+  "scopeFiles": [
+    "packages/contracts/src/library.ts",
+    "packages/contracts/test/streamline-regressions.test.ts",
+    "packages/contracts/test/upload-service.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "gitCleanAtAcceptance": true,
+  "observableCompactions": 0,
+  "controllerAcceptance": "independent-typecheck-full-suite-and-exact-scope-audit-passed",
+  "nextTaskIds": ["2.1", "3.1"],
+  "externalStateAuthorized": false,
+  "notes": "The only source change tightened copied generation-information rejection for local paths, external URLs, credentials and image payloads; all other implementation is regression coverage."
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-authoritative-streamline-task-1.3-accepted-task-1.4-authorized",
+  "status": "controller-generation-12-authoritative-streamline-task-1.4-accepted-ready-for-tasks-2.1-and-3.1",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -48,12 +48,12 @@
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-recovered-after-predecessor-system-error",
+    "status": "authoritative-controller-generation-12-streamline-task-1.4-accepted",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
   },
-  "applyOwner": {
+  "lastApplyOwner": {
     "lane": "streamline",
     "threadId": "019f89ad-8a34-7fb2-87a2-839985494ef1",
     "generation": 2,
@@ -67,31 +67,48 @@
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
   },
+  "activeApplyOwners": {
+    "creation": {
+      "status": "pending-registration",
+      "taskId": "2.1",
+      "branch": "codex/routego-creation-g1",
+      "worktree": "/Users/dalizi/Documents/routego-image-creation-g1",
+      "authorizedScope": "task-2.1-exact-creation-and-foundation-generation-only-routing"
+    },
+    "library": {
+      "status": "pending-registration",
+      "taskId": "3.1",
+      "branch": "codex/routego-library-g1",
+      "worktree": "/Users/dalizi/Documents/routego-image-library-g1",
+      "authorizedScope": "task-3.1-exact-library-generation-mark-persistence"
+    }
+  },
   "currentChange": {
     "id": "streamline-routego-image-generation",
-    "lane": "streamline",
+    "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 3,
-      "completedTaskIds": ["1.1", "1.2", "1.3"],
-      "nextTaskId": "1.4"
+      "completedTasks": 4,
+      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4"],
+      "readyTaskIds": ["2.1", "3.1"],
+      "nextTaskId": "2.1"
     },
     "currentTask": {
-      "id": "1.4",
+      "id": "2.1-and-3.1",
       "locked": false,
       "activationAuthorized": true,
-      "authorizedScope": "packages/contracts/** and the task checkbox only after all required verification passes"
+      "authorizedScope": "separate owner-only branches; task 2.1 and task 3.1 have no dependency on each other"
     }
   },
   "latestDirectCheckpoint": {
     "lane": "streamline",
-    "event": "TASK_1_3_ACCEPTED",
-    "implementationCommit": "361acf40cd5733470e16e51ad302147aa26f8263",
-    "taskStateCommit": "c096f9023d66125c03866cb71e3d4319570d8962",
-    "openspecProgress": "3/33",
-    "nextTaskId": "1.4",
-    "evidence": ".codex/routego-program/evidence/streamline-1.3.json",
-    "evidenceSha256": "c61aab915402d7a90bd6a00dd14c2d55a4115b19fe7198bd4d0d07c9e56cc9f5"
+    "event": "TASK_1_4_ACCEPTED",
+    "implementationCommit": "2227a08e5bc07925bca90a0efcea31f6aebfeb28",
+    "taskStateCommit": "9895039edcaa75be3d8346d5ead2131da790fbdc",
+    "openspecProgress": "4/33",
+    "nextTaskIds": ["2.1", "3.1"],
+    "evidence": ".codex/routego-program/evidence/streamline-1.4.json",
+    "evidenceSha256": "012bb424389823c831ec2440eea5c962ba442368f4cfdfdc55441a580086ed19"
   },
   "currentBlockers": [],
   "currentRisks": [
@@ -113,7 +130,8 @@
     "streamlineEvidence": [
       ".codex/routego-program/evidence/streamline-1.1.json",
       ".codex/routego-program/evidence/streamline-1.2.json",
-      ".codex/routego-program/evidence/streamline-1.3.json"
+      ".codex/routego-program/evidence/streamline-1.3.json",
+      ".codex/routego-program/evidence/streamline-1.4.json"
     ]
   }
 }
