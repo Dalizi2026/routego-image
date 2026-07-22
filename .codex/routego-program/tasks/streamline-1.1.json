@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "b68cd83435f8376639abfa3a8c29b5d186483999b45fd6d62e44ff9f0a7ce292",
+  "contentSha256": "a6117610a097920c4aaaeabbd4726367395d84029a588061eb1a453904d55267",
   "hashSemantics": {
     "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null",
     "rawFileSha256RecordedAt": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json#currentState.taskCapsule.rawFileSha256"
@@ -8,7 +8,7 @@
   "lane": "streamline",
   "change": "streamline-routego-image-generation",
   "taskId": "1.1",
-  "status": "active-authorized",
+  "status": "active-authorized-offline-deps-retained",
   "sourceCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -38,11 +38,13 @@
   ],
   "requiredBehavior": [
     "Read fresh OpenSpec apply instructions and confirm task 1.1 is the first pending task.",
-    "Do not modify product or OpenSpec state until Controller G12 sends sole-owner activation after LANE_ACCEPTED.",
+    "Continue Task 1.1 implementation within the exact allowed files only.",
     "Make the public image request generation-only and limit ordered references to five.",
     "Strictly reject edit kind, target, mask, edit invariants and continuation identifiers before file or network access.",
     "Preserve legacy-only parsing shapes only where required by the later migration design; do not keep a callable edit operation.",
-    "Run the focused test, inspect diff scope and secrets, commit implementation, then separately record the full implementation SHA and check task 1.1."
+    "Use already-present local offline dependencies only; do not download packages or change lockfiles.",
+    "Run the focused test, inspect diff scope and secrets, commit implementation, then separately record the full implementation SHA and check task 1.1.",
+    "Hard handoff rule: if observableCompactions reaches 3, stop large work and start low-context handoff immediately (PD-014)."
   ],
   "verification": [
     "openspec instructions apply --change streamline-routego-image-generation --json",
@@ -51,8 +53,16 @@
     "exact allowed-file scope and no credentials/user images/generated artifacts"
   ],
   "directSpecifications": [
-    {"path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md", "sha256": "aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529", "reason": "Generation-only request, five-reference limit and strict removed-field behavior."},
-    {"path": "openspec/changes/streamline-routego-image-generation/design.md", "sha256": "e252fa8eafdacb6099740cb47ef16c3906ef4162172d02bd5f7fe7ebb5fe87ed", "reason": "Contract-first vertical removal and migration compatibility boundary."}
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529",
+      "reason": "Generation-only request, five-reference limit and strict removed-field behavior."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "e252fa8eafdacb6099740cb47ef16c3906ef4162172d02bd5f7fe7ebb5fe87ed",
+      "reason": "Contract-first vertical removal and migration compatibility boundary."
+    }
   ],
   "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
   "ownershipFingerprint": "streamline-task-1.1-exact-contract-files",
@@ -68,5 +78,19 @@
     "Downstream packages still reference edit-aware types and are outside task 1.1; do not silently broaden file scope.",
     "If the focused task cannot leave contracts in a valid import state within allowed files, report PLAN_DEVIATION before editing downstream files."
   ],
-  "externalStateAuthorized": false
+  "externalStateAuthorized": false,
+  "dependencyInstallationAuthorized": true,
+  "dependencyAuthorization": {
+    "scope": "offline-local-cache-only",
+    "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
+    "allowed": [
+      "Retain existing local node_modules created from local package cache",
+      "Rerun the focused vitest command using already present local dependencies",
+      "Do not download packages from the network",
+      "Do not modify package.json or pnpm-lock.yaml",
+      "Do not install outside the streamline worktree"
+    ],
+    "userAuthorizationText": "按照你的建议开始开发。记得做好备份，没有问题的话不要问我。",
+    "controllerDisposition": "retain-existing-local-deps-for-offline-tests-only"
+  }
 }
