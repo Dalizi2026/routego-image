@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "c082fedfdc67455f09aa510183d0100cb9a7b1ce07515f1e233583a67194a3f2",
+  "hashSemantics": {
+    "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null"
+  },
+  "lane": "library",
+  "change": "streamline-routego-image-generation",
+  "taskId": "3.2",
+  "status": "active-authorized-unaccepted-independent-verification-required",
+  "sourceCommit": "12968524786b947479ae84b294fe4e46a8bd4ea2",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "a73d1a4e3e9caf126bbc26a4c17ee1e822107c02cdac1bcf68bc545b9fd44977",
+    "lineSha256": "cf95f832da24ac2a57b75878fa8b09e5f8a586768f0ecf5fdabdc2057869fec5"
+  },
+  "dependencies": ["3.1"],
+  "allowedFiles": [
+    "packages/library/src/gallery/query.ts",
+    "packages/library/src/gallery/read-service.ts",
+    "packages/library/src/gallery/service.ts",
+    "packages/library/test/gallery/query.test.ts",
+    "packages/library/test/gallery/service.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "allowedFileMode": "Task 3.2 only: implement safe allowlisted generation-information projection and read-only recipe preparation; tasks.md may change only after committed implementation and independent acceptance.",
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/foundation/**",
+    "packages/creation/**",
+    "packages/integration/**",
+    "packages/studio/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".codex-plugin/**",
+    "plugin/**",
+    "dist/**",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Read fresh OpenSpec apply instructions and confirm Task 3.1 is accepted while Task 3.2 remains incomplete.",
+    "Resolve only an explicit eligible generation record ID or the persistent current mark, with zero-to-five eligible ordered references.",
+    "Return only an allowlisted path-free recipe and generation-information projection; never return credentials, headers, bytes, Base64, file URLs, local paths, or unrestricted URLs.",
+    "Keep preparation read-only: no provider access, probe, generation, mark mutation, or provider request-count change.",
+    "Do not accept, merge, or mark this task complete until the listed focused verification, scope review, and independent Controller acceptance have passed.",
+    "Use existing local dependencies only; do not migrate real Library data, use real images, or change dependencies.",
+    "Start low-context handoff immediately at three observable compactions under PD-014."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/library test -- gallery/service.test.ts gallery/query.test.ts",
+    "git diff --check",
+    "exact allowed-file scope, no credentials, no user images, no real Library migration or generated artifacts"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/durable-image-library/spec.md",
+      "sha256": "a1430b378e7147a5e9a828b0529d1cd164060a0994b953b8c9b8bf9359a98a85",
+      "reason": "Generation record metadata, eligible references, and current-mark boundary."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/regeneration-preparation/spec.md",
+      "sha256": "010f5e42ce8d842a17791f7d885dc36248b226fc4f6773ea8fe5cc5d1767cb03",
+      "reason": "Allowlisted, path-free, read-only generation information and regeneration recipe requirements."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "e252fa8eafdacb6099740cb47ef16c3906ef4162172d02bd5f7fe7ebb5fe87ed",
+      "reason": "Safe data-preparation and no-provider/no-mutation design boundary."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-3.2-exact-library-safe-projection-files",
+  "activation": {
+    "controllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
+    "controllerGeneration": 12,
+    "workerThreadId": "/root/library_task_3_2",
+    "workerGeneration": 2,
+    "soleApplyOwner": true,
+    "applyAuthorized": true
+  },
+  "knownRisks": [
+    "The old library-generation-3 correction capsule belongs to an archived change and must not be used for this task.",
+    "Task 3.2 must not expand into migration execution, destructive cleanup, Integration wiring, or public contract changes."
+  ],
+  "externalStateAuthorized": false,
+  "dependencyInstallationAuthorized": false
+}

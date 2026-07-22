@@ -1,22 +1,58 @@
 {
   "schemaVersion": 2,
   "lane": "creation",
-  "change": "add-routego-image-creation",
+  "change": "streamline-routego-image-generation",
   "role": "openspec-apply-owner",
-  "status": "completed-merged-synced-archived",
-  "threadId": "019f71e2-aabc-77f2-84a2-59ba87936c27",
-  "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\da45\\生图插件",
-  "branch": "codex/routego-creation-g1",
-  "generation": 1,
-  "completion": {
-    "openspecProgress": "8/8",
-    "deliveryCommit": "624e7390b902814620d3eeb583ed43a57fd8243a",
-    "mergeCommit": "ebe5b564c3990fa89f5616b636aab0ce053b144a",
-    "archiveCommit": "d03389ec108bcfd9e79ed076048e50b430900028",
-    "archivePath": "openspec/changes/archive/2026-07-17-add-routego-image-creation"
+  "status": "task-2.2-active-unaccepted-task-2.3-prepared-locked",
+  "threadId": "/root/creation_task_2_2",
+  "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
+  "branch": "codex/routego-creation-g2",
+  "generation": 2,
+  "currentHead": "eee9db1426118d9333a20655a26938076f1f7851",
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
+  "currentTask": {
+    "id": "2.2",
+    "status": "implementation-commit-present-unaccepted",
+    "taskCapsule": ".codex/routego-program/tasks/creation-2.2.json",
+    "handoffCapsule": ".codex/routego-program/handoffs/creation-generation-2.capsule.json",
+    "locked": false
   },
-  "applyOwner": false,
-  "successor": null,
-  "externalStateAuthorized": false,
-  "history": { "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243", "sourceSha256": "dead475e8c4a920a90a43d7619da72ec4e8a8932cf5ff9feb8ae4ba4b90d615a", "index": ".codex/routego-program/history/pre-pd008-state-index.json" }
+  "preparedSuccessorTask": {
+    "id": "2.3",
+    "taskCapsule": ".codex/routego-program/tasks/creation-2.3.json",
+    "locked": true,
+    "activationCondition": "Task 2.2 must be independently accepted and fresh OpenSpec instructions must confirm eligibility."
+  },
+  "sourceOwner": {
+    "threadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
+    "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "role": "controller-dispatch-baseline",
+    "soleApplyOwner": false,
+    "archived": true,
+    "authorityRevoked": true
+  },
+  "handoffCapsuleIntegrity": {
+    "canonicalSha256": "f4a1999ea1c9e046e3dfdffc4f9a4ac51dbda2107fffb74619da4f63a44b0440",
+    "rawFileSha256": "cd430294e39df4acb7978436fa420137fbb99c680185f918bb80a9bdf7aaa3fb"
+  },
+  "reportingContract": {
+    "currentControllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
+    "currentControllerGeneration": 12,
+    "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, implementation, delivery, or acceptance request",
+    "fallback": "routego-program-continuity remains missed-message fallback only",
+    "acknowledgementRequiredBeforeAcceptance": true
+  },
+  "lowContextPolicy": {
+    "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    "hardHandoffDecision": ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md",
+    "startupMaxFiles": 12,
+    "startupMaxUtf8Bytes": 122880,
+    "startupByteCounting": "utf8-after-crlf-to-lf-normalization",
+    "acceptanceObservableCompactions": 0
+  },
+  "externalStateAuthorized": false
 }

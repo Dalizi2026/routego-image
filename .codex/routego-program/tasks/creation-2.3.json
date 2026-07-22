@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "faa61fa8cf27d73e6b75082295d51c14cf02212f930b34a94c33afd5f1526101",
+  "hashSemantics": {
+    "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null"
+  },
+  "lane": "creation",
+  "change": "streamline-routego-image-generation",
+  "taskId": "2.3",
+  "status": "prepared-locked-pending-task-2.2-acceptance",
+  "sourceCommit": "12968524786b947479ae84b294fe4e46a8bd4ea2",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "a73d1a4e3e9caf126bbc26a4c17ee1e822107c02cdac1bcf68bc545b9fd44977",
+    "lineSha256": "c3017d4c7c69226134619517f71669d3f82abefb21d1ad74a94903e3b804e540"
+  },
+  "dependencies": ["2.1", "2.2"],
+  "allowedFiles": [
+    "packages/creation/src/execution/batch.ts",
+    "packages/creation/src/execution/service.ts",
+    "packages/creation/src/execution/types.ts",
+    "packages/creation/src/provider/image-inputs.ts",
+    "packages/creation/src/provider/requests.ts",
+    "packages/creation/test/batch.test.ts",
+    "packages/creation/test/integration.test.ts",
+    "packages/creation/test/provider-request.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "allowedFileMode": "Task 2.3 only after Task 2.2 acceptance: enforce ordered zero-to-five references and generation-only batches with internal concurrency two and isolated results.",
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/integration/**",
+    "packages/studio/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".codex-plugin/**",
+    "plugin/**",
+    "dist/**",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Do not activate until Task 2.2 has an accepted implementation and fresh OpenSpec instructions confirm Task 2.3 is eligible.",
+    "Preserve zero-to-five input order for references and reject any non-generation batch before provider access.",
+    "Use fixed internal concurrency two, preserve item IDs/order, and isolate per-item outcomes.",
+    "Use existing local dependencies only and never call a provider, use real images, or change dependencies.",
+    "Start low-context handoff immediately at three observable compactions under PD-014."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/creation test -- batch.test.ts integration.test.ts",
+    "git diff --check",
+    "exact allowed-file scope, no credentials, no user images, no generated artifacts"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/image-job-execution/spec.md",
+      "sha256": "5cd0ebea97edb6f900ae96d2090b8f8adde70b4e5471a482db115c266b260d15",
+      "reason": "Generation-only batch semantics, internal concurrency two, ordering, and isolated outcomes."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529",
+      "reason": "Zero-to-five ordered reference contract."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "e252fa8eafdacb6099740cb47ef16c3906ef4162172d02bd5f7fe7ebb5fe87ed",
+      "reason": "Runtime batch and generation-only boundaries."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-2.3-exact-creation-batch-reference-files",
+  "activation": {
+    "controllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
+    "controllerGeneration": 12,
+    "workerThreadId": "/root/creation_task_2_2",
+    "workerGeneration": 2,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
+  },
+  "knownRisks": [
+    "This is a prepared successor capsule only; it does not authorize Task 2.3 or change the Task 2.2 acceptance gate."
+  ],
+  "externalStateAuthorized": false,
+  "dependencyInstallationAuthorized": false
+}

@@ -1,111 +1,52 @@
 {
   "schemaVersion": 2,
   "lane": "library",
-  "change": "integrate-routego-image-plugin",
-  "role": "isolated-library-correction-owner",
-  "status": "generation-3-correction-accepted-incorporated",
-  "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
-  "threadId": "019f7a81-775e-7063-bfd4-3e444e0b0354",
-  "worktree": "/Users/dalizi/Documents/routego-image-library-correction-g3",
-  "branch": "codex/routego-library-correction-g3",
-  "generation": 3,
-  "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-  "registrationAttempt": 2,
-  "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
-  "registrationCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
-  "currentHead": "7e1e0f02a02f9b81ad4a709789ec038cae0d79c2",
-  "gitClean": true,
+  "change": "streamline-routego-image-generation",
+  "role": "openspec-apply-owner",
+  "status": "task-3.2-active-unaccepted-safe-projection-only",
+  "threadId": "/root/library_task_3_2",
+  "worktree": "/Users/dalizi/Documents/routego-image-library-g2",
+  "branch": "codex/routego-library-g2",
+  "generation": 2,
+  "currentHead": "12968524786b947479ae84b294fe4e46a8bd4ea2",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": true,
-  "frozen": false,
   "applyAuthorized": true,
-  "externalStateAuthorized": false,
-  "completion": {
-    "openspecProgress": "10/10",
-    "deliveryCommit": "96fea3b5618808fd00daac274178512daf2a5ff2",
-    "verifiedHead": "3cd8007e40675e6e5c1e93d2d09a34cc078944dc",
-    "mergeCommit": "c7ee16a6bca371e656ce11253c31636f7f05e9d1",
-    "archiveCommit": "50141def268015579febee067c311aa09aaf117f",
-    "archivePath": "openspec/changes/archive/2026-07-18-add-routego-image-library"
-  },
-  "correction": {
-    "taskId": "integration-5.2-library-path-identity-gate",
-    "decision": ".codex/routego-program/deviations/PD-013-library-canonical-path-identity.md",
-    "taskCapsule": ".codex/routego-program/tasks/library-correction-5.2.json",
-    "handoffCapsule": ".codex/routego-program/handoffs/library-generation-3.capsule.json",
-    "sourceCheckpoint": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "locked": false,
-    "activationAuthorized": true,
-    "completionStatus": "accepted-incorporated",
-    "correctionCommit": "7e1e0f02a02f9b81ad4a709789ec038cae0d79c2",
-    "incorporatedInto": "3b2a938e8dacfb710480f7e6155bd1d791eee874",
-    "postCommitCapsuleStartupBytes": {"expected": 80111, "observed": 82971, "reason": "authorized packages/library/src/fs/paths.ts implementation changed a mandatory startup file"},
-    "workspaceDependencyInstallationAuthorized": true,
-    "installationMode": "pnpm-offline-frozen-local-store-only-zero-downloads",
-    "networkAuthorized": false,
-    "targetPluginInstallationAuthorized": false,
-    "authorizedScope": "library-canonical-path-identity-exact-eleven-files",
-    "rootCause": "macOS requested /var filesystem identity and canonical /private/var identity are compared inconsistently across output, protected-root, source-rendition, mutation and ZIP boundaries"
-  },
-  "successor": {
-    "generation": 3,
-    "threadId": "019f7a81-775e-7063-bfd4-3e444e0b0354",
-    "worktree": "/Users/dalizi/Documents/routego-image-library-correction-g3",
-    "plannedBranch": "codex/routego-library-correction-g3",
-    "startingCommit": "fbd254f07bff1bc61a8fa4c15f53e3a419af7bd9",
-    "registrationAttempt": 2,
-    "registrationCommit": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
-    "incorporationCommit": "83dbd7af65553fb794831efe7c7afbb46dfe44bc",
-    "currentHead": "7e1e0f02a02f9b81ad4a709789ec038cae0d79c2",
-    "acceptedHead": "05682877f5394cae1e7366aab8c1e79c047ebbb2",
-    "status": "correction-accepted-incorporated",
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null,
-    "correctionCommit": "7e1e0f02a02f9b81ad4a709789ec038cae0d79c2",
-    "incorporatedInto": "3b2a938e8dacfb710480f7e6155bd1d791eee874",
-    "soleApplyOwner": true,
-    "applyAuthorized": true,
-    "handoffCapsule": ".codex/routego-program/handoffs/library-generation-3.capsule.json",
-    "failedRegistrationAttempts": [
-      {
-        "attempt": 1,
-        "commit": "9875a595b8c44c595fffdc77f0fe451d1cb8be04",
-        "status": "controller-pre-dispatch-audit-failed-never-sent-never-activated"
-      }
-    ]
+  "currentTask": {
+    "id": "3.2",
+    "status": "authorized-unaccepted",
+    "taskCapsule": ".codex/routego-program/tasks/library-3.2.json",
+    "handoffCapsule": ".codex/routego-program/handoffs/library-generation-4.capsule.json",
+    "locked": false
   },
   "sourceOwner": {
-    "threadId": "019f7261-2c57-7a01-b519-e1de521819fe",
-    "generation": 2,
-    "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\236b\\生图插件",
-    "branch": "codex/routego-library-g2",
-    "acceptedProductCommit": "96fea3b5618808fd00daac274178512daf2a5ff2",
+    "threadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
+    "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "role": "controller-dispatch-baseline",
     "soleApplyOwner": false,
-    "frozen": true,
     "archived": true,
-    "authorityRevoked": true,
-    "status": "completed-merged-synced-archived"
+    "authorityRevoked": true
+  },
+  "handoffCapsuleIntegrity": {
+    "canonicalSha256": "207c8eacfe9f868f040a2dbdfaff8bb21b112d77a9b9df93c4bd15b0a3aae56f",
+    "rawFileSha256": "c25638dc467bec9f9ec1eddbb28c533e1fe2662371de3143ce68d7fd4104f9b2"
   },
   "reportingContract": {
-    "currentControllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
-    "currentControllerGeneration": 8,
-    "primary": "send_message_to_thread plus read_thread after every checkpoint/blocker/deviation/handoff/activation/implementation/delivery",
+    "currentControllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
+    "currentControllerGeneration": 12,
+    "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, implementation, delivery, or acceptance request",
     "fallback": "routego-program-continuity remains missed-message fallback only",
     "acknowledgementRequiredBeforeAcceptance": true
   },
   "lowContextPolicy": {
     "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    "hardHandoffDecision": ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md",
     "startupMaxFiles": 12,
     "startupMaxUtf8Bytes": 122880,
     "startupByteCounting": "utf8-after-crlf-to-lf-normalization",
-    "fullHistoryDefaultReadForbidden": true,
-    "acceptanceObservableCompactions": 0,
-    "acknowledgementRequiredBeforeAcceptance": true
+    "acceptanceObservableCompactions": 0
   },
-  "history": {
-    "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243",
-    "sourceSha256": "428d3b610dbebfdc0a2935e365d826cdbac2646034df46083712d3f67110992d",
-    "index": ".codex/routego-program/history/pre-pd008-state-index.json"
-  }
+  "externalStateAuthorized": false
 }

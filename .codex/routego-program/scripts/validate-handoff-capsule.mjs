@@ -340,6 +340,7 @@ try {
 }
 
 if (program && lane) {
+  const activeApplyOwner = program.activeApplyOwners?.[capsule.lane];
   const programSuccessor =
     program.successor?.lane === capsule.lane
       ? program.successor
@@ -411,11 +412,21 @@ if (program && lane) {
         capsule.successor.verifiedHeadBeforeContainingCommit &&
       lane.currentHead === capsule.successor.verifiedHeadBeforeContainingCommit
     : programSuccessor?.threadId === null && programSuccessor?.worktree === null;
+  const taskIsCurrentOrReady =
+    program.currentChange.openspec.nextTaskId === capsule.currentState.nextTaskId ||
+    program.currentChange.openspec.readyTaskIds?.includes(capsule.currentState.nextTaskId) === true;
+  const activeOwnerMatches =
+    activeApplyOwner?.taskId === capsule.currentState.nextTaskId &&
+    activeApplyOwner?.branch === capsule.successor.plannedBranch &&
+    activeApplyOwner?.worktree === capsule.successor.worktree &&
+    activeApplyOwner?.taskCapsule?.path === capsule.currentState.taskCapsule.path &&
+    activeApplyOwner?.handoffCapsule?.path === capsulePath;
   if (
     program.currentChange.id !== capsule.change ||
-    program.currentChange.openspec.nextTaskId !== capsule.currentState.nextTaskId ||
+    !taskIsCurrentOrReady ||
     !laneIdentityMatches ||
-    !successorMatches
+    !successorMatches ||
+    !activeOwnerMatches
   ) {
     fail("program/lane/capsule current identity mismatch");
   } else {

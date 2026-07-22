@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "033f7c648df67a88e6ca3f07c8c36bfe394a9f54821698c4d5e0f54b9eeb5213",
+  "hashSemantics": {
+    "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null"
+  },
+  "lane": "creation",
+  "change": "streamline-routego-image-generation",
+  "taskId": "2.2",
+  "status": "active-authorized-unaccepted-independent-verification-required",
+  "sourceCommit": "12968524786b947479ae84b294fe4e46a8bd4ea2",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "a73d1a4e3e9caf126bbc26a4c17ee1e822107c02cdac1bcf68bc545b9fd44977",
+    "lineSha256": "3d46b9b266d38e1864feb31de8e7d3dad7e47054848f2e084ce4fbfab3b35938"
+  },
+  "dependencies": ["2.1"],
+  "allowedFiles": [
+    "packages/creation/src/execution/executor.ts",
+    "packages/creation/src/execution/index.ts",
+    "packages/creation/src/execution/retry.ts",
+    "packages/creation/src/execution/types.ts",
+    "packages/creation/src/provider/errors.ts",
+    "packages/creation/test/executor.test.ts",
+    "packages/creation/test/integration.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "allowedFileMode": "Task 2.2 only: remove automatic real-provider retry paths and add exact no-replay/request-count coverage; tasks.md may change only after the implementation is committed and independently accepted.",
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/integration/**",
+    "packages/studio/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".codex-plugin/**",
+    "plugin/**",
+    "dist/**",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Read fresh OpenSpec apply instructions and confirm Task 2.1 is complete and Task 2.2 remains incomplete.",
+    "Remove every automatic replay of a real provider generation request, including pre-generation 429 and 5xx handling.",
+    "Preserve truthful provider request counts and possible-billing errors; a retry must require a new explicit user operation.",
+    "Do not accept, merge, or mark this task complete until the listed focused verification, scope review, and independent Controller acceptance have passed.",
+    "Use existing local dependencies only; do not download packages, change lockfiles, call providers, or handle real images.",
+    "Start low-context handoff immediately at three observable compactions under PD-014."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/creation test -- executor.test.ts batch.test.ts",
+    "git diff --check",
+    "exact allowed-file scope, no credentials, no user images, no generated artifacts"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/image-job-execution/spec.md",
+      "sha256": "5cd0ebea97edb6f900ae96d2090b8f8adde70b4e5471a482db115c266b260d15",
+      "reason": "No automatic real-provider replay, truthful request counts, and possible-billing outcomes."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "e252fa8eafdacb6099740cb47ef16c3906ef4162172d02bd5f7fe7ebb5fe87ed",
+      "reason": "Vertical no-retry design boundary and offline safety requirements."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-2.2-exact-creation-no-retry-files",
+  "activation": {
+    "controllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
+    "controllerGeneration": 12,
+    "workerThreadId": "/root/creation_task_2_2",
+    "workerGeneration": 2,
+    "soleApplyOwner": true,
+    "applyAuthorized": true
+  },
+  "knownRisks": [
+    "The existing Task 2.2 branch commit is unaccepted and must not be merged or represented as complete by this governance work.",
+    "Task 2.3 remains separately locked until Task 2.2 has passed acceptance."
+  ],
+  "externalStateAuthorized": false,
+  "dependencyInstallationAuthorized": false
+}

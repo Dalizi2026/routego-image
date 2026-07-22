@@ -71,18 +71,48 @@
     "creation": {
       "status": "active-internal-apply-owner",
       "taskRef": "/root/creation_task_2_2",
+      "threadId": "/root/creation_task_2_2",
+      "generation": 2,
       "taskId": "2.2",
       "branch": "codex/routego-creation-g2",
       "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
-      "authorizedScope": "task-2.2-exact-automatic-retry-removal"
+      "currentHead": "eee9db1426118d9333a20655a26938076f1f7851",
+      "taskCapsule": { "path": ".codex/routego-program/tasks/creation-2.2.json", "sha256": "033f7c648df67a88e6ca3f07c8c36bfe394a9f54821698c4d5e0f54b9eeb5213" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/creation-generation-2.capsule.json", "sha256": "f4a1999ea1c9e046e3dfdffc4f9a4ac51dbda2107fffb74619da4f63a44b0440", "rawFileSha256": "cd430294e39df4acb7978436fa420137fbb99c680185f918bb80a9bdf7aaa3fb" },
+      "authorizedScope": "task-2.2-exact-automatic-retry-removal-unaccepted"
     },
     "library": {
       "status": "active-internal-apply-owner",
       "taskRef": "/root/library_task_3_2",
+      "threadId": "/root/library_task_3_2",
+      "generation": 2,
       "taskId": "3.2",
       "branch": "codex/routego-library-g2",
       "worktree": "/Users/dalizi/Documents/routego-image-library-g2",
-      "authorizedScope": "task-3.2-exact-safe-generation-information-projection-and-recipe-preparation"
+      "currentHead": "12968524786b947479ae84b294fe4e46a8bd4ea2",
+      "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.2.json", "sha256": "c082fedfdc67455f09aa510183d0100cb9a7b1ce07515f1e233583a67194a3f2" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-4.capsule.json", "sha256": "207c8eacfe9f868f040a2dbdfaff8bb21b112d77a9b9df93c4bd15b0a3aae56f", "rawFileSha256": "c25638dc467bec9f9ec1eddbb28c533e1fe2662371de3143ce68d7fd4104f9b2" },
+      "authorizedScope": "task-3.2-exact-safe-generation-information-projection-and-recipe-preparation-unaccepted"
+    }
+  },
+  "laneSuccessors": {
+    "creation": {
+      "threadId": "/root/creation_task_2_2",
+      "generation": 2,
+      "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
+      "plannedBranch": "codex/routego-creation-g2",
+      "currentHead": "eee9db1426118d9333a20655a26938076f1f7851",
+      "observableCompactions": 0,
+      "handoffCapsuleIntegrity": { "canonicalSha256": "f4a1999ea1c9e046e3dfdffc4f9a4ac51dbda2107fffb74619da4f63a44b0440", "rawFileSha256": "cd430294e39df4acb7978436fa420137fbb99c680185f918bb80a9bdf7aaa3fb" }
+    },
+    "library": {
+      "threadId": "/root/library_task_3_2",
+      "generation": 2,
+      "worktree": "/Users/dalizi/Documents/routego-image-library-g2",
+      "plannedBranch": "codex/routego-library-g2",
+      "currentHead": "12968524786b947479ae84b294fe4e46a8bd4ea2",
+      "observableCompactions": 0,
+      "handoffCapsuleIntegrity": { "canonicalSha256": "207c8eacfe9f868f040a2dbdfaff8bb21b112d77a9b9df93c4bd15b0a3aae56f", "rawFileSha256": "c25638dc467bec9f9ec1eddbb28c533e1fe2662371de3143ce68d7fd4104f9b2" }
     }
   },
   "currentChange": {
@@ -99,7 +129,8 @@
       "id": "2.2",
       "locked": false,
       "activationAuthorized": true,
-      "authorizedScope": "task 2.2 is ready; task 3.1 remains blocked pending a task-order decision"
+      "parallelReadyTaskIds": ["2.2", "3.2"],
+      "authorizedScope": "Task 2.2 Creation and Task 3.2 Library are independently active but unaccepted; Task 2.3 remains prepared and locked pending Task 2.2 acceptance."
     }
   },
   "latestDirectCheckpoint": {
