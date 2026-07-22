@@ -18,12 +18,12 @@
     "openspecProgress": "5/33",
     "acceptedTask": "2.1",
     "readyTask": "2.2",
-    "blockedTask": "3.1",
+    "activeTask": "3.1-user-approved-obsolete-test-cleanup",
     "independentVerification": "Foundation 48 tests and exact Creation provider-request/executor 26 tests passed; scope and git diff --check passed."
   },
   "currentOperation": {
-    "id": "task-2.2-ready-task-3.1-blocked",
-    "allowedNext": "Task 2.2 may be dispatched after its own owner registration. Task 3.1 awaits a task-order decision; its existing WIP must remain uncommitted.",
+    "id": "task-3.1-user-approved-obsolete-test-cleanup",
+    "allowedNext": "The Library owner may finish Task 3.1 after removing only obsolete Trash/delete/restore/permanent-delete test cases in mutations.test.ts. Task 2.2 remains ready but is not dispatched yet.",
     "forbidden": [
       "Product code outside each task's exact owner scope",
       "package.json or pnpm-lock.yaml changes",

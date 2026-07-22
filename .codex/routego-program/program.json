@@ -77,13 +77,13 @@
       "authorizedScope": "task-2.1-exact-creation-and-foundation-generation-only-routing"
     },
     "library": {
-      "status": "blocked-task-order-conflict",
+      "status": "active-user-approved-task-order-correction",
       "taskRef": "/root/library_task_3_1",
       "taskId": "3.1",
       "branch": "codex/routego-library-g1",
       "worktree": "/Users/dalizi/Documents/routego-image-library-g1",
       "authorizedScope": "task-3.1-exact-library-generation-mark-persistence",
-      "blocker": "The required mutations test retains Task 3.5 Trash cases that now contradict the strict contracts accepted in Task 1.3."
+      "authorizedDeviation": "User approved the minimal early cleanup of obsolete Trash/delete/restore/permanent-delete test cases inside packages/library/test/gallery/mutations.test.ts only; no runtime Trash product code or real data operation is authorized."
     }
   },
   "currentChange": {
@@ -112,8 +112,14 @@
     "nextTaskIds": ["2.2", "3.1"],
     "verification": "Foundation 48 tests and exact Creation provider-request/executor 26 tests passed; the package script was verified to ignore file filters, so the equivalent direct Vitest invocation was used."
   },
-  "currentBlockers": [
-    "Task 3.1 is blocked: its required mutations test still contains Task 3.5 Trash cases, which contradict the strict public contracts accepted in Task 1.3."
+  "currentBlockers": [],
+  "approvedDeviations": [
+    {
+      "id": "PD-015-task-3.1-obsolete-trash-test-cleanup",
+      "status": "user-approved",
+      "scope": "packages/library/test/gallery/mutations.test.ts obsolete Trash/delete/restore/permanent-delete cases only",
+      "nonGoals": ["runtime Trash behavior", "real data deletion", "migration execution", "public contract changes"]
+    }
   ],
   "currentRisks": [
     "Only local, offline contract work is currently authorized; real providers, credentials, images, migrations, installation, deployment and release remain prohibited.",
