@@ -20,7 +20,6 @@ import {
 import {
   createCreationImageService,
   createResolvedImageExecutor,
-  decideProviderRetry,
   type ImageExecutionDependencies
 } from "../src/execution/index";
 import type { ProviderRuntimeContext } from "../src/provider/index";
@@ -286,52 +285,19 @@ describe("native variants and same-transport fan-out", () => {
   });
 });
 
-describe("retry safety, backoff, and frozen route", () => {
-  it("honors bounded Retry-After then exponential same-transport backoff", async () => {
-    const delays: number[] = [];
-    const urls: string[] = [];
-    let calls = 0;
-    const fetchMock: typeof fetch = async (input) => {
-      urls.push(String(input));
-      calls += 1;
-      if (calls === 1) {
-        return Response.json(
-          { error: { code: "rate_limit", message: "Slow down" } },
-          { status: 429, headers: { "retry-after": "0.01" } }
-        );
-      }
-      if (calls === 2) {
-        return Response.json({ error: { code: "temporary", message: "Unavailable" } }, { status: 503 });
-      }
-      return imageResponse();
-    };
-    const result = await createResolvedImageExecutor(
-      dependencies(runtime(fetchMock), {
-        sleep: async (milliseconds) => {
-          delays.push(milliseconds);
-        }
-      })
-    ).execute(request());
-    expect(result.status).toBe("succeeded");
-    expect(result.execution).toMatchObject({ attemptCount: 3, providerRequestCount: 3 });
-    expect(delays).toEqual([10, 160]);
-    expect(urls).toEqual([GENERATION_ENDPOINT, GENERATION_ENDPOINT, GENERATION_ENDPOINT]);
-  });
-
-  it("stops at three total attempts and refuses an overlong Retry-After", async () => {
-    const alwaysUnavailable = vi.fn<typeof fetch>(async () =>
-      Response.json({ error: { code: "temporary", message: "Unavailable" } }, { status: 503 })
-    );
-    const failed = await createResolvedImageExecutor(
-      dependencies(runtime(alwaysUnavailable), { sleep: async () => undefined })
-    ).execute(request());
-    expect(failed.status).toBe("failed");
-    expect(failed.execution.providerRequestCount).toBe(3);
-
-    const retryError = routeError("rate_limited", "respect-retry-after", { retryAfterMs: 5_000 });
-    expect(
-      decideProviderRetry(retryError, 1, { maxAttempts: 3, baseDelayMs: 100, maxDelayMs: 1_000 })
-    ).toEqual({ retry: false, delayMs: 0, reason: "retry-after-too-long" });
+describe("provider failures submit once", () => {
+  it.each([
+    [429, { error: { code: "rate_limit", message: "Slow down" } }, "rate_limited"],
+    [503, { error: { code: "temporary", message: "Unavailable" } }, "provider_5xx"]
+  ] as const)("does not replay HTTP %s", async (status, body, code) => {
+    const fetchMock = vi.fn<typeof fetch>(async () => Response.json(body, { status }));
+    const result = await createResolvedImageExecutor(dependencies(runtime(fetchMock))).execute(request());
+    expect(result).toMatchObject({
+      status: "failed",
+      error: { code, retryDisposition: "user-confirmation" },
+      execution: { attemptCount: 1, providerRequestCount: 1, mayHaveBilled: false }
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it.each([
@@ -340,7 +306,7 @@ describe("retry safety, backoff, and frozen route", () => {
   ] as const)("never retries HTTP %s %s failures", async (status, body, code) => {
     const fetchMock = vi.fn<typeof fetch>(async () => Response.json(body, { status }));
     const result = await createResolvedImageExecutor(
-      dependencies(runtime(fetchMock), { sleep: async () => undefined })
+      dependencies(runtime(fetchMock))
     ).execute(request());
     expect(result.error?.code).toBe(code);
     expect(result.execution.providerRequestCount).toBe(1);
@@ -379,7 +345,7 @@ describe("retry safety, backoff, and frozen route", () => {
       ]
     });
     const result = await createResolvedImageExecutor(
-      dependencies(provider, { sleep: async () => undefined })
+      dependencies(provider)
     ).execute(request());
     expect(result.status).toBe("partial");
     expect(result.partialArtifacts).toHaveLength(1);
@@ -387,24 +353,6 @@ describe("retry safety, backoff, and frozen route", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
-
-function routeError(
-  code: "rate_limited" | "provider_5xx",
-  retryDisposition: "safe-pre-generation" | "respect-retry-after",
-  details: Record<string, unknown> = {}
-) {
-  return {
-    code,
-    category: code === "rate_limited" ? "rate_limit" as const : "provider" as const,
-    stage: "submit" as const,
-    safeMessage: "Synthetic retry error",
-    retryDisposition,
-    partialArtifacts: [],
-    receivedAnyOutput: false,
-    mayHaveBilled: false,
-    details
-  };
-}
 
 describe("stage deadlines, cancellation, state, continuation, and events", () => {
   it("times out stalled response headers and stalled bodies without replay", async () => {
@@ -454,17 +402,16 @@ describe("stage deadlines, cancellation, state, continuation, and events", () =>
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("enforces the total deadline during retry backoff", async () => {
+  it("preserves the provider failure instead of retrying until the total deadline", async () => {
     const fetchMock = vi.fn<typeof fetch>(async () =>
       Response.json({ error: { code: "temporary", message: "Unavailable" } }, { status: 503 })
     );
     const result = await createResolvedImageExecutor(
       dependencies(runtime(fetchMock, {
-        deadlines: { responseHeaderMs: 100, bodyMs: 100, downloadMs: 100, totalMs: 15 },
-        retry: { maxAttempts: 3, baseDelayMs: 100, maxDelayMs: 1_000 }
+        deadlines: { responseHeaderMs: 100, bodyMs: 100, downloadMs: 100, totalMs: 15 }
       }))
     ).execute(request());
-    expect(result.error).toMatchObject({ code: "timeout", stage: "complete" });
+    expect(result.error).toMatchObject({ code: "provider_5xx", retryDisposition: "user-confirmation" });
     expect(result.execution.providerRequestCount).toBe(1);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });

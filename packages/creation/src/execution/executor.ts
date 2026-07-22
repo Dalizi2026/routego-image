@@ -26,7 +26,6 @@ import {
   type ProviderRuntimeContext
 } from "../provider";
 import { parseProviderResponse } from "../provider/responses";
-import { decideProviderRetry, defaultExecutionSleep } from "./retry";
 import type {
   ImageExecutionDependencies,
   ResolvedExecutionOptions,
@@ -490,7 +489,7 @@ async function submitAttempt(
   }
 }
 
-async function submitWithRetry(
+async function submitOnce(
   prepared: PreparedProviderRequest,
   provider: ProviderRuntimeContext,
   requestId: string,
@@ -499,62 +498,28 @@ async function submitWithRetry(
   events: ExecutionEvents,
   slotOffset?: number
 ): Promise<SubmissionResult> {
-  const sleep = dependencies.sleep ?? defaultExecutionSleep;
-  let attemptCount = 0;
-  while (true) {
-    if (operationSignal.aborted) {
-      return {
-        normalized: normalizedFailure(
-          abortError(
-            abortMarker(operationSignal) ?? { kind: "cancelled", stage: "complete" },
-            false
-          )
-        ),
-        attemptCount,
-        providerRequestCount: attemptCount
-      };
-    }
-    attemptCount += 1;
-    const normalizedResponse = await submitAttempt(
-      prepared,
-      provider,
-      requestId,
-      operationSignal,
-      dependencies,
-      events,
-      slotOffset
-    );
-    if (normalizedResponse.error === undefined) {
-      return {
-        normalized: normalizedResponse,
-        attemptCount,
-        providerRequestCount: attemptCount
-      };
-    }
-    const retry = decideProviderRetry(
-      normalizedResponse.error,
-      attemptCount,
-      provider.retry,
-      provider.random
-    );
-    if (!retry.retry) {
-      return {
-        normalized: normalizedResponse,
-        attemptCount,
-        providerRequestCount: attemptCount
-      };
-    }
-    try {
-      await sleep(retry.delayMs, operationSignal);
-    } catch {
-      const marker = abortMarker(operationSignal) ?? { kind: "cancelled", stage: "complete" as const };
-      return {
-        normalized: normalizedFailure(abortError(marker, attemptCount > 0)),
-        attemptCount,
-        providerRequestCount: attemptCount
-      };
-    }
+  if (operationSignal.aborted) {
+    return {
+      normalized: normalizedFailure(
+        abortError(
+          abortMarker(operationSignal) ?? { kind: "cancelled", stage: "complete" },
+          false
+        )
+      ),
+      attemptCount: 0,
+      providerRequestCount: 0
+    };
   }
+  const normalized = await submitAttempt(
+    prepared,
+    provider,
+    requestId,
+    operationSignal,
+    dependencies,
+    events,
+    slotOffset
+  );
+  return { normalized, attemptCount: 1, providerRequestCount: 1 };
 }
 
 function remapArtifact(artifact: ImageArtifact, slot: number): ImageArtifact {
@@ -743,7 +708,7 @@ async function executePlan(
         }
         break;
       }
-      const submission = await submitWithRetry(
+      const submission = await submitOnce(
         plan.providerRequest,
         plan.provider,
         childRequestId(requestId, slot),
@@ -755,7 +720,7 @@ async function executePlan(
       collectSubmission(collection, submission, slot);
     }
   } else {
-    const submission = await submitWithRetry(
+    const submission = await submitOnce(
       plan.providerRequest,
       plan.provider,
       requestId,
