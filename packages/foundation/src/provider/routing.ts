@@ -17,7 +17,6 @@ export const PROVIDER_REQUEST_SHAPES = {
   singleEndpointImage: "single-endpoint-json:image",
   singleEndpointImages: "single-endpoint-json:images",
   imagesGenerationsJson: "openai-images:generations-json",
-  imagesEditsMultipart: "openai-images:edits-multipart",
   responsesImageGeneration: "openai-responses:image-generation"
 } as const;
 
@@ -46,8 +45,6 @@ export interface ProviderRoutingContext {
   readonly capabilities: readonly ProviderCapabilityRecord[];
   readonly preferredTransports?: readonly ProviderTransport[];
   readonly previousAttempt?: PreviousProviderAttempt;
-  readonly allowDegradedContinuation?: boolean;
-  readonly previousOutputAvailable?: boolean;
 }
 
 export interface CapabilityLimitViolation {
@@ -63,11 +60,9 @@ export interface SelectedProviderRoute {
   readonly transport: ProviderTransport;
   readonly endpoint: string;
   readonly requestShape: string;
-  readonly effectiveKind: "generate" | "edit";
+  readonly effectiveKind: "generate";
   readonly requiredCapabilities: readonly ProviderCapability[];
   readonly degraded: boolean;
-  readonly degradedContinuation: boolean;
-  readonly continuationInput?: "previous-output-as-target";
   readonly replayPolicy: "never-cross-transport";
 }
 
@@ -87,7 +82,7 @@ interface RouteCandidate {
   readonly transport: ProviderTransport;
   readonly endpoint: string;
   readonly requestShape: string;
-  readonly effectiveKind: "generate" | "edit";
+  readonly effectiveKind: "generate";
   readonly imageInputCount: number;
   readonly requiredCapabilities: readonly ProviderCapability[];
   readonly allowUnknownTextBaseline?: boolean;
@@ -146,15 +141,7 @@ function makeUnavailable(
 }
 
 function physicalImageInputCount(request: ImageOperationRequest): number {
-  return (
-    request.references.length +
-    request.supportingImages.length +
-    (request.targetImage === undefined ? 0 : 1)
-  );
-}
-
-function tierCImageInputCount(request: ImageOperationRequest): number {
-  return physicalImageInputCount(request) + request.imageIds.length + request.fileIds.length;
+  return request.references.length;
 }
 
 function requestedFeatureCapabilities(request: ImageOperationRequest): ProviderCapability[] {
@@ -188,25 +175,17 @@ function requestedFeatureCapabilities(request: ImageOperationRequest): ProviderC
 
 function tierACapabilities(
   request: ImageOperationRequest,
-  imageInputs: number,
-  effectiveKind: "generate" | "edit"
+  imageInputs: number
 ): ProviderCapability[] {
   const required: ProviderCapability[] = imageInputs === 0
     ? ["text-generation"]
     : [imageInputs === 1 ? "single-image-input" : "multi-image-input", "data-url-input"];
-  if (request.maskPath !== undefined) {
-    required.push("mask-edit");
-  }
-  if (effectiveKind === "edit") {
-    required.push("target-edit");
-  }
   return uniqueCapabilities([...required, ...requestedFeatureCapabilities(request)]);
 }
 
 function tierBCapabilities(
   request: ImageOperationRequest,
-  imageInputs: number,
-  effectiveKind: "generate" | "edit"
+  imageInputs: number
 ): ProviderCapability[] {
   const required: ProviderCapability[] = imageInputs === 0
     ? ["text-generation"]
@@ -214,65 +193,33 @@ function tierBCapabilities(
         imageInputs === 1 ? "single-image-input" : "multi-image-input",
         "multipart-input"
       ];
-  if (effectiveKind === "edit") {
-    required.push("target-edit");
-  }
-  if (request.maskPath !== undefined) {
-    required.push("mask-edit");
-  }
   return uniqueCapabilities([...required, ...requestedFeatureCapabilities(request)]);
 }
 
 function tierCCapabilities(request: ImageOperationRequest): ProviderCapability[] {
   const required: ProviderCapability[] = ["text-generation"];
-  const inputs = tierCImageInputCount(request);
-  const localInputs = physicalImageInputCount(request);
+  const inputs = physicalImageInputCount(request);
   if (inputs > 0) {
     required.push(inputs === 1 ? "single-image-input" : "multi-image-input");
-  }
-  if (localInputs > 0) {
     required.push("data-url-input");
-  }
-  if (request.kind === "edit") {
-    required.push("target-edit");
-  }
-  if (request.fileIds.length > 0) {
-    required.push("file-id-input");
-  }
-  if (request.imageIds.length > 0) {
-    required.push("image-id-input");
-  }
-  if (request.previousResponseId !== undefined || request.fileIds.length > 0 || request.imageIds.length > 0) {
-    required.push("responses-state");
-  }
-  if (request.maskPath !== undefined) {
-    required.push("mask-edit");
   }
   return uniqueCapabilities([...required, ...requestedFeatureCapabilities(request)]);
 }
 
 function configuredCandidates(
   context: ProviderRoutingContext,
-  request: ImageOperationRequest,
-  forcedPreviousOutput: boolean
+  request: ImageOperationRequest
 ): RouteCandidate[] {
   const endpoints = normalizeProviderEndpoints(providerEndpointSetSchema.parse(context.endpoints));
-  const physicalInputs = physicalImageInputCount(request) + (forcedPreviousOutput ? 1 : 0);
-  const stateful =
-    request.previousResponseId !== undefined || request.imageIds.length > 0 || request.fileIds.length > 0;
+  const physicalInputs = physicalImageInputCount(request);
   const order = context.preferredTransports ??
-    (stateful
-      ? ["openai-responses"]
-      : physicalInputs === 0 && request.kind === "generate"
-        ? ["single-endpoint-json", "openai-responses"]
-        : ["single-endpoint-json", "openai-images", "openai-responses"]);
+    (physicalInputs === 0
+      ? ["single-endpoint-json", "openai-responses"]
+      : ["single-endpoint-json", "openai-images", "openai-responses"]);
 
   const candidates: RouteCandidate[] = [];
   for (const transport of order) {
     if (transport === "single-endpoint-json") {
-      if (stateful && !forcedPreviousOutput) {
-        continue;
-      }
       candidates.push({
         tier: "A",
         transport,
@@ -283,23 +230,16 @@ function configuredCandidates(
             : physicalInputs === 1
               ? PROVIDER_REQUEST_SHAPES.singleEndpointImage
               : PROVIDER_REQUEST_SHAPES.singleEndpointImages,
-        effectiveKind: forcedPreviousOutput ? "edit" : request.kind,
+        effectiveKind: "generate",
         imageInputCount: physicalInputs,
-        requiredCapabilities: tierACapabilities(
-          request,
-          physicalInputs,
-          forcedPreviousOutput ? "edit" : request.kind
-        ),
+        requiredCapabilities: tierACapabilities(request, physicalInputs),
         allowUnknownTextBaseline: physicalInputs === 0
       });
       continue;
     }
 
     if (transport === "openai-images") {
-      if (stateful && !forcedPreviousOutput) {
-        continue;
-      }
-      if (physicalInputs === 0 && request.kind === "generate") {
+      if (physicalInputs === 0) {
         candidates.push({
           tier: "B",
           transport,
@@ -307,34 +247,22 @@ function configuredCandidates(
           requestShape: PROVIDER_REQUEST_SHAPES.imagesGenerationsJson,
           effectiveKind: "generate",
           imageInputCount: 0,
-          requiredCapabilities: tierBCapabilities(request, 0, "generate"),
+          requiredCapabilities: tierBCapabilities(request, 0),
           allowUnknownTextBaseline: true
         });
         continue;
       }
-      if (endpoints.editsEndpoint === undefined) {
-        continue;
-      }
-      candidates.push({
-        tier: "B",
-        transport,
-        endpoint: endpoints.editsEndpoint,
-        requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart,
-        effectiveKind: "edit",
-        imageInputCount: physicalInputs,
-        requiredCapabilities: tierBCapabilities(request, physicalInputs, "edit")
-      });
       continue;
     }
 
-    if (endpoints.responsesEndpoint !== undefined && !forcedPreviousOutput) {
+    if (endpoints.responsesEndpoint !== undefined) {
       candidates.push({
         tier: "C",
         transport,
         endpoint: endpoints.responsesEndpoint,
         requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration,
-        effectiveKind: request.kind,
-        imageInputCount: tierCImageInputCount(request),
+        effectiveKind: "generate",
+        imageInputCount: physicalImageInputCount(request),
         requiredCapabilities: tierCCapabilities(request)
       });
     }
@@ -464,8 +392,7 @@ function capabilityLimitViolations(
 function selectFromCandidates(
   context: ProviderRoutingContext,
   request: ImageOperationRequest,
-  candidates: readonly RouteCandidate[],
-  degradedContinuation: boolean
+  candidates: readonly RouteCandidate[]
 ): ProviderRouteDecision {
   const attempted: ProviderTransport[] = [];
   const missing: ProviderCapability[] = [];
@@ -482,7 +409,7 @@ function selectFromCandidates(
       }
     }
 
-    let degraded = degradedContinuation;
+    let degraded = false;
     let candidateUnavailable = false;
     for (const capability of candidate.requiredCapabilities) {
       const record = findCapabilityRecord(context, candidate, capability);
@@ -520,8 +447,6 @@ function selectFromCandidates(
       effectiveKind: candidate.effectiveKind,
       requiredCapabilities: candidate.requiredCapabilities,
       degraded,
-      degradedContinuation,
-      ...(degradedContinuation ? { continuationInput: "previous-output-as-target" as const } : {}),
       replayPolicy: "never-cross-transport"
     };
   }
@@ -544,38 +469,7 @@ export function selectProviderRoute(
   requestInput: unknown
 ): ProviderRouteDecision {
   const request = imageOperationRequestSchema.parse(requestInput);
-  const stateful =
-    request.previousResponseId !== undefined || request.imageIds.length > 0 || request.fileIds.length > 0;
-
-  const direct = selectFromCandidates(
-    context,
-    request,
-    configuredCandidates(context, request, false),
-    false
-  );
-  if (direct.selected || !stateful) {
-    return direct;
-  }
-  if (context.allowDegradedContinuation !== true || context.previousOutputAvailable !== true) {
-    return direct;
-  }
-
-  const requestedFallbacks = context.preferredTransports?.filter(
-    (transport) => transport !== "openai-responses"
-  );
-  const fallbackContext: ProviderRoutingContext = {
-    ...context,
-    preferredTransports:
-      requestedFallbacks !== undefined && requestedFallbacks.length > 0
-        ? requestedFallbacks
-        : ["single-endpoint-json", "openai-images"]
-  };
-  return selectFromCandidates(
-    fallbackContext,
-    request,
-    configuredCandidates(fallbackContext, request, true),
-    true
-  );
+  return selectFromCandidates(context, request, configuredCandidates(context, request));
 }
 
 export interface AutomaticRetryDecision {

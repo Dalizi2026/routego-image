@@ -19,12 +19,10 @@ import {
   type EffectiveProviderControls,
   type EffectiveProviderPlan,
   type PrepareImageInputOptions,
-  type PreparedImageInput,
   type PreparedImageInputs,
   type PreparedProviderRequest,
   type ProviderJsonObject,
   type ProviderJsonSubmission,
-  type ProviderMultipartSubmission,
   type ProviderRequestPreparationContext,
   type ProviderRequestPreparationResult,
   type ProviderSubmission
@@ -98,8 +96,7 @@ export function planEffectiveProviderControls(
   return {
     effectiveParams: request,
     controls,
-    degraded: route.degraded,
-    degradedContinuation: route.degradedContinuation
+    degraded: route.degraded
   };
 }
 
@@ -164,7 +161,7 @@ export function serializeTierARequest(
   assertTierRoute(route, "A", "single-endpoint-json");
   const body: ProviderJsonObject = commonJsonFields(model, request, effective.controls);
   if (route.requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointText) {
-    if (inputs.images.length !== 0 || inputs.mask !== undefined) {
+    if (inputs.images.length !== 0) {
       throw new ProviderPreparationError(
         "request-shape-mismatch",
         "A text-only provider route cannot contain image inputs."
@@ -182,8 +179,7 @@ export function serializeTierARequest(
     }
     return jsonSubmission(route.endpoint, {
       ...body,
-      image: imageDataUrl(image),
-      ...(inputs.mask === undefined ? {} : { mask: imageDataUrl(inputs.mask) })
+      image: imageDataUrl(image)
     });
   }
   if (route.requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointImages) {
@@ -195,8 +191,7 @@ export function serializeTierARequest(
     }
     return jsonSubmission(route.endpoint, {
       ...body,
-      images: inputs.images.map(imageDataUrl),
-      ...(inputs.mask === undefined ? {} : { mask: imageDataUrl(inputs.mask) })
+      images: inputs.images.map(imageDataUrl)
     });
   }
   throw new ProviderPreparationError(
@@ -204,26 +199,6 @@ export function serializeTierARequest(
     "The selected Tier A request shape is not supported.",
     { requestShape: route.requestShape }
   );
-}
-
-function imageBlob(image: PreparedImageInput | NonNullable<PreparedImageInputs["mask"]>): Blob {
-  return new Blob([new Uint8Array(image.bytes)], { type: image.mimeType });
-}
-
-function appendMultipartControls(form: FormData, controls: EffectiveProviderControls): void {
-  form.append("n", String(controls.n));
-  form.append("size", controls.size);
-  if (controls.quality !== undefined) form.append("quality", controls.quality);
-  if (controls.outputFormat !== undefined) form.append("output_format", controls.outputFormat);
-  if (controls.outputCompression !== undefined) {
-    form.append("output_compression", String(controls.outputCompression));
-  }
-  if (controls.partialImages !== undefined) {
-    form.append("partial_images", String(controls.partialImages));
-  }
-  if (controls.nativeTransparency) form.append("background", "transparent");
-  if (controls.moderation !== undefined) form.append("moderation", controls.moderation);
-  if (controls.stream) form.append("stream", "true");
 }
 
 export function serializeTierBRequest(
@@ -234,49 +209,20 @@ export function serializeTierBRequest(
   effective: EffectiveProviderPlan
 ): ProviderSubmission {
   assertTierRoute(route, "B", "openai-images");
-  if (route.requestShape === PROVIDER_REQUEST_SHAPES.imagesGenerationsJson) {
-    if (inputs.images.length !== 0 || inputs.mask !== undefined) {
-      throw new ProviderPreparationError(
-        "request-shape-mismatch",
-        "Images generations JSON cannot contain prepared image inputs."
-      );
-    }
-    return jsonSubmission(route.endpoint, commonJsonFields(model, request, effective.controls));
-  }
-  if (route.requestShape !== PROVIDER_REQUEST_SHAPES.imagesEditsMultipart) {
+  if (route.requestShape !== PROVIDER_REQUEST_SHAPES.imagesGenerationsJson) {
     throw new ProviderPreparationError(
       "request-shape-mismatch",
       "The selected Tier B request shape is not supported.",
       { requestShape: route.requestShape }
     );
   }
-  const target = inputs.images[0];
-  if (target === undefined) {
+  if (inputs.images.length !== 0) {
     throw new ProviderPreparationError(
       "request-shape-mismatch",
-      "Images Edits multipart requires at least one prepared image."
+      "Images generations JSON cannot contain prepared image inputs."
     );
   }
-
-  const form = new FormData();
-  form.append("model", model);
-  form.append("prompt", request.prompt);
-  form.append("image", imageBlob(target), target.fileName);
-  if (inputs.mask !== undefined) {
-    form.append("mask", imageBlob(inputs.mask), inputs.mask.fileName);
-  }
-  for (const image of inputs.images.slice(1)) {
-    form.append("image[]", imageBlob(image), image.fileName);
-  }
-  appendMultipartControls(form, effective.controls);
-  const submission: ProviderMultipartSubmission = {
-    bodyType: "multipart",
-    method: "POST",
-    endpoint: route.endpoint,
-    headers: {},
-    body: form
-  };
-  return submission;
+  return jsonSubmission(route.endpoint, commonJsonFields(model, request, effective.controls));
 }
 
 export function serializeTierCRequest(
@@ -297,13 +243,10 @@ export function serializeTierCRequest(
 
   const content: ProviderJsonObject[] = [
     { type: "input_text", text: request.prompt },
-    ...inputs.images.map((image) => ({ type: "input_image", image_url: imageDataUrl(image) })),
-    ...request.fileIds.map((fileId) => ({ type: "input_image", file_id: fileId })),
-    ...request.imageIds.map((imageId) => ({ type: "input_image", image_id: imageId }))
+    ...inputs.images.map((image) => ({ type: "input_image", image_url: imageDataUrl(image) }))
   ];
   const tool: ProviderJsonObject = {
     type: "image_generation",
-    action: request.action,
     ...(effective.controls.n === 1 ? {} : { n: effective.controls.n }),
     ...(effective.controls.size === "auto" ? {} : { size: effective.controls.size }),
     ...(effective.controls.quality === undefined
@@ -321,18 +264,12 @@ export function serializeTierCRequest(
     ...(effective.controls.nativeTransparency ? { background: "transparent" } : {}),
     ...(effective.controls.moderation === undefined
       ? {}
-      : { moderation: effective.controls.moderation }),
-    ...(inputs.mask === undefined
-      ? {}
-      : { input_image_mask: { image_url: imageDataUrl(inputs.mask) } })
+      : { moderation: effective.controls.moderation })
   };
   return jsonSubmission(route.endpoint, {
     model,
     input: [{ role: "user", content }],
     tools: [tool],
-    ...(request.previousResponseId === undefined
-      ? {}
-      : { previous_response_id: request.previousResponseId }),
     ...(effective.controls.stream ? { stream: true } : {})
   });
 }
