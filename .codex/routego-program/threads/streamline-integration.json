@@ -1,1 +1,60 @@
-{"schemaVersion":2,"lane":"integration","change":"streamline-routego-image-generation","role":"openspec-cross-lane-sole-apply-owner-existing-controller-worktree","status":"activated-cross-lane-sole-apply-owner-task-4.1-zero-compaction-acceptance","controllerThreadId":"019f8ab7-8af6-7181-a59d-2f662c037b1a","threadId":"019f8ad0-5d83-72f2-b26c-7cad6b488289","worktree":"/Users/dalizi/Documents/Routego Image 1.0/controller-g12","branch":"codex/routego-controller-g12","generation":1,"currentHead":"5e5ab5df0a305590a558a86287a22e5b8047753b","observableCompactions":0,"lastCompactionFingerprint":null,"soleApplyOwner":true,"applyAuthorized":true,"currentTask":{"id":"4.1","status":"activated-sole-apply-owner-exact-task-4.1","taskCapsule":".codex/routego-program/tasks/integration-4.1.json","handoffCapsule":".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json","locked":false},"sourceOwner":{"threadId":"019f8a48-ee58-7f73-b362-947478c0c85a","worktree":"/Users/dalizi/Documents/routego-image-library-g3","branch":"codex/routego-library-g3","role":"task-3.5-accepted-source-owner-cross-lane-archived-during-workspace-consolidation","soleApplyOwner":false,"archived":true,"authorityRevoked":true},"handoffCapsuleIntegrity":{"canonicalSha256":"849a027d5672ba3da51357fe2c41e3c0da9be75ec18b2ccf542d7b29a6c225d8","rawFileSha256":"643fb456cc23be47abde6fa3cde13bc00b1044ad2d7f19e30a6b82a21f6ce9fa"},"crossLaneIsolation":{"legacyStatePath":".codex/routego-program/threads/integration.json","legacyChange":"integrate-routego-image-plugin","legacyStateMayNotAuthorizeThisTask":true,"currentStateRoutingKey":"streamlineIntegration","workspaceConsolidation":"Only the existing controller-g12 worktree may host a future visible Integration thread; new directories and worktrees require fresh user approval."},"reportingContract":{"currentControllerThreadId":"019f8ab7-8af6-7181-a59d-2f662c037b1a","currentControllerGeneration":12,"primary":"send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request","fallback":"routego-program-continuity remains missed-message fallback only","acknowledgementRequiredBeforeAcceptance":true},"lowContextPolicy":{"decision":".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md","hardHandoffDecision":".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md","startupMaxFiles":12,"startupMaxUtf8Bytes":122880,"startupByteCounting":"utf8-after-crlf-to-lf-normalization","acceptanceObservableCompactions":0},"externalStateAuthorized":false}
+{
+  "schemaVersion": 2,
+  "lane": "integration",
+  "change": "streamline-routego-image-generation",
+  "role": "openspec-cross-lane-sole-apply-owner-existing-controller-worktree",
+  "status": "activated-task-4.1-implementation-validated-pending-owner-task-state",
+  "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+  "threadId": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
+  "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+  "branch": "codex/routego-controller-g12",
+  "generation": 1,
+  "currentHead": "edc3812022abd3ea76b3860c48c78cde2672f173",
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
+  "currentTask": {
+    "id": "4.1",
+    "status": "implementation-validated-pending-sole-owner-task-state",
+    "taskCapsule": ".codex/routego-program/tasks/integration-4.1.json",
+    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json",
+    "locked": false
+  },
+  "sourceOwner": {
+    "threadId": "019f8a48-ee58-7f73-b362-947478c0c85a",
+    "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
+    "branch": "codex/routego-library-g3",
+    "role": "task-3.5-accepted-source-owner-cross-lane-archived-during-workspace-consolidation",
+    "soleApplyOwner": false,
+    "archived": true,
+    "authorityRevoked": true
+  },
+  "handoffCapsuleIntegrity": {
+    "canonicalSha256": "dc1d95b3e24dbc7705f650df9d2092ef1b867a354657f7b7f30514b2ac313f50",
+    "rawFileSha256": "08e15ddac02dd39a12aa382074e6070a3aea974765a8e9b3f2ff4003cf56fae8"
+  },
+  "crossLaneIsolation": {
+    "legacyStatePath": ".codex/routego-program/threads/integration.json",
+    "legacyChange": "integrate-routego-image-plugin",
+    "legacyStateMayNotAuthorizeThisTask": true,
+    "currentStateRoutingKey": "streamlineIntegration",
+    "workspaceConsolidation": "Only the existing controller-g12 worktree may host a future visible Integration thread; new directories and worktrees require fresh user approval."
+  },
+  "reportingContract": {
+    "currentControllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "currentControllerGeneration": 12,
+    "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
+    "fallback": "routego-program-continuity remains missed-message fallback only",
+    "acknowledgementRequiredBeforeAcceptance": true
+  },
+  "lowContextPolicy": {
+    "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    "hardHandoffDecision": ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md",
+    "startupMaxFiles": 12,
+    "startupMaxUtf8Bytes": 122880,
+    "startupByteCounting": "utf8-after-crlf-to-lf-normalization",
+    "acceptanceObservableCompactions": 0
+  },
+  "externalStateAuthorized": false
+}

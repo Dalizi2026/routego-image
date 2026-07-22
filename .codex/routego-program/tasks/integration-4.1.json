@@ -1,1 +1,87 @@
-{"schemaVersion":1,"contentSha256":"7cf0358bb50a8ebac19c69e9101bd594770c0a346f31cb0678ffc637e9013e0d","lane":"integration","change":"streamline-routego-image-generation","taskId":"4.1","status":"activated-sole-apply-owner-zero-compaction-handoff-accepted","sourceCommit":"5f1f67caf4296925a4b5a914777bfb1adbbc8267","taskSource":{"path":"openspec/changes/streamline-routego-image-generation/tasks.md","fileSha256":"0c693f69da4e77177e5cbf2753a595d68ab53890875248eddf2f5cc4577caf76","lineSha256":"b97dbcfe06e37eaa502ea3387b67fdd9be9ed0a46271afc717010358da13f91e"},"dependencies":["1.4","2.4","3.5"],"allowedFiles":["packages/integration/src/composition/service.ts","packages/integration/src/runtime/mcp-process.ts","packages/integration/src/runtime/routes.ts","packages/integration/test/install-smoke.test.ts","packages/integration/test/mcp-process.test.ts","packages/integration/test/routes.test.ts","packages/integration/test/service.test.ts","openspec/changes/streamline-routego-image-generation/tasks.md"],"forbiddenFileGlobs":["packages/contracts/**","packages/creation/**","packages/foundation/**","packages/library/**","packages/studio/**","packages/integration/src/composition/graph.ts","packages/integration/src/composition/inputs.ts","packages/integration/src/composition/results.ts","packages/integration/src/image/**","packages/integration/src/provider/**","packages/integration/src/runtime/http-host.ts","packages/integration/src/runtime/lifecycle.ts","packages/integration/src/runtime/sessions.ts","packages/integration/src/runtime/static.ts","packages/integration/src/runtime/stream-route.ts","package.json","pnpm-lock.yaml","node_modules/**"],"requiredBehavior":["Task 4.1 remains locked until a Controller-created visible Integration thread is registered on the existing controller-g12 worktree, that worktree is clean, and the thread passes zero-observable-compaction handoff acceptance; no new directory, worktree, clone, or successor folder is authorized.","Register routego_prepare_regeneration, remove routego_edit from MCP, HTTP, and tool discovery, and resolve the safe recipe without Provider, network, credential, image, migration, deletion, deployment, or release access.","Keep the exact seven public operations and do not implement any future Integration, Studio, Library, Foundation, Creation, packaging, or approval-gated capability."],"verification":["openspec instructions apply --change streamline-routego-image-generation --json","pnpm --filter @routego-image/integration test -- mcp-process.test.ts routes.test.ts service.test.ts","git diff --check"],"directSpecifications":[{"path":"openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md","sha256":"aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529","reason":"exact seven-operation public discovery and removed edit surface"},{"path":"openspec/changes/streamline-routego-image-generation/specs/regeneration-preparation/spec.md","sha256":"010f5e42ce8d842a17791f7d885dc36248b226fc4f6773ea8fe5cc5d1767cb03","reason":"read-only safe recipe preparation boundary"},{"path":"openspec/changes/streamline-routego-image-generation/specs/durable-image-library/spec.md","sha256":"a1430b378e7147a5e9a828b0529d1cd164060a0994b953b8c9b8bf9359a98a85","reason":"Library recipe source remains read-only and provider-free"}],"publicContractFingerprint":"913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01","ownershipFingerprint":"streamline-task-4.1-exact-integration-public-regeneration-discovery-files","activation":{"controllerThreadId":"019f8ab7-8af6-7181-a59d-2f662c037b1a","controllerGeneration":12,"workerThreadId":"019f8ad0-5d83-72f2-b26c-7cad6b488289","workerGeneration":1,"soleApplyOwner":true,"applyAuthorized":true},"externalStateAuthorized":false}
+{
+  "schemaVersion": 1,
+  "contentSha256": "9eca7c0e04df053527c451c2e2405fcb215426bb0f9fc32a9ceff916385eced5",
+  "lane": "integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "4.1",
+  "status": "activated-sole-apply-owner-zero-compaction-handoff-accepted",
+  "sourceCommit": "edc3812022abd3ea76b3860c48c78cde2672f173",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "312218b138793c9381877c895140b1d062615b0fd4b88e4c9138b39167c16daf",
+    "lineSha256": "86f5fc2f283f9b0d3b4b58d977ca954ffca1725de06661aa4fbd0f89d70a306d"
+  },
+  "dependencies": [
+    "1.4",
+    "2.4",
+    "3.5"
+  ],
+  "allowedFiles": [
+    "packages/integration/src/composition/service.ts",
+    "packages/integration/src/runtime/mcp-process.ts",
+    "packages/integration/src/runtime/routes.ts",
+    "packages/integration/test/install-smoke.test.ts",
+    "packages/integration/test/mcp-process.test.ts",
+    "packages/integration/test/routes.test.ts",
+    "packages/integration/test/service.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/studio/**",
+    "packages/integration/src/composition/graph.ts",
+    "packages/integration/src/composition/inputs.ts",
+    "packages/integration/src/composition/results.ts",
+    "packages/integration/src/image/**",
+    "packages/integration/src/provider/**",
+    "packages/integration/src/runtime/http-host.ts",
+    "packages/integration/src/runtime/lifecycle.ts",
+    "packages/integration/src/runtime/sessions.ts",
+    "packages/integration/src/runtime/static.ts",
+    "packages/integration/src/runtime/stream-route.ts",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Task 4.1 remains locked until a Controller-created visible Integration thread is registered on the existing controller-g12 worktree, that worktree is clean, and the thread passes zero-observable-compaction handoff acceptance; no new directory, worktree, clone, or successor folder is authorized.",
+    "Register routego_prepare_regeneration, remove routego_edit from MCP, HTTP, and tool discovery, and resolve the safe recipe without Provider, network, credential, image, migration, deletion, deployment, or release access.",
+    "Keep the exact seven public operations and do not implement any future Integration, Studio, Library, Foundation, Creation, packaging, or approval-gated capability."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/integration test -- mcp-process.test.ts routes.test.ts service.test.ts",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529",
+      "reason": "exact seven-operation public discovery and removed edit surface"
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/regeneration-preparation/spec.md",
+      "sha256": "010f5e42ce8d842a17791f7d885dc36248b226fc4f6773ea8fe5cc5d1767cb03",
+      "reason": "read-only safe recipe preparation boundary"
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/durable-image-library/spec.md",
+      "sha256": "a1430b378e7147a5e9a828b0529d1cd164060a0994b953b8c9b8bf9359a98a85",
+      "reason": "Library recipe source remains read-only and provider-free"
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-4.1-exact-integration-public-regeneration-discovery-files",
+  "activation": {
+    "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "controllerGeneration": 12,
+    "workerThreadId": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
+    "workerGeneration": 1,
+    "soleApplyOwner": true,
+    "applyAuthorized": true
+  },
+  "externalStateAuthorized": false
+}

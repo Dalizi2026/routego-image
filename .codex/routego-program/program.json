@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-project-local-re-registered-streamline-integration-4.1-locked",
+  "status": "controller-generation-12-task-4.1-implementation-validated-pending-task-state",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -43,7 +43,10 @@
         "routego_open_studio",
         "routego_prepare_regeneration"
       ],
-      "imageArtifactPhase": ["partial", "final"],
+      "imageArtifactPhase": [
+        "partial",
+        "final"
+      ],
       "fingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01"
     },
     "externalStateAuthorized": false
@@ -56,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-4.1-activated",
+    "status": "authoritative-controller-generation-12-task-4.1-implementation-validated-pending-task-state",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -85,8 +88,15 @@
       "branch": "codex/routego-creation-g5",
       "worktree": "/Users/dalizi/Documents/routego-image-creation-g5",
       "currentHead": "8d595d50def843e37a97772df5b1f0bb05c21c9d",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/creation-2.4.json", "sha256": "a13a7b55ee6c64e873dc4e01ec3b6ad626a5d879f8f6b54e6495a0a903fe5814" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/creation-generation-4.capsule.json", "sha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3", "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39" },
+      "taskCapsule": {
+        "path": ".codex/routego-program/tasks/creation-2.4.json",
+        "sha256": "a13a7b55ee6c64e873dc4e01ec3b6ad626a5d879f8f6b54e6495a0a903fe5814"
+      },
+      "handoffCapsule": {
+        "path": ".codex/routego-program/handoffs/creation-generation-4.capsule.json",
+        "sha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3",
+        "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39"
+      },
       "authorizedScope": "historical-task-2.4-accepted-worktree-pruned-no-active-product-owner",
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
@@ -99,22 +109,36 @@
       "branch": "codex/routego-library-g3",
       "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
       "currentHead": "24c1e8483a66262b9075fc3621b682878aef3ea3",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.5.json", "sha256": "c499bce967917e71b1f060f75c0d9e92c4bd4c78cb25419d7dc10fc5546f15b3" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-7.capsule.json", "sha256": "4ac3d5c7fcb6c7015352a69a1170057e8e37974c988d12b398fab3a31331afdc", "rawFileSha256": "8a28c8638e173a0d689b696b793eb2f58637c86155aa98d3d8c3045188a8e031" },
+      "taskCapsule": {
+        "path": ".codex/routego-program/tasks/library-3.5.json",
+        "sha256": "c499bce967917e71b1f060f75c0d9e92c4bd4c78cb25419d7dc10fc5546f15b3"
+      },
+      "handoffCapsule": {
+        "path": ".codex/routego-program/handoffs/library-generation-7.capsule.json",
+        "sha256": "4ac3d5c7fcb6c7015352a69a1170057e8e37974c988d12b398fab3a31331afdc",
+        "rawFileSha256": "8a28c8638e173a0d689b696b793eb2f58637c86155aa98d3d8c3045188a8e031"
+      },
       "authorizedScope": "historical-task-3.5-accepted-worktree-pruned-no-active-product-owner",
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "activated-cross-lane-sole-apply-owner-task-4.1-zero-compaction-acceptance",
+      "status": "activated-task-4.1-implementation-validated-pending-owner-task-state",
       "taskRef": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
       "threadId": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
       "generation": 1,
       "taskId": "4.1",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "5e5ab5df0a305590a558a86287a22e5b8047753b",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/integration-4.1.json", "sha256": "7cf0358bb50a8ebac19c69e9101bd594770c0a346f31cb0678ffc637e9013e0d" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json", "sha256": "849a027d5672ba3da51357fe2c41e3c0da9be75ec18b2ccf542d7b29a6c225d8", "rawFileSha256": "643fb456cc23be47abde6fa3cde13bc00b1044ad2d7f19e30a6b82a21f6ce9fa" },
+      "currentHead": "edc3812022abd3ea76b3860c48c78cde2672f173",
+      "taskCapsule": {
+        "path": ".codex/routego-program/tasks/integration-4.1.json",
+        "sha256": "9eca7c0e04df053527c451c2e2405fcb215426bb0f9fc32a9ceff916385eced5"
+      },
+      "handoffCapsule": {
+        "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json",
+        "sha256": "dc1d95b3e24dbc7705f650df9d2092ef1b867a354657f7b7f30514b2ac313f50",
+        "rawFileSha256": "08e15ddac02dd39a12aa382074e6070a3aea974765a8e9b3f2ff4003cf56fae8"
+      },
       "authorizedScope": "task-4.1-exact-integration-public-regeneration-discovery-files"
     }
   },
@@ -126,7 +150,10 @@
       "plannedBranch": "codex/routego-creation-g5",
       "currentHead": "8d595d50def843e37a97772df5b1f0bb05c21c9d",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3", "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39" },
+      "handoffCapsuleIntegrity": {
+        "canonicalSha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3",
+        "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39"
+      },
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "library": {
@@ -136,7 +163,10 @@
       "plannedBranch": "codex/routego-library-g3",
       "currentHead": "d4efb8a7c9040d771ac16d1a7c29da5c5bb7d958",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "4ac3d5c7fcb6c7015352a69a1170057e8e37974c988d12b398fab3a31331afdc", "rawFileSha256": "8a28c8638e173a0d689b696b793eb2f58637c86155aa98d3d8c3045188a8e031" },
+      "handoffCapsuleIntegrity": {
+        "canonicalSha256": "4ac3d5c7fcb6c7015352a69a1170057e8e37974c988d12b398fab3a31331afdc",
+        "rawFileSha256": "8a28c8638e173a0d689b696b793eb2f58637c86155aa98d3d8c3045188a8e031"
+      },
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
@@ -144,9 +174,12 @@
       "generation": 1,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "5e5ab5df0a305590a558a86287a22e5b8047753b",
+      "currentHead": "edc3812022abd3ea76b3860c48c78cde2672f173",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "849a027d5672ba3da51357fe2c41e3c0da9be75ec18b2ccf542d7b29a6c225d8", "rawFileSha256": "643fb456cc23be47abde6fa3cde13bc00b1044ad2d7f19e30a6b82a21f6ce9fa" }
+      "handoffCapsuleIntegrity": {
+        "canonicalSha256": "dc1d95b3e24dbc7705f650df9d2092ef1b867a354657f7b7f30514b2ac313f50",
+        "rawFileSha256": "08e15ddac02dd39a12aa382074e6070a3aea974765a8e9b3f2ff4003cf56fae8"
+      }
     }
   },
   "currentChange": {
@@ -155,27 +188,47 @@
     "openspec": {
       "totalTasks": 33,
       "completedTasks": 13,
-      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "3.1", "3.2", "3.3", "3.4", "3.5"],
-      "readyTaskIds": ["4.1"],
+      "completedTaskIds": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "1.4",
+        "2.1",
+        "2.2",
+        "2.3",
+        "2.4",
+        "3.1",
+        "3.2",
+        "3.3",
+        "3.4",
+        "3.5"
+      ],
+      "readyTaskIds": [
+        "4.1"
+      ],
       "nextTaskId": "4.1"
     },
     "currentTask": {
       "id": "4.1",
       "locked": false,
       "activationAuthorized": true,
-      "parallelReadyTaskIds": ["4.1"],
+      "parallelReadyTaskIds": [
+        "4.1"
+      ],
       "authorizedScope": "Task 4.1 is activated only for Integration thread 019f8ad0-5d83-72f2-b26c-7cad6b488289 in the existing controller-g12 worktree. Exact task-capsule files only; no new directory, worktree, provider, network, credentials, real data, migration, deletion, deployment, release, or future task scope."
     }
   },
   "latestDirectCheckpoint": {
-    "lane": "creation-library-and-streamline-integration",
-    "event": "TASK_4_1_CONTROLLER_ACTIVATED_ZERO_COMPACTION",
-    "implementationCommit": "24c1e8483a66262b9075fc3621b682878aef3ea3",
-    "controllerMergeCommit": "30857ba5f495b39342af55347459a95f14dd4fff",
-    "taskStateCommit": "9db7c998da60ea7bf4b0e4cb75b58c046a4a795a",
+    "lane": "streamline-integration",
+    "event": "TASK_4_1_IMPLEMENTATION_VALIDATED_PENDING_OWNER_TASK_STATE",
+    "implementationCommit": "70fa66b856b693e405b9539bdf9adf7e4bbe358e",
+    "controllerMergeCommit": null,
+    "taskStateCommit": "edc3812022abd3ea76b3860c48c78cde2672f173",
     "openspecProgress": "13/33",
-    "nextTaskIds": ["4.1"],
-    "verification": "Integration Task 4.1 handoff acceptance passed at zero observable compactions with clean Git and the handoff validator. The project-local Controller activated only the exact task-capsule Integration scope for the registered visible thread; implementation remains subject to per-checkpoint direct reporting and exact allowed files."
+    "nextTaskIds": [
+      "4.1"
+    ],
+    "verification": "The five direct Task 4.1 assertions passed through explicit Vitest selection; legacy later-task assertions were retained and not weakened. Governance references refreshed before the sole owner marks task state."
   },
   "currentBlockers": [],
   "approvedDeviations": [
@@ -183,7 +236,12 @@
       "id": "PD-015-task-3.1-obsolete-trash-test-cleanup",
       "status": "user-approved-complete",
       "scope": "packages/library/test/gallery/mutations.test.ts obsolete Trash/delete/restore/permanent-delete cases only",
-      "nonGoals": ["runtime Trash behavior", "real data deletion", "migration execution", "public contract changes"]
+      "nonGoals": [
+        "runtime Trash behavior",
+        "real data deletion",
+        "migration execution",
+        "public contract changes"
+      ]
     }
   ],
   "currentRisks": [
@@ -193,7 +251,12 @@
     "User-approved workspace consolidation prohibits new project directories, Git worktrees, clones, successor folders and persistent test directories without fresh explicit approval; future visible threads must reuse the existing controller-g12 worktree."
   ],
   "externalApprovalGates": {
-    "tasks": ["6.1", "7.2", "8.2", "9.1"],
+    "tasks": [
+      "6.1",
+      "7.2",
+      "8.2",
+      "9.1"
+    ],
     "freshExplicitUserApprovalRequired": true
   },
   "automation": {
