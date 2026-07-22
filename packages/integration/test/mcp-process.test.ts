@@ -7,6 +7,7 @@ import {
   routegoOpenStudioResultSchema,
   routegoOperationDefinitions,
   routegoOperationNames,
+  routegoPrepareRegenerationResultSchema,
   routegoStatusResultSchema
 } from "@routego-image/contracts";
 
@@ -23,7 +24,7 @@ import type { RuntimeSignalSource } from "../src/runtime/lifecycle";
 const EXPECTED_TOOLS = [
   "routego_status",
   "routego_generate",
-  "routego_edit",
+  "routego_prepare_regeneration",
   "routego_batch",
   "routego_search_library",
   "routego_manage_library",
@@ -123,6 +124,30 @@ function statusResult() {
       httpAvailable: true,
       studioAvailable: true
     }
+  });
+}
+
+function regenerationResult() {
+  return routegoPrepareRegenerationResultSchema.parse({
+    schemaVersion: 1,
+    recipe: {
+      schemaVersion: 1,
+      kind: "generate",
+      sourceRecordId: "record-1",
+      prompt: "A safe saved prompt",
+      referenceIds: [],
+      size: "auto",
+      aspectRatio: "auto",
+      quality: "auto",
+      format: "png",
+      count: 1,
+      partialImages: 0,
+      transparentMode: "off",
+      moderation: "auto",
+      saveToLibrary: true
+    },
+    providerRequestCount: 0,
+    markUnchanged: true
   });
 }
 
@@ -268,6 +293,38 @@ describe("task 4.3 MCP process protocol", () => {
     expect(statusCalls).toBe(2);
     expect(http.shutdown).not.toHaveBeenCalled();
     expect(runtime.closed).toBe(false);
+
+    input.end();
+    await runtime.waitUntilClosed();
+  });
+
+  it("exposes read-only regeneration preparation and rejects the removed edit tool", async () => {
+    const prepareRegeneration = vi.fn(async () => regenerationResult());
+    const input = new ControlledInput();
+    const output = new MemoryOutput();
+    const runtime = createRoutegoMcpProcess({
+      service: managedService({ prepareRegeneration }),
+      httpLifecycle: httpLifecycle(),
+      input,
+      output,
+      error: new MemoryOutput()
+    });
+    await runtime.start();
+
+    input.push([
+      request(1, "initialize"),
+      request(2, "tools/call", {
+        name: "routego_prepare_regeneration",
+        arguments: { recordId: "record-1" }
+      }),
+      request(3, "tools/call", { name: "routego_edit", arguments: { kind: "edit" } })
+    ].join(""));
+    await waitForResponses(output, 3);
+
+    const responses = output.responses();
+    expect(toolText(responses[1]!)).toEqual(regenerationResult());
+    expect(prepareRegeneration).toHaveBeenCalledWith({ schemaVersion: 1, recordId: "record-1" });
+    expect(responses[2]).toMatchObject({ error: { code: -32601 } });
 
     input.end();
     await runtime.waitUntilClosed();

@@ -41,6 +41,8 @@ import {
   routegoManageLibraryResultSchema,
   routegoOpenStudioInputSchema,
   routegoOpenStudioResultSchema,
+  routegoPrepareRegenerationInputSchema,
+  routegoPrepareRegenerationResultSchema,
   routegoSearchLibraryInputSchema,
   routegoSearchLibraryResultSchema,
   routegoServiceErrorSchema,
@@ -103,6 +105,8 @@ import {
   type RoutegoManageLibraryResult,
   type RoutegoOpenStudioInput,
   type RoutegoOpenStudioResult,
+  type RoutegoPrepareRegenerationInput,
+  type RoutegoPrepareRegenerationResult,
   type RoutegoSearchLibraryInput,
   type RoutegoSearchLibraryResult,
   type RoutegoServiceError,
@@ -753,6 +757,15 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
 
   async manageLibrary(input: RoutegoManageLibraryInput): Promise<RoutegoManageLibraryResult> {
     return routegoManageLibraryResultSchema.parse(await this.#options.library.manageLibrary(routegoManageLibraryInputSchema.parse(input)));
+  }
+
+  async prepareRegeneration(
+    input: RoutegoPrepareRegenerationInput
+  ): Promise<RoutegoPrepareRegenerationResult> {
+    const parsed = routegoPrepareRegenerationInputSchema.parse(input);
+    return routegoPrepareRegenerationResultSchema.parse(
+      await this.#options.library.galleryService.prepareRegeneration(parsed)
+    );
   }
 
   async searchStudioLibrary(input: StudioLibrarySearchInput): Promise<StudioLibrarySearchResult> {

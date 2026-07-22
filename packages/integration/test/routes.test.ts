@@ -6,6 +6,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 
 import {
   studioGenerateInputSchema,
+  routegoPrepareRegenerationResultSchema,
   studioServiceErrorSchema,
   type LocalRoutegoService,
   type RoutegoService,
@@ -291,6 +292,49 @@ async function createHarness(options: {
 }
 
 describe("task 4.2 protected upload and resource routes", () => {
+  it("maps only the read-only regeneration route and rejects the removed edit route", async () => {
+    const prepareRegeneration = vi.fn(async () => routegoPrepareRegenerationResultSchema.parse({
+      schemaVersion: 1,
+      recipe: {
+        schemaVersion: 1,
+        kind: "generate",
+        sourceRecordId: "record-1",
+        prompt: "A safe saved prompt",
+        referenceIds: [],
+        size: "auto",
+        aspectRatio: "auto",
+        quality: "auto",
+        format: "png",
+        count: 1,
+        partialImages: 0,
+        transparentMode: "off",
+        moderation: "auto",
+        saveToLibrary: true
+      },
+      providerRequestCount: 0,
+      markUnchanged: true
+    }));
+    const dispatcher = createRoutegoHttpDispatcher({
+      service: new Proxy({ prepareRegeneration }, {
+        get(target, property) {
+          if (property in target) return target[property as keyof typeof target];
+          return async () => { throw new Error(`Unexpected public service call: ${String(property)}`); };
+        }
+      }) as unknown as RoutegoService,
+      expectedSessionToken: TOKEN_A,
+      allowedOrigins: [ORIGIN]
+    });
+
+    const prepared = await dispatcher.dispatch(jsonRequest("/api/v1/prepare-regeneration", { recordId: "record-1" }));
+    expect(prepared.status).toBe(200);
+    expect(json(prepared)).toMatchObject({ providerRequestCount: 0, markUnchanged: true });
+    expect(prepareRegeneration).toHaveBeenCalledWith({ schemaVersion: 1, recordId: "record-1" });
+
+    const removed = await dispatcher.dispatch(jsonRequest("/api/v1/edit", { kind: "edit" }));
+    expect(removed.status).toBe(404);
+    expect(prepareRegeneration).toHaveBeenCalledTimes(1);
+  });
+
   it("runs reserve, strict PUT staging, status, finalize, and discard through one protected dispatcher", async () => {
     const { dispatcher } = await createHarness();
     const runtime = dispatcher();

@@ -308,12 +308,12 @@ describe("task 3.5 contract surface and recovery", () => {
     expect(LOCAL_METHODS).toHaveLength(28);
     for (const method of LOCAL_METHODS) expect(typeof service[method]).toBe("function");
     expect(routegoOperationNames).toEqual([
-      "status", "generate", "edit", "batch", "searchLibrary", "manageLibrary", "openStudio"
+      "status", "generate", "prepareRegeneration", "batch", "searchLibrary", "manageLibrary", "openStudio"
     ]);
     expect(Object.values(routegoOperationDefinitions).map((definition) => definition.toolName)).toEqual([
       "routego_status",
       "routego_generate",
-      "routego_edit",
+      "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
       "routego_manage_library",
@@ -322,6 +322,17 @@ describe("task 3.5 contract surface and recovery", () => {
     expect(studioOperationNames).toHaveLength(21);
     expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
     expect(imageArtifactPhaseSchema.safeParse("source").success).toBe(false);
+  });
+
+  it("resolves regeneration recipes through Library without invoking Creation", async () => {
+    const execute = vi.fn<CreationExecution>();
+    const { service, library } = await createHarness({ executeCreation: execute });
+    const prepare = vi.spyOn(library.galleryService, "prepareRegeneration");
+
+    await expect(service.prepareRegeneration({})).rejects.toThrow("No generation record is currently marked");
+
+    expect(prepare).toHaveBeenCalledWith({ schemaVersion: 1 });
+    expect(execute).not.toHaveBeenCalled();
   });
 
   it("reports ready health without turning status refresh into an unscoped billable probe", async () => {

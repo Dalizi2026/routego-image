@@ -22,10 +22,10 @@ import { ACCEPTED_ARTIFACT_MANIFEST_SHA256, INSTALLED_PACKAGE_ARGUMENT_PREFIX, c
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
 const EXPECTED_TOOLS = [
   "routego_batch",
-  "routego_edit",
   "routego_generate",
   "routego_manage_library",
   "routego_open_studio",
+  "routego_prepare_regeneration",
   "routego_search_library",
   "routego_status"
 ];
