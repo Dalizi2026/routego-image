@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-authoritative-streamline-task-1.4-accepted-ready-for-tasks-2.1-and-3.1",
+  "status": "controller-generation-12-authoritative-task-2.1-accepted-task-3.1-blocked-by-task-order-conflict",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -69,7 +69,7 @@
   },
   "activeApplyOwners": {
     "creation": {
-      "status": "active-internal-apply-owner",
+      "status": "task-2.1-accepted",
       "taskRef": "/root/creation_task_2_1",
       "taskId": "2.1",
       "branch": "codex/routego-creation-g1",
@@ -77,12 +77,13 @@
       "authorizedScope": "task-2.1-exact-creation-and-foundation-generation-only-routing"
     },
     "library": {
-      "status": "active-internal-apply-owner",
+      "status": "blocked-task-order-conflict",
       "taskRef": "/root/library_task_3_1",
       "taskId": "3.1",
       "branch": "codex/routego-library-g1",
       "worktree": "/Users/dalizi/Documents/routego-image-library-g1",
-      "authorizedScope": "task-3.1-exact-library-generation-mark-persistence"
+      "authorizedScope": "task-3.1-exact-library-generation-mark-persistence",
+      "blocker": "The required mutations test retains Task 3.5 Trash cases that now contradict the strict contracts accepted in Task 1.3."
     }
   },
   "currentChange": {
@@ -90,29 +91,30 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 4,
-      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4"],
-      "readyTaskIds": ["2.1", "3.1"],
-      "nextTaskId": "2.1"
+      "completedTasks": 5,
+      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "2.1"],
+      "readyTaskIds": ["2.2", "3.1"],
+      "nextTaskId": "2.2"
     },
     "currentTask": {
-      "id": "2.1-and-3.1",
+      "id": "2.2",
       "locked": false,
       "activationAuthorized": true,
-      "authorizedScope": "separate owner-only branches; task 2.1 and task 3.1 have no dependency on each other"
+      "authorizedScope": "task 2.2 is ready; task 3.1 remains blocked pending a task-order decision"
     }
   },
   "latestDirectCheckpoint": {
     "lane": "streamline",
-    "event": "TASK_1_4_ACCEPTED",
-    "implementationCommit": "2227a08e5bc07925bca90a0efcea31f6aebfeb28",
-    "taskStateCommit": "9895039edcaa75be3d8346d5ead2131da790fbdc",
-    "openspecProgress": "4/33",
-    "nextTaskIds": ["2.1", "3.1"],
-    "evidence": ".codex/routego-program/evidence/streamline-1.4.json",
-    "evidenceSha256": "012bb424389823c831ec2440eea5c962ba442368f4cfdfdc55441a580086ed19"
+    "event": "TASK_2_1_ACCEPTED",
+    "implementationCommit": "19d94fe8b3343ccae634c39cfc4b26f99ac05145",
+    "taskStateCommit": "6417426c760eb2feb85e73a88e7711b5f4e6a618",
+    "openspecProgress": "5/33",
+    "nextTaskIds": ["2.2", "3.1"],
+    "verification": "Foundation 48 tests and exact Creation provider-request/executor 26 tests passed; the package script was verified to ignore file filters, so the equivalent direct Vitest invocation was used."
   },
-  "currentBlockers": [],
+  "currentBlockers": [
+    "Task 3.1 is blocked: its required mutations test still contains Task 3.5 Trash cases, which contradict the strict public contracts accepted in Task 1.3."
+  ],
   "currentRisks": [
     "Only local, offline contract work is currently authorized; real providers, credentials, images, migrations, installation, deployment and release remain prohibited.",
     "The legacy integrate-routego-image-plugin change remains separately blocked at task 9.1 by missing Windows and Ubuntu CI evidence."
