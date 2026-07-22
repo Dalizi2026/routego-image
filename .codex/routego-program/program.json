@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-authoritative-task-2.3-accepted-task-2.4-activated-library-3.2-accepted",
+  "status": "controller-generation-12-authoritative-task-2.4-accepted-library-3.3-registered-locked",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -69,30 +69,30 @@
   },
   "activeApplyOwners": {
     "creation": {
-      "status": "active-sole-apply-owner-zero-compaction-handoff-accepted",
+      "status": "accepted-no-successor-product-task-active",
       "taskRef": "019f8a35-481e-7150-9c45-70fae241ac87",
       "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
       "generation": 4,
       "taskId": "2.4",
       "branch": "codex/routego-creation-g5",
       "worktree": "/Users/dalizi/Documents/routego-image-creation-g5",
-      "currentHead": "fa48efba54f90aeb4082c691da859647362fcd90",
+      "currentHead": "8d595d50def843e37a97772df5b1f0bb05c21c9d",
       "taskCapsule": { "path": ".codex/routego-program/tasks/creation-2.4.json", "sha256": "a13a7b55ee6c64e873dc4e01ec3b6ad626a5d879f8f6b54e6495a0a903fe5814" },
       "handoffCapsule": { "path": ".codex/routego-program/handoffs/creation-generation-4.capsule.json", "sha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3", "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39" },
-      "authorizedScope": "task-2.4-exact-foundation-creation-routing-files-active-sole-owner"
+      "authorizedScope": "task-2.4-accepted-merged-no-successor-product-task-active"
     },
     "library": {
-      "status": "accepted-no-successor-product-task-active",
-      "taskRef": "/root/library_task_3_2",
-      "threadId": "/root/library_task_3_2",
-      "generation": 2,
-      "taskId": "3.2",
-      "branch": "codex/routego-library-g2",
-      "worktree": "/Users/dalizi/Documents/routego-image-library-g2",
-      "currentHead": "2244ca2df0e0b1777014e9e1647f468c298601fe",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.2.json", "sha256": "c082fedfdc67455f09aa510183d0100cb9a7b1ce07515f1e233583a67194a3f2" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-4.capsule.json", "sha256": "207c8eacfe9f868f040a2dbdfaff8bb21b112d77a9b9df93c4bd15b0a3aae56f", "rawFileSha256": "c25638dc467bec9f9ec1eddbb28c533e1fe2662371de3143ce68d7fd4104f9b2" },
-      "authorizedScope": "task-3.2-accepted-merged-no-successor-product-task-active"
+      "status": "registered-locked-awaiting-real-worktree-visible-thread-and-zero-compaction-handoff-acceptance",
+      "taskRef": "pending",
+      "threadId": "pending",
+      "generation": 3,
+      "taskId": "3.3",
+      "branch": "codex/routego-library-g3",
+      "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
+      "currentHead": "34eafa28f04f3c68e3896173b00b20a0ba7a3438",
+      "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.3.json", "sha256": "04763e3a5b32e3648a6ed2c7bfa00f88a4b7b0671ffc4fe1d070706ed071e5b3" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-5.capsule.json", "sha256": "c6df85347ac3c48d6e213b9c51a1941c6b9f8117d0087b5bbd46ab1845c4788f", "rawFileSha256": "a3b50136ba609a27ef05db08e38959422d6f56da0b003ad72487a90a85a5d01d" },
+      "authorizedScope": "task-3.3-registered-locked-no-product-apply-before-controller-created-worktree-thread-and-zero-compaction-handoff-acceptance"
     }
   },
   "laneSuccessors": {
@@ -101,18 +101,18 @@
       "generation": 4,
       "worktree": "/Users/dalizi/Documents/routego-image-creation-g5",
       "plannedBranch": "codex/routego-creation-g5",
-      "currentHead": "fa48efba54f90aeb4082c691da859647362fcd90",
+      "currentHead": "8d595d50def843e37a97772df5b1f0bb05c21c9d",
       "observableCompactions": 0,
       "handoffCapsuleIntegrity": { "canonicalSha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3", "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39" }
     },
     "library": {
-      "threadId": "/root/library_task_3_2",
-      "generation": 2,
-      "worktree": "/Users/dalizi/Documents/routego-image-library-g2",
-      "plannedBranch": "codex/routego-library-g2",
-      "currentHead": "12968524786b947479ae84b294fe4e46a8bd4ea2",
+      "threadId": "pending",
+      "generation": 3,
+      "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
+      "plannedBranch": "codex/routego-library-g3",
+      "currentHead": "34eafa28f04f3c68e3896173b00b20a0ba7a3438",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "207c8eacfe9f868f040a2dbdfaff8bb21b112d77a9b9df93c4bd15b0a3aae56f", "rawFileSha256": "c25638dc467bec9f9ec1eddbb28c533e1fe2662371de3143ce68d7fd4104f9b2" }
+      "handoffCapsuleIntegrity": { "canonicalSha256": "c6df85347ac3c48d6e213b9c51a1941c6b9f8117d0087b5bbd46ab1845c4788f", "rawFileSha256": "a3b50136ba609a27ef05db08e38959422d6f56da0b003ad72487a90a85a5d01d" }
     }
   },
   "currentChange": {
@@ -120,28 +120,28 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 9,
-      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "3.1", "3.2"],
-      "readyTaskIds": ["2.4"],
-      "nextTaskId": "2.4"
+      "completedTasks": 10,
+      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "3.1", "3.2"],
+      "readyTaskIds": ["3.3"],
+      "nextTaskId": "3.3"
     },
     "currentTask": {
-      "id": "2.4",
-      "locked": false,
-      "activationAuthorized": true,
-      "parallelReadyTaskIds": ["2.4"],
-      "authorizedScope": "Task 2.4 G5 completed zero-compaction handoff acceptance and is the sole active apply owner only within its exact capsule scope. Library Task 3.2 remains accepted with no Library successor product task activated."
+      "id": "3.3",
+      "locked": true,
+      "activationAuthorized": false,
+      "parallelReadyTaskIds": ["3.3"],
+      "authorizedScope": "Task 2.4 is accepted and merged. Task 3.3 is registered but locked until Controller creates its real worktree and visible thread and that successor passes zero-compaction handoff acceptance."
     }
   },
   "latestDirectCheckpoint": {
-    "lane": "creation",
-    "event": "TASK_2_4_G5_HANDOFF_ACCEPTED_AND_ACTIVATED",
-    "implementationCommit": "c0c7e2cbcd04ede9b8614c48242665cd26020f1c",
-    "controllerMergeCommit": "89dc4cd83e27e53088eca16af9c8e64a5d969c1a",
-    "taskStateCommit": "fa48efba54f90aeb4082c691da859647362fcd90",
-    "openspecProgress": "9/33",
-    "nextTaskIds": ["2.4"],
-    "verification": "Creation Task 2.3 focused regressions passed 22/22. Its original pnpm command also ran the whole Creation suite and retains five out-of-scope old failures (MCP edit inputs 3; provider-response 429/503 retry disposition 2), so no full-suite-green claim is made. Creation G5 Task 2.4 handoff acceptance passed validator 19 checks with zero observable compactions and clean Git; it is now the sole apply owner."
+    "lane": "creation-and-library",
+    "event": "TASK_2_4_ACCEPTED_TASK_3_3_REGISTERED_LOCKED",
+    "implementationCommit": "8d595d50def843e37a97772df5b1f0bb05c21c9d",
+    "controllerMergeCommit": "0d0d58561ba15f85aa3a290a3b0afe5eafab1c88",
+    "taskStateCommit": "34eafa28f04f3c68e3896173b00b20a0ba7a3438",
+    "openspecProgress": "10/33",
+    "nextTaskIds": ["3.3"],
+    "verification": "Task 2.4 Foundation typecheck passed, Foundation tests passed 56/56, and Creation focused regressions passed 14/14. Creation's full suite retains five known out-of-scope old failures; Creation typecheck retains documented old edit/Trash contract debt including the existing executor FormData branch, so neither is claimed green. Task 3.3 is registered and locked pending a real worker worktree, visible thread, and zero-compaction handoff acceptance."
   },
   "currentBlockers": [],
   "approvedDeviations": [
@@ -175,6 +175,7 @@
       ".codex/routego-program/evidence/streamline-1.4.json",
       ".codex/routego-program/evidence/streamline-2.2.json",
       ".codex/routego-program/evidence/streamline-2.3.json",
+      ".codex/routego-program/evidence/streamline-2.4.json",
       ".codex/routego-program/evidence/streamline-3.2.json"
     ]
   }
