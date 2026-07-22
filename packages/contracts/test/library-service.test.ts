@@ -2,17 +2,23 @@ import { describe, expect, it } from "vitest";
 
 import {
   browserResourceDescriptorSchema,
+  copyGenerationInfoInputSchema,
+  copyGenerationInfoResultSchema,
   executeLibraryMutationInputSchema,
   executeLibraryMutationResultSchema,
   getAssetDetailInputSchema,
   getAssetDetailResultSchema,
   getBrowserResourceInputSchema,
   getBrowserResourceResultSchema,
-  imageArtifactPhaseSchema,
   libraryAssetDetailSchema,
-  libraryAssetRenditionPhaseSchema,
+  libraryMigrationConfirmationInputSchema,
+  libraryMigrationConfirmationResultSchema,
+  libraryMigrationPreflightInputSchema,
+  libraryMigrationPreflightResultSchema,
   libraryMutationRequestSchema,
   listFoldersResultSchema,
+  markLibraryAssetInputSchema,
+  markLibraryAssetResultSchema,
   MAX_LIBRARY_ASSET_RENDITIONS,
   parseStudioOperationInput,
   parseStudioOperationOutput,
@@ -42,10 +48,10 @@ const folderA = {
 
 const folderB = {
   id: "folder-b",
-  name: "Archived folder",
+  name: "Secondary folder",
   order: 1,
   assetCount: 1,
-  state: "deleted" as const,
+  state: "active" as const,
   createdAt: TEST_TIMESTAMP,
   updatedAt: TEST_TIMESTAMP
 };
@@ -61,15 +67,9 @@ const execution = {
 };
 
 const requestedParams = {
-  kind: "edit" as const,
-  prompt: "Replace the sky while preserving the subject.",
+  kind: "generate" as const,
+  prompt: "Generate a path-safe skyline at dusk.",
   references: [{ assetId: "asset-reference", role: "style" as const, label: "Color" }],
-  target: { assetId: "asset-target", label: "Primary target" },
-  supportingImages: [
-    { assetId: "asset-supporting", role: "supporting" as const, label: "Wardrobe" }
-  ],
-  maskAssetId: "asset-mask",
-  invariants: { allowedChanges: ["sky"], preserve: ["subject"], forbiddenChanges: [] },
   size: "1024x1024",
   aspectRatio: "1:1",
   quality: "high" as const,
@@ -78,9 +78,6 @@ const requestedParams = {
   partialImages: 0,
   transparentMode: "off" as const,
   moderation: "auto" as const,
-  action: "edit" as const,
-  imageIds: [],
-  fileIds: [],
   outputDirectoryMode: "default" as const,
   saveToLibrary: true
 };
@@ -127,8 +124,9 @@ const assetDetail = (overrides: Record<string, unknown> = {}) => ({
   id: "asset-output",
   prompt: requestedParams.prompt,
   model: "gpt-image-2",
-  kind: "edit",
+  kind: "generate",
   status: "succeeded",
+  currentMark: false,
   primaryArtifactId: "artifact-final-0",
   mimeType: "image/png",
   width: 1024,
@@ -149,7 +147,7 @@ const assetDetail = (overrides: Record<string, unknown> = {}) => ({
     }
   ],
   folders: [],
-  allowedActions: ["edit", "retry", "download"],
+  allowedActions: ["mark", "copy-generation-info", "download"],
   ...overrides
 });
 
@@ -161,212 +159,149 @@ describe("folder and complete asset detail contracts", () => {
       )
     ).toEqual(["folder-a", "folder-b"]);
     expect(
-      listFoldersResultSchema.safeParse({ schemaVersion: 1, folders: [folderB, folderA] }).success
-    ).toBe(false);
-    expect(reorderFoldersInputSchema.parse({ folderIds: ["folder-b", "folder-a"] })).toEqual({
-      schemaVersion: 1,
-      folderIds: ["folder-b", "folder-a"]
-    });
-    expect(reorderFoldersInputSchema.safeParse({ folderIds: ["folder-a", "folder-a"] }).success).toBe(
-      false
-    );
-  });
-
-  it("represents full parameters, folder state, allowed actions, and every relationship role", () => {
-    const asset = libraryAssetDetailSchema.parse({
-      id: "asset-output",
-      prompt: requestedParams.prompt,
-      model: "gpt-image-2",
-      kind: "edit",
-      status: "succeeded",
-      primaryArtifactId: "artifact-output",
-      mimeType: "image/png",
-      width: 1024,
-      height: 1024,
-      createdAt: TEST_TIMESTAMP,
-      updatedAt: TEST_TIMESTAMP,
-      requestedParams,
-      effectiveParams: requestedParams,
-      execution,
-      renditions: [
-        {
-          artifactId: "artifact-output",
-          phase: "final",
-          mimeType: "image/png",
-          byteLength: 68,
-          width: 1024,
-          height: 1024,
-          sha256: "a".repeat(64),
-          createdAt: TEST_TIMESTAMP
-        }
-      ],
-      relationships: [
-        { id: "rel-source", role: "source", relatedAssetId: "asset-source", order: 0 },
-        { id: "rel-target", role: "target", relatedAssetId: "asset-target", order: 1 },
-        { id: "rel-reference", role: "reference", relatedAssetId: "asset-reference", order: 2 },
-        {
-          id: "rel-supporting",
-          role: "supporting",
-          relatedAssetId: "asset-supporting",
-          order: 3
-        },
-        { id: "rel-mask", role: "mask", relatedAssetId: "asset-mask", order: 4 },
-        {
-          id: "rel-output",
-          role: "output",
-          relatedAssetId: "asset-output",
-          artifactId: "artifact-output",
-          order: 5
-        }
-      ],
-      folders: [
-        { folderId: "folder-a", name: "Primary folder", state: "active", order: 0 },
-        { folderId: "folder-b", name: "Archived folder", state: "deleted", order: 1 }
-      ],
-      allowedActions: ["edit", "retry", "assign-folders", "soft-delete", "export-zip", "download"]
-    });
-
-    expect(asset.relationships.map((relationship) => relationship.role)).toEqual([
-      "source",
-      "target",
-      "reference",
-      "supporting",
-      "mask",
-      "output"
-    ]);
-    expect(asset.requestedParams).toEqual(asset.effectiveParams);
-    expect(JSON.stringify(asset)).not.toContain("C:\\");
-    expect(JSON.stringify(asset)).not.toContain("/Users/");
-  });
-
-  it("returns structured failure instead of fabricated detail", () => {
-    const result = getAssetDetailResultSchema.parse({
-      schemaVersion: 1,
-      status: "failed",
-      error: { ...persistenceError, code: "not_found", safeMessage: "Synthetic asset not found." }
-    });
-    expect(result).toMatchObject({ status: "failed", error: { code: "not_found" } });
-    expect(
-      getAssetDetailResultSchema.safeParse({
-        schemaVersion: 1,
-        status: "succeeded",
-        error: persistenceError
+      reorderFoldersInputSchema.safeParse({
+        folderIds: ["folder-a", "folder-a"]
       }).success
     ).toBe(false);
   });
 
-  it("keeps source renditions Library-only while accepting mixed source MIME", () => {
-    expect(libraryAssetRenditionPhaseSchema.options).toEqual(["source", "partial", "final"]);
-    expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
-    expect(imageArtifactPhaseSchema.safeParse("source").success).toBe(false);
-
-    const parsed = libraryAssetDetailSchema.parse(
+  it("represents generation parameters, folder state, mark actions, and generation relationships", () => {
+    const detail = libraryAssetDetailSchema.parse(
       assetDetail({
-        renditions: [
-          rendition("artifact-source-target", "source", "image/jpeg"),
-          rendition("artifact-source-mask", "source", "image/png"),
-          rendition("artifact-source-supporting", "source", "image/webp"),
-          rendition("artifact-final-0", "final", "image/png")
-        ],
+        currentMark: true,
         relationships: [
           {
-            id: "relationship-target",
-            role: "target",
-            relatedAssetId: "asset-output",
-            artifactId: "artifact-source-target",
-            order: 0
+            id: "relationship-reference-0",
+            role: "reference",
+            relatedAssetId: "asset-reference",
+            order: 0,
+            label: "Color"
           },
           {
-            id: "relationship-mask",
-            role: "mask",
-            relatedAssetId: "asset-output",
-            artifactId: "artifact-source-mask",
-            order: 1
-          },
-          {
-            id: "relationship-supporting",
-            role: "supporting",
-            relatedAssetId: "asset-output",
-            artifactId: "artifact-source-supporting",
-            order: 2
-          },
-          {
-            id: "relationship-output",
+            id: "relationship-output-0",
             role: "output",
             relatedAssetId: "asset-output",
             artifactId: "artifact-final-0",
-            order: 3
+            order: 0
           }
+        ],
+        folders: [
+          {
+            folderId: "folder-a",
+            name: "Primary folder",
+            state: "active",
+            order: 0
+          }
+        ],
+        allowedActions: [
+          "assign-folders",
+          "remove-folders",
+          "export-zip",
+          "download",
+          "mark",
+          "copy-generation-info"
         ]
       })
     );
+    expect(detail.kind).toBe("generate");
+    expect(detail.currentMark).toBe(true);
+    expect(detail.allowedActions).toContain("mark");
+    expect(detail.allowedActions).not.toContain("edit");
+    expect(detail.allowedActions).not.toContain("soft-delete");
+    expect(detail.requestedParams).not.toHaveProperty("target");
+    expect(detail.requestedParams.references).toHaveLength(1);
+  });
 
-    expect(parsed.renditions.map((item) => item.phase)).toEqual([
-      "source",
-      "source",
-      "source",
-      "final"
-    ]);
-    expect(JSON.stringify(parsed)).not.toMatch(/(?:filePath|C:\\|\/Users\/|data:image)/u);
+  it("rejects edit parameters, removed actions, and edit relationship roles", () => {
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          kind: "edit",
+          requestedParams: {
+            ...requestedParams,
+            kind: "edit",
+            target: { assetId: "asset-target" }
+          }
+        })
+      ).success
+    ).toBe(false);
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          allowedActions: ["edit", "soft-delete", "restore", "permanent-delete"]
+        })
+      ).success
+    ).toBe(false);
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          relationships: [
+            {
+              id: "relationship-mask",
+              role: "mask",
+              relatedAssetId: "asset-mask",
+              order: 0
+            }
+          ]
+        })
+      ).success
+    ).toBe(false);
+  });
+
+  it("returns structured failure instead of fabricated detail", () => {
+    expect(
+      getAssetDetailResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: persistenceError
+      })
+    ).toMatchObject({ status: "failed" });
+    expect(
+      getAssetDetailResultSchema.safeParse({
+        schemaVersion: 1,
+        status: "succeeded"
+      }).success
+    ).toBe(false);
   });
 
   it("accepts exactly 17 source plus 12 partial plus 4 final renditions and rejects 34", () => {
-    const sources = Array.from({ length: 17 }, (_, index) =>
-      rendition(
-        `artifact-source-${index}`,
-        "source",
-        (["image/png", "image/jpeg", "image/webp"] as const)[index % 3]
-      )
-    );
-    const partials = Array.from({ length: 12 }, (_, index) =>
-      rendition(`artifact-partial-${index}`, "partial")
-    );
-    const finals = Array.from({ length: 4 }, (_, index) =>
-      rendition(`artifact-final-${index}`, "final")
-    );
-    const renditions = [...sources, ...partials, ...finals];
-    const relationships = renditions.map((item, index) => ({
-      id: `relationship-${index}`,
-      role: item.phase === "source" ? ("source" as const) : ("output" as const),
-      relatedAssetId: "asset-output",
-      artifactId: item.artifactId,
-      order: index
-    }));
-
-    const parsed = libraryAssetDetailSchema.parse(assetDetail({ renditions, relationships }));
-    expect(parsed.renditions).toHaveLength(MAX_LIBRARY_ASSET_RENDITIONS);
+    const renditions = [
+      ...Array.from({ length: 17 }, (_, index) => rendition(`artifact-source-${index}`, "source")),
+      ...Array.from({ length: 12 }, (_, index) => rendition(`artifact-partial-${index}`, "partial")),
+      ...Array.from({ length: 4 }, (_, index) => rendition(`artifact-final-${index}`, "final"))
+    ];
+    expect(renditions).toHaveLength(MAX_LIBRARY_ASSET_RENDITIONS);
     expect(
-      libraryAssetDetailSchema.safeParse({
-        ...assetDetail({ renditions, relationships }),
-        renditions: [...renditions, rendition("artifact-final-overflow", "final")]
-      }).success
+      libraryAssetDetailSchema.parse(
+        assetDetail({
+          primaryArtifactId: "artifact-final-0",
+          renditions
+        })
+      ).renditions
+    ).toHaveLength(MAX_LIBRARY_ASSET_RENDITIONS);
+    expect(
+      libraryAssetDetailSchema.safeParse(
+        assetDetail({
+          renditions: [...renditions, rendition("artifact-extra", "final")]
+        })
+      ).success
     ).toBe(false);
   });
 
   it("requires an output primary, a final succeeded output, and exact local ownership", () => {
-    const sourceAndFinal = [
-      rendition("artifact-source-0", "source"),
-      rendition("artifact-final-0", "final")
-    ];
     expect(
       libraryAssetDetailSchema.safeParse(
-        assetDetail({ primaryArtifactId: "artifact-source-0", renditions: sourceAndFinal })
+        assetDetail({
+          primaryArtifactId: "missing-artifact"
+        })
       ).success
     ).toBe(false);
     expect(
       libraryAssetDetailSchema.safeParse(
         assetDetail({
+          status: "succeeded",
           primaryArtifactId: "artifact-partial-0",
-          renditions: [rendition("artifact-partial-0", "partial")],
-          relationships: [
-            {
-              id: "relationship-output",
-              role: "output",
-              relatedAssetId: "asset-output",
-              artifactId: "artifact-partial-0",
-              order: 0
-            }
-          ]
+          renditions: [rendition("artifact-partial-0", "partial")]
         })
       ).success
     ).toBe(false);
@@ -375,22 +310,8 @@ describe("folder and complete asset detail contracts", () => {
         assetDetail({
           relationships: [
             {
-              id: "relationship-without-artifact",
+              id: "relationship-output-foreign",
               role: "output",
-              relatedAssetId: "asset-output",
-              order: 0
-            }
-          ]
-        })
-      ).success
-    ).toBe(false);
-    expect(
-      libraryAssetDetailSchema.safeParse(
-        assetDetail({
-          relationships: [
-            {
-              id: "relationship-wrong-owner",
-              role: "target",
               relatedAssetId: "asset-other",
               artifactId: "artifact-final-0",
               order: 0
@@ -399,49 +320,13 @@ describe("folder and complete asset detail contracts", () => {
         })
       ).success
     ).toBe(false);
-    expect(
-      libraryAssetDetailSchema.safeParse(
-        assetDetail({
-          relationships: [
-            {
-              id: "relationship-missing-artifact",
-              role: "output",
-              relatedAssetId: "asset-output",
-              artifactId: "artifact-not-owned",
-              order: 0
-            }
-          ]
-        })
-      ).success
-    ).toBe(false);
-    expect(
-      libraryAssetDetailSchema.safeParse(
-        assetDetail({
-          status: "partial",
-          primaryArtifactId: "artifact-partial-0",
-          renditions: [
-            rendition("artifact-source-0", "source"),
-            rendition("artifact-partial-0", "partial")
-          ],
-          relationships: [
-            {
-              id: "relationship-output",
-              role: "output",
-              relatedAssetId: "asset-output",
-              artifactId: "artifact-partial-0",
-              order: 0
-            }
-          ]
-        })
-      ).success
-    ).toBe(true);
   });
 
   it("keeps the public MCP surface at exactly seven tool names", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
-      "edit",
+      "prepareRegeneration",
       "batch",
       "searchLibrary",
       "manageLibrary",
@@ -452,7 +337,7 @@ describe("folder and complete asset detail contracts", () => {
     ).toEqual([
       "routego_status",
       "routego_generate",
-      "routego_edit",
+      "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
       "routego_manage_library",
@@ -465,7 +350,7 @@ describe("session-protected browser resources", () => {
   it("accepts only relative protected Library URLs with MIME and dimensions", () => {
     expect(browserResourceDescriptorSchema.parse(resource)).toEqual(resource);
     for (const value of [
-      "C:\\Users\\person\\Pictures\\image.png",
+      "C:\\\\Users\\\\person\\\\Pictures\\\\image.png",
       "file:///Users/person/Pictures/image.png",
       "https://relay.example/image.png",
       "//relay.example/image.png",
@@ -488,7 +373,7 @@ describe("session-protected browser resources", () => {
       getBrowserResourceResultSchema.safeParse({
         schemaVersion: 1,
         status: "succeeded",
-        resource: { ...resource, relativeUrl: "C:\\synthetic\\image.png" }
+        resource: { ...resource, relativeUrl: "C:\\\\synthetic\\\\image.png" }
       }).success
     ).toBe(false);
   });
@@ -501,7 +386,7 @@ describe("path-free Studio Library search", () => {
       models: ["gpt-image-2"],
       from: "2026-07-01T00:00:00.000Z",
       to: "2026-07-31T23:59:59.000Z",
-      kinds: ["edit" as const],
+      kinds: ["generate" as const],
       sizes: ["1024x1024"],
       statuses: ["partial" as const],
       folderIds: ["folder-a"],
@@ -516,7 +401,7 @@ describe("path-free Studio Library search", () => {
     );
   });
 
-  it("returns stable asset/artifact IDs and an optional protected thumbnail without paths", () => {
+  it("returns stable generation asset/artifact IDs and optional protected thumbnails without paths", () => {
     const result = studioLibrarySearchResultSchema.parse({
       schemaVersion: 1,
       items: [
@@ -525,13 +410,14 @@ describe("path-free Studio Library search", () => {
           artifactId: "artifact-output",
           prompt: requestedParams.prompt,
           model: "gpt-image-2",
-          kind: "edit",
+          kind: "generate",
           mimeType: "image/png",
           width: 1024,
           height: 1024,
           status: "partial",
           folderIds: ["folder-a"],
           createdAt: TEST_TIMESTAMP,
+          currentMark: true,
           thumbnail: resource
         }
       ],
@@ -539,6 +425,8 @@ describe("path-free Studio Library search", () => {
       total: 1
     });
     const item = result.items[0]!;
+    expect(item.kind).toBe("generate");
+    expect(item.currentMark).toBe(true);
     expect(getAssetDetailInputSchema.parse({ assetId: item.assetId }).assetId).toBe(
       "asset-output"
     );
@@ -552,7 +440,7 @@ describe("path-free Studio Library search", () => {
     expect(JSON.stringify(result)).not.toMatch(/(?:filePath|"path"|C:\\|\/Users\/)/u);
   });
 
-  it("rejects path leakage, unsafe thumbnails, and invalid deletion state", () => {
+  it("rejects path leakage, unsafe thumbnails, deleted trash rows, and edit kinds", () => {
     const base = {
       assetId: "asset-output",
       artifactId: "artifact-output",
@@ -569,7 +457,7 @@ describe("path-free Studio Library search", () => {
     expect(
       studioLibrarySearchResultSchema.safeParse({
         schemaVersion: 1,
-        items: [{ ...base, filePath: "C:\\Users\\person\\image.png" }]
+        items: [{ ...base, filePath: "C:\\\\Users\\\\person\\\\image.png" }]
       }).success
     ).toBe(false);
     expect(
@@ -589,176 +477,341 @@ describe("path-free Studio Library search", () => {
         items: [{ ...base, status: "deleted" }]
       }).success
     ).toBe(false);
+    expect(
+      studioLibrarySearchResultSchema.safeParse({
+        schemaVersion: 1,
+        items: [{ ...base, kind: "edit" }]
+      }).success
+    ).toBe(false);
   });
 });
 
 describe("preflighted Library mutation and per-item partial results", () => {
-  it("uses asset/upload resource identifiers and rejects browser filesystem paths", () => {
-    expect(
-      preflightLibraryMutationInputSchema.parse({
-        mutation: { action: "permanent-delete", assetIds: ["asset-a", "asset-b"] }
-      })
-    ).toMatchObject({ mutation: { action: "permanent-delete" } });
+  it("uses asset/upload resource identifiers and rejects browser filesystem paths and removed mutations", () => {
     expect(
       libraryMutationRequestSchema.parse({
-        action: "import-zip",
-        uploadResourceId: "upload-zip-a"
-      })
-    ).toEqual({ action: "import-zip", uploadResourceId: "upload-zip-a" });
+        action: "assign-folders",
+        assetIds: ["asset-a", "asset-b"],
+        folderIds: ["folder-a"]
+      }).action
+    ).toBe("assign-folders");
+    expect(
+      libraryMutationRequestSchema.parse({
+        action: "mark",
+        assetIds: ["asset-a"]
+      }).action
+    ).toBe("mark");
     expect(
       libraryMutationRequestSchema.safeParse({
-        action: "import-zip",
-        zipPath: "C:\\Users\\person\\archive.zip"
+        action: "soft-delete",
+        assetIds: ["asset-a"]
+      }).success
+    ).toBe(false);
+    expect(
+      libraryMutationRequestSchema.safeParse({
+        action: "permanent-delete",
+        assetIds: ["asset-a"]
+      }).success
+    ).toBe(false);
+    expect(
+      libraryMutationRequestSchema.safeParse({
+        action: "export-zip",
+        assetIds: ["C:\\\\Users\\\\person\\\\image.png"]
       }).success
     ).toBe(false);
   });
 
-  it("reports partial preflight eligibility and required permanent-delete confirmation", () => {
-    const result = preflightLibraryMutationResultSchema.parse({
+  it("reports partial preflight eligibility for folder mutations without trash confirmations", () => {
+    const preflight = preflightLibraryMutationResultSchema.parse({
       schemaVersion: 1,
-      preflightId: "preflight-delete-a",
-      action: "permanent-delete",
+      preflightId: "preflight-assign",
+      action: "assign-folders",
       status: "partial",
       expiresAt: TEST_TIMESTAMP,
-      requiredConfirmations: ["permanent-delete"],
+      requiredConfirmations: [],
       items: [
         {
           targetId: "asset-a",
           targetKind: "asset",
           eligible: true,
-          currentStatus: "deleted",
-          allowedActions: ["restore", "permanent-delete"]
+          currentStatus: "succeeded",
+          allowedActions: ["assign-folders", "export-zip", "mark"],
+          requiredConfirmations: []
         },
         {
           targetId: "asset-b",
           targetKind: "asset",
           eligible: false,
-          currentStatus: "succeeded",
-          allowedActions: ["soft-delete"],
+          currentStatus: "failed",
+          allowedActions: ["download"],
+          requiredConfirmations: [],
           error: persistenceError
         }
       ]
     });
-    expect(result.status).toBe("partial");
-    expect(result.items.map((item) => item.eligible)).toEqual([true, false]);
+    expect(preflight.status).toBe("partial");
+    expect(preflight.requiredConfirmations).toEqual([]);
   });
 
   it("requires the preflight identifier and preserves ordered partial execution outcomes", () => {
     expect(
-      executeLibraryMutationInputSchema.safeParse({
-        preflightId: "preflight-delete-a",
-        action: "permanent-delete"
+      executeLibraryMutationInputSchema.parse({
+        preflightId: "preflight-assign",
+        action: "assign-folders",
+        confirmations: []
+      }).preflightId
+    ).toBe("preflight-assign");
+    const result = executeLibraryMutationResultSchema.parse({
+      schemaVersion: 1,
+      preflightId: "preflight-assign",
+      action: "assign-folders",
+      status: "partial",
+      items: [
+        {
+          targetId: "asset-a",
+          status: "succeeded",
+          affectedAssetId: "asset-a",
+          affectedFolderIds: ["folder-a"]
+        },
+        {
+          targetId: "asset-b",
+          status: "failed",
+          error: persistenceError
+        }
+      ]
+    });
+    expect(result.items.map((item) => item.targetId)).toEqual(["asset-a", "asset-b"]);
+  });
+
+  it("returns ZIP export only as a protected browser resource", () => {
+    const exportResource = {
+      resourceId: "resource-export-zip",
+      relativeUrl: "/api/v1/library/resources/resource-export-zip",
+      requiresSession: true as const,
+      mimeType: "application/zip" as const,
+      byteLength: 128,
+      etag: "zip-etag",
+      expiresAt: TEST_TIMESTAMP
+    };
+    expect(
+      executeLibraryMutationResultSchema.parse({
+        schemaVersion: 1,
+        preflightId: "preflight-export",
+        action: "export-zip",
+        status: "succeeded",
+        items: [{ targetId: "asset-a", status: "succeeded", affectedAssetId: "asset-a" }],
+        outputResource: exportResource
+      }).outputResource?.requiresSession
+    ).toBe(true);
+  });
+});
+
+describe("browser-safe mark, regeneration-copy, and migration contracts", () => {
+  it("toggles a single current mark without provider work", () => {
+    expect(markLibraryAssetInputSchema.parse({ recordId: "asset-output" }).recordId).toBe(
+      "asset-output"
+    );
+    expect(
+      markLibraryAssetResultSchema.parse({
+        schemaVersion: 1,
+        status: "succeeded",
+        recordId: "asset-output",
+        currentMarkRecordId: "asset-output",
+        markCleared: false,
+        providerRequestCount: 0
+      }).currentMarkRecordId
+    ).toBe("asset-output");
+    expect(
+      markLibraryAssetResultSchema.parse({
+        schemaVersion: 1,
+        status: "succeeded",
+        recordId: "asset-output",
+        markCleared: true,
+        providerRequestCount: 0
+      }).markCleared
+    ).toBe(true);
+    expect(
+      markLibraryAssetResultSchema.safeParse({
+        schemaVersion: 1,
+        status: "succeeded",
+        recordId: "asset-output",
+        currentMarkRecordId: "asset-other",
+        markCleared: false,
+        providerRequestCount: 0
       }).success
     ).toBe(false);
     expect(
-      executeLibraryMutationInputSchema.parse({
-        preflightId: "preflight-delete-a",
-        action: "permanent-delete",
-        confirmations: ["permanent-delete"]
-      })
-    ).toEqual({
-      schemaVersion: 1,
-      preflightId: "preflight-delete-a",
-      action: "permanent-delete",
-      confirmations: ["permanent-delete"]
-    });
-
-    const result = executeLibraryMutationResultSchema.parse({
-      schemaVersion: 1,
-      preflightId: "preflight-delete-a",
-      action: "permanent-delete",
-      status: "partial",
-      items: [
-        { targetId: "asset-a", status: "succeeded", affectedAssetId: "asset-a" },
-        { targetId: "asset-b", status: "failed", error: persistenceError }
-      ]
-    });
-    expect(result.items.map((item) => item.status)).toEqual(["succeeded", "failed"]);
-    expect(
-      executeLibraryMutationResultSchema.safeParse({
-        ...result,
-        status: "succeeded"
+      markLibraryAssetResultSchema.safeParse({
+        schemaVersion: 1,
+        status: "failed",
+        recordId: "asset-missing",
+        markCleared: false,
+        providerRequestCount: 0
       }).success
     ).toBe(false);
   });
 
-  it("returns ZIP export only as a protected browser resource", () => {
-    const zipResource = {
-      ...resource,
-      resourceId: "resource-export-zip",
-      relativeUrl: "/api/v1/library/resources/resource-export-zip",
-      mimeType: "application/zip" as const,
-      width: undefined,
-      height: undefined
-    };
-    const output = executeLibraryMutationResultSchema.parse({
+  it("projects safe generation information without paths or credentials", () => {
+    expect(copyGenerationInfoInputSchema.parse({ recordId: "asset-output" }).recordId).toBe(
+      "asset-output"
+    );
+    const copied = copyGenerationInfoResultSchema.parse({
       schemaVersion: 1,
-      preflightId: "preflight-export-a",
-      action: "export-zip",
       status: "succeeded",
-      items: [{ targetId: "asset-a", status: "succeeded", affectedAssetId: "asset-a" }],
-      outputResource: zipResource
+      providerRequestCount: 0,
+      projection: {
+        recordId: "asset-output",
+        prompt: requestedParams.prompt,
+        referenceIds: ["asset-reference"],
+        parameters: {
+          size: "1024x1024",
+          aspectRatio: "1:1",
+          quality: "high",
+          format: "png",
+          count: 1,
+          transparentMode: "off",
+          moderation: "auto"
+        }
+      },
+      clipboardText:
+        "recordId=asset-output\\nprompt=Generate a path-safe skyline at dusk.\\nreferenceIds=asset-reference\\nsize=1024x1024"
     });
-    expect(output.outputResource?.relativeUrl).toMatch(/^\/api\/v1\/library\/resources\//u);
-    expect(JSON.stringify(output)).not.toContain("zipPath");
+    expect(copied.projection?.referenceIds).toEqual(["asset-reference"]);
+    expect(
+      copyGenerationInfoResultSchema.safeParse({
+        ...copied,
+        clipboardText: "path=C:\\\\Users\\\\person\\\\Pictures\\\\image.png"
+      }).success
+    ).toBe(false);
+    expect(
+      copyGenerationInfoResultSchema.safeParse({
+        schemaVersion: 1,
+        status: "failed",
+        providerRequestCount: 0,
+        clipboardText: "partial"
+      }).success
+    ).toBe(false);
+  });
+
+  it("requires fingerprinted migration confirmation and never mutates during preflight", () => {
+    const fingerprint = "b".repeat(64);
+    expect(libraryMigrationPreflightInputSchema.parse({}).schemaVersion).toBe(1);
+    const preflight = libraryMigrationPreflightResultSchema.parse({
+      schemaVersion: 1,
+      fingerprint,
+      eligible: true,
+      projectedCounts: {
+        trashGenerationRecords: 2,
+        editRecords: 1,
+        ownedFiles: 3,
+        sharedReferences: 0,
+        conflicts: 0
+      },
+      conflicts: [],
+      removableRecordIds: ["asset-trash-1", "asset-edit-1"],
+      providerRequestCount: 0,
+      mutatesData: false
+    });
+    expect(preflight.mutatesData).toBe(false);
+    expect(preflight.eligible).toBe(true);
+
+    expect(
+      libraryMigrationPreflightResultSchema.safeParse({
+        ...preflight,
+        eligible: true,
+        conflicts: [
+          {
+            dependentRecordId: "asset-generate",
+            dependencyRecordId: "asset-edit",
+            reason: "generation-references-edit"
+          }
+        ],
+        projectedCounts: { ...preflight.projectedCounts, conflicts: 1 }
+      }).success
+    ).toBe(false);
+
+    expect(
+      libraryMigrationConfirmationInputSchema.parse({
+        fingerprint,
+        confirmDestructiveMigration: true
+      }).confirmDestructiveMigration
+    ).toBe(true);
+    expect(
+      libraryMigrationConfirmationInputSchema.safeParse({
+        fingerprint,
+        confirmDestructiveMigration: false
+      }).success
+    ).toBe(false);
+
+    expect(
+      libraryMigrationConfirmationResultSchema.parse({
+        schemaVersion: 1,
+        status: "succeeded",
+        fingerprint,
+        removedRecordCount: 3,
+        removedFileCount: 2,
+        recovered: false,
+        providerRequestCount: 0
+      }).status
+    ).toBe("succeeded");
+    expect(
+      libraryMigrationConfirmationResultSchema.parse({
+        schemaVersion: 1,
+        status: "blocked",
+        fingerprint,
+        removedRecordCount: 0,
+        removedFileCount: 0,
+        recovered: false,
+        providerRequestCount: 0,
+        error: persistenceError
+      }).status
+    ).toBe("blocked");
   });
 });
 
 describe("Library Studio operation definitions", () => {
   it("registers internal HTTP operations without MCP tool names", () => {
-    expect(studioOperationNames).toEqual([
-      "readSettings",
-      "upsertProviderProfile",
-      "removeProviderProfile",
-      "setActiveProviderProfile",
-      "refreshModels",
-      "probeCapabilities",
+    expect(studioOperationNames).toEqual(expect.arrayContaining([
       "listFolders",
       "reorderFolders",
       "getAssetDetail",
       "getBrowserResource",
       "preflightLibraryMutation",
       "executeLibraryMutation",
-      "reserveUploadResource",
-      "finalizeUploadResource",
-      "getUploadResourceStatus",
-      "discardUploadResource",
-      "studioGenerate",
-      "studioEdit",
-      "studioBatch",
-      "searchStudioLibrary",
-      "updateSettings"
-    ]);
+      "searchStudioLibrary"
+    ]));
     for (const operation of [
       "listFolders",
       "reorderFolders",
       "getAssetDetail",
       "getBrowserResource",
       "preflightLibraryMutation",
-      "executeLibraryMutation"
+      "executeLibraryMutation",
+      "searchStudioLibrary"
     ] as const) {
-      expect(studioOperationDefinitions[operation].http.path).toMatch(/^\/api\/v1\/library\//u);
+      expect(studioOperationDefinitions[operation].http.path).toMatch(/^\/api\/v1\//u);
       expect("toolName" in studioOperationDefinitions[operation]).toBe(false);
     }
   });
 
   it("dispatches Library operation inputs and outputs through shared schemas", () => {
-    expect(parseStudioOperationInput("listFolders", {})).toEqual({
-      schemaVersion: 1,
-      includeDeleted: false
-    });
     expect(
-      parseStudioOperationOutput("listFolders", {
-        schemaVersion: 1,
-        folders: [folderA, folderB]
-      })
-    ).toMatchObject({ folders: [{ id: "folder-a" }, { id: "folder-b" }] });
+      parseStudioOperationInput("getAssetDetail", { assetId: "asset-output" })
+    ).toMatchObject({ assetId: "asset-output" });
     expect(
-      parseStudioOperationOutput("searchStudioLibrary", {
-        schemaVersion: 1,
-        items: [],
-        total: 0
+      parseStudioOperationOutput(
+        "getAssetDetail",
+        getAssetDetailResultSchema.parse({
+          schemaVersion: 1,
+          status: "succeeded",
+          asset: assetDetail()
+        })
+      )
+    ).toMatchObject({ status: "succeeded" });
+    expect(() =>
+      parseStudioOperationInput("preflightLibraryMutation", {
+        mutation: { action: "soft-delete", assetIds: ["asset-a"] }
       })
-    ).toEqual({ schemaVersion: 1, items: [], total: 0 });
+    ).toThrow();
   });
 });

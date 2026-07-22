@@ -1,13 +1,15 @@
 import { z } from "zod";
 
-import { identifierSchema, routegoSchemaVersionSchema, timestampSchema } from "./common";
+import {
+  identifierSchema,
+  nonEmptyTextSchema,
+  routegoSchemaVersionSchema,
+  timestampSchema
+} from "./common";
 import { routegoServiceErrorSchema } from "./errors";
 import {
   aspectRatioSchema,
-  continuationActionSchema,
-  editInvariantsSchema,
   imageFormatSchema,
-  imageOperationKindSchema,
   imageQualitySchema,
   imageSizeSchema,
   moderationSchema,
@@ -125,13 +127,9 @@ export const libraryOutputDirectoryModeSchema = z.enum(["default", "custom"]);
 
 export const libraryOperationParametersSchema = z
   .object({
-    kind: imageOperationKindSchema,
+    kind: z.literal("generate"),
     prompt: z.string().trim().min(1).max(32_000),
-    references: z.array(libraryParameterImageSchema).max(16).default([]),
-    target: libraryTargetParameterSchema.optional(),
-    supportingImages: z.array(libraryParameterImageSchema).max(15).default([]),
-    maskAssetId: identifierSchema.optional(),
-    invariants: editInvariantsSchema.optional(),
+    references: z.array(libraryParameterImageSchema).max(5).default([]),
     size: imageSizeSchema,
     aspectRatio: aspectRatioSchema,
     quality: imageQualitySchema,
@@ -141,66 +139,16 @@ export const libraryOperationParametersSchema = z
     partialImages: z.number().int().min(0).max(3),
     transparentMode: transparentModeSchema,
     moderation: moderationSchema,
-    action: continuationActionSchema,
-    previousResponseId: identifierSchema.optional(),
-    imageIds: z.array(identifierSchema).max(16).default([]),
-    fileIds: z.array(identifierSchema).max(16).default([]),
     outputDirectoryMode: libraryOutputDirectoryModeSchema,
     saveToLibrary: z.boolean()
   })
   .strict()
   .superRefine((value, context) => {
-    const physicalInputs =
-      value.references.length + value.supportingImages.length + (value.target ? 1 : 0);
-    if (physicalInputs > 16) {
-      context.addIssue({
-        code: "custom",
-        path: ["references"],
-        message: "Library parameters can describe at most sixteen image inputs"
-      });
-    }
-
-    if (value.kind === "edit") {
-      if (!value.target) {
-        context.addIssue({
-          code: "custom",
-          path: ["target"],
-          message: "Edit parameters require a target asset"
-        });
-      }
-      if (!value.invariants) {
-        context.addIssue({
-          code: "custom",
-          path: ["invariants"],
-          message: "Edit parameters require edit invariants"
-        });
-      }
-    } else if (value.target || value.supportingImages.length > 0 || value.maskAssetId || value.invariants) {
-      context.addIssue({
-        code: "custom",
-        message: "Generate parameters cannot include edit-only assets or invariants"
-      });
-    }
-
-    if (value.maskAssetId && !value.target) {
-      context.addIssue({
-        code: "custom",
-        path: ["maskAssetId"],
-        message: "A mask asset requires an edit target"
-      });
-    }
-    if (value.action === "edit" && value.kind !== "edit") {
-      context.addIssue({
-        code: "custom",
-        path: ["action"],
-        message: "Continuation action edit requires edit parameters"
-      });
-    }
     if (value.compression !== undefined && value.format === "png") {
       context.addIssue({
         code: "custom",
         path: ["compression"],
-        message: "Compression percentage applies only to JPEG or WebP"
+        message: "Compression percentage applies only to JPEG or WebP output"
       });
     }
     if (value.transparentMode !== "off" && value.format !== "png") {
@@ -214,11 +162,9 @@ export const libraryOperationParametersSchema = z
 
 export const libraryAssetRelationshipRoleSchema = z.enum([
   "source",
-  "target",
   "reference",
-  "supporting",
-  "mask",
-  "output"
+  "output",
+  "transparent-original"
 ]);
 
 export const libraryAssetRelationshipSchema = z
@@ -250,15 +196,12 @@ export const libraryAssetRenditionSchema = z
   .strict();
 
 export const libraryAssetAllowedActionSchema = z.enum([
-  "edit",
-  "retry",
   "assign-folders",
   "remove-folders",
-  "soft-delete",
-  "restore",
-  "permanent-delete",
   "export-zip",
-  "download"
+  "download",
+  "mark",
+  "copy-generation-info"
 ]);
 
 export const libraryAssetFolderMembershipSchema = z
@@ -275,8 +218,9 @@ export const libraryAssetDetailSchema = z
     id: identifierSchema,
     prompt: z.string().max(32_000),
     model: z.string().trim().min(1).max(200),
-    kind: imageOperationKindSchema,
+    kind: z.literal("generate"),
     status: libraryAssetStatusSchema,
+    currentMark: z.boolean().default(false),
     primaryArtifactId: identifierSchema,
     mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]),
     width: z.number().int().min(1).max(65_535),
@@ -527,32 +471,18 @@ export const studioLibrarySearchItemSchema = z
     artifactId: identifierSchema,
     prompt: z.string().max(32_000),
     model: z.string().trim().min(1).max(200),
-    kind: imageOperationKindSchema,
+    kind: z.literal("generate"),
     mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]),
     width: z.number().int().min(1).max(65_535),
     height: z.number().int().min(1).max(65_535),
-    status: libraryAssetStatusSchema,
+    status: z.enum(["queued", "running", "succeeded", "partial", "failed"]),
     folderIds: z.array(identifierSchema).max(100),
     createdAt: timestampSchema,
-    deletedAt: timestampSchema.optional(),
+    currentMark: z.boolean().default(false),
     thumbnail: browserResourceDescriptorSchema.optional()
   })
   .strict()
   .superRefine((value, context) => {
-    if (value.status === "deleted" && value.deletedAt === undefined) {
-      context.addIssue({
-        code: "custom",
-        path: ["deletedAt"],
-        message: "Deleted Studio search items require deletedAt"
-      });
-    }
-    if (value.status !== "deleted" && value.deletedAt !== undefined) {
-      context.addIssue({
-        code: "custom",
-        path: ["deletedAt"],
-        message: "Only deleted Studio search items can include deletedAt"
-      });
-    }
     if (value.thumbnail && !value.thumbnail.mimeType.startsWith("image/")) {
       context.addIssue({
         code: "custom",
@@ -592,11 +522,9 @@ export const studioLibrarySearchResultSchema = z
 export const libraryMutationActionSchema = z.enum([
   "assign-folders",
   "remove-folders",
-  "soft-delete",
-  "restore",
-  "permanent-delete",
   "export-zip",
-  "import-zip"
+  "import-zip",
+  "mark"
 ]);
 
 const assetFolderMutationSchema = (action: "assign-folders" | "remove-folders") =>
@@ -608,9 +536,7 @@ const assetFolderMutationSchema = (action: "assign-folders" | "remove-folders") 
     })
     .strict();
 
-const assetMutationSchema = (
-  action: "soft-delete" | "restore" | "permanent-delete" | "export-zip"
-) =>
+const assetMutationSchema = (action: "export-zip") =>
   z
     .object({
       action: z.literal(action),
@@ -618,23 +544,27 @@ const assetMutationSchema = (
     })
     .strict();
 
+const markMutationSchema = z
+  .object({
+    action: z.literal("mark"),
+    assetIds: uniqueIdentifiersSchema(1, 1)
+  })
+  .strict();
+
 export const libraryMutationRequestSchema = z.discriminatedUnion("action", [
   assetFolderMutationSchema("assign-folders"),
   assetFolderMutationSchema("remove-folders"),
-  assetMutationSchema("soft-delete"),
-  assetMutationSchema("restore"),
-  assetMutationSchema("permanent-delete"),
   assetMutationSchema("export-zip"),
   z
     .object({
       action: z.literal("import-zip"),
       uploadResourceId: identifierSchema
     })
-    .strict()
+    .strict(),
+  markMutationSchema
 ]);
 
 export const libraryMutationConfirmationSchema = z.enum([
-  "permanent-delete",
   "zip-export",
   "zip-import"
 ]);
@@ -711,13 +641,11 @@ export const preflightLibraryMutationResultSchema = z
       });
     }
     const requiredForAction =
-      value.action === "permanent-delete"
-        ? "permanent-delete"
-        : value.action === "export-zip"
-          ? "zip-export"
-          : value.action === "import-zip"
-            ? "zip-import"
-            : undefined;
+      value.action === "export-zip"
+        ? "zip-export"
+        : value.action === "import-zip"
+          ? "zip-import"
+          : undefined;
     if (
       requiredForAction !== undefined &&
       !value.requiredConfirmations.includes(requiredForAction)
@@ -760,13 +688,11 @@ export const executeLibraryMutationInputSchema = z
   .strict()
   .superRefine((value, context) => {
     const requiredForAction =
-      value.action === "permanent-delete"
-        ? "permanent-delete"
-        : value.action === "export-zip"
-          ? "zip-export"
-          : value.action === "import-zip"
-            ? "zip-import"
-            : undefined;
+      value.action === "export-zip"
+        ? "zip-export"
+        : value.action === "import-zip"
+          ? "zip-import"
+          : undefined;
     if (requiredForAction !== undefined && !value.confirmations.includes(requiredForAction)) {
       context.addIssue({
         code: "custom",
@@ -862,6 +788,247 @@ export const executeLibraryMutationResultSchema = z
     }
   });
 
+
+const sha256FingerprintSchema = z
+  .string()
+  .regex(/^[a-f0-9]{64}$/u, "Migration fingerprint must be a lowercase SHA-256 hex digest");
+
+export const markLibraryAssetInputSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    recordId: identifierSchema
+  })
+  .strict();
+
+export const markLibraryAssetResultSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    status: z.enum(["succeeded", "failed"]),
+    recordId: identifierSchema,
+    currentMarkRecordId: identifierSchema.optional(),
+    markCleared: z.boolean(),
+    providerRequestCount: z.literal(0),
+    error: routegoServiceErrorSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.status === "succeeded") {
+      if (value.error) {
+        context.addIssue({
+          code: "custom",
+          path: ["error"],
+          message: "Successful mark results cannot include an error"
+        });
+      }
+      if (value.markCleared && value.currentMarkRecordId !== undefined) {
+        context.addIssue({
+          code: "custom",
+          path: ["currentMarkRecordId"],
+          message: "Cleared mark results cannot keep a current mark identity"
+        });
+      }
+      if (!value.markCleared && value.currentMarkRecordId !== value.recordId) {
+        context.addIssue({
+          code: "custom",
+          path: ["currentMarkRecordId"],
+          message: "Successful mark must set the current mark to the requested record"
+        });
+      }
+    }
+    if (value.status === "failed" && !value.error) {
+      context.addIssue({
+        code: "custom",
+        path: ["error"],
+        message: "Failed mark results require a structured error"
+      });
+    }
+  });
+
+export const copyGenerationInfoInputSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    recordId: identifierSchema
+  })
+  .strict();
+
+export const generationInfoProjectionSchema = z
+  .object({
+    recordId: identifierSchema,
+    prompt: nonEmptyTextSchema,
+    referenceIds: z.array(identifierSchema).max(5).default([]),
+    parameters: z
+      .object({
+        size: imageSizeSchema,
+        aspectRatio: aspectRatioSchema,
+        quality: imageQualitySchema,
+        format: imageFormatSchema,
+        compression: z.number().int().min(0).max(100).optional(),
+        count: z.number().int().min(1).max(4),
+        transparentMode: transparentModeSchema,
+        moderation: moderationSchema
+      })
+      .strict()
+  })
+  .strict();
+
+export const copyGenerationInfoResultSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    status: z.enum(["succeeded", "failed"]),
+    projection: generationInfoProjectionSchema.optional(),
+    clipboardText: z.string().trim().min(1).max(64_000).optional(),
+    providerRequestCount: z.literal(0),
+    error: routegoServiceErrorSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.status === "succeeded") {
+      if (!value.projection || !value.clipboardText || value.error) {
+        context.addIssue({
+          code: "custom",
+          path: ["status"],
+          message: "Successful copy results require projection, clipboard text, and no error"
+        });
+      } else {
+        const forbidden = /(?:[A-Za-z]:[\\/]|\\\\[A-Za-z]|\/Users\/|\/home\/|file:|Bearer\s|api[_-]?key|sk-[A-Za-z0-9]{10,}|data:image\/|base64,)/iu;
+        if (forbidden.test(value.clipboardText)) {
+          context.addIssue({
+            code: "custom",
+            path: ["clipboardText"],
+            message: "Clipboard text must not contain paths, credentials, or image bytes"
+          });
+        }
+      }
+    }
+    if (value.status === "failed") {
+      if (!value.error || value.projection || value.clipboardText) {
+        context.addIssue({
+          code: "custom",
+          path: ["status"],
+          message: "Failed copy results require a structured error and no partial clipboard payload"
+        });
+      }
+    }
+  });
+
+export const libraryMigrationPreflightInputSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1)
+  })
+  .strict();
+
+export const libraryMigrationConflictSchema = z
+  .object({
+    dependentRecordId: identifierSchema,
+    dependencyRecordId: identifierSchema,
+    reason: z.enum([
+      "generation-references-edit",
+      "shared-file-survives",
+      "unresolved-locator"
+    ])
+  })
+  .strict();
+
+export const libraryMigrationProjectedCountsSchema = z
+  .object({
+    trashGenerationRecords: z.number().int().min(0),
+    editRecords: z.number().int().min(0),
+    ownedFiles: z.number().int().min(0),
+    sharedReferences: z.number().int().min(0),
+    conflicts: z.number().int().min(0)
+  })
+  .strict();
+
+export const libraryMigrationPreflightResultSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    fingerprint: sha256FingerprintSchema,
+    eligible: z.boolean(),
+    projectedCounts: libraryMigrationProjectedCountsSchema,
+    conflicts: z.array(libraryMigrationConflictSchema).max(1_000).default([]),
+    removableRecordIds: z.array(identifierSchema).max(10_000).default([]),
+    providerRequestCount: z.literal(0),
+    mutatesData: z.literal(false),
+    error: routegoServiceErrorSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.projectedCounts.conflicts !== value.conflicts.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["projectedCounts", "conflicts"],
+        message: "Projected conflict count must match the conflict list length"
+      });
+    }
+    if (value.eligible && value.conflicts.length > 0) {
+      context.addIssue({
+        code: "custom",
+        path: ["eligible"],
+        message: "Eligible migration preflight cannot include conflicts"
+      });
+    }
+    if (!value.eligible && value.conflicts.length === 0 && !value.error) {
+      context.addIssue({
+        code: "custom",
+        path: ["eligible"],
+        message: "Blocked migration preflight requires conflicts or a structured error"
+      });
+    }
+  });
+
+export const libraryMigrationConfirmationInputSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    fingerprint: sha256FingerprintSchema,
+    confirmDestructiveMigration: z.literal(true)
+  })
+  .strict();
+
+export const libraryMigrationConfirmationResultSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    status: z.enum(["succeeded", "failed", "blocked"]),
+    fingerprint: sha256FingerprintSchema,
+    removedRecordCount: z.number().int().min(0).default(0),
+    removedFileCount: z.number().int().min(0).default(0),
+    recovered: z.boolean().default(false),
+    providerRequestCount: z.literal(0),
+    error: routegoServiceErrorSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.status === "succeeded") {
+      if (value.error || value.recovered) {
+        context.addIssue({
+          code: "custom",
+          path: ["status"],
+          message: "Successful migration cannot report recovery or an error"
+        });
+      }
+    }
+    if (value.status === "failed" && !value.error) {
+      context.addIssue({
+        code: "custom",
+        path: ["error"],
+        message: "Failed migration requires a structured error"
+      });
+    }
+    if (value.status === "blocked" && !value.error) {
+      context.addIssue({
+        code: "custom",
+        path: ["error"],
+        message: "Blocked migration requires a structured error"
+      });
+    }
+    if (value.status !== "succeeded" && value.removedRecordCount + value.removedFileCount > 0 && !value.recovered) {
+      context.addIssue({
+        code: "custom",
+        path: ["recovered"],
+        message: "Non-success migration that removed data must report recovery"
+      });
+    }
+  });
+
 export type LibraryFolderDescriptor = z.infer<typeof libraryFolderDescriptorSchema>;
 export type ListFoldersInput = z.input<typeof listFoldersInputSchema>;
 export type ListFoldersResult = z.output<typeof listFoldersResultSchema>;
@@ -886,3 +1053,15 @@ export type PreflightLibraryMutationResult = z.output<
 >;
 export type ExecuteLibraryMutationInput = z.input<typeof executeLibraryMutationInputSchema>;
 export type ExecuteLibraryMutationResult = z.output<typeof executeLibraryMutationResultSchema>;
+
+export type MarkLibraryAssetInput = z.input<typeof markLibraryAssetInputSchema>;
+export type MarkLibraryAssetResult = z.output<typeof markLibraryAssetResultSchema>;
+export type CopyGenerationInfoInput = z.input<typeof copyGenerationInfoInputSchema>;
+export type CopyGenerationInfoResult = z.output<typeof copyGenerationInfoResultSchema>;
+export type GenerationInfoProjection = z.infer<typeof generationInfoProjectionSchema>;
+export type LibraryMigrationPreflightInput = z.input<typeof libraryMigrationPreflightInputSchema>;
+export type LibraryMigrationPreflightResult = z.output<typeof libraryMigrationPreflightResultSchema>;
+export type LibraryMigrationConfirmationInput = z.input<typeof libraryMigrationConfirmationInputSchema>;
+export type LibraryMigrationConfirmationResult = z.output<
+  typeof libraryMigrationConfirmationResultSchema
+>;

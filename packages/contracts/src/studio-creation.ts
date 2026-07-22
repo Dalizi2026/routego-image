@@ -14,42 +14,51 @@ import {
 } from "./errors";
 import {
   aspectRatioSchema,
-  continuationActionSchema,
-  editInvariantsSchema,
   imageArtifactPhaseSchema,
   imageFormatSchema,
-  imageQualitySchema,
   imageSizeSchema,
-  moderationSchema,
   operationExecutionMetadataSchema,
-  referenceRoleSchema,
   transparentModeSchema
 } from "./image";
 import { browserResourceDescriptorSchema } from "./library";
 import { providerCapabilitySchema } from "./provider";
 
+/**
+ * @deprecated Studio is text-generation-only and no longer accepts image locators.
+ * Retained only so temporary in-package consumers can typecheck until later cutover.
+ * Validation always fails when used as a Studio generation input.
+ */
 export const studioImageInputRefSchema = z.discriminatedUnion("source", [
   z.object({ source: z.literal("asset"), assetId: identifierSchema }).strict(),
   z.object({ source: z.literal("artifact"), artifactId: identifierSchema }).strict(),
   z.object({ source: z.literal("upload"), uploadResourceId: identifierSchema }).strict()
 ]);
 
+/**
+ * @deprecated Removed with Studio image inputs. Validation is unused by generation contracts.
+ */
 export const studioReferenceInputSchema = z
   .object({
     image: studioImageInputRefSchema,
-    role: referenceRoleSchema,
+    role: z.string().trim().min(1).max(64),
     label: z.string().trim().min(1).max(200).optional()
   })
   .strict();
 
+/**
+ * @deprecated Removed with Studio image inputs.
+ */
 export const studioSupportingInputSchema = z
   .object({
     image: studioImageInputRefSchema,
-    role: referenceRoleSchema.default("supporting"),
+    role: z.string().trim().min(1).max(64).default("supporting"),
     label: z.string().trim().min(1).max(200).optional()
   })
   .strict();
 
+/**
+ * @deprecated Removed with Studio mask editing.
+ */
 export const studioMaskInputSchema = z
   .object({
     image: studioImageInputRefSchema,
@@ -57,42 +66,13 @@ export const studioMaskInputSchema = z
   })
   .strict();
 
-const studioCreationControlShape = {
-  schemaVersion: routegoSchemaVersionSchema.default(1),
-  prompt: nonEmptyTextSchema,
-  references: z.array(studioReferenceInputSchema).max(16).default([]),
-  size: imageSizeSchema.default("auto"),
-  aspectRatio: aspectRatioSchema.default("auto"),
-  quality: imageQualitySchema.default("auto"),
-  format: imageFormatSchema.default("png"),
-  compression: z.number().int().min(0).max(100).optional(),
-  count: z.number().int().min(1).max(4).default(1),
-  partialImages: z.number().int().min(0).max(3).default(0),
-  transparentMode: transparentModeSchema.default("off"),
-  moderation: moderationSchema.default("auto"),
-  action: continuationActionSchema.default("auto"),
-  previousResponseId: identifierSchema.optional(),
-  imageIds: z.array(identifierSchema).max(16).default([]),
-  fileIds: z.array(identifierSchema).max(16).default([]),
-  saveToLibrary: z.boolean().default(true)
-};
-
-function addOutputControlIssues(
+function addStudioOutputControlIssues(
   value: {
     format: "png" | "jpeg" | "webp";
-    compression?: number | undefined;
     transparentMode: string;
   },
   context: z.core.$RefinementCtx
 ): void {
-  if (value.compression !== undefined && value.format === "png") {
-    context.addIssue({
-      code: "custom",
-      path: ["compression"],
-      message: "Compression percentage applies only to JPEG or WebP output",
-      input: value
-    });
-  }
   if (value.transparentMode !== "off" && value.format !== "png") {
     context.addIssue({
       code: "custom",
@@ -103,52 +83,48 @@ function addOutputControlIssues(
   }
 }
 
+/**
+ * Text-only Studio generation request.
+ * Approved workbench controls: size, aspect ratio, format, count, transparency.
+ * Hidden Settings defaults (quality, compression, partial-images, moderation) are
+ * resolved by the service after validation and MUST NOT appear on the workbench contract.
+ */
 export const studioGenerateInputSchema = z
   .object({
-    ...studioCreationControlShape,
-    kind: z.literal("generate")
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    kind: z.literal("generate"),
+    prompt: nonEmptyTextSchema,
+    size: imageSizeSchema.default("auto"),
+    aspectRatio: aspectRatioSchema.default("auto"),
+    format: imageFormatSchema.default("png"),
+    count: z.number().int().min(1).max(4).default(1),
+    transparentMode: transparentModeSchema.default("off"),
+    saveToLibrary: z.boolean().default(true)
   })
   .strict()
   .superRefine((value, context) => {
-    addOutputControlIssues(value, context);
-    if (value.action === "edit") {
-      context.addIssue({
-        code: "custom",
-        path: ["action"],
-        message: "Continuation action edit requires an edit operation"
-      });
-    }
+    addStudioOutputControlIssues(value, context);
   });
 
+/**
+ * @deprecated Removed from the Studio surface. Retained only so temporary in-package
+ * consumers can still typecheck until later cutover tasks. Validation always fails.
+ */
 export const studioEditInputSchema = z
   .object({
-    ...studioCreationControlShape,
-    kind: z.literal("edit"),
-    target: studioImageInputRefSchema,
-    supportingImages: z.array(studioSupportingInputSchema).max(15).default([]),
-    mask: studioMaskInputSchema.optional(),
-    invariants: editInvariantsSchema
+    kind: z.literal("edit")
   })
   .strict()
-  .superRefine((value, context) => {
-    addOutputControlIssues(value, context);
-    const physicalInputs = value.references.length + value.supportingImages.length + 1;
-    if (physicalInputs > 16) {
-      context.addIssue({
-        code: "too_big",
-        origin: "array",
-        maximum: 16,
-        inclusive: true,
-        path: ["references"],
-        message: "A Studio edit can contain at most 16 target/reference/supporting images"
-      });
-    }
+  .superRefine((_value, context) => {
+    context.addIssue({
+      code: "custom",
+      path: ["kind"],
+      message:
+        "studioEdit is removed; Studio is text-generation-only. Use Library mark/copy and routego_prepare_regeneration"
+    });
   });
 
-export const studioImageOperationRequestSchema = z.discriminatedUnion("kind", [
-  studioGenerateInputSchema,
-  studioEditInputSchema
-]);
+export const studioImageOperationRequestSchema = studioGenerateInputSchema;
 
 export const studioImageArtifactSchema = z
   .object({
@@ -172,55 +148,18 @@ export const studioImageArtifactSchema = z
   });
 
 export const studioImageRelationshipRoleSchema = z.enum([
-  "target",
-  "reference",
-  "supporting",
-  "mask",
   "output",
-  "stream-partial"
+  "stream-partial",
+  "transparent-original"
 ]);
 
 export const studioImageRelationshipSchema = z
   .object({
     role: studioImageRelationshipRoleSchema,
-    input: studioImageInputRefSchema.optional(),
     outputArtifactId: identifierSchema,
-    order: z.number().int().min(0).max(255),
-    targetSlot: z.literal(0).optional()
+    order: z.number().int().min(0).max(255)
   })
-  .strict()
-  .superRefine((value, context) => {
-    if (value.role === "output" || value.role === "stream-partial") {
-      if (value.input !== undefined || value.targetSlot !== undefined) {
-        context.addIssue({
-          code: "custom",
-          message: `${value.role} relationships cannot include an input or target slot`
-        });
-      }
-      return;
-    }
-    if (value.input === undefined) {
-      context.addIssue({
-        code: "custom",
-        path: ["input"],
-        message: `${value.role} relationships require an input locator`
-      });
-    }
-    if (value.role === "mask" && value.targetSlot !== 0) {
-      context.addIssue({
-        code: "custom",
-        path: ["targetSlot"],
-        message: "Mask relationships must bind to target slot zero"
-      });
-    }
-    if (value.role !== "mask" && value.targetSlot !== undefined) {
-      context.addIssue({
-        code: "custom",
-        path: ["targetSlot"],
-        message: "Only mask relationships can include targetSlot"
-      });
-    }
-  });
+  .strict();
 
 export const studioServiceErrorSchema = z
   .object({
@@ -434,15 +373,14 @@ export const studioImageOperationEventSchema = z.discriminatedUnion("type", [
 export const studioBatchItemSchema = z
   .object({
     id: identifierSchema,
-    operation: studioImageOperationRequestSchema
+    operation: studioGenerateInputSchema
   })
   .strict();
 
 export const studioBatchInputSchema = z
   .object({
     schemaVersion: routegoSchemaVersionSchema.default(1),
-    tasks: z.array(studioBatchItemSchema).min(1).max(20),
-    concurrency: z.number().int().min(1).max(10).default(3)
+    tasks: z.array(studioBatchItemSchema).min(1).max(20)
   })
   .strict()
   .superRefine((value, context) => {
@@ -453,14 +391,18 @@ export const studioBatchInputSchema = z
         message: "Studio batch task identifiers must be unique"
       });
     }
-  });
+  })
+  .transform((value) => ({
+    ...value,
+    concurrency: 2 as const
+  }));
 
 export const studioBatchResultSchema = z
   .object({
     schemaVersion: routegoSchemaVersionSchema,
     requestId: identifierSchema,
     status: z.enum(["succeeded", "partial", "failed"]),
-    concurrency: z.number().int().min(1).max(10),
+    concurrency: z.literal(2),
     taskIds: z.array(identifierSchema).min(1).max(20),
     items: z
       .array(
