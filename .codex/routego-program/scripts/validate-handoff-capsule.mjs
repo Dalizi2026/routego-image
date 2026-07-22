@@ -384,9 +384,19 @@ if (program && lane) {
   ) {
     fail("successor verifiedHeadBeforeContainingCommit is unreachable");
   } else if (registeredAwaitingAcceptance && !allowDirty) {
-    const actualContainingParent = git(["rev-parse", "HEAD^"]).trim();
-    if (actualContainingParent !== capsule.successor.verifiedHeadBeforeContainingCommit) {
-      fail("registered successor verified head must equal the containing commit parent");
+    const containingCommit = git(["log", "--format=%H", "--all", "--", capsulePath])
+      .trim()
+      .split("\n")
+      .filter(Boolean)
+      .find((commit) => {
+        const parent = git(["rev-parse", commit + "^"]).trim();
+        if (parent !== capsule.successor.verifiedHeadBeforeContainingCommit) {
+          return false;
+        }
+        return git(["show", commit + ":" + capsulePath], null).equals(capsuleBytes);
+      });
+    if (!containingCommit) {
+      fail("registered successor verified head must equal its registration-containing commit parent");
     } else {
       pass("registered successor containing-parent relation");
     }
