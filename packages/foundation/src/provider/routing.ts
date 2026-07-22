@@ -63,7 +63,13 @@ export interface SelectedProviderRoute {
   readonly effectiveKind: "generate";
   readonly requiredCapabilities: readonly ProviderCapability[];
   readonly degraded: boolean;
-  readonly replayPolicy: "never-cross-transport";
+  /**
+   * A transparent request is sent natively only with scoped, supported evidence.
+   * Every other transparency state keeps the single generation request ordinary so
+   * the later local-processing stage can handle the returned PNG without probing.
+   */
+  readonly transparency?: "none" | "native" | "local-fallback";
+  readonly replayPolicy: "never" | "never-cross-transport";
 }
 
 export interface UnavailableProviderRoute {
@@ -164,13 +170,20 @@ function requestedFeatureCapabilities(request: ImageOperationRequest): ProviderC
   if (request.partialImages > 0) {
     required.push("streaming", "partial-images");
   }
-  if (request.transparentMode === "native") {
-    required.push("native-transparency");
-  }
   if (request.moderation === "low") {
     required.push("moderation");
   }
   return required;
+}
+
+function transparencyFor(
+  context: ProviderRoutingContext,
+  request: ImageOperationRequest,
+  candidate: RouteCandidate
+): NonNullable<SelectedProviderRoute["transparency"]> {
+  if (request.transparentMode !== "native") return "none";
+  const record = findCapabilityRecord(context, candidate, "native-transparency");
+  return record?.state === "supported" ? "native" : "local-fallback";
 }
 
 function tierACapabilities(
@@ -447,7 +460,8 @@ function selectFromCandidates(
       effectiveKind: candidate.effectiveKind,
       requiredCapabilities: candidate.requiredCapabilities,
       degraded,
-      replayPolicy: "never-cross-transport"
+      transparency: transparencyFor(context, request, candidate),
+      replayPolicy: "never"
     };
   }
 
@@ -474,32 +488,14 @@ export function selectProviderRoute(
 
 export interface AutomaticRetryDecision {
   readonly allowed: boolean;
-  readonly reason:
-    | "safe-same-transport-pre-generation"
-    | "cross-transport-replay-forbidden"
-    | "output-or-billing-risk"
-    | "failure-not-retryable"
-    | "retry-limit-reached";
+  readonly reason: "automatic-replay-forbidden";
 }
 
 export function evaluateAutomaticRetry(
   previous: PreviousProviderAttempt,
   nextTransport: ProviderTransport
 ): AutomaticRetryDecision {
-  if (previous.transport !== nextTransport) {
-    return { allowed: false, reason: "cross-transport-replay-forbidden" };
-  }
-  if (previous.receivedAnyOutput || previous.mayHaveBilled) {
-    return { allowed: false, reason: "output-or-billing-risk" };
-  }
-  if (
-    previous.stage !== "pre-generation" ||
-    (previous.errorCode !== "rate_limited" && previous.errorCode !== "provider_5xx")
-  ) {
-    return { allowed: false, reason: "failure-not-retryable" };
-  }
-  if (previous.attemptCount >= 3) {
-    return { allowed: false, reason: "retry-limit-reached" };
-  }
-  return { allowed: true, reason: "safe-same-transport-pre-generation" };
+  void previous;
+  void nextTransport;
+  return { allowed: false, reason: "automatic-replay-forbidden" };
 }

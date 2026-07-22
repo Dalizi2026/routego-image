@@ -41,6 +41,7 @@ interface AbortMarker {
 interface PreparedExecutionPlan {
   readonly prepared: true;
   readonly request: ImageOperationRequest;
+  readonly effectiveRequest: ImageOperationRequest;
   readonly provider: ProviderRuntimeContext;
   readonly providerRequest: PreparedProviderRequest;
   readonly mode: VariantExecutionMode;
@@ -50,6 +51,7 @@ interface PreparedExecutionPlan {
 interface UnavailableExecutionPlan {
   readonly prepared: false;
   readonly request: ImageOperationRequest;
+  readonly effectiveRequest: ImageOperationRequest;
   readonly provider?: ProviderRuntimeContext;
   readonly error: RoutegoServiceError;
 }
@@ -204,7 +206,10 @@ async function prepareSelectedRoute(
   request: ImageOperationRequest,
   route: SelectedProviderRoute
 ): Promise<PreparedProviderRequest | RoutegoServiceError> {
-  const prepared = await prepareProviderRequest(provider, request);
+  const providerRequest = route.transparency === "local-fallback"
+    ? imageOperationRequestSchema.parse({ ...request, transparentMode: "off" })
+    : request;
+  const prepared = await prepareProviderRequest(provider, providerRequest);
   return prepared.prepared ? prepared.value : prepared.error;
 }
 
@@ -221,6 +226,7 @@ async function prepareExecutionPlan(
     return {
       prepared: false,
       request,
+      effectiveRequest: request,
       error: createExecutionError({
         code: "config_missing",
         category: "configuration",
@@ -233,6 +239,7 @@ async function prepareExecutionPlan(
     return {
       prepared: false,
       request,
+      effectiveRequest: request,
       provider,
       error: createExecutionError({
         code: "config_missing",
@@ -246,10 +253,15 @@ async function prepareExecutionPlan(
   const directRoute = selectProviderRoute(provider, request);
   if (directRoute.selected) {
     const prepared = await prepareSelectedRoute(provider, request, directRoute);
-    if ("code" in prepared) return { prepared: false, request, provider, error: prepared };
+    if ("code" in prepared) {
+      return { prepared: false, request, effectiveRequest: request, provider, error: prepared };
+    }
     return {
       prepared: true,
       request,
+      effectiveRequest: directRoute.transparency === "local-fallback"
+        ? imageOperationRequestSchema.parse({ ...request, transparentMode: "off" })
+        : request,
       provider,
       providerRequest: prepared,
       mode: request.count > 1 ? "native" : "single",
@@ -262,10 +274,15 @@ async function prepareExecutionPlan(
     const singleRoute = selectProviderRoute(provider, singleRequest);
     if (singleRoute.selected) {
       const prepared = await prepareSelectedRoute(provider, singleRequest, singleRoute);
-      if ("code" in prepared) return { prepared: false, request, provider, error: prepared };
+      if ("code" in prepared) {
+        return { prepared: false, request, effectiveRequest: request, provider, error: prepared };
+      }
       return {
         prepared: true,
         request,
+        effectiveRequest: singleRoute.transparency === "local-fallback"
+          ? imageOperationRequestSchema.parse({ ...request, transparentMode: "off" })
+          : request,
         provider,
         providerRequest: prepared,
         mode: "fan-out",
@@ -273,7 +290,7 @@ async function prepareExecutionPlan(
       };
     }
   }
-  return { prepared: false, request, provider, error: directRoute.error };
+  return { prepared: false, request, effectiveRequest: request, provider, error: directRoute.error };
 }
 
 class ExecutionEvents {
@@ -666,7 +683,7 @@ function buildResult(
     requestId,
     status,
     requestedParams: plan.request,
-    effectiveParams: plan.request,
+    effectiveParams: plan.effectiveRequest,
     execution: {
       ...(route === undefined ? {} : { transport: route.transport }),
       attemptCount: collection.attemptCount,
@@ -769,7 +786,12 @@ export function createResolvedImageExecutor(
           stage: "configure",
           safeMessage: "The active provider context is unavailable."
         });
-        const plan: UnavailableExecutionPlan = { prepared: false, request, error };
+        const plan: UnavailableExecutionPlan = {
+          prepared: false,
+          request,
+          effectiveRequest: request,
+          error
+        };
         const collection = emptyCollection();
         collection.errors.push(error);
         collection.failedSlots.push(failedOutputSlotSchema.parse({ slot: 0, error }));
