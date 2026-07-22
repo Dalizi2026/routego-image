@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-authoritative-task-2.3-accepted-task-2.4-registered-locked-library-3.2-accepted",
+  "status": "controller-generation-12-authoritative-task-2.3-accepted-task-2.4-activated-library-3.2-accepted",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -69,17 +69,17 @@
   },
   "activeApplyOwners": {
     "creation": {
-      "status": "registered-locked-awaiting-real-worktree-visible-thread-and-zero-compaction-handoff-acceptance",
-      "taskRef": "pending",
-      "threadId": "pending",
+      "status": "active-sole-apply-owner-zero-compaction-handoff-accepted",
+      "taskRef": "019f8a35-481e-7150-9c45-70fae241ac87",
+      "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
       "generation": 4,
       "taskId": "2.4",
       "branch": "codex/routego-creation-g5",
       "worktree": "/Users/dalizi/Documents/routego-image-creation-g5",
       "currentHead": "fa48efba54f90aeb4082c691da859647362fcd90",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/creation-2.4.json", "sha256": "0bda6ccd5bc26087974a4f0ebb67ee48a965877c430f67e739fa1ad7a2760349" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/creation-generation-4.capsule.json", "sha256": "5a110aca8619dbeb4eeb16e85adc571286fea5a3c145c23bf3af75850a0f923f", "rawFileSha256": "d696b239860b34fcd257ff2befe6f08582faf96928ebb634b9e3ce1c6cf4b79f" },
-      "authorizedScope": "task-2.4-registered-locked-no-product-apply-before-controller-created-worktree-thread-and-zero-compaction-handoff-acceptance"
+      "taskCapsule": { "path": ".codex/routego-program/tasks/creation-2.4.json", "sha256": "a13a7b55ee6c64e873dc4e01ec3b6ad626a5d879f8f6b54e6495a0a903fe5814" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/creation-generation-4.capsule.json", "sha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3", "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39" },
+      "authorizedScope": "task-2.4-exact-foundation-creation-routing-files-active-sole-owner"
     },
     "library": {
       "status": "accepted-no-successor-product-task-active",
@@ -97,13 +97,13 @@
   },
   "laneSuccessors": {
     "creation": {
-      "threadId": "pending",
+      "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
       "generation": 4,
       "worktree": "/Users/dalizi/Documents/routego-image-creation-g5",
       "plannedBranch": "codex/routego-creation-g5",
       "currentHead": "fa48efba54f90aeb4082c691da859647362fcd90",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "5a110aca8619dbeb4eeb16e85adc571286fea5a3c145c23bf3af75850a0f923f", "rawFileSha256": "d696b239860b34fcd257ff2befe6f08582faf96928ebb634b9e3ce1c6cf4b79f" }
+      "handoffCapsuleIntegrity": { "canonicalSha256": "5525138b6a2c4a60463cc54e0d67b0d14b33b17acd81711225af1d602271d2f3", "rawFileSha256": "fc12ddd85f40f72b29a0f861cc865709ef100910d757009c253179c886d78c39" }
     },
     "library": {
       "threadId": "/root/library_task_3_2",
@@ -127,21 +127,21 @@
     },
     "currentTask": {
       "id": "2.4",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": ["2.4"],
-      "authorizedScope": "Task 2.3 Creation is accepted and merged. Task 2.4 is registered but locked until Controller creates its real worktree and visible thread and that successor passes zero-compaction handoff acceptance. Library Task 3.2 remains accepted with no Library successor product task activated."
+      "authorizedScope": "Task 2.4 G5 completed zero-compaction handoff acceptance and is the sole active apply owner only within its exact capsule scope. Library Task 3.2 remains accepted with no Library successor product task activated."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "creation",
-    "event": "TASK_2_3_ACCEPTED_TASK_2_4_REGISTERED_LOCKED",
+    "event": "TASK_2_4_G5_HANDOFF_ACCEPTED_AND_ACTIVATED",
     "implementationCommit": "c0c7e2cbcd04ede9b8614c48242665cd26020f1c",
     "controllerMergeCommit": "89dc4cd83e27e53088eca16af9c8e64a5d969c1a",
     "taskStateCommit": "fa48efba54f90aeb4082c691da859647362fcd90",
     "openspecProgress": "9/33",
     "nextTaskIds": ["2.4"],
-    "verification": "Creation Task 2.3 focused regressions passed 22/22. Its original pnpm command also ran the whole Creation suite and retains five out-of-scope old failures (MCP edit inputs 3; provider-response 429/503 retry disposition 2), so no full-suite-green claim is made. Task 2.4 is registered and locked pending a real worker worktree, visible thread, and zero-compaction handoff acceptance."
+    "verification": "Creation Task 2.3 focused regressions passed 22/22. Its original pnpm command also ran the whole Creation suite and retains five out-of-scope old failures (MCP edit inputs 3; provider-response 429/503 retry disposition 2), so no full-suite-green claim is made. Creation G5 Task 2.4 handoff acceptance passed validator 19 checks with zero observable compactions and clean Git; it is now the sole apply owner."
   },
   "currentBlockers": [],
   "approvedDeviations": [
