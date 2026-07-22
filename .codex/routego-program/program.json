@@ -69,14 +69,16 @@
   },
   "activeApplyOwners": {
     "creation": {
-      "status": "pending-registration",
+      "status": "active-internal-apply-owner",
+      "taskRef": "/root/creation_task_2_2",
       "taskId": "2.2",
       "branch": "codex/routego-creation-g2",
       "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
       "authorizedScope": "task-2.2-exact-automatic-retry-removal"
     },
     "library": {
-      "status": "pending-registration",
+      "status": "active-internal-apply-owner",
+      "taskRef": "/root/library_task_3_2",
       "taskId": "3.2",
       "branch": "codex/routego-library-g2",
       "worktree": "/Users/dalizi/Documents/routego-image-library-g2",
