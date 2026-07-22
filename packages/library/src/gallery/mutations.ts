@@ -135,16 +135,12 @@ function requiredConfirmation(
 
 function allowedActions(asset: StoredLibraryAsset): LibraryAssetDetail["allowedActions"] {
   if (asset.status === "deleted") {
-    return ["restore", "permanent-delete", "export-zip", "download"];
+    return ["export-zip", "download"];
   }
   const actions: LibraryAssetDetail["allowedActions"][number][] = [];
-  if (asset.status === "succeeded" || asset.status === "partial") actions.push("edit");
-  if (asset.status === "succeeded" || asset.status === "partial" || asset.status === "failed") {
-    actions.push("retry");
-  }
   actions.push("assign-folders");
   if (asset.folderIds.length > 0) actions.push("remove-folders");
-  actions.push("soft-delete", "export-zip", "download");
+  actions.push("export-zip", "download", "mark", "copy-generation-info");
   return actions;
 }
 
@@ -380,6 +376,14 @@ export class LibraryMutationStore {
       } else if (mutation.action === "soft-delete" && asset.status === "deleted") {
         error = libraryMutationError("conflict", "The Library asset is already in the recycle bin.");
       } else if (
+        mutation.action === "mark" &&
+        (asset.kind !== "generate" || asset.status === "deleted")
+      ) {
+        error = libraryMutationError(
+          "conflict",
+          "Only an active generation record can be marked."
+        );
+      } else if (
         (mutation.action === "restore" || mutation.action === "permanent-delete") &&
         asset.status !== "deleted"
       ) {
@@ -528,7 +532,9 @@ export class LibraryMutationStore {
         if (
           (action === "soft-delete" && asset.status === "deleted") ||
           ((action === "restore" || action === "permanent-delete") && asset.status !== "deleted") ||
-          ((action === "assign-folders" || action === "remove-folders") && asset.status === "deleted")
+          ((action === "assign-folders" || action === "remove-folders" || action === "mark") &&
+            asset.status === "deleted") ||
+          (action === "mark" && asset.kind !== "generate")
         ) {
           items.set(
             targetId,
@@ -573,6 +579,20 @@ export class LibraryMutationStore {
     items: Map<string, MutationItem>,
     now: Date
   ): Promise<void> {
+    if (action === "mark") {
+      const recordId = candidates[0];
+      if (recordId === undefined) return;
+      const currentMarkRecordId =
+        context.index.currentMarkRecordId === recordId ? undefined : recordId;
+      await context.commit({
+        blobs: context.index.blobs,
+        assets: context.index.assets,
+        folders: context.index.folders,
+        currentMarkRecordId
+      });
+      items.set(recordId, successItem(recordId));
+      return;
+    }
     const selected = new Set(candidates);
     const folderOrder = new Map(
       [...context.index.folders]
