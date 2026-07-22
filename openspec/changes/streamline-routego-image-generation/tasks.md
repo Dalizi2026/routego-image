@@ -7,7 +7,7 @@
 
 ## 2. Generation Runtime
 
-- [ ] 2.1 [Lane: Foundation/Creation] [Depends: 1.4] Remove edit, target, mask, and continuation routing/request/executor branches while retaining text and reference-image generation adapters. [Verify: `pnpm --filter @routego-image/foundation test && pnpm --filter @routego-image/creation test -- provider-request.test.ts executor.test.ts`]
+- [x] 2.1 [Lane: Foundation/Creation] [Depends: 1.4] Remove edit, target, mask, and continuation routing/request/executor branches while retaining text and reference-image generation adapters. [Verify: `pnpm --filter @routego-image/foundation test && pnpm --filter @routego-image/creation test -- provider-request.test.ts executor.test.ts`]
 - [ ] 2.2 [Lane: Creation] [Depends: 2.1] Remove every automatic real-provider retry, including pre-generation 429/5xx retry, and preserve request counts and possible-billing errors. [Verify: `pnpm --filter @routego-image/creation test -- executor.test.ts batch.test.ts`]
 - [ ] 2.3 [Lane: Creation] [Depends: 2.1] Enforce zero-to-five ordered references and generation-only batches with internal concurrency two and isolated per-item outcomes. [Verify: `pnpm --filter @routego-image/creation test -- batch.test.ts integration.test.ts`]
 - [ ] 2.4 [Lane: Foundation/Creation] [Depends: 2.1-2.3] Add four-state reference/transparency routing and no-probe/no-replay regressions, then run full typecheck/tests for both packages. [Verify: `pnpm --filter @routego-image/foundation typecheck && pnpm --filter @routego-image/foundation test && pnpm --filter @routego-image/creation typecheck && pnpm --filter @routego-image/creation test`]
