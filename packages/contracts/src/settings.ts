@@ -331,6 +331,81 @@ export const updateSettingsInputSchema = z
 
 export const updateSettingsResultSchema = readSettingsResultSchema;
 
+
+/**
+ * Browser-safe Header provider switch.
+ * Changes apply only to future submissions; in-flight work keeps its snapshot.
+ * When preferredModel exists in the target catalog it is preserved; otherwise the
+ * target profile default/valid model is selected and reported honestly.
+ */
+export const studioProviderSwitchInputSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    profileId: identifierSchema,
+    preferredModel: z.string().trim().min(1).max(200).optional()
+  })
+  .strict();
+
+export const studioProviderSwitchResultSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    status: z.enum(["succeeded", "failed"]),
+    activeProviderId: identifierSchema.optional(),
+    selectedModel: z.string().trim().min(1).max(200).optional(),
+    modelPreserved: z.boolean().optional(),
+    profile: providerProfileDescriptorSchema.optional(),
+    appliesToFutureSubmissionsOnly: z.literal(true).optional(),
+    error: routegoServiceErrorSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.status === "succeeded") {
+      if (
+        value.error ||
+        value.activeProviderId === undefined ||
+        value.selectedModel === undefined ||
+        value.modelPreserved === undefined ||
+        value.profile === undefined ||
+        value.appliesToFutureSubmissionsOnly !== true
+      ) {
+        context.addIssue({
+          code: "custom",
+          path: ["status"],
+          message:
+            "Successful provider switch requires active profile, selected model, preservation flag, and future-only marker"
+        });
+      } else if (!value.profile.isActive || value.profile.id !== value.activeProviderId) {
+        context.addIssue({
+          code: "custom",
+          path: ["profile"],
+          message: "Switched profile must be active and match activeProviderId"
+        });
+      }
+    }
+    if (value.status === "failed") {
+      if (!value.error) {
+        context.addIssue({
+          code: "custom",
+          path: ["error"],
+          message: "Failed provider switch requires a structured error"
+        });
+      }
+      if (
+        value.activeProviderId !== undefined ||
+        value.selectedModel !== undefined ||
+        value.modelPreserved !== undefined ||
+        value.profile !== undefined ||
+        value.appliesToFutureSubmissionsOnly !== undefined
+      ) {
+        context.addIssue({
+          code: "custom",
+          path: ["status"],
+          message: "Failed provider switch must not claim a new active selection"
+        });
+      }
+    }
+  });
+
 export type ApiKeyMutation = z.infer<typeof apiKeyMutationSchema>;
 export type ProviderProfileDescriptor = z.infer<typeof providerProfileDescriptorSchema>;
 export type ReadSettingsInput = z.input<typeof readSettingsInputSchema>;
@@ -348,3 +423,6 @@ export type CapabilityProbeResult = z.output<typeof capabilityProbeResultSchema>
 export type OutputDirectoryMutation = z.infer<typeof outputDirectoryMutationSchema>;
 export type UpdateSettingsInput = z.input<typeof updateSettingsInputSchema>;
 export type UpdateSettingsResult = z.output<typeof updateSettingsResultSchema>;
+
+export type StudioProviderSwitchInput = z.input<typeof studioProviderSwitchInputSchema>;
+export type StudioProviderSwitchResult = z.output<typeof studioProviderSwitchResultSchema>;

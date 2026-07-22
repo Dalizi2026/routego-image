@@ -9,7 +9,6 @@ import {
   studioBatchResultSchema,
   studioEditInputSchema,
   studioGenerateInputSchema,
-  studioImageInputRefSchema,
   studioImageOperationEventSchema,
   studioImageOperationResultSchema,
   studioOperationDefinitions,
@@ -19,9 +18,6 @@ import {
   type StudioImageOperationResult
 } from "../src/index";
 import { TEST_TIMESTAMP } from "./fixtures";
-
-type StudioGenerateRequest = Extract<StudioImageOperationRequest, { kind: "generate" }>;
-type StudioEditRequest = Extract<StudioImageOperationRequest, { kind: "edit" }>;
 
 const EXPIRES_AT = "2026-07-17T12:39:56.000Z";
 
@@ -55,50 +51,10 @@ function artifact(
 
 function generateRequest(
   overrides: Record<string, unknown> = {}
-): StudioGenerateRequest {
+): StudioImageOperationRequest {
   return studioGenerateInputSchema.parse({
     kind: "generate",
     prompt: "生成路径安全的宇航猫 🚀",
-    ...overrides
-  });
-}
-
-function editRequest(overrides: Record<string, unknown> = {}): StudioEditRequest {
-  return studioEditInputSchema.parse({
-    kind: "edit",
-    prompt: "只替换天空并保留主体",
-    references: [
-      {
-        image: { source: "asset", assetId: "asset-reference" },
-        role: "style",
-        label: "Color reference"
-      }
-    ],
-    target: { source: "artifact", artifactId: "artifact-target" },
-    supportingImages: [
-      {
-        image: { source: "upload", uploadResourceId: "upload-supporting" },
-        role: "supporting"
-      }
-    ],
-    mask: {
-      image: { source: "upload", uploadResourceId: "upload-mask" },
-      targetSlot: 0
-    },
-    invariants: {
-      allowedChanges: ["sky"],
-      preserve: ["subject and composition"],
-      forbiddenChanges: ["text"]
-    },
-    action: "edit",
-    size: "1024x1024",
-    aspectRatio: "1:1",
-    quality: "high",
-    format: "png",
-    count: 1,
-    partialImages: 1,
-    moderation: "auto",
-    transparentMode: "off",
     ...overrides
   });
 }
@@ -147,7 +103,7 @@ function failureError(overrides: Record<string, unknown> = {}) {
     code: "capability_unavailable",
     category: "capability",
     stage: "route",
-    safeMessage: "The synthetic provider cannot accept image input.",
+    safeMessage: "The synthetic provider cannot accept the request.",
     retryDisposition: "user-confirmation",
     partialArtifacts: [],
     receivedAnyOutput: false,
@@ -180,111 +136,98 @@ function failedResult(request: StudioImageOperationRequest): StudioImageOperatio
   });
 }
 
-describe("path-free Studio image inputs", () => {
-  it("accepts exactly one asset, artifact, or upload locator", () => {
-    expect(studioImageInputRefSchema.parse({ source: "asset", assetId: "asset-a" })).toEqual({
-      source: "asset",
-      assetId: "asset-a"
-    });
-    expect(
-      studioImageInputRefSchema.parse({ source: "artifact", artifactId: "artifact-a" })
-    ).toEqual({ source: "artifact", artifactId: "artifact-a" });
-    expect(
-      studioImageInputRefSchema.parse({ source: "upload", uploadResourceId: "upload-a" })
-    ).toEqual({ source: "upload", uploadResourceId: "upload-a" });
-
-    for (const value of [
-      { source: "asset", assetId: "asset-a", artifactId: "artifact-a" },
-      { source: "upload", uploadResourceId: "upload-a", path: "C:\\image.png" },
-      { source: "upload", uploadResourceId: "upload-a", url: "https://example.invalid/a.png" },
-      { source: "upload", uploadResourceId: "upload-a", dataUrl: "data:image/png;base64,AAAA" }
-    ]) {
-      expect(studioImageInputRefSchema.safeParse(value).success).toBe(false);
-    }
-  });
-
-  it("accepts text-only generate with full controls and no local output path", () => {
+describe("text-only Studio generation contracts", () => {
+  it("accepts non-empty text-only requests with the five approved control groups", () => {
     const request = generateRequest({
-      references: [
-        {
-          image: { source: "upload", uploadResourceId: "upload-reference" },
-          role: "reference"
-        }
-      ],
-      quality: "medium",
-      format: "webp",
-      compression: 80,
-      count: 4,
-      partialImages: 3,
-      moderation: "low",
-      action: "auto",
-      previousResponseId: "response-a",
-      imageIds: ["provider-image-a"],
-      fileIds: ["provider-file-a"],
-      saveToLibrary: false
+      size: "1024x1024",
+      aspectRatio: "auto",
+      format: "png",
+      count: 2,
+      transparentMode: "auto",
+      saveToLibrary: true
     });
-    expect(request).toMatchObject({ count: 4, partialImages: 3, format: "webp" });
-    expect(JSON.stringify(request)).not.toMatch(/(?:outputDir|path|dataUrl|base64|https?:\/\/)/u);
+    expect(request).toMatchObject({
+      kind: "generate",
+      prompt: "生成路径安全的宇航猫 🚀",
+      size: "1024x1024",
+      format: "png",
+      count: 2,
+      transparentMode: "auto",
+      saveToLibrary: true
+    });
+    expect(request).not.toHaveProperty("references");
+    expect(request).not.toHaveProperty("quality");
+    expect(request).not.toHaveProperty("compression");
+    expect(request).not.toHaveProperty("partialImages");
+    expect(request).not.toHaveProperty("moderation");
+    expect(request).not.toHaveProperty("outputDir");
   });
 
-  it("binds an edit mask to target slot zero and preserves ordered inputs", () => {
-    const request = editRequest();
-    expect(request.references[0]?.image).toEqual({ source: "asset", assetId: "asset-reference" });
-    expect(request.target).toEqual({ source: "artifact", artifactId: "artifact-target" });
-    expect(request.supportingImages[0]?.image).toEqual({
-      source: "upload",
-      uploadResourceId: "upload-supporting"
-    });
-    expect(request.mask?.targetSlot).toBe(0);
-  });
-
-  it("rejects invalid limits, controls, or edit invariants", () => {
-    const tooManyReferences = Array.from({ length: 16 }, (_, index) => ({
-      image: { source: "asset" as const, assetId: `asset-${index}` },
-      role: "reference" as const
-    }));
-    for (const value of [
-      { kind: "generate", prompt: "bad edit action", action: "edit" },
-      { kind: "generate", prompt: "bad PNG compression", format: "png", compression: 50 },
-      { kind: "generate", prompt: "bad transparency", format: "jpeg", transparentMode: "native" },
-      {
-        kind: "edit",
-        prompt: "missing invariants",
-        target: { source: "asset", assetId: "asset-target" }
-      },
-      {
-        kind: "edit",
-        prompt: "too many",
-        target: { source: "asset", assetId: "asset-target" },
-        references: tooManyReferences,
-        invariants: { preserve: ["subject"] }
-      },
-      {
-        kind: "edit",
-        prompt: "bad mask",
-        target: { source: "asset", assetId: "asset-target" },
-        mask: { image: { source: "upload", uploadResourceId: "upload-mask" }, targetSlot: 1 },
-        invariants: { preserve: ["subject"] }
-      }
+  it("rejects image locators, edit fields, and removed advanced workbench controls", () => {
+    for (const overrides of [
+      { references: [{ image: { source: "asset", assetId: "asset-a" }, role: "style" }] },
+      { quality: "high" },
+      { compression: 80, format: "jpeg" },
+      { partialImages: 1 },
+      { moderation: "low" },
+      { action: "generate" },
+      { previousResponseId: "resp-1" },
+      { imageIds: ["img-1"] },
+      { fileIds: ["file-1"] },
+      { outputDir: "C:\\\\Users\\\\person\\\\Pictures" },
+      { target: { source: "asset", assetId: "asset-target" } },
+      { mask: { image: { source: "upload", uploadResourceId: "upload-mask" }, targetSlot: 0 } }
     ]) {
-      expect(
-        (value.kind === "generate" ? studioGenerateInputSchema : studioEditInputSchema).safeParse(
-          value
-        ).success
-      ).toBe(false);
+      expect(studioGenerateInputSchema.safeParse({ kind: "generate", prompt: "ok", ...overrides }).success).toBe(
+        false
+      );
     }
+  });
+
+  it("rejects transparency conflicts with JPEG or WebP rather than rewriting the contract", () => {
+    expect(
+      studioGenerateInputSchema.safeParse({
+        kind: "generate",
+        prompt: "transparent jpeg",
+        format: "jpeg",
+        transparentMode: "native"
+      }).success
+    ).toBe(false);
+    expect(
+      studioGenerateInputSchema.safeParse({
+        kind: "generate",
+        prompt: "transparent webp",
+        format: "webp",
+        transparentMode: "auto"
+      }).success
+    ).toBe(false);
+    expect(
+      studioGenerateInputSchema.parse({
+        kind: "generate",
+        prompt: "transparent png",
+        format: "png",
+        transparentMode: "native"
+      }).transparentMode
+    ).toBe("native");
+  });
+
+  it("rejects the removed studioEdit operation before any resource resolution", () => {
+    expect(
+      studioEditInputSchema.safeParse({
+        kind: "edit",
+        prompt: "edit me",
+        target: { source: "asset", assetId: "asset-a" }
+      }).success
+    ).toBe(false);
+    expect(studioEditInputSchema.safeParse({ kind: "edit" }).success).toBe(false);
   });
 });
 
-describe("path-free Studio results, relationships, and SSE events", () => {
-  it("accepts path-free artifacts and rejects unsafe browser resources", () => {
-    const result = successResult(editRequest());
-    expect(result.finalArtifacts[0]).toMatchObject({
-      artifactId: "artifact-final",
-      resource: { requiresSession: true, mimeType: "image/png" }
-    });
-    expect(JSON.stringify(result)).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64|Authorization)/u);
-
+describe("path-free Studio generation results and events", () => {
+  it("accepts protected browser artifacts without local paths", () => {
+    const result = successResult();
+    expect(result.finalArtifacts[0]?.resource.requiresSession).toBe(true);
+    expect(JSON.stringify(result)).not.toMatch(/(?:filePath|"path"|C:\\|\/Users\/)/u);
     expect(
       studioImageOperationResultSchema.safeParse({
         ...result,
@@ -292,8 +235,8 @@ describe("path-free Studio results, relationships, and SSE events", () => {
           {
             ...result.finalArtifacts[0],
             resource: {
-              ...result.finalArtifacts[0]?.resource,
-              relativeUrl: "https://example.invalid/result.png"
+              ...result.finalArtifacts[0]!.resource,
+              relativeUrl: "C:\\\\Users\\\\person\\\\image.png"
             }
           }
         ]
@@ -301,116 +244,20 @@ describe("path-free Studio results, relationships, and SSE events", () => {
     ).toBe(false);
   });
 
-  it("represents partial output and matching billing/output flags", () => {
-    const request = generateRequest();
-    const partialArtifact = artifact("artifact-partial", "partial");
-    const error = studioServiceErrorSchema.parse({
-      code: "invalid_response",
-      category: "protocol",
-      stage: "stream",
-      safeMessage: "The synthetic stream ended after partial output.",
-      retryDisposition: "never",
-      partialArtifacts: [partialArtifact],
-      receivedAnyOutput: true,
-      mayHaveBilled: true
-    });
-    const result = studioImageOperationResultSchema.parse({
-      schemaVersion: 1,
-      requestId: "studio-request-partial",
-      status: "partial",
-      requestedParams: request,
-      effectiveParams: request,
-      execution: execution({ transport: "openai-responses" }),
-      finalArtifacts: [],
-      partialArtifacts: [partialArtifact],
-      failedSlots: [{ slot: 0, error }],
-      relationships: [
-        {
-          role: "stream-partial",
-          outputArtifactId: partialArtifact.artifactId,
-          order: 0
-        }
-      ],
-      error
-    });
-    expect(result).toMatchObject({
-      status: "partial",
-      execution: { receivedAnyOutput: true, mayHaveBilled: true },
-      error: { retryDisposition: "never" }
-    });
-  });
-
-  it("marks degraded continuation explicitly without changing path-free artifacts", () => {
-    const result = successResult(editRequest(), {
-      execution: execution({ degradedContinuation: true })
-    });
-    expect(result.execution.degradedContinuation).toBe(true);
-    expect(JSON.stringify(result.finalArtifacts)).not.toMatch(/(?:path|dataUrl|base64)/u);
-  });
-
-  it("validates target/reference/supporting/mask/output relationships", () => {
-    const request = editRequest();
-    const output = artifact("artifact-edit-output");
-    const result = studioImageOperationResultSchema.parse({
-      schemaVersion: 1,
-      requestId: "studio-request-edit",
-      status: "succeeded",
-      requestedParams: request,
-      effectiveParams: request,
-      execution: execution(),
-      finalArtifacts: [output],
-      relationships: [
-        {
-          role: "target",
-          input: request.target,
-          outputArtifactId: output.artifactId,
-          order: 0
-        },
-        {
-          role: "reference",
-          input: request.references[0]?.image,
-          outputArtifactId: output.artifactId,
-          order: 1
-        },
-        {
-          role: "supporting",
-          input: request.supportingImages[0]?.image,
-          outputArtifactId: output.artifactId,
-          order: 2
-        },
-        {
-          role: "mask",
-          input: request.mask?.image,
-          outputArtifactId: output.artifactId,
-          order: 3,
-          targetSlot: 0
-        },
-        { role: "output", outputArtifactId: output.artifactId, order: 4 }
-      ]
-    });
-    expect(result.relationships.map((relationship) => relationship.role)).toEqual([
-      "target",
-      "reference",
-      "supporting",
-      "mask",
-      "output"
-    ]);
-  });
-
-  it("covers started, partial, completed, and failed SSE projections", () => {
+  it("preserves ordered started, partial, completed, and failed events", () => {
     const request = generateRequest();
     const partialArtifact = artifact("artifact-event-partial", "partial");
     const failed = failureError();
     const events = [
       {
-        type: "started",
+        type: "started" as const,
         requestId: "studio-event-request",
         sequence: 0,
         occurredAt: TEST_TIMESTAMP,
         requestedParams: request
       },
       {
-        type: "partial",
+        type: "partial" as const,
         requestId: "studio-event-request",
         sequence: 1,
         occurredAt: TEST_TIMESTAMP,
@@ -419,14 +266,14 @@ describe("path-free Studio results, relationships, and SSE events", () => {
         mayHaveBilled: true
       },
       {
-        type: "completed",
+        type: "completed" as const,
         requestId: "studio-event-request",
         sequence: 2,
         occurredAt: TEST_TIMESTAMP,
         result: successResult(request)
       },
       {
-        type: "failed",
+        type: "failed" as const,
         requestId: "studio-event-request-failed",
         sequence: 0,
         occurredAt: TEST_TIMESTAMP,
@@ -451,17 +298,20 @@ describe("path-free Studio results, relationships, and SSE events", () => {
 });
 
 describe("ordered path-free Studio batch contracts", () => {
-  it("preserves task order and derives succeeded, partial, and failed status", () => {
-    const first = generateRequest();
-    const second = editRequest();
+  it("uses fixed concurrency two, preserves order, and derives succeeded/partial/failed", () => {
+    const first = generateRequest({ prompt: "first", count: 1, size: "1024x1024" });
+    const second = generateRequest({ prompt: "second", count: 2, aspectRatio: "1:1" });
     const input = studioBatchInputSchema.parse({
       tasks: [
         { id: "task-first", operation: first },
         { id: "task-second", operation: second }
-      ],
-      concurrency: 2
+      ]
     });
+    expect(input.concurrency).toBe(2);
     expect(input.tasks.map((task) => task.id)).toEqual(["task-first", "task-second"]);
+    expect(input.tasks[0]?.operation.format).toBe("png");
+    expect(input.tasks[0]?.operation.count).toBe(1);
+    expect(input.tasks[1]?.operation.count).toBe(2);
 
     const partial = studioBatchResultSchema.parse({
       schemaVersion: 1,
@@ -511,26 +361,44 @@ describe("ordered path-free Studio batch contracts", () => {
     ).toBe("failed");
   });
 
-  it("rejects duplicate task identities and invalid bounds", () => {
+  it("rejects duplicate task identities, edit items, concurrency overrides, and oversized batches", () => {
     const operation = generateRequest();
     expect(
       studioBatchInputSchema.safeParse({
         tasks: [
           { id: "duplicate", operation },
           { id: "duplicate", operation }
-        ],
-        concurrency: 11
+        ]
+      }).success
+    ).toBe(false);
+    expect(
+      studioBatchInputSchema.safeParse({
+        tasks: [{ id: "task-edit", operation: { kind: "edit", prompt: "no" } }]
+      }).success
+    ).toBe(false);
+    expect(
+      studioBatchInputSchema.safeParse({
+        tasks: [{ id: "task-one", operation }],
+        concurrency: 4
+      }).success
+    ).toBe(false);
+    expect(
+      studioBatchInputSchema.safeParse({
+        tasks: Array.from({ length: 21 }, (_, index) => ({
+          id: `task-${index}`,
+          operation
+        }))
       }).success
     ).toBe(false);
   });
 });
 
 describe("Studio creation operation definitions", () => {
-  it("registers path-free creation internally without changing the public seven", () => {
+  it("registers path-free generation/batch internally without changing the public seven", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
-      "edit",
+      "prepareRegeneration",
       "batch",
       "searchLibrary",
       "manageLibrary",
@@ -539,18 +407,19 @@ describe("Studio creation operation definitions", () => {
     expect(Object.values(routegoOperationDefinitions).map((item) => item.toolName)).toEqual([
       "routego_status",
       "routego_generate",
-      "routego_edit",
+      "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
       "routego_manage_library",
       "routego_open_studio"
     ]);
-    for (const operation of ["studioGenerate", "studioEdit", "studioBatch"] as const) {
-      expect(studioOperationDefinitions[operation].http.path).toMatch(
-        /^\/api\/v1\/studio\/creation\//u
-      );
-      expect("toolName" in studioOperationDefinitions[operation]).toBe(false);
-    }
+    expect(studioOperationDefinitions.studioGenerate.http.path).toMatch(
+      /^\/api\/v1\/studio\/creation\//u
+    );
+    expect(studioOperationDefinitions.studioBatch.http.path).toMatch(
+      /^\/api\/v1\/studio\/creation\//u
+    );
+    expect("toolName" in studioOperationDefinitions.studioGenerate).toBe(false);
   });
 
   it("dispatches exact path-free inputs and outputs", () => {
@@ -562,7 +431,7 @@ describe("Studio creation operation definitions", () => {
     expect(() =>
       parseStudioOperationInput("studioGenerate", {
         ...request,
-        outputDir: "C:\\Users\\person\\Pictures"
+        outputDir: "C:\\\\Users\\\\person\\\\Pictures"
       })
     ).toThrow();
   });

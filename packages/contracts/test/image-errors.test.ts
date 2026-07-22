@@ -7,7 +7,6 @@ import {
   routegoServiceErrorSchema
 } from "../src/index";
 import {
-  createEditRequest,
   createGenerateRequest,
   TEST_IMAGE_DATA_URL,
   TEST_TIMESTAMP
@@ -45,47 +44,37 @@ describe("image operation contracts", () => {
     expect(imageOperationRequestSchema.safeParse({ ...variants, count: 5 }).success).toBe(false);
   });
 
-  it("accepts a fully described edit and binds mask semantics to its target", () => {
-    const edit = createEditRequest({
-      maskPath: "C:\\Users\\测试 用户\\Masks\\mask alpha.png",
-      supportingImages: [
-        { path: "/tmp/supporting image.png", role: "supporting", label: "服装参考" }
-      ]
-    });
-    expect(edit.kind).toBe("edit");
-    expect(edit.maskPath).toContain("mask alpha.png");
-    expect(edit.targetImage?.id).toBe("target-0");
-  });
-
   it.each([
-    {
-      kind: "edit",
-      prompt: "missing target",
-      invariants: { preserve: ["subject"] }
-    },
-    { kind: "generate", prompt: "mask without target", maskPath: "/tmp/mask.png" },
+    { kind: "edit", prompt: "removed operation" },
+    { kind: "generate", prompt: "target image", targetImage: { path: "/tmp/target.png" } },
+    { kind: "generate", prompt: "target alias", target: { path: "/tmp/target.png" } },
+    { kind: "generate", prompt: "supporting image", supportingImages: [] },
+    { kind: "generate", prompt: "mask", maskPath: "/tmp/mask.png" },
+    { kind: "generate", prompt: "invariants", invariants: { preserve: ["subject"] } },
+    { kind: "generate", prompt: "edit action", action: "edit" },
+    { kind: "generate", prompt: "continuation response", previousResponseId: "response-1" },
+    { kind: "generate", prompt: "continuation images", imageIds: ["image-1"] },
+    { kind: "generate", prompt: "continuation files", fileIds: ["file-1"] },
     { kind: "generate", prompt: "bad count", count: 0 },
     { kind: "generate", prompt: "bad compression", format: "jpeg", compression: 101 },
     { kind: "generate", prompt: "PNG compression", format: "png", compression: 50 },
     { kind: "generate", prompt: "transparent JPEG", format: "jpeg", transparentMode: "native" },
     { kind: "generate", prompt: "unknown", unexpected: true }
-  ])("rejects ambiguous, bounded, or unknown request shape %#", (value) => {
+  ])("rejects removed, bounded, or unknown request shape %#", (value) => {
     expect(imageOperationRequestSchema.safeParse(value).success).toBe(false);
   });
 
-  it("rejects more than sixteen ordered physical image inputs", () => {
-    const references = Array.from({ length: 16 }, (_, index) => ({
+  it("rejects more than five ordered references", () => {
+    const references = Array.from({ length: 6 }, (_, index) => ({
       id: `reference-${index}`,
       path: `/tmp/reference-${index}.png`,
       role: "reference" as const
     }));
     expect(
       imageOperationRequestSchema.safeParse({
-        kind: "edit",
+        kind: "generate",
         prompt: "too many",
-        references,
-        targetImage: { path: "/tmp/target.png" },
-        invariants: { preserve: ["subject"] }
+        references
       }).success
     ).toBe(false);
   });

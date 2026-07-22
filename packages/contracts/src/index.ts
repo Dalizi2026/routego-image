@@ -5,7 +5,18 @@ export * from "./errors";
 export * from "./image";
 export * from "./library";
 export * from "./provider";
-export * from "./service";
+export {
+  studioOperationNames,
+  type StudioOperation,
+  studioOperationDefinitions,
+  type StudioSettingsService,
+  type StudioLibraryService,
+  type StudioUploadService,
+  type StudioCreationService,
+  type LocalRoutegoService,
+  parseStudioOperationInput,
+  parseStudioOperationOutput
+} from "./service";
 export * from "./settings";
 export * from "./studio-creation";
 export * from "./tools";

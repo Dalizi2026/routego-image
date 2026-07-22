@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-import { filePathSchema, identifierSchema, routegoSchemaVersionSchema, timestampSchema } from "./common";
+import {
+  filePathSchema,
+  identifierSchema,
+  nonEmptyTextSchema,
+  routegoSchemaVersionSchema,
+  timestampSchema
+} from "./common";
 import { failedOutputSlotSchema, routegoServiceErrorSchema } from "./errors";
 import {
   aspectRatioSchema,
@@ -145,23 +151,97 @@ export const routegoGenerateInputSchema = imageOperationRequestSchema.refine(
   { message: "routego_generate requires kind=generate", path: ["kind"] }
 );
 
-export const routegoEditInputSchema = imageOperationRequestSchema.refine(
-  (value) => value.kind === "edit",
-  { message: "routego_edit requires kind=edit", path: ["kind"] }
-);
+/**
+ * @deprecated Removed from the public seven-tool surface. Retained only so
+ * temporary in-package consumers can still typecheck until later cutover tasks.
+ * Validation always fails.
+ */
+export const routegoEditInputSchema = z
+  .object({
+    kind: z.literal("edit")
+  })
+  .strict()
+  .superRefine((_value, context) => {
+    context.addIssue({
+      code: "custom",
+      path: ["kind"],
+      message: "routego_edit is removed; use routego_prepare_regeneration then routego_generate"
+    });
+  });
+
+export const routegoPrepareRegenerationInputSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    recordId: identifierSchema.optional()
+  })
+  .strict();
+
+export const generationRecipeSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    kind: z.literal("generate"),
+    sourceRecordId: identifierSchema,
+    prompt: nonEmptyTextSchema,
+    referenceIds: z.array(identifierSchema).max(5).default([]),
+    size: imageSizeSchema.default("auto"),
+    aspectRatio: aspectRatioSchema.default("auto"),
+    quality: imageQualitySchema.default("auto"),
+    format: imageFormatSchema.default("png"),
+    compression: z.number().int().min(0).max(100).optional(),
+    count: z.number().int().min(1).max(4).default(1),
+    partialImages: z.number().int().min(0).max(3).default(0),
+    transparentMode: transparentModeSchema.default("off"),
+    moderation: moderationSchema.default("auto"),
+    saveToLibrary: z.boolean().default(true)
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.compression !== undefined && value.format === "png") {
+      context.addIssue({
+        code: "custom",
+        path: ["compression"],
+        message: "Compression percentage applies only to JPEG or WebP output"
+      });
+    }
+
+    if (value.transparentMode !== "off" && value.format !== "png") {
+      context.addIssue({
+        code: "custom",
+        path: ["format"],
+        message: "Transparent output requires PNG format"
+      });
+    }
+  });
+
+export const routegoPrepareRegenerationResultSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    recipe: generationRecipeSchema,
+    providerRequestCount: z.literal(0),
+    markUnchanged: z.literal(true)
+  })
+  .strict();
 
 export const routegoBatchItemSchema = z
   .object({
     id: identifierSchema,
     operation: imageOperationRequestSchema
   })
-  .strict();
+  .strict()
+  .superRefine((value, context) => {
+    if (value.operation.kind !== "generate") {
+      context.addIssue({
+        code: "custom",
+        path: ["operation", "kind"],
+        message: "Batch items must be generation operations"
+      });
+    }
+  });
 
 export const routegoBatchInputSchema = z
   .object({
     schemaVersion: routegoSchemaVersionSchema.default(1),
-    tasks: z.array(routegoBatchItemSchema).min(1).max(20),
-    concurrency: z.number().int().min(1).max(10).default(3)
+    tasks: z.array(routegoBatchItemSchema).min(1).max(20)
   })
   .strict()
   .superRefine((value, context) => {
@@ -173,14 +253,18 @@ export const routegoBatchInputSchema = z
         message: "Batch task identifiers must be unique"
       });
     }
-  });
+  })
+  .transform((value) => ({
+    ...value,
+    concurrency: 2 as const
+  }));
 
 export const routegoBatchResultSchema = z
   .object({
     schemaVersion: routegoSchemaVersionSchema,
     requestId: identifierSchema,
     status: z.enum(["succeeded", "partial", "failed", "cancelled"]),
-    concurrency: z.number().int().min(1).max(10),
+    concurrency: z.literal(2),
     items: z
       .array(
         z
@@ -342,8 +426,13 @@ export type ImageOperationResult = z.infer<typeof imageOperationResultSchema>;
 export type RoutegoStatusInput = z.input<typeof routegoStatusInputSchema>;
 export type RoutegoStatusResult = z.output<typeof routegoStatusResultSchema>;
 export type RoutegoGenerateInput = z.input<typeof routegoGenerateInputSchema>;
+/** @deprecated Removed public tool input. */
 export type RoutegoEditInput = z.input<typeof routegoEditInputSchema>;
+export type RoutegoPrepareRegenerationInput = z.input<typeof routegoPrepareRegenerationInputSchema>;
+export type GenerationRecipe = z.output<typeof generationRecipeSchema>;
+export type RoutegoPrepareRegenerationResult = z.output<typeof routegoPrepareRegenerationResultSchema>;
 export type RoutegoBatchInput = z.input<typeof routegoBatchInputSchema>;
+export type RoutegoBatchParsedInput = z.output<typeof routegoBatchInputSchema>;
 export type RoutegoBatchResult = z.output<typeof routegoBatchResultSchema>;
 export type RoutegoSearchLibraryInput = z.input<typeof routegoSearchLibraryInputSchema>;
 export type RoutegoSearchLibraryResult = z.output<typeof routegoSearchLibraryResultSchema>;
@@ -351,3 +440,88 @@ export type RoutegoManageLibraryInput = z.input<typeof routegoManageLibraryInput
 export type RoutegoManageLibraryResult = z.output<typeof routegoManageLibraryResultSchema>;
 export type RoutegoOpenStudioInput = z.input<typeof routegoOpenStudioInputSchema>;
 export type RoutegoOpenStudioResult = z.output<typeof routegoOpenStudioResultSchema>;
+
+export const routegoOperationNames = [
+  "status",
+  "generate",
+  "prepareRegeneration",
+  "batch",
+  "searchLibrary",
+  "manageLibrary",
+  "openStudio"
+] as const;
+
+export type RoutegoOperation = (typeof routegoOperationNames)[number];
+
+export const routegoOperationDefinitions = {
+  status: {
+    toolName: "routego_status",
+    http: { method: "GET" as const, path: "/api/v1/status" },
+    inputSchema: routegoStatusInputSchema,
+    outputSchema: routegoStatusResultSchema
+  },
+  generate: {
+    toolName: "routego_generate",
+    http: { method: "POST" as const, path: "/api/v1/generate" },
+    inputSchema: routegoGenerateInputSchema,
+    outputSchema: imageOperationResultSchema
+  },
+  prepareRegeneration: {
+    toolName: "routego_prepare_regeneration",
+    http: { method: "POST" as const, path: "/api/v1/prepare-regeneration" },
+    inputSchema: routegoPrepareRegenerationInputSchema,
+    outputSchema: routegoPrepareRegenerationResultSchema
+  },
+  batch: {
+    toolName: "routego_batch",
+    http: { method: "POST" as const, path: "/api/v1/batch" },
+    inputSchema: routegoBatchInputSchema,
+    outputSchema: routegoBatchResultSchema
+  },
+  searchLibrary: {
+    toolName: "routego_search_library",
+    http: { method: "POST" as const, path: "/api/v1/library/search" },
+    inputSchema: routegoSearchLibraryInputSchema,
+    outputSchema: routegoSearchLibraryResultSchema
+  },
+  manageLibrary: {
+    toolName: "routego_manage_library",
+    http: { method: "POST" as const, path: "/api/v1/library/manage" },
+    inputSchema: routegoManageLibraryInputSchema,
+    outputSchema: routegoManageLibraryResultSchema
+  },
+  openStudio: {
+    toolName: "routego_open_studio",
+    http: { method: "POST" as const, path: "/api/v1/studio/open" },
+    inputSchema: routegoOpenStudioInputSchema,
+    outputSchema: routegoOpenStudioResultSchema
+  }
+} as const satisfies Record<
+  RoutegoOperation,
+  {
+    toolName: string;
+    http: { method: "GET" | "POST"; path: string };
+    inputSchema: z.ZodType;
+    outputSchema: z.ZodType;
+  }
+>;
+
+export interface RoutegoService {
+  status(input: RoutegoStatusInput): Promise<RoutegoStatusResult>;
+  generate(input: RoutegoGenerateInput): Promise<ImageOperationResult>;
+  prepareRegeneration(
+    input: RoutegoPrepareRegenerationInput
+  ): Promise<RoutegoPrepareRegenerationResult>;
+  batch(input: RoutegoBatchInput): Promise<RoutegoBatchResult>;
+  searchLibrary(input: RoutegoSearchLibraryInput): Promise<RoutegoSearchLibraryResult>;
+  manageLibrary(input: RoutegoManageLibraryInput): Promise<RoutegoManageLibraryResult>;
+  openStudio(input: RoutegoOpenStudioInput): Promise<RoutegoOpenStudioResult>;
+}
+
+export function parseRoutegoOperationInput(operation: RoutegoOperation, input: unknown): unknown {
+  return routegoOperationDefinitions[operation].inputSchema.parse(input);
+}
+
+export function parseRoutegoOperationOutput(operation: RoutegoOperation, output: unknown): unknown {
+  return routegoOperationDefinitions[operation].outputSchema.parse(output);
+}

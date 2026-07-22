@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "829cd175b478e2225da8b93a756a857ba4ebafacfdf93d769990c663f3980cbb",
+  "event": "streamline-task-1.2-accepted",
+  "lane": "streamline",
+  "change": "streamline-routego-image-generation",
+  "taskId": "1.2",
+  "status": "accepted",
+  "implementationCommit": "d9658f0bc5ee40f816bcf2ae9ab40c22cf68b1c3",
+  "taskStateCommit": "dc3908fc91079ba643d5a235641457c50f154b50",
+  "workerThreadId": "019f899c-f862-7a01-aed7-6448d337cd85",
+  "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
+  "branch": "codex/routego-streamline-g1",
+  "tests": [
+    {
+      "command": "pnpm --filter @routego-image/contracts exec vitest run test/tools-service.test.ts",
+      "result": "pass",
+      "passed": 8,
+      "retester": "controller-g12-independent"
+    }
+  ],
+  "scopeExact": true,
+  "scopeFiles": [
+    "packages/contracts/src/index.ts",
+    "packages/contracts/src/tools.ts",
+    "packages/contracts/test/tools-service.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "gitCleanAtAcceptance": true,
+  "observableCompactions": 0,
+  "controllerAcceptance": "independent-retest-and-scope-audit-passed",
+  "nextTaskId": "1.3",
+  "externalStateAuthorized": false,
+  "notes": "Apply-owner process exited after commits; project-bound replacement session died at startup. Controller independently retested before acceptance."
+}

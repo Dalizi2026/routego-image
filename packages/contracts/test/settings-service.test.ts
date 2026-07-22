@@ -12,6 +12,8 @@ import {
   routegoOperationNames,
   studioOperationDefinitions,
   studioOperationNames,
+  studioProviderSwitchInputSchema,
+  studioProviderSwitchResultSchema,
   outputDirectoryMutationSchema,
   updateSettingsInputSchema,
   updateSettingsResultSchema,
@@ -317,12 +319,105 @@ describe("defaults and output-directory mutation contracts", () => {
   });
 });
 
+describe("browser-safe Header provider switch contracts", () => {
+  it("activates a profile for future submissions and reports model preservation", () => {
+    expect(
+      studioProviderSwitchInputSchema.parse({
+        profileId: "provider-b",
+        preferredModel: "gpt-image-2"
+      })
+    ).toMatchObject({ profileId: "provider-b", preferredModel: "gpt-image-2" });
+
+    const preserved = studioProviderSwitchResultSchema.parse({
+      schemaVersion: 1,
+      status: "succeeded",
+      activeProviderId: "provider-b",
+      selectedModel: "gpt-image-2",
+      modelPreserved: true,
+      profile: { ...profile, id: "provider-b", isActive: true },
+      appliesToFutureSubmissionsOnly: true
+    });
+    expect(preserved.modelPreserved).toBe(true);
+    expect(preserved.appliesToFutureSubmissionsOnly).toBe(true);
+
+    const fallback = studioProviderSwitchResultSchema.parse({
+      schemaVersion: 1,
+      status: "succeeded",
+      activeProviderId: "provider-b",
+      selectedModel: "default-model-b",
+      modelPreserved: false,
+      profile: {
+        ...profile,
+        id: "provider-b",
+        defaultModel: "default-model-b",
+        models: ["default-model-b"],
+        isActive: true
+      },
+      appliesToFutureSubmissionsOnly: true
+    });
+    expect(fallback.selectedModel).toBe("default-model-b");
+    expect(fallback.modelPreserved).toBe(false);
+  });
+
+  it("rejects false success and keeps failure free of a claimed new selection", () => {
+    expect(
+      studioProviderSwitchResultSchema.safeParse({
+        schemaVersion: 1,
+        status: "succeeded",
+        activeProviderId: "provider-b",
+        selectedModel: "gpt-image-2",
+        modelPreserved: true,
+        profile: { ...profile, id: "provider-b", isActive: false },
+        appliesToFutureSubmissionsOnly: true
+      }).success
+    ).toBe(false);
+
+    expect(
+      studioProviderSwitchResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: {
+          code: "config_missing",
+          category: "configuration",
+          stage: "configure",
+          safeMessage: "The selected provider profile is unavailable.",
+          retryDisposition: "user-confirmation",
+          partialArtifacts: [],
+          receivedAnyOutput: false,
+          mayHaveBilled: false
+        }
+      }).status
+    ).toBe("failed");
+
+    expect(
+      studioProviderSwitchResultSchema.safeParse({
+        schemaVersion: 1,
+        status: "failed",
+        activeProviderId: "provider-b",
+        selectedModel: "gpt-image-2",
+        modelPreserved: false,
+        appliesToFutureSubmissionsOnly: true,
+        error: {
+          code: "config_missing",
+          category: "configuration",
+          stage: "configure",
+          safeMessage: "The selected provider profile is unavailable.",
+          retryDisposition: "user-confirmation",
+          partialArtifacts: [],
+          receivedAnyOutput: false,
+          mayHaveBilled: false
+        }
+      }).success
+    ).toBe(false);
+  });
+});
+
 describe("separate Studio operation registry", () => {
   it("keeps the seven public operations and MCP tool names frozen", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
-      "edit",
+      "prepareRegeneration",
       "batch",
       "searchLibrary",
       "manageLibrary",
@@ -331,7 +426,7 @@ describe("separate Studio operation registry", () => {
     expect(Object.values(routegoOperationDefinitions).map((item) => item.toolName)).toEqual([
       "routego_status",
       "routego_generate",
-      "routego_edit",
+      "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
       "routego_manage_library",

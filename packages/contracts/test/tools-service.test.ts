@@ -1,35 +1,34 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  generationRecipeSchema,
   imageOperationResultSchema,
   parseRoutegoOperationInput,
   parseRoutegoOperationOutput,
   routegoBatchInputSchema,
   routegoBatchResultSchema,
+  routegoEditInputSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
   routegoOpenStudioInputSchema,
   routegoOpenStudioResultSchema,
   routegoOperationDefinitions,
   routegoOperationNames,
+  routegoPrepareRegenerationInputSchema,
+  routegoPrepareRegenerationResultSchema,
   routegoSearchLibraryInputSchema,
   routegoSearchLibraryResultSchema,
   routegoStatusInputSchema,
   routegoStatusResultSchema
 } from "../src/index";
-import {
-  createEditRequest,
-  createGenerateRequest,
-  createSuccessResult,
-  TEST_TIMESTAMP
-} from "./fixtures";
+import { createGenerateRequest, createSuccessResult, TEST_TIMESTAMP } from "./fixtures";
 
 describe("seven public tool contracts", () => {
   it("freezes all seven MCP names and loopback HTTP mappings to shared schemas", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
-      "edit",
+      "prepareRegeneration",
       "batch",
       "searchLibrary",
       "manageLibrary",
@@ -38,12 +37,17 @@ describe("seven public tool contracts", () => {
     expect(Object.values(routegoOperationDefinitions).map((item) => item.toolName)).toEqual([
       "routego_status",
       "routego_generate",
-      "routego_edit",
+      "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
       "routego_manage_library",
       "routego_open_studio"
     ]);
+    expect(routegoOperationNames).toHaveLength(7);
+    expect(routegoOperationNames).not.toContain("edit");
+    expect(
+      Object.values(routegoOperationDefinitions).map((item) => item.toolName)
+    ).not.toContain("routego_edit");
 
     for (const operation of routegoOperationNames) {
       const definition = routegoOperationDefinitions[operation];
@@ -58,9 +62,7 @@ describe("seven public tool contracts", () => {
       refreshCapabilities: false,
       confirmBillableProbe: false
     });
-    expect(
-      routegoStatusInputSchema.safeParse({ confirmBillableProbe: true }).success
-    ).toBe(false);
+    expect(routegoStatusInputSchema.safeParse({ confirmBillableProbe: true }).success).toBe(false);
 
     const result = routegoStatusResultSchema.parse({
       schemaVersion: 1,
@@ -92,21 +94,23 @@ describe("seven public tool contracts", () => {
     expect(result.hasApiKey).toBe(false);
   });
 
-  it("keeps variants separate from a bounded ordered batch", () => {
+  it("keeps generation-only batches with fixed concurrency two", () => {
     const input = routegoBatchInputSchema.parse({
       tasks: [
-        { id: "task-generate", operation: createGenerateRequest({ count: 4 }) },
-        { id: "task-edit", operation: createEditRequest() }
-      ],
-      concurrency: 10
+        { id: "task-generate-a", operation: createGenerateRequest({ count: 4 }) },
+        { id: "task-generate-b", operation: createGenerateRequest({ prompt: "第二张独立生成" }) }
+      ]
     });
-    expect(input.tasks.map((item) => item.id)).toEqual(["task-generate", "task-edit"]);
+    expect(input.tasks.map((item) => item.id)).toEqual(["task-generate-a", "task-generate-b"]);
     expect(input.tasks[0]?.operation.count).toBe(4);
-    expect(input.concurrency).toBe(10);
+    expect(input.concurrency).toBe(2);
 
     expect(
       routegoBatchInputSchema.safeParse({
-        tasks: [{ id: "duplicate", operation: createGenerateRequest() }, { id: "duplicate", operation: createGenerateRequest() }]
+        tasks: [
+          { id: "duplicate", operation: createGenerateRequest() },
+          { id: "duplicate", operation: createGenerateRequest() }
+        ]
       }).success
     ).toBe(false);
     expect(
@@ -114,21 +118,107 @@ describe("seven public tool contracts", () => {
         tasks: Array.from({ length: 21 }, (_, index) => ({
           id: `task-${index}`,
           operation: createGenerateRequest()
-        })),
-        concurrency: 11
+        }))
+      }).success
+    ).toBe(false);
+    expect(
+      routegoBatchInputSchema.safeParse({
+        tasks: [{ id: "task-1", operation: createGenerateRequest() }],
+        concurrency: 3
+      }).success
+    ).toBe(false);
+    expect(
+      routegoBatchInputSchema.safeParse({
+        tasks: [{ id: "task-1", operation: createGenerateRequest() }],
+        concurrency: 2
+      }).success
+    ).toBe(false);
+    expect(
+      routegoBatchResultSchema.safeParse({
+        schemaVersion: 1,
+        requestId: "batch-result-1",
+        status: "succeeded",
+        concurrency: 3,
+        items: [{ id: "task-1", result: createSuccessResult() }]
       }).success
     ).toBe(false);
   });
 
-  it("validates library search/manage and UTF-8 path results", () => {
-    const search = routegoSearchLibraryInputSchema.parse({
-      query: "宇航猫 🚀",
-      kinds: ["generate"],
-      statuses: ["succeeded"],
-      limit: 20
-    });
-    expect(search.query).toBe("宇航猫 🚀");
+  it("rejects removed edit tool input and accepts read-only prepare_regeneration recipes", () => {
+    expect(
+      routegoEditInputSchema.safeParse({
+        kind: "edit",
+        prompt: "should fail",
+        target: { path: "/tmp/target.png" }
+      }).success
+    ).toBe(false);
+    expect(routegoEditInputSchema.safeParse({ kind: "edit" }).success).toBe(false);
 
+    expect(routegoPrepareRegenerationInputSchema.parse({})).toEqual({
+      schemaVersion: 1
+    });
+    expect(
+      routegoPrepareRegenerationInputSchema.parse({
+        recordId: "asset-generation-1"
+      })
+    ).toEqual({
+      schemaVersion: 1,
+      recordId: "asset-generation-1"
+    });
+    expect(
+      routegoPrepareRegenerationInputSchema.safeParse({
+        recordId: "asset-1",
+        unknown: true
+      }).success
+    ).toBe(false);
+
+    const recipe = generationRecipeSchema.parse({
+      kind: "generate",
+      sourceRecordId: "asset-generation-1",
+      prompt: "宇航猫 🚀",
+      referenceIds: ["ref-1", "ref-2"],
+      size: "1024x1024",
+      count: 2
+    });
+    expect(recipe.referenceIds).toEqual(["ref-1", "ref-2"]);
+    expect(recipe).not.toHaveProperty("outputDir");
+    expect(
+      generationRecipeSchema.safeParse({
+        kind: "generate",
+        sourceRecordId: "asset-1",
+        prompt: "too many refs",
+        referenceIds: ["a", "b", "c", "d", "e", "f"]
+      }).success
+    ).toBe(false);
+    expect(
+      generationRecipeSchema.safeParse({
+        kind: "generate",
+        sourceRecordId: "asset-1",
+        prompt: "path leak",
+        referenceIds: [],
+        outputDir: "/Users/secret/out"
+      }).success
+    ).toBe(false);
+
+    const prepared = routegoPrepareRegenerationResultSchema.parse({
+      schemaVersion: 1,
+      recipe,
+      providerRequestCount: 0,
+      markUnchanged: true
+    });
+    expect(prepared.providerRequestCount).toBe(0);
+    expect(prepared.markUnchanged).toBe(true);
+    expect(
+      routegoPrepareRegenerationResultSchema.safeParse({
+        schemaVersion: 1,
+        recipe,
+        providerRequestCount: 1,
+        markUnchanged: true
+      }).success
+    ).toBe(false);
+  });
+
+  it("accepts non-ASCII library paths and folder names without truncation", () => {
     const searchResult = routegoSearchLibraryResultSchema.parse({
       schemaVersion: 1,
       items: [
@@ -192,18 +282,41 @@ describe("seven public tool contracts", () => {
 
   it("dispatches inputs and outputs through the exact shared operation schemas", () => {
     const generate = createGenerateRequest();
-    const edit = createEditRequest();
     const imageResult = createSuccessResult(generate);
-    const batchInput = routegoBatchInputSchema.parse({
-      tasks: [{ id: "task-1", operation: generate }],
-      concurrency: 1
-    });
+    const batchRawInput = {
+      tasks: [{ id: "task-1", operation: generate }]
+    };
+    const batchInput = routegoBatchInputSchema.parse(batchRawInput);
+    expect(batchInput.concurrency).toBe(2);
     const batchResult = routegoBatchResultSchema.parse({
       schemaVersion: 1,
       requestId: "batch-result-1",
       status: "succeeded",
-      concurrency: 1,
+      concurrency: 2,
       items: [{ id: "task-1", result: imageResult }]
+    });
+    const prepareInput = routegoPrepareRegenerationInputSchema.parse({
+      recordId: "asset-generation-1"
+    });
+    const prepareOutput = routegoPrepareRegenerationResultSchema.parse({
+      schemaVersion: 1,
+      recipe: {
+        kind: "generate",
+        sourceRecordId: "asset-generation-1",
+        prompt: generate.prompt,
+        referenceIds: [],
+        size: generate.size,
+        aspectRatio: generate.aspectRatio,
+        quality: generate.quality,
+        format: generate.format,
+        count: generate.count,
+        partialImages: generate.partialImages,
+        transparentMode: generate.transparentMode,
+        moderation: generate.moderation,
+        saveToLibrary: generate.saveToLibrary
+      },
+      providerRequestCount: 0,
+      markUnchanged: true
     });
     const fixtures = {
       status: {
@@ -237,8 +350,8 @@ describe("seven public tool contracts", () => {
         })
       },
       generate: { input: generate, output: imageOperationResultSchema.parse(imageResult) },
-      edit: { input: edit, output: imageOperationResultSchema.parse(createSuccessResult(edit)) },
-      batch: { input: batchInput, output: batchResult },
+      prepareRegeneration: { input: prepareInput, output: prepareOutput },
+      batch: { input: batchRawInput, output: batchResult },
       searchLibrary: {
         input: routegoSearchLibraryInputSchema.parse({}),
         output: routegoSearchLibraryResultSchema.parse({ schemaVersion: 1, items: [] })
@@ -266,9 +379,12 @@ describe("seven public tool contracts", () => {
     } as const;
 
     for (const operation of routegoOperationNames) {
-      expect(parseRoutegoOperationInput(operation, fixtures[operation].input)).toEqual(
-        fixtures[operation].input
-      );
+      const parsedInput = parseRoutegoOperationInput(operation, fixtures[operation].input);
+      if (operation === "batch") {
+        expect(parsedInput).toEqual(batchInput);
+      } else {
+        expect(parsedInput).toEqual(fixtures[operation].input);
+      }
       expect(parseRoutegoOperationOutput(operation, fixtures[operation].output)).toEqual(
         fixtures[operation].output
       );
@@ -276,12 +392,20 @@ describe("seven public tool contracts", () => {
   });
 
   it("rejects unknown fields at public boundaries", () => {
-    expect(routegoSearchLibraryInputSchema.safeParse({ limit: 10, unknown: true }).success).toBe(false);
+    expect(routegoSearchLibraryInputSchema.safeParse({ limit: 10, unknown: true }).success).toBe(
+      false
+    );
     expect(
       routegoManageLibraryInputSchema.safeParse({
         action: "create-folder",
         name: "folder",
         unknown: true
+      }).success
+    ).toBe(false);
+    expect(
+      routegoPrepareRegenerationInputSchema.safeParse({
+        recordId: "asset-1",
+        path: "/Users/secret.png"
       }).success
     ).toBe(false);
   });
