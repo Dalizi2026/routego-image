@@ -11,6 +11,10 @@ export type ProviderContextSource =
   | ProviderRuntimeContext
   | ((request: ImageOperationRequest) => ProviderRuntimeContext | Promise<ProviderRuntimeContext>);
 
+/**
+ * Retained as an inert dependency shape for callers compiled before retry removal.
+ * The executor never waits or replays a provider request.
+ */
 export type ExecutionSleep = (milliseconds: number, signal: AbortSignal) => Promise<void>;
 
 export interface ResolvedExecutionOptions {

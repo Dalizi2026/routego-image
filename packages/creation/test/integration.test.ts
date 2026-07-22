@@ -355,35 +355,31 @@ describe("Creation package integration", () => {
     }
   });
 
-  it("retries one eligible same-endpoint failure before using the offline relay result", async () => {
+  it("returns a pre-generation server failure after one provider request", async () => {
     const server = await startMockRelayTestServer({ fixture: "single-endpoint-text" });
     try {
       const calls: string[] = [];
-      let attempt = 0;
-      const retryingFetch: typeof fetch = async (input, init) => {
+      const failingFetch: typeof fetch = async (input) => {
         calls.push(String(input));
-        attempt += 1;
-        if (attempt === 1) {
-          return Response.json(
-            { error: { code: "temporary", message: "Synthetic pre-generation failure." } },
-            { status: 503 }
-          );
-        }
-        return fetch(input, init);
+        return Response.json(
+          { error: { code: "temporary", message: "Synthetic pre-generation failure." } },
+          { status: 503 }
+        );
       };
       const runtime = providerRuntime(server, {
-        fetch: retryingFetch,
+        fetch: failingFetch,
         retry: { maxAttempts: 2, baseDelayMs: 1, maxDelayMs: 1 }
       });
       const result = await createCreationImageService(
-        dependencies(runtime, "retry", { sleep: async () => undefined })
-      ).generate({ kind: "generate", prompt: "Offline safe retry" });
+        dependencies(runtime, "single-request")
+      ).generate({ kind: "generate", prompt: "Offline single request" });
       expect(result).toMatchObject({
-        status: "succeeded",
-        execution: { attemptCount: 2, providerRequestCount: 2 }
+        status: "failed",
+        error: { code: "provider_5xx", retryDisposition: "user-confirmation" },
+        execution: { attemptCount: 1, providerRequestCount: 1 }
       });
-      expect(calls).toEqual([calls[0], calls[0]]);
-      expect(server.relay.observations).toHaveLength(1);
+      expect(calls).toEqual([calls[0]]);
+      expect(server.relay.observations).toHaveLength(0);
     } finally {
       await close(server);
     }

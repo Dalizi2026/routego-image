@@ -88,7 +88,6 @@ export function mapProviderHttpError(
 ): RoutegoServiceError {
   const shape = extractProviderErrorShape(body);
   const flags = errorFlags(context);
-  const replayRisk = flags.receivedAnyOutput || flags.mayHaveBilled;
   const details = {
     ...(shape.providerType === undefined ? {} : { providerType: shape.providerType }),
     ...(shape.safeProviderMessage === undefined
@@ -133,12 +132,7 @@ export function mapProviderHttpError(
         code: "rate_limited",
         category: "rate_limit",
         safeMessage: "The provider rate limit was reached before any output was received.",
-        retryDisposition:
-          replayRisk
-            ? "never"
-            : context.retryAfterMs === undefined
-              ? "safe-pre-generation"
-              : "respect-retry-after"
+        retryDisposition: "user-confirmation"
       },
       context
     );
@@ -150,10 +144,7 @@ export function mapProviderHttpError(
         code: "provider_5xx",
         category: "provider",
         safeMessage: "The provider returned a server error before any output was received.",
-        retryDisposition:
-          replayRisk
-            ? "never"
-            : "safe-pre-generation"
+        retryDisposition: "user-confirmation"
       },
       context
     );
