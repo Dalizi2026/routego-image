@@ -2,7 +2,6 @@ import type {
   ImageOperationEvent,
   ImageOperationRequest,
   ImageOperationResult,
-  RoutegoEditInput,
   RoutegoGenerateInput
 } from "@routego-image/contracts";
 
@@ -14,16 +13,8 @@ export type ProviderContextSource =
 
 export type ExecutionSleep = (milliseconds: number, signal: AbortSignal) => Promise<void>;
 
-export interface ResolvedPreviousOutput {
-  readonly id?: string;
-  readonly path: string;
-  readonly label?: string;
-}
-
 export interface ResolvedExecutionOptions {
   readonly signal?: AbortSignal;
-  readonly previousOutput?: ResolvedPreviousOutput;
-  readonly degradedContinuationRequest?: ImageOperationRequest;
   readonly onEvent?: (event: ImageOperationEvent) => void | Promise<void>;
 }
 
@@ -45,7 +36,6 @@ export interface ResolvedImageExecutor {
 
 export interface CreationImageService {
   generate(input: RoutegoGenerateInput): Promise<ImageOperationResult>;
-  edit(input: RoutegoEditInput): Promise<ImageOperationResult>;
 }
 
 export type VariantExecutionMode = "native" | "single" | "fan-out";

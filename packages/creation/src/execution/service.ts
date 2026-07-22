@@ -1,6 +1,5 @@
 import {
   routegoBatchInputSchema,
-  routegoEditInputSchema,
   routegoGenerateInputSchema
 } from "@routego-image/contracts";
 
@@ -16,9 +15,6 @@ export function createCreationImageService(
   return {
     generate(input) {
       return executor.execute(routegoGenerateInputSchema.parse(input));
-    },
-    edit(input) {
-      return executor.execute(routegoEditInputSchema.parse(input));
     },
     batch(input) {
       return batch.execute(routegoBatchInputSchema.parse(input));

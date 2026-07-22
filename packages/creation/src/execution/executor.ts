@@ -20,10 +20,7 @@ import {
 import { selectProviderRoute, type SelectedProviderRoute } from "@routego-image/foundation";
 
 import {
-  planEffectiveProviderControls,
-  prepareImageInputs,
   prepareProviderRequest,
-  serializeProviderRequest,
   type NormalizedProviderResponse,
   type PreparedProviderRequest,
   type ProviderRuntimeContext
@@ -34,7 +31,6 @@ import type {
   ImageExecutionDependencies,
   ResolvedExecutionOptions,
   ResolvedImageExecutor,
-  ResolvedPreviousOutput,
   VariantExecutionMode
 } from "./types";
 
@@ -204,137 +200,18 @@ function providerContextFor(
   );
 }
 
-function supportingFromPrevious(
-  previous: ResolvedPreviousOutput
-): ImageOperationRequest["supportingImages"][number] {
-  return {
-    ...(previous.id === undefined ? {} : { id: previous.id }),
-    path: previous.path,
-    role: "previous-output",
-    ...(previous.label === undefined ? {} : { label: previous.label })
-  };
-}
-
-function degradedInputRequest(
-  request: ImageOperationRequest,
-  previous: ResolvedPreviousOutput
-): ImageOperationRequest {
-  if (request.kind === "edit") {
-    return imageOperationRequestSchema.parse({
-      ...request,
-      supportingImages: [supportingFromPrevious(previous), ...request.supportingImages],
-      previousResponseId: undefined,
-      imageIds: [],
-      fileIds: []
-    });
-  }
-  return imageOperationRequestSchema.parse({
-    ...request,
-    kind: "edit",
-    targetImage: {
-      ...(previous.id === undefined ? {} : { id: previous.id }),
-      path: previous.path,
-      ...(previous.label === undefined ? {} : { label: previous.label })
-    },
-    supportingImages: [],
-    invariants: {
-      preserve: ["Preserve the resolved previous output except for changes requested by the prompt."]
-    },
-    previousResponseId: undefined,
-    imageIds: [],
-    fileIds: []
-  });
-}
-
 async function prepareSelectedRoute(
   provider: ProviderRuntimeContext,
   request: ImageOperationRequest,
-  route: SelectedProviderRoute,
-  options: ResolvedExecutionOptions
+  route: SelectedProviderRoute
 ): Promise<PreparedProviderRequest | RoutegoServiceError> {
-  if (!route.degradedContinuation) {
-    const prepared = await prepareProviderRequest(provider, request);
-    return prepared.prepared ? prepared.value : prepared.error;
-  }
-  if (options.previousOutput === undefined && options.degradedContinuationRequest === undefined) {
-    return createExecutionError({
-      code: "capability_unavailable",
-      category: "capability",
-      stage: "route",
-      safeMessage: "Degraded continuation requires a resolved previous output.",
-      details: { reason: "resolved-previous-output-required" }
-    });
-  }
-  try {
-    let fallback: ImageOperationRequest;
-    if (options.degradedContinuationRequest !== undefined) {
-      const supplied = imageOperationRequestSchema.parse(options.degradedContinuationRequest);
-      if (
-        supplied.kind !== "edit" ||
-        supplied.prompt !== request.prompt ||
-        supplied.previousResponseId !== undefined ||
-        supplied.imageIds.length > 0 ||
-        supplied.fileIds.length > 0
-      ) {
-        return createExecutionError({
-          code: "invalid_input",
-          category: "validation",
-          stage: "validate",
-          safeMessage: "The degraded continuation request must be a resolved state-free edit of the same prompt.",
-          details: { reason: "invalid-degraded-continuation-request" }
-        });
-      }
-      fallback = imageOperationRequestSchema.parse({
-        ...supplied,
-        size: request.size,
-        aspectRatio: request.aspectRatio,
-        quality: request.quality,
-        format: request.format,
-        compression: request.compression,
-        count: request.count,
-        partialImages: request.partialImages,
-        transparentMode: request.transparentMode,
-        moderation: request.moderation,
-        action: request.action,
-        outputDir: request.outputDir,
-        saveToLibrary: request.saveToLibrary
-      });
-    } else {
-      if (request.kind === "edit") {
-        return createExecutionError({
-          code: "capability_unavailable",
-          category: "capability",
-          stage: "route",
-          safeMessage: "A stateful edit requires a complete resolved degraded-continuation request.",
-          details: { reason: "ambiguous-edit-continuation" }
-        });
-      }
-      fallback = degradedInputRequest(request, options.previousOutput!);
-    }
-    const inputs = await prepareImageInputs(fallback);
-    const effective = planEffectiveProviderControls(fallback, route);
-    return {
-      route,
-      requestedParams: request,
-      effective,
-      inputs,
-      submission: serializeProviderRequest(provider.model, fallback, route, inputs, effective)
-    };
-  } catch (error) {
-    return createExecutionError({
-      code: "invalid_input",
-      category: "validation",
-      stage: "validate",
-      safeMessage: error instanceof Error ? error.message : "The degraded continuation input is invalid.",
-      details: { reason: "degraded-input-invalid" }
-    });
-  }
+  const prepared = await prepareProviderRequest(provider, request);
+  return prepared.prepared ? prepared.value : prepared.error;
 }
 
 async function prepareExecutionPlan(
   dependencies: ImageExecutionDependencies,
   requestInput: ImageOperationRequest,
-  options: ResolvedExecutionOptions,
   providerInput?: ProviderRuntimeContext
 ): Promise<ExecutionPlan> {
   const request = imageOperationRequestSchema.parse(requestInput);
@@ -367,19 +244,14 @@ async function prepareExecutionPlan(
     };
   }
 
-  const routingProvider: ProviderRuntimeContext = {
-    ...provider,
-    previousOutputAvailable:
-      options.previousOutput !== undefined || options.degradedContinuationRequest !== undefined
-  };
-  const directRoute = selectProviderRoute(routingProvider, request);
+  const directRoute = selectProviderRoute(provider, request);
   if (directRoute.selected) {
-    const prepared = await prepareSelectedRoute(routingProvider, request, directRoute, options);
-    if ("code" in prepared) return { prepared: false, request, provider: routingProvider, error: prepared };
+    const prepared = await prepareSelectedRoute(provider, request, directRoute);
+    if ("code" in prepared) return { prepared: false, request, provider, error: prepared };
     return {
       prepared: true,
       request,
-      provider: routingProvider,
+      provider,
       providerRequest: prepared,
       mode: request.count > 1 ? "native" : "single",
       variantCount: request.count
@@ -388,26 +260,21 @@ async function prepareExecutionPlan(
 
   if (request.count > 1) {
     const singleRequest = imageOperationRequestSchema.parse({ ...request, count: 1 });
-    const singleRoute = selectProviderRoute(routingProvider, singleRequest);
+    const singleRoute = selectProviderRoute(provider, singleRequest);
     if (singleRoute.selected) {
-      const prepared = await prepareSelectedRoute(
-        routingProvider,
-        singleRequest,
-        singleRoute,
-        options
-      );
-      if ("code" in prepared) return { prepared: false, request, provider: routingProvider, error: prepared };
+      const prepared = await prepareSelectedRoute(provider, singleRequest, singleRoute);
+      if ("code" in prepared) return { prepared: false, request, provider, error: prepared };
       return {
         prepared: true,
         request,
-        provider: routingProvider,
+        provider,
         providerRequest: prepared,
         mode: "fan-out",
         variantCount: request.count
       };
     }
   }
-  return { prepared: false, request, provider: routingProvider, error: directRoute.error };
+  return { prepared: false, request, provider, error: directRoute.error };
 }
 
 class ExecutionEvents {
@@ -834,20 +701,14 @@ function buildResult(
     requestId,
     status,
     requestedParams: plan.request,
-    effectiveParams:
-      route?.degradedContinuation === true && plan.prepared
-        ? imageOperationRequestSchema.parse({
-            ...plan.providerRequest.effective.effectiveParams,
-            count: plan.request.count
-          })
-        : plan.request,
+    effectiveParams: plan.request,
     execution: {
       ...(route === undefined ? {} : { transport: route.transport }),
       attemptCount: collection.attemptCount,
       providerRequestCount: collection.providerRequestCount,
       receivedAnyOutput: collection.receivedAnyOutput,
       mayHaveBilled: collection.mayHaveBilled,
-      degradedContinuation: route?.degradedContinuation ?? false,
+      degradedContinuation: false,
       ...(providerResponseIds.length === 1 ? { providerResponseId: providerResponseIds[0] } : {}),
       providerImageIds: [...new Set(collection.providerImageIds)].slice(0, 16)
     },
@@ -973,7 +834,7 @@ export function createResolvedImageExecutor(
         provider.deadlines.totalMs
       );
       try {
-        const plan = await prepareExecutionPlan(dependencies, request, options, provider);
+        const plan = await prepareExecutionPlan(dependencies, request, provider);
         if (!plan.prepared) {
           const collection = emptyCollection();
           collection.errors.push(plan.error);

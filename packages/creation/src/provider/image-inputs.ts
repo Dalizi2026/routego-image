@@ -11,7 +11,6 @@ import {
   type PrepareImageInputOptions,
   type PreparedImageInput,
   type PreparedImageInputs,
-  type PreparedMaskInput,
   type SupportedImageMimeType
 } from "./types";
 
@@ -374,7 +373,7 @@ async function readValidatedImage(
   return { bytes, metadata };
 }
 
-export function imageDataUrl(input: Pick<PreparedImageInput | PreparedMaskInput, "bytes" | "mimeType">): string {
+export function imageDataUrl(input: Pick<PreparedImageInput, "bytes" | "mimeType">): string {
   return `data:${input.mimeType};base64,${Buffer.from(input.bytes).toString("base64")}`;
 }
 
@@ -383,25 +382,13 @@ export async function prepareImageInputs(
   options: PrepareImageInputOptions = {}
 ): Promise<PreparedImageInputs> {
   const maxFileBytes = options.maxFileBytes ?? MAX_PROVIDER_INPUT_BYTES;
-  const maxMaskBytes = options.maxMaskBytes ?? MAX_PROVIDER_INPUT_BYTES;
   const maxTotalBytes = options.maxTotalBytes ?? MAX_PROVIDER_INPUTS * MAX_PROVIDER_INPUT_BYTES;
-  const descriptors = [
-    ...(request.targetImage === undefined
-      ? []
-      : [{ kind: "target" as const, sourceIndex: 0, role: "target" as const, value: request.targetImage }]),
-    ...request.supportingImages.map((value, sourceIndex) => ({
-      kind: "supporting" as const,
-      sourceIndex,
-      role: value.role,
-      value
-    })),
-    ...request.references.map((value, sourceIndex) => ({
+  const descriptors = request.references.map((value, sourceIndex) => ({
       kind: "reference" as const,
       sourceIndex,
       role: value.role,
       value
-    }))
-  ];
+    }));
   if (descriptors.length > MAX_PROVIDER_INPUTS) {
     throw new ProviderPreparationError(
       "too-many-images",
@@ -441,62 +428,8 @@ export async function prepareImageInputs(
     });
   }
 
-  let mask: PreparedMaskInput | undefined;
-  if (request.maskPath !== undefined) {
-    const target = images[0];
-    if (target === undefined || target.kind !== "target") {
-      throw new ProviderPreparationError(
-        "invalid-mask",
-        "A mask requires a target image in slot zero."
-      );
-    }
-    const validated = await readValidatedImage(request.maskPath, maxMaskBytes, "mask-too-large");
-    if (validated.metadata.mimeType !== "image/png" || !validated.metadata.hasAlpha) {
-      throw new ProviderPreparationError(
-        "invalid-mask",
-        "A mask must be a PNG image with alpha transparency.",
-        {
-          detectedMimeType: validated.metadata.mimeType,
-          hasAlpha: validated.metadata.hasAlpha
-        }
-      );
-    }
-    if (
-      validated.metadata.width !== target.width ||
-      validated.metadata.height !== target.height
-    ) {
-      throw new ProviderPreparationError(
-        "mask-dimension-mismatch",
-        "The mask dimensions must match the target image dimensions.",
-        {
-          targetWidth: target.width,
-          targetHeight: target.height,
-          maskWidth: validated.metadata.width,
-          maskHeight: validated.metadata.height
-        }
-      );
-    }
-    totalBytes += validated.bytes.byteLength;
-    if (totalBytes > maxTotalBytes) {
-      throw new ProviderPreparationError(
-        "mask-too-large",
-        "The combined image and mask inputs exceed the byte limit.",
-        { totalBytes, maximumBytes: maxTotalBytes }
-      );
-    }
-    mask = {
-      targetSlot: 0,
-      path: request.maskPath,
-      fileName: "mask.png",
-      byteLength: validated.bytes.byteLength,
-      bytes: validated.bytes,
-      ...validated.metadata
-    };
-  }
-
   return {
     images,
-    totalBytes,
-    ...(mask === undefined ? {} : { mask })
+    totalBytes
   };
 }

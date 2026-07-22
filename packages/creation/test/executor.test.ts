@@ -177,8 +177,7 @@ function imageCapabilities(
   const shape = PROVIDER_REQUEST_SHAPES.singleEndpointImage;
   return [
     capability("single-image-input", { requestShape: shape, state }),
-    capability("data-url-input", { requestShape: shape, state: state === "unknown" ? "unknown" : "supported" }),
-    capability("target-edit", { requestShape: shape, state: state === "unknown" ? "unknown" : "supported" })
+    capability("data-url-input", { requestShape: shape, state: state === "unknown" ? "unknown" : "supported" })
   ];
 }
 
@@ -206,9 +205,7 @@ describe("resolved executor success, capability states, and false-success reject
       const provider = runtime(fetchMock, { capabilities: imageCapabilities(state) });
       const result = await createResolvedImageExecutor(dependencies(provider)).execute(
         request({
-          kind: "edit",
-          targetImage: { path: previousOutputPath },
-          invariants: { preserve: ["subject"] }
+          references: [{ path: previousOutputPath, role: "reference" }]
         })
       );
       if (state === "supported" || state === "degraded") {
@@ -531,88 +528,6 @@ describe("stage deadlines, cancellation, state, continuation, and events", () =>
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("preserves native Responses state and provider identifiers", async () => {
-    const bodies: Array<Record<string, unknown>> = [];
-    const shape = PROVIDER_REQUEST_SHAPES.responsesImageGeneration;
-    const provider = runtime(async (_input, init) => {
-      bodies.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
-      return Response.json({
-        id: "response-new",
-        status: "completed",
-        output: [
-          {
-            type: "image_generation_call",
-            id: "image-new",
-            status: "completed",
-            result: PNG_BASE64
-          }
-        ]
-      });
-    }, {
-      endpoints: {
-        generation: { mode: "exact-generation-endpoint", value: GENERATION_ENDPOINT },
-        responses: RESPONSES_ENDPOINT
-      },
-      capabilities: [
-        capability("text-generation", {
-          endpoint: RESPONSES_ENDPOINT,
-          transport: "openai-responses",
-          requestShape: shape
-        }),
-        capability("responses-state", {
-          endpoint: RESPONSES_ENDPOINT,
-          transport: "openai-responses",
-          requestShape: shape
-        })
-      ]
-    });
-    const result = await createResolvedImageExecutor(dependencies(provider)).execute(
-      request({ previousResponseId: "response-previous" })
-    );
-    expect(result.status).toBe("succeeded");
-    expect(result.execution).toMatchObject({
-      transport: "openai-responses",
-      providerResponseId: "response-new",
-      providerImageIds: ["image-new"]
-    });
-    expect(bodies[0]).toMatchObject({ previous_response_id: "response-previous" });
-  });
-
-  it("uses a resolved previous output only for explicit degraded same-transport continuation", async () => {
-    const bodies: Array<Record<string, unknown>> = [];
-    const shape = PROVIDER_REQUEST_SHAPES.singleEndpointImage;
-    const provider = runtime(async (_input, init) => {
-      bodies.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
-      return imageResponse();
-    }, {
-      allowDegradedContinuation: true,
-      capabilities: [
-        capability("single-image-input", { requestShape: shape }),
-        capability("data-url-input", { requestShape: shape }),
-        capability("target-edit", { requestShape: shape })
-      ]
-    });
-    const executor = createResolvedImageExecutor(dependencies(provider));
-    const stateful = request({ imageIds: ["previous-provider-image"] });
-    const unavailable = await executor.execute(stateful);
-    expect(unavailable.error?.code).toBe("capability_unavailable");
-    expect(unavailable.execution.providerRequestCount).toBe(0);
-
-    const result = await executor.execute(stateful, {
-      previousOutput: { id: "resolved-previous", path: previousOutputPath }
-    });
-    expect(result.status).toBe("succeeded");
-    expect(result.execution).toMatchObject({
-      transport: "single-endpoint-json",
-      degradedContinuation: true,
-      providerRequestCount: 1
-    });
-    expect(bodies).toHaveLength(1);
-    expect(bodies[0]?.["image"]).toMatch(/^data:image\/png;base64,/u);
-    expect(bodies[0]).not.toHaveProperty("image_ids");
-    expect(bodies[0]).not.toHaveProperty("previous_response_id");
-  });
-
   it("publishes monotonic started/partial/completed events and ignores observer failures", async () => {
     const events: ImageOperationEvent[] = [];
     const shape = PROVIDER_REQUEST_SHAPES.responsesImageGeneration;
@@ -668,19 +583,13 @@ describe("stage deadlines, cancellation, state, continuation, and events", () =>
     expect(events.map((event) => event.sequence)).toEqual([0, 1, 2]);
   });
 
-  it("exposes validated generate/edit service methods over the same executor", async () => {
+  it("exposes only the validated generation service method", async () => {
     const fetchMock = vi.fn<typeof fetch>(async () => imageResponse());
     const imageCaps = imageCapabilities("supported");
     const service = createCreationImageService(dependencies(runtime(fetchMock, { capabilities: imageCaps })));
     const generated = await service.generate({ kind: "generate", prompt: "Service generate" });
-    const edited = await service.edit({
-      kind: "edit",
-      prompt: "Service edit",
-      targetImage: { path: previousOutputPath },
-      invariants: { preserve: ["subject"] }
-    });
     expect(generated.status).toBe("succeeded");
-    expect(edited.status).toBe("succeeded");
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect("edit" in service).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

@@ -226,7 +226,7 @@ describe("provider route selection", () => {
     });
   });
 
-  it("supports explicitly preferred Tier B text generation without guessing an Edits URL", () => {
+  it("supports explicitly preferred Tier B text generation without using an edit endpoint", () => {
     const text = selectProviderRoute(
       context([], { preferredTransports: ["openai-images"] }),
       { kind: "generate", prompt: "Tier B text" }
@@ -239,39 +239,24 @@ describe("provider route selection", () => {
       requestShape: PROVIDER_REQUEST_SHAPES.imagesGenerationsJson
     });
 
-    const edit = selectProviderRoute(
-      context([], { preferredTransports: ["openai-images"] }),
-      {
-        kind: "edit",
-        prompt: "No guessed Edits",
-        targetImage: { path: "/tmp/target.png" },
-        invariants: { preserve: ["subject"] }
-      }
-    );
-    expect(edit.selected).toBe(false);
-    if (!edit.selected) {
-      expect(edit.attemptedTransports).toEqual([]);
-      expect(edit.error.code).toBe("capability_unavailable");
-    }
+    expect(text.selected).toBe(true);
   });
 
-  it("gates Tier A single-image editing on exact scoped evidence", () => {
+  it("gates Tier A generation references on exact scoped evidence", () => {
     const request = {
-      kind: "edit",
-      prompt: "Edit target",
-      targetImage: { path: "/tmp/target.png" },
-      invariants: { preserve: ["subject"] }
+      kind: "generate",
+      prompt: "Reference generation",
+      references: [{ path: "/tmp/reference.png", role: "subject" }]
     };
     const required = [
       capability("single-image-input"),
-      capability("data-url-input"),
-      capability("target-edit")
+      capability("data-url-input")
     ];
     expect(selectProviderRoute(context(required), request)).toMatchObject({
       selected: true,
       tier: "A",
       requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
-      effectiveKind: "edit"
+      effectiveKind: "generate"
     });
 
     const wrongShape = required.map((record) => ({
@@ -282,41 +267,14 @@ describe("provider route selection", () => {
     expect(unavailable.selected).toBe(false);
     if (!unavailable.selected) {
       expect(unavailable.missingCapabilities).toEqual(
-        expect.arrayContaining(["single-image-input", "data-url-input", "target-edit"])
+        expect.arrayContaining(["single-image-input", "data-url-input"])
       );
     }
   });
 
-  it("selects Tier B multipart and Tier C Responses only with explicit endpoints and scoped capabilities", () => {
-    const editsEndpoint = "https://relay.example/custom/edits";
+  it("selects Tier C Responses reference generation only with an explicit endpoint and scoped capabilities", () => {
     const responsesEndpoint = "https://relay.example/custom/responses";
-    const tierB = ["single-image-input", "multipart-input", "target-edit"].map((name) =>
-      capability(name as ProviderCapability, {
-        endpoint: editsEndpoint,
-        transport: "openai-images",
-        requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
-      })
-    );
-    const editDecision = selectProviderRoute(
-      context(tierB, {
-        endpoints: { ...ENDPOINTS, edits: editsEndpoint },
-        preferredTransports: ["openai-images"]
-      }),
-      {
-        kind: "edit",
-        prompt: "Multipart edit",
-        targetImage: { path: "/tmp/target.png" },
-        invariants: { preserve: ["subject"] }
-      }
-    );
-    expect(editDecision).toMatchObject({
-      selected: true,
-      tier: "B",
-      endpoint: editsEndpoint,
-      requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
-    });
-
-    const tierC = ["text-generation", "responses-state"].map((name) =>
+    const tierC = ["text-generation", "single-image-input", "data-url-input"].map((name) =>
       capability(name as ProviderCapability, {
         endpoint: responsesEndpoint,
         transport: "openai-responses",
@@ -329,8 +287,8 @@ describe("provider route selection", () => {
       }),
       {
         kind: "generate",
-        prompt: "Continue statefully",
-        previousResponseId: "response-previous"
+        prompt: "Responses reference",
+        references: [{ path: "/tmp/reference.png", role: "reference" }]
       }
     );
     expect(responsesDecision).toMatchObject({
@@ -434,32 +392,16 @@ describe("provider route selection", () => {
     }
   });
 
-  it("degrades stateful continuation by reusing only the previous physical output", () => {
-    const records = [
-      capability("single-image-input"),
-      capability("data-url-input"),
-      capability("target-edit")
-    ];
-    const decision = selectProviderRoute(
-      context(records, {
-        allowDegradedContinuation: true,
-        previousOutputAvailable: true
-      }),
-      {
-        kind: "generate",
-        prompt: "Continue from previous result",
-        imageIds: ["provider-image-1", "provider-image-2"]
-      }
-    );
-    expect(decision).toMatchObject({
-      selected: true,
-      tier: "A",
-      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
-      effectiveKind: "edit",
-      degraded: true,
-      degradedContinuation: true,
-      continuationInput: "previous-output-as-target"
-    });
+  it("rejects removed edit and continuation request fields before route selection", () => {
+    expect(() => selectProviderRoute(context(), {
+      kind: "edit",
+      prompt: "Removed edit"
+    })).toThrow();
+    expect(() => selectProviderRoute(context(), {
+      kind: "generate",
+      prompt: "Removed continuation",
+      previousResponseId: "response-previous"
+    })).toThrow();
   });
 });
 

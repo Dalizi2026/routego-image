@@ -22,12 +22,12 @@ export interface ImageFileMetadata {
   readonly hasAlpha: boolean;
 }
 
-export type PreparedImageKind = "target" | "supporting" | "reference";
+export type PreparedImageKind = "reference";
 
 export interface PreparedImageInput extends ImageFileMetadata {
   readonly slot: number;
   readonly kind: PreparedImageKind;
-  readonly role: ImageOperationRequest["references"][number]["role"] | "target";
+  readonly role: ImageOperationRequest["references"][number]["role"];
   readonly sourceIndex: number;
   readonly path: string;
   readonly fileName: string;
@@ -37,23 +37,13 @@ export interface PreparedImageInput extends ImageFileMetadata {
   readonly label?: string;
 }
 
-export interface PreparedMaskInput extends ImageFileMetadata {
-  readonly targetSlot: 0;
-  readonly path: string;
-  readonly fileName: "mask.png";
-  readonly byteLength: number;
-  readonly bytes: Uint8Array;
-}
-
 export interface PreparedImageInputs {
   readonly images: readonly PreparedImageInput[];
-  readonly mask?: PreparedMaskInput;
   readonly totalBytes: number;
 }
 
 export interface PrepareImageInputOptions {
   readonly maxFileBytes?: number;
-  readonly maxMaskBytes?: number;
   readonly maxTotalBytes?: number;
 }
 
@@ -62,9 +52,6 @@ export type ProviderPreparationFailureReason =
   | "unsupported-image"
   | "image-too-large"
   | "too-many-images"
-  | "invalid-mask"
-  | "mask-too-large"
-  | "mask-dimension-mismatch"
   | "request-shape-mismatch";
 
 export class ProviderPreparationError extends Error {
@@ -128,7 +115,6 @@ export interface EffectiveProviderPlan {
   readonly effectiveParams: ImageOperationRequest;
   readonly controls: EffectiveProviderControls;
   readonly degraded: boolean;
-  readonly degradedContinuation: boolean;
 }
 
 export type ProviderJsonValue =
@@ -149,15 +135,7 @@ export interface ProviderJsonSubmission {
   readonly body: ProviderJsonObject;
 }
 
-export interface ProviderMultipartSubmission {
-  readonly bodyType: "multipart";
-  readonly method: "POST";
-  readonly endpoint: string;
-  readonly headers: Readonly<Record<string, string>>;
-  readonly body: FormData;
-}
-
-export type ProviderSubmission = ProviderJsonSubmission | ProviderMultipartSubmission;
+export type ProviderSubmission = ProviderJsonSubmission;
 
 export interface PreparedProviderRequest {
   readonly route: SelectedProviderRoute;
