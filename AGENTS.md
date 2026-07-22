@@ -2,6 +2,17 @@
 
 ## 开始工作前
 
+## 工作区合并与新增目录禁令
+
+用户已在 2026-07-23 明确要求完成工作区合并。唯一允许的执行工作区是
+`/Users/dalizi/Documents/Routego Image 1.0/controller-g12`；共同 Git 历史只保存在同级
+`repository`，不得把它当作第二个执行工作区。
+
+- 后续窗口可以创建新的可见对话，但必须复用上述现有执行工作区和现有分支；不得创建新的项目目录、worktree、clone、临时执行目录或 successor 文件夹。
+- 禁止运行 `git worktree add`、`git clone`、`mkdir` 创建工作目录，或以“交接/隔离/顺序任务”为理由新建目录。需要一个新目录、独立 worktree 或永久测试目录时，必须先取得用户新的明确授权。
+- 每次任务范围切换仍须核对任务胶囊、唯一 owner、工作区 clean、完整性、预算和零压缩 acceptance；若同一工作区存在并发写入或无法满足这些门禁，停止并向 Controller 报告，而不是新建目录绕过门禁。
+- 此禁令不授权产品实现、依赖安装、真实数据操作、外部访问或删除；原有 OpenSpec、安全和批准门禁继续生效。
+
 PD-008 默认使用低上下文、无损细节启动。每个顶层任务或 successor 依次读取：
 
 1. 本文件；
@@ -28,7 +39,7 @@ handoff capsule 必须通过 `.codex/routego-program/scripts/validate-handoff-ca
 ## 顶层任务与子代理
 
 - Program Controller 只为 Foundation、Creation、Library、Studio、Integration 这类 OpenSpec change 负责人创建用户可见的顶层 Codex 新任务。
-- 顶层任务必须拥有独立 worktree、分支、线程状态文件、清晰标题，并在任务列表中置顶。
+- 顶层任务通常拥有独立 worktree；但在“工作区合并与新增目录禁令”有效期间，所有顶层任务必须复用唯一现有执行工作区，不得新建 worktree、分支目录或 successor 目录。
 - 同一 Lane 的唯一可见执行线程可在第 1、2 次可观察上下文压缩期间连续处理顺序 OpenSpec 任务；不得仅因任务顺序推进自动创建 successor 工作区或线程。
 - 每次范围切换仍须由 Controller 明确激活，并重新核对 task capsule、授权范围、唯一 owner、工作区 clean、完整性和启动预算；在该 in-thread scope acceptance 完成前，新任务保持锁定且不得写入。
 - 旧插件审计、上游审计、模块拆分、测试、审查等有界工作，默认由对应顶层任务在自己的线程内派发子代理。
