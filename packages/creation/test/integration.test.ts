@@ -272,6 +272,29 @@ describe("Creation package integration", () => {
     }
   });
 
+  it("uses one ordinary PNG request for unknown native transparency without probing", async () => {
+    const server = await startMockRelayTestServer({ fixture: "single-endpoint-text" });
+    try {
+      const bodies: Array<Record<string, unknown>> = [];
+      const fetchMock: typeof fetch = async (_input, init) => {
+        bodies.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
+        return Response.json({ data: [{ b64_json: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZVt8AAAAASUVORK5CYII=" }] });
+      };
+      const result = await createCreationImageService(
+        dependencies(providerRuntime(server, { fetch: fetchMock }), "transparent-local-fallback")
+      ).generate({ kind: "generate", prompt: "Synthetic transparent request", transparentMode: "native" });
+      expect(result).toMatchObject({
+        status: "succeeded",
+        effectiveParams: { transparentMode: "off" },
+        execution: { providerRequestCount: 1 }
+      });
+      expect(bodies).toEqual([expect.not.objectContaining({ background: "transparent" })]);
+      expect(server.relay.observations).toHaveLength(0);
+    } finally {
+      await close(server);
+    }
+  });
+
   it("preserves ordered batch identities and provider counts over the offline relay", async () => {
     const server = await startMockRelayTestServer({ fixture: "single-endpoint-text" });
     try {

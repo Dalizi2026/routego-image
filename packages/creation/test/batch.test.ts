@@ -238,4 +238,32 @@ describe("public Creation batch service", () => {
     expect(result.items.map((item) => item.result.execution.providerRequestCount)).toEqual([1, 1]);
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  it("does not replay failed batch items even when the runtime retry policy allows it", async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => Response.json(
+      { error: { code: "temporary", message: "Synthetic unavailable" } },
+      { status: 503 }
+    ));
+    const provider: ProviderRuntimeContext = {
+      providerId: "provider-a",
+      model: "gpt-image-2",
+      endpoints: {
+        generation: { mode: "exact-generation-endpoint", value: "https://provider.example/generate" }
+      },
+      capabilities: [],
+      apiKey: "synthetic-api-key",
+      fetch: fetchMock,
+      deadlines: {
+        responseHeaderMs: 1_000,
+        bodyMs: 1_000,
+        downloadMs: 1_000,
+        totalMs: 5_000
+      },
+      retry: { maxAttempts: 3, baseDelayMs: 1, maxDelayMs: 1 }
+    };
+    const result = await createCreationImageService({ providerContext: provider }).batch(batchInput(2));
+    expect(result.status).toBe("failed");
+    expect(result.items.map((item) => item.result.execution.providerRequestCount)).toEqual([1, 1]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 });

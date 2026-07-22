@@ -35,7 +35,7 @@ function capability(
     endpoint?: string;
     transport?: ProviderTransport;
     requestShape?: string;
-    state?: "supported" | "degraded";
+    state?: ProviderCapabilityRecord["state"];
     limits?: Record<string, unknown>;
   } = {}
 ): ProviderCapabilityRecord {
@@ -54,10 +54,15 @@ function capability(
     state,
     evidence: [
       {
-        source: state === "degraded" ? "degraded-fallback" : "successful-request",
+        source: state === "unsupported"
+          ? "protocol-rejection"
+          : state === "degraded"
+            ? "degraded-fallback"
+            : "successful-request",
         observedAt: OBSERVED_AT,
         summary: `synthetic ${state} evidence`,
-        requestShape: options.requestShape ?? PROVIDER_REQUEST_SHAPES.singleEndpointImage
+        requestShape: options.requestShape ?? PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+        ...(state === "unsupported" ? { httpStatus: 400 } : {})
       }
     ],
     verifiedAt: OBSERVED_AT,
@@ -299,6 +304,27 @@ describe("provider route selection", () => {
     });
   });
 
+  it.each([
+    ["unknown", false, false],
+    ["unsupported", false, false],
+    ["degraded", true, true],
+    ["supported", true, false]
+  ] as const)("routes %s reference evidence without probing", (state, selected, degraded) => {
+    const records = ["single-image-input", "data-url-input"].map((name) =>
+      capability(name as ProviderCapability, {
+        state,
+        requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage
+      })
+    );
+    const decision = selectProviderRoute(context(records), {
+      kind: "generate",
+      prompt: "Reference state",
+      references: [{ path: "/synthetic/reference.png", role: "reference" }]
+    });
+    expect(decision.selected).toBe(selected);
+    if (decision.selected) expect(decision.degraded).toBe(degraded);
+  });
+
   it("requires evidence for every non-default requested feature", () => {
     const featureCapabilities: ProviderCapability[] = [
       "native-variants",
@@ -365,7 +391,32 @@ describe("provider route selection", () => {
       ),
       { kind: "generate", prompt: "Transparent", transparentMode: "native", format: "png" }
     );
-    expect(nativeTransparency).toMatchObject({ selected: true });
+    expect(nativeTransparency).toMatchObject({
+      selected: true,
+      transparency: "native",
+      replayPolicy: "never"
+    });
+  });
+
+  it.each([
+    ["unknown", "local-fallback"],
+    ["unsupported", "local-fallback"],
+    ["degraded", "local-fallback"],
+    ["supported", "native"]
+  ] as const)("routes %s native-transparency evidence without probing", (state, transparency) => {
+    const decision = selectProviderRoute(
+      context([
+        capability("native-transparency", {
+          state,
+          requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText
+        })
+      ], { preferredTransports: ["single-endpoint-json"] }),
+      { kind: "generate", prompt: "Transparency route", transparentMode: "native", format: "png" }
+    );
+    expect(decision).toMatchObject({ selected: true, transparency });
+    if (decision.selected) {
+      expect(decision.requiredCapabilities).not.toContain("native-transparency");
+    }
   });
 
   it("enforces capability limits instead of silently degrading them", () => {
@@ -418,19 +469,15 @@ describe("automatic retry and replay prohibitions", () => {
     };
   }
 
-  it("allows only bounded same-transport pre-generation 429/5xx retries", () => {
+  it("forbids every automatic replay, including same-transport pre-generation 429/5xx", () => {
     expect(evaluateAutomaticRetry(previous(), "single-endpoint-json")).toEqual({
-      allowed: true,
-      reason: "safe-same-transport-pre-generation"
-    });
-    expect(
-      evaluateAutomaticRetry(previous({ errorCode: "provider_5xx", attemptCount: 2 }), "single-endpoint-json")
-        .allowed
-    ).toBe(true);
-    expect(evaluateAutomaticRetry(previous({ attemptCount: 3 }), "single-endpoint-json")).toEqual({
       allowed: false,
-      reason: "retry-limit-reached"
+      reason: "automatic-replay-forbidden"
     });
+    expect(evaluateAutomaticRetry(
+      previous({ errorCode: "provider_5xx", attemptCount: 2 }),
+      "single-endpoint-json"
+    )).toEqual({ allowed: false, reason: "automatic-replay-forbidden" });
   });
 
   it.each(["timeout", "auth_failed", "invalid_response", "cancelled"] as const)(
@@ -438,23 +485,23 @@ describe("automatic retry and replay prohibitions", () => {
     (errorCode) => {
       expect(
         evaluateAutomaticRetry(previous({ errorCode }), "single-endpoint-json")
-      ).toEqual({ allowed: false, reason: "failure-not-retryable" });
+      ).toEqual({ allowed: false, reason: "automatic-replay-forbidden" });
     }
   );
 
   it("blocks cross-transport, post-submit, partial-output, and billing-risk replay", () => {
     expect(evaluateAutomaticRetry(previous(), "openai-images").reason).toBe(
-      "cross-transport-replay-forbidden"
+      "automatic-replay-forbidden"
     );
     expect(
       evaluateAutomaticRetry(previous({ stage: "submitted" }), "single-endpoint-json").reason
-    ).toBe("failure-not-retryable");
+    ).toBe("automatic-replay-forbidden");
     expect(
       evaluateAutomaticRetry(
         previous({ receivedAnyOutput: true, mayHaveBilled: true }),
         "single-endpoint-json"
       ).reason
-    ).toBe("output-or-billing-risk");
+    ).toBe("automatic-replay-forbidden");
   });
 
   it("returns an unavailable decision rather than routing after a timeout or partial output", () => {
