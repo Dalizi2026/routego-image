@@ -2,47 +2,47 @@
   "schemaVersion": 2,
   "lane": "creation",
   "change": "streamline-routego-image-generation",
-  "role": "openspec-apply-owner",
-  "status": "task-2.2-active-unaccepted-task-2.3-prepared-locked",
-  "threadId": "/root/creation_task_2_2",
-  "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
-  "branch": "codex/routego-creation-g2",
-  "generation": 2,
-  "currentHead": "eee9db1426118d9333a20655a26938076f1f7851",
+  "role": "openspec-apply-owner-successor-candidate",
+  "status": "task-2.2-accepted-merged-task-2.3-registered-awaiting-handoff-acceptance",
+  "threadId": "pending",
+  "worktree": "/Users/dalizi/Documents/routego-image-creation-g4",
+  "branch": "codex/routego-creation-g4",
+  "generation": 3,
+  "currentHead": "ca19db67723027f8c6c8c9e2820969240f5d6f40",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
-    "id": "2.2",
-    "status": "implementation-commit-present-unaccepted",
-    "taskCapsule": ".codex/routego-program/tasks/creation-2.2.json",
-    "handoffCapsule": ".codex/routego-program/handoffs/creation-generation-2.capsule.json",
-    "locked": false
-  },
-  "preparedSuccessorTask": {
     "id": "2.3",
+    "status": "registered-awaiting-zero-compaction-handoff-acceptance",
     "taskCapsule": ".codex/routego-program/tasks/creation-2.3.json",
-    "locked": true,
-    "activationCondition": "Task 2.2 must be independently accepted and fresh OpenSpec instructions must confirm eligibility."
+    "handoffCapsule": ".codex/routego-program/handoffs/creation-generation-3.capsule.json",
+    "locked": true
+  },
+  "lastAcceptedTask": {
+    "id": "2.2",
+    "implementationCommit": "eee9db1426118d9333a20655a26938076f1f7851",
+    "controllerMergeCommit": "8fe5ace0f9343f5f9489587c21fdb32497d634e0",
+    "taskStateCommit": "ca19db67723027f8c6c8c9e2820969240f5d6f40",
+    "evidence": ".codex/routego-program/evidence/streamline-2.2.json",
+    "evidenceSha256": "1b11ce25fa18b2a19a93029027439ad60d303280654f345cd622eeb6123810e5",
+    "fullPackageSuite": "not-green-known-task-2.3-and-later-regressions; see evidence"
   },
   "sourceOwner": {
-    "threadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
-    "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
-    "branch": "codex/routego-controller-g12",
-    "role": "controller-dispatch-baseline",
-    "soleApplyOwner": false,
-    "archived": true,
-    "authorityRevoked": true
+    "threadId": "019f8a12-36ce-74f0-80f5-a8c67c73c5fb",
+    "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
+    "branch": "codex/routego-creation-g2",
+    "role": "task-2.2-apply-owner",
+    "soleApplyOwner": true,
+    "archived": false,
+    "authorityRevoked": false
   },
-  "handoffCapsuleIntegrity": {
-    "canonicalSha256": "f4a1999ea1c9e046e3dfdffc4f9a4ac51dbda2107fffb74619da4f63a44b0440",
-    "rawFileSha256": "cd430294e39df4acb7978436fa420137fbb99c680185f918bb80a9bdf7aaa3fb"
-  },
+  "handoffCapsuleIntegrity": { "canonicalSha256": "930a97293472cd94cf24ab200901273e43bc63e7e73a00de0a150409f4c6f34b", "rawFileSha256": "194d23bf88663fb0b71792c7435a1d1dba6f4855c4a1c472176851b2dd49d359" },
   "reportingContract": {
     "currentControllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
     "currentControllerGeneration": 12,
-    "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, implementation, delivery, or acceptance request",
+    "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
     "fallback": "routego-program-continuity remains missed-message fallback only",
     "acknowledgementRequiredBeforeAcceptance": true
   },

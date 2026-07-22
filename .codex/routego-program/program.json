@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-authoritative-task-3.1-accepted-ready-for-tasks-2.2-and-3.2",
+  "status": "controller-generation-12-authoritative-task-2.2-accepted-task-2.3-registered-library-3.2-active",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -69,17 +69,17 @@
   },
   "activeApplyOwners": {
     "creation": {
-      "status": "active-internal-apply-owner",
-      "taskRef": "/root/creation_task_2_2",
-      "threadId": "/root/creation_task_2_2",
-      "generation": 2,
-      "taskId": "2.2",
-      "branch": "codex/routego-creation-g2",
-      "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
-      "currentHead": "eee9db1426118d9333a20655a26938076f1f7851",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/creation-2.2.json", "sha256": "033f7c648df67a88e6ca3f07c8c36bfe394a9f54821698c4d5e0f54b9eeb5213" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/creation-generation-2.capsule.json", "sha256": "f4a1999ea1c9e046e3dfdffc4f9a4ac51dbda2107fffb74619da4f63a44b0440", "rawFileSha256": "cd430294e39df4acb7978436fa420137fbb99c680185f918bb80a9bdf7aaa3fb" },
-      "authorizedScope": "task-2.2-exact-automatic-retry-removal-unaccepted"
+      "status": "registered-awaiting-handoff-acceptance",
+      "taskRef": "pending",
+      "threadId": "pending",
+      "generation": 3,
+      "taskId": "2.3",
+      "branch": "codex/routego-creation-g4",
+      "worktree": "/Users/dalizi/Documents/routego-image-creation-g4",
+      "currentHead": "ca19db67723027f8c6c8c9e2820969240f5d6f40",
+      "taskCapsule": { "path": ".codex/routego-program/tasks/creation-2.3.json", "sha256": "74ecb277f6d1d01590daf8696c454b45edd33f8621b013314e27a66c2bbbb650" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/creation-generation-3.capsule.json", "sha256": "930a97293472cd94cf24ab200901273e43bc63e7e73a00de0a150409f4c6f34b", "rawFileSha256": "194d23bf88663fb0b71792c7435a1d1dba6f4855c4a1c472176851b2dd49d359" },
+      "authorizedScope": "task-2.3-exact-batch-reference-runtime-scope-registered-not-active"
     },
     "library": {
       "status": "active-internal-apply-owner",
@@ -97,13 +97,13 @@
   },
   "laneSuccessors": {
     "creation": {
-      "threadId": "/root/creation_task_2_2",
-      "generation": 2,
-      "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
-      "plannedBranch": "codex/routego-creation-g2",
-      "currentHead": "eee9db1426118d9333a20655a26938076f1f7851",
+      "threadId": "pending",
+      "generation": 3,
+      "worktree": "/Users/dalizi/Documents/routego-image-creation-g4",
+      "plannedBranch": "codex/routego-creation-g4",
+      "currentHead": "ca19db67723027f8c6c8c9e2820969240f5d6f40",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "f4a1999ea1c9e046e3dfdffc4f9a4ac51dbda2107fffb74619da4f63a44b0440", "rawFileSha256": "cd430294e39df4acb7978436fa420137fbb99c680185f918bb80a9bdf7aaa3fb" }
+      "handoffCapsuleIntegrity": { "canonicalSha256": "930a97293472cd94cf24ab200901273e43bc63e7e73a00de0a150409f4c6f34b", "rawFileSha256": "194d23bf88663fb0b71792c7435a1d1dba6f4855c4a1c472176851b2dd49d359" }
     },
     "library": {
       "threadId": "/root/library_task_3_2",
@@ -120,27 +120,27 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 6,
-      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "2.1", "3.1"],
-      "readyTaskIds": ["2.2", "3.2"],
-      "nextTaskId": "2.2"
+      "completedTasks": 7,
+      "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "3.1"],
+      "readyTaskIds": ["2.3", "3.2"],
+      "nextTaskId": "2.3"
     },
     "currentTask": {
-      "id": "2.2",
-      "locked": false,
-      "activationAuthorized": true,
-      "parallelReadyTaskIds": ["2.2", "3.2"],
-      "authorizedScope": "Task 2.2 Creation and Task 3.2 Library are independently active but unaccepted; Task 2.3 remains prepared and locked pending Task 2.2 acceptance."
+      "id": "2.3",
+      "locked": true,
+      "activationAuthorized": false,
+      "parallelReadyTaskIds": ["2.3", "3.2"],
+      "authorizedScope": "Task 2.2 is accepted and merged. Task 2.3 is registered for a fresh zero-compaction handoff and may start only after acceptance; Library Task 3.2 remains independently active and unaccepted."
     }
   },
   "latestDirectCheckpoint": {
-    "lane": "streamline",
-    "event": "TASK_3_1_ACCEPTED",
-    "implementationCommit": "6f968a5d6213025c5597949671a1948c8cbee5ef",
-    "taskStateCommit": "2f04291f27487ef1083d56309ea96032612bb5d8",
-    "openspecProgress": "6/33",
-    "nextTaskIds": ["2.2", "3.2"],
-    "verification": "Exact Library model and mutations tests passed 6/6; user-approved obsolete Trash test cleanup was restricted to the test file and git diff --check passed."
+    "lane": "creation",
+    "event": "TASK_2_2_ACCEPTED_MERGED_TASK_2_3_REGISTERED",
+    "implementationCommit": "eee9db1426118d9333a20655a26938076f1f7851",
+    "taskStateCommit": "ca19db67723027f8c6c8c9e2820969240f5d6f40",
+    "openspecProgress": "7/33",
+    "nextTaskIds": ["2.3", "3.2"],
+    "verification": "Task 2.2 focused executor 17/17 and pre-generation server-failure 1/1 passed with exact scope. The requested Creation package command is not green: five batch concurrency failures belong to Task 2.3 and eight stale edit/retry assertions remain for Tasks 2.3/2.4; this is recorded as residual work, not hidden."
   },
   "currentBlockers": [],
   "approvedDeviations": [

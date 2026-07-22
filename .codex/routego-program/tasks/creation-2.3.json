@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "faa61fa8cf27d73e6b75082295d51c14cf02212f930b34a94c33afd5f1526101",
+  "contentSha256": "74ecb277f6d1d01590daf8696c454b45edd33f8621b013314e27a66c2bbbb650",
   "hashSemantics": {
     "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null"
   },
   "lane": "creation",
   "change": "streamline-routego-image-generation",
   "taskId": "2.3",
-  "status": "prepared-locked-pending-task-2.2-acceptance",
-  "sourceCommit": "12968524786b947479ae84b294fe4e46a8bd4ea2",
+  "status": "registered-awaiting-handoff-acceptance",
+  "sourceCommit": "ca19db67723027f8c6c8c9e2820969240f5d6f40",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
-    "fileSha256": "a73d1a4e3e9caf126bbc26a4c17ee1e822107c02cdac1bcf68bc545b9fd44977",
+    "fileSha256": "201d77d35e81fa105fadf61916cb4f01d24c048911d4f18234efeda6c9901cb1",
     "lineSha256": "c3017d4c7c69226134619517f71669d3f82abefb21d1ad74a94903e3b804e540"
   },
   "dependencies": ["2.1", "2.2"],
@@ -26,7 +26,7 @@
     "packages/creation/test/provider-request.test.ts",
     "openspec/changes/streamline-routego-image-generation/tasks.md"
   ],
-  "allowedFileMode": "Task 2.3 only after Task 2.2 acceptance: enforce ordered zero-to-five references and generation-only batches with internal concurrency two and isolated results.",
+  "allowedFileMode": "Task 2.3 is registered but not active: after handoff acceptance, enforce ordered zero-to-five references and generation-only batches with internal concurrency two and isolated results.",
   "forbiddenFileGlobs": [
     "packages/contracts/**",
     "packages/foundation/**",
@@ -41,7 +41,7 @@
     "node_modules/**"
   ],
   "requiredBehavior": [
-    "Do not activate until Task 2.2 has an accepted implementation and fresh OpenSpec instructions confirm Task 2.3 is eligible.",
+    "Task 2.2 is accepted and merged; do not write product code until this registered successor passes zero-compaction handoff acceptance and receives a real worker thread ID.",
     "Preserve zero-to-five input order for references and reject any non-generation batch before provider access.",
     "Use fixed internal concurrency two, preserve item IDs/order, and isolate per-item outcomes.",
     "Use existing local dependencies only and never call a provider, use real images, or change dependencies.",
@@ -75,13 +75,14 @@
   "activation": {
     "controllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
     "controllerGeneration": 12,
-    "workerThreadId": "/root/creation_task_2_2",
-    "workerGeneration": 2,
+    "workerThreadId": "pending",
+    "workerGeneration": 3,
     "soleApplyOwner": false,
     "applyAuthorized": false
   },
   "knownRisks": [
-    "This is a prepared successor capsule only; it does not authorize Task 2.3 or change the Task 2.2 acceptance gate."
+    "This successor is registered only. A real successor task must verify the handoff from the stated baseline with zero observable compactions before it becomes the sole apply owner.",
+    "The full Creation package test command is not green at registration: the documented batch concurrency and stale edit/retry assertions remain planned Task 2.3/2.4 work and must not be suppressed."
   ],
   "externalStateAuthorized": false,
   "dependencyInstallationAuthorized": false
