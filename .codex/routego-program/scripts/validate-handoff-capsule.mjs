@@ -5,7 +5,19 @@ import { dirname, resolve, sep } from "node:path";
 
 const root = process.cwd();
 const args = process.argv.slice(2);
-const capsuleArgument = args.find((value) => !value.startsWith("--"));
+const governanceRootOptionIndex = args.indexOf("--governance-root");
+const governanceRoot = resolve(
+  governanceRootOptionIndex === -1 ? root : args[governanceRootOptionIndex + 1],
+);
+if (governanceRootOptionIndex !== -1 && !args[governanceRootOptionIndex + 1]) {
+  console.error("[HANDOFF_AUDIT_FAILED] --governance-root requires a directory path");
+  process.exit(1);
+}
+const capsuleArgument = args.find(
+  (value, index) =>
+    !value.startsWith("--") &&
+    (governanceRootOptionIndex === -1 || index !== governanceRootOptionIndex + 1),
+);
 const capsulePath = capsuleArgument ?? ".codex/routego-program/handoffs/integration-generation-3.capsule.json";
 const allowDirty = args.includes("--allow-dirty");
 const failures = [];
@@ -72,8 +84,16 @@ function readRepositoryPath(filePath, sourceCommit) {
   return git(["show", sourceCommit + ":" + filePath], null);
 }
 
+function readStartupPath(filePath, sourceCommit) {
+  const governancePath = resolve(governanceRoot, filePath);
+  if (existsSync(governancePath)) {
+    return readFileSync(governancePath);
+  }
+  return readRepositoryPath(filePath, sourceCommit);
+}
+
 function readJson(filePath) {
-  return JSON.parse(readFileSync(resolve(root, filePath), "utf8"));
+  return JSON.parse(readFileSync(resolve(governanceRoot, filePath), "utf8"));
 }
 
 function requireFields(object, fields, label) {
@@ -101,7 +121,7 @@ function pathOverlap(allowed, forbidden) {
 let capsule;
 let capsuleBytes;
 try {
-  capsuleBytes = readFileSync(resolve(root, capsulePath));
+  capsuleBytes = readFileSync(resolve(governanceRoot, capsulePath));
   capsule = JSON.parse(capsuleBytes.toString("utf8"));
 } catch (error) {
   console.error("[HANDOFF_AUDIT_FAILED] cannot read capsule: " + error.message);
@@ -196,7 +216,7 @@ if (taskCapsule) {
   }
 
   if (capsule.hashSemantics !== undefined) {
-    const taskRawSha256 = sha256(readFileSync(resolve(root, taskCapsulePath)));
+    const taskRawSha256 = sha256(readFileSync(resolve(governanceRoot, taskCapsulePath)));
     if (capsule.currentState.taskCapsule.rawFileSha256 !== taskRawSha256) {
       fail("handoff task capsule raw file fingerprint mismatch");
     } else {
@@ -453,7 +473,7 @@ if (program && lane) {
 }
 
 try {
-  const summaryBytes = readFileSync(resolve(root, capsule.authority.summaryPath));
+  const summaryBytes = readFileSync(resolve(governanceRoot, capsule.authority.summaryPath));
   const normalizedSummaryBytes = Buffer.from(
     summaryBytes.toString("utf8").replace(/\r\n/g, "\n"),
     "utf8",
@@ -521,18 +541,18 @@ const fixedBudgetFiles = [
 ];
 
 for (const [filePath, limit] of fixedBudgetFiles) {
-  const size = statSync(resolve(root, filePath)).size;
+  const size = statSync(resolve(governanceRoot, filePath)).size;
   if (size > limit) {
     fail("file budget exceeded: " + filePath + " " + size + " > " + limit);
   }
 }
 
-for (const fileName of readdirSync(resolve(root, ".codex/routego-program/threads"))) {
+for (const fileName of readdirSync(resolve(governanceRoot, ".codex/routego-program/threads"))) {
   if (!fileName.endsWith(".json")) {
     continue;
   }
   const filePath = ".codex/routego-program/threads/" + fileName;
-  const size = statSync(resolve(root, filePath)).size;
+  const size = statSync(resolve(governanceRoot, filePath)).size;
   if (size > budgets.lane) {
     fail("lane state budget exceeded: " + filePath + " " + size + " > " + budgets.lane);
   }
@@ -561,7 +581,7 @@ let startupBytes = 0;
 for (const startupFile of capsule.startup.mandatoryFiles) {
   try {
     startupBytes += normalizeUtf8LineEndings(
-      readRepositoryPath(startupFile, capsule.startup.fallbackSourceCommit),
+      readStartupPath(startupFile, capsule.startup.fallbackSourceCommit),
     ).length;
   } catch (error) {
     fail("startup file unavailable: " + startupFile + " (" + error.message + ")");
@@ -602,7 +622,7 @@ const forbiddenPayloadPatterns = [
   /(?:^|[^A-Za-z0-9+/])[A-Za-z0-9+/]{512,}={0,2}(?:$|[^A-Za-z0-9+/])/,
 ];
 for (const filePath of scanFiles) {
-  const text = readFileSync(resolve(root, filePath), "utf8");
+  const text = readFileSync(resolve(governanceRoot, filePath), "utf8");
   for (const pattern of forbiddenPayloadPatterns) {
     if (pattern.test(text)) {
       fail("sensitive payload pattern detected in " + filePath);
