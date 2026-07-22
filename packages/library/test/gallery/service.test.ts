@@ -62,9 +62,6 @@ function parameters(prompt: string): LibraryOperationParameters {
     partialImages: 0,
     transparentMode: "off",
     moderation: "auto",
-    action: "generate",
-    imageIds: [],
-    fileIds: [],
     outputDirectoryMode: "default",
     saveToLibrary: true
   };
@@ -109,6 +106,19 @@ async function createService() {
             sourceRelativePath: `${name}.png`
           }
         ],
+        ...(name === "two"
+          ? {
+              relationships: [
+                {
+                  id: "relationship-two-reference-one",
+                  role: "reference" as const,
+                  relatedAssetId: "asset-one",
+                  artifactId: "artifact-one",
+                  order: 0
+                }
+              ]
+            }
+          : {}),
         createdAt: `2026-07-18T0${index + 1}:00:00.000Z`,
         updatedAt: `2026-07-18T0${index + 1}:00:00.000Z`
       };
@@ -186,32 +196,14 @@ describe("public routego_manage_library compatibility", () => {
     });
   });
 
-  it("maps recycle, restore, and confirmed permanent deletion without false affected IDs", async () => {
-    const { service } = await createService();
-    expect(
-      await service.manageLibrary({ action: "soft-delete", assetIds: ["asset-one"] })
-    ).toMatchObject({ affectedAssetIds: ["asset-one"] });
-    expect((await service.searchLibrary({})).items.map((item) => item.id)).toEqual(["asset-two"]);
-    expect(
-      (await service.searchLibrary({ includeDeleted: true })).items.find(
-        (item) => item.id === "asset-one"
-      )?.status
-    ).toBe("deleted");
-    expect(
-      await service.manageLibrary({ action: "restore", assetIds: ["asset-one"] })
-    ).toMatchObject({ affectedAssetIds: ["asset-one"] });
-
-    await service.manageLibrary({ action: "soft-delete", assetIds: ["asset-one"] });
-    const permanent = await service.manageLibrary({
-      action: "permanent-delete",
-      assetIds: ["asset-one", "asset-missing"],
-      confirmPermanentDelete: true
+  it("marks an active generation through the scoped mutation service", async () => {
+    const { service, indexStore } = await createService();
+    const preflight = await service.preflightLibraryMutation({
+      mutation: { action: "mark", assetIds: ["asset-one"] }
     });
-    expect(permanent.affectedAssetIds).toEqual(["asset-one"]);
-    expect(permanent.warnings.join(" ")).toContain("asset-missing");
-    expect((await service.searchLibrary({ includeDeleted: true })).items.map((item) => item.id)).toEqual([
-      "asset-two"
-    ]);
+    const result = await service.executeLibraryMutation({ preflightId: preflight.preflightId, action: "mark" });
+    expect(result).toMatchObject({ status: "succeeded", items: [{ affectedAssetId: "asset-one" }] });
+    expect((await indexStore.read()).currentMarkRecordId).toBe("asset-one");
   });
 
   it("fails closed for ZIP actions that belong to later portability tasks", async () => {
@@ -229,11 +221,122 @@ describe("public routego_manage_library compatibility", () => {
   });
 });
 
+describe("safe generation information and read-only recipe preparation", () => {
+  it("returns only safe allowlisted metadata for explicit and current generation records", async () => {
+    const { service, indexStore } = await createService();
+    const before = await indexStore.read();
+
+    const copied = await service.copyGenerationInfo({ recordId: "asset-two" });
+    expect(copied).toMatchObject({
+      status: "succeeded",
+      providerRequestCount: 0,
+      projection: {
+        recordId: "asset-two",
+        prompt: "Service prompt two",
+        referenceIds: ["asset-one"],
+        parameters: { size: "1024x1024", format: "png", count: 1 }
+      }
+    });
+    expect(copied.clipboardText).not.toMatch(
+      /(?:[A-Za-z]:[\\/]|file:|https?:\/\/|Authorization\s*:|Bearer\s|data:image\/|base64,)/iu
+    );
+
+    const explicit = await service.prepareRegeneration({ recordId: "asset-two" });
+    expect(explicit).toMatchObject({
+      providerRequestCount: 0,
+      markUnchanged: true,
+      recipe: {
+        kind: "generate",
+        sourceRecordId: "asset-two",
+        referenceIds: ["asset-one"],
+        prompt: "Service prompt two"
+      }
+    });
+    expect(await indexStore.read()).toEqual(before);
+
+    await indexStore.runExclusive(async ({ index, commit }) => {
+      await commit({
+        blobs: index.blobs,
+        assets: index.assets,
+        folders: index.folders,
+        currentMarkRecordId: "asset-one"
+      });
+    });
+    const fromMark = await service.prepareRegeneration({});
+    expect(fromMark.recipe.sourceRecordId).toBe("asset-one");
+    expect((await indexStore.read()).currentMarkRecordId).toBe("asset-one");
+  });
+
+  it("fails closed for absent current marks and unavailable references without returning partial text", async () => {
+    const { service, indexStore } = await createService();
+    await expect(service.prepareRegeneration({})).rejects.toMatchObject({ code: "not_found" });
+
+    await indexStore.runExclusive(async ({ index, commit }) => {
+      await commit({
+        blobs: index.blobs,
+        folders: index.folders,
+        assets: index.assets.map((asset) =>
+          asset.id === "asset-one"
+            ? {
+                ...asset,
+                status: "deleted" as const,
+                previousStatus: "succeeded" as const,
+                deletedAt: "2026-07-18T07:00:00.000Z",
+                purgeEligibleAt: "2026-08-17T07:00:00.000Z",
+                updatedAt: "2026-07-18T07:00:00.000Z"
+              }
+            : asset
+        )
+      });
+    });
+    await expect(service.prepareRegeneration({ recordId: "asset-two" })).rejects.toMatchObject({
+      code: "conflict"
+    });
+    expect(await service.copyGenerationInfo({ recordId: "asset-two" })).toMatchObject({
+      status: "failed",
+      providerRequestCount: 0,
+      error: { code: "conflict" }
+    });
+  });
+
+  it("rejects stored prompts that could expose paths or credentials", async () => {
+    const { service, indexStore } = await createService();
+    await indexStore.runExclusive(async ({ index, commit }) => {
+      await commit({
+        blobs: index.blobs,
+        folders: index.folders,
+        assets: index.assets.map((asset) =>
+          asset.id === "asset-one"
+            ? {
+                ...asset,
+                prompt: "Use C:\\Users\\person\\secret.png and Authorization: Bearer token",
+                requestedParams: {
+                  ...asset.requestedParams,
+                  prompt: "Use C:\\Users\\person\\secret.png and Authorization: Bearer token"
+                },
+                effectiveParams: {
+                  ...asset.effectiveParams,
+                  prompt: "Use C:\\Users\\person\\secret.png and Authorization: Bearer token"
+                }
+              }
+            : asset
+        )
+      });
+    });
+    await expect(service.prepareRegeneration({ recordId: "asset-one" })).rejects.toMatchObject({
+      code: "conflict"
+    });
+    const copied = await service.copyGenerationInfo({ recordId: "asset-one" });
+    expect(copied).toMatchObject({ status: "failed", error: { code: "conflict" } });
+    expect(JSON.stringify(copied)).not.toMatch(/(?:C:\\Users|Bearer token|secret\.png)/u);
+  });
+});
+
 describe("Studio Library mutation service", () => {
-  it("returns schema-shaped preflight and ordered partial execution outcomes", async () => {
+  it("returns a conflict when a marked target changes after preflight", async () => {
     const { service, indexStore } = await createService();
     const preflight = await service.preflightLibraryMutation({
-      mutation: { action: "soft-delete", assetIds: ["asset-one", "asset-two"] }
+      mutation: { action: "mark", assetIds: ["asset-two"] }
     });
     await indexStore.runExclusive(async ({ index, commit }) => {
       await commit({
@@ -248,14 +351,11 @@ describe("Studio Library mutation service", () => {
     });
     const result = await service.executeLibraryMutation({
       preflightId: preflight.preflightId,
-      action: "soft-delete"
+      action: "mark"
     });
     expect(result).toMatchObject({
-      status: "partial",
-      items: [
-        { targetId: "asset-one", status: "succeeded", affectedAssetId: "asset-one" },
-        { targetId: "asset-two", status: "failed", error: { code: "conflict" } }
-      ]
+      status: "failed",
+      items: [{ targetId: "asset-two", status: "failed", error: { code: "conflict" } }]
     });
   });
 

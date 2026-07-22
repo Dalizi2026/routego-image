@@ -70,9 +70,6 @@ function generateParameters(prompt: string, size: LibraryOperationParameters["si
     partialImages: 0,
     transparentMode: "off",
     moderation: "auto",
-    action: "generate",
-    imageIds: [],
-    fileIds: [],
     outputDirectoryMode: "default",
     saveToLibrary: true
   };
@@ -80,30 +77,10 @@ function generateParameters(prompt: string, size: LibraryOperationParameters["si
 
 function editParameters(prompt: string): LibraryOperationParameters {
   return {
-    kind: "edit",
-    prompt,
-    references: [{ assetId: "asset-a", role: "style", label: "Style" }],
-    target: { assetId: "asset-a", label: "Target" },
-    supportingImages: [{ assetId: "asset-a", role: "supporting", label: "Support" }],
-    maskAssetId: "asset-a",
-    invariants: {
-      allowedChanges: ["background"],
-      preserve: ["subject"],
-      forbiddenChanges: []
-    },
-    size: "1536x1024",
+    ...generateParameters(prompt, "1536x1024"),
     aspectRatio: "3:2",
-    quality: "high",
-    format: "png",
-    count: 1,
     partialImages: 1,
-    transparentMode: "off",
-    moderation: "auto",
-    action: "edit",
-    imageIds: [],
-    fileIds: [],
-    outputDirectoryMode: "default",
-    saveToLibrary: true
+    references: [{ assetId: "asset-a", role: "style", label: "Style" }]
   };
 }
 
@@ -183,12 +160,8 @@ async function createGallery() {
         }
       ],
       relationships: [
-        { id: "relationship-source", role: "source", relatedAssetId: "asset-a", artifactId: "artifact-a", order: 0 },
-        { id: "relationship-target", role: "target", relatedAssetId: "asset-a", artifactId: "artifact-a", order: 1 },
-        { id: "relationship-reference", role: "reference", relatedAssetId: "asset-a", artifactId: "artifact-a", order: 2 },
-        { id: "relationship-supporting", role: "supporting", relatedAssetId: "asset-a", artifactId: "artifact-a", order: 3 },
-        { id: "relationship-mask", role: "mask", relatedAssetId: "asset-a", artifactId: "artifact-a", order: 4 },
-        { id: "relationship-output", role: "output", relatedAssetId: "asset-b", artifactId: "artifact-b", order: 5 }
+        { id: "relationship-reference", role: "reference", relatedAssetId: "asset-a", artifactId: "artifact-a", order: 0 },
+        { id: "relationship-output", role: "output", relatedAssetId: "asset-b", artifactId: "artifact-b", order: 1 }
       ],
       folderIds: ["folder-primary", "folder-edits"],
       createdAt: "2026-07-18T04:00:00.000Z",
@@ -220,14 +193,11 @@ async function createGallery() {
       blobs: index.blobs,
       folders: index.folders,
       assets: index.assets.map((asset) =>
-        asset.id === "asset-c"
-          ? {
-              ...asset,
-              status: "deleted",
-              previousStatus: "succeeded",
-              deletedAt: "2026-07-18T05:00:00.000Z",
-              purgeEligibleAt: "2026-08-17T05:00:00.000Z",
-              updatedAt: "2026-07-18T05:00:00.000Z"
+          asset.id === "asset-c"
+            ? {
+                ...asset,
+                status: "partial",
+                updatedAt: "2026-07-18T05:00:00.000Z"
             }
           : asset
       )
@@ -261,9 +231,9 @@ describe("Library public and Studio query projections", () => {
       service.searchStudioLibrary({ models: ["model-two"] }),
       service.searchStudioLibrary({ from: "2026-07-18T03:30:00.000Z" }),
       service.searchStudioLibrary({ to: "2026-07-18T03:30:00.000Z" }),
-      service.searchStudioLibrary({ kinds: ["edit"] }),
+      service.searchStudioLibrary({ kinds: ["generate"] }),
       service.searchStudioLibrary({ sizes: ["1536x1024"] }),
-      service.searchStudioLibrary({ statuses: ["deleted"], includeDeleted: true }),
+      service.searchStudioLibrary({ statuses: ["partial"], includeDeleted: true }),
       service.searchStudioLibrary({ folderIds: ["folder-edits"] }),
       service.searchStudioLibrary({ sort: "prompt-asc", includeDeleted: true }),
       service.searchStudioLibrary({ sort: "prompt-desc", includeDeleted: true }),
@@ -273,10 +243,10 @@ describe("Library public and Studio query projections", () => {
       ["asset-a"],
       ["asset-b"],
       ["asset-b"],
-      ["asset-a"],
+      ["asset-a", "asset-c"],
+      ["asset-b", "asset-a", "asset-c"],
       ["asset-b"],
-      ["asset-b"],
-      ["asset-c"],
+      ["asset-b", "asset-c"],
       ["asset-b"],
       ["asset-c", "asset-a", "asset-b"],
       ["asset-b", "asset-a", "asset-c"],
@@ -331,19 +301,19 @@ describe("Library public and Studio query projections", () => {
       });
     });
     const first = await service.searchStudioLibrary({ sort: "prompt-asc", limit: 1 });
-    expect(first.items[0]?.assetId).toBe("asset-a");
+    expect(first.items[0]?.assetId).toBe("asset-c");
     expect(first.nextCursor?.length).toBeLessThan(2_000);
     const second = await service.searchStudioLibrary({
       sort: "prompt-asc",
       limit: 1,
       cursor: first.nextCursor
     });
-    expect(second.items[0]?.assetId).toBe("asset-b");
+    expect(second.items[0]?.assetId).toBe("asset-a");
   });
 
   it("aligns search, complete detail relationships, allowed actions, and resources", async () => {
     const { service } = await createGallery();
-    const search = await service.searchStudioLibrary({ kinds: ["edit"] });
+    const search = await service.searchStudioLibrary({ query: "ocean" });
     const item = search.items[0]!;
     const detail = await service.getAssetDetail({ assetId: item.assetId });
     const resource = await service.getBrowserResource({
@@ -354,11 +324,7 @@ describe("Library public and Studio query projections", () => {
     expect(detail.status).toBe("succeeded");
     expect(detail.asset?.renditions[0]?.artifactId).toBe(item.artifactId);
     expect(detail.asset?.relationships.map((relationship) => relationship.role)).toEqual([
-      "source",
-      "target",
       "reference",
-      "supporting",
-      "mask",
       "output"
     ]);
     expect(detail.asset?.folders.map((folder) => folder.folderId)).toEqual([
@@ -366,11 +332,10 @@ describe("Library public and Studio query projections", () => {
       "folder-edits"
     ]);
     expect(detail.asset?.allowedActions).toEqual([
-      "edit",
-      "retry",
       "assign-folders",
       "remove-folders",
-      "soft-delete",
+      "mark",
+      "copy-generation-info",
       "export-zip",
       "download"
     ]);
