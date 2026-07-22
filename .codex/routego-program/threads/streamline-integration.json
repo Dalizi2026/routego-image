@@ -3,23 +3,21 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "openspec-cross-lane-sole-apply-owner-existing-controller-worktree",
-  "status": "activated-task-4.1-implementation-validated-pending-owner-task-state",
+  "status": "task-4.1-complete-no-active-product-task-4.2-locked",
   "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "threadId": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 1,
-  "currentHead": "edc3812022abd3ea76b3860c48c78cde2672f173",
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "currentHead": "1b8314472fe56e5e94b49c5ee2af494fa156c8fd",
+  "observableCompactions": 1,
+  "lastCompactionFingerprint": "thread:019f8ad0-5d83-72f2-b26c-7cad6b488289/turn:019f8af0-3f8a-7360-9e6d-5e380df0ae1c/item:65",
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
-    "id": "4.1",
-    "status": "implementation-validated-pending-sole-owner-task-state",
-    "taskCapsule": ".codex/routego-program/tasks/integration-4.1.json",
-    "handoffCapsule": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json",
-    "locked": false
+    "id": "4.2",
+    "status": "locked-awaiting-separate-controller-scope-and-owner-acceptance",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f8a48-ee58-7f73-b362-947478c0c85a",
@@ -32,7 +30,8 @@
   },
   "handoffCapsuleIntegrity": {
     "canonicalSha256": "dc1d95b3e24dbc7705f650df9d2092ef1b867a354657f7b7f30514b2ac313f50",
-    "rawFileSha256": "08e15ddac02dd39a12aa382074e6070a3aea974765a8e9b3f2ff4003cf56fae8"
+    "rawFileSha256": "08e15ddac02dd39a12aa382074e6070a3aea974765a8e9b3f2ff4003cf56fae8",
+    "status": "historical-task-4.1-handoff; not an activation authority for Task 4.2"
   },
   "crossLaneIsolation": {
     "legacyStatePath": ".codex/routego-program/threads/integration.json",
@@ -56,5 +55,16 @@
     "startupByteCounting": "utf8-after-crlf-to-lf-normalization",
     "acceptanceObservableCompactions": 0
   },
-  "externalStateAuthorized": false
+  "externalStateAuthorized": false,
+  "lastCompletedTask": {
+    "id": "4.1",
+    "implementationCommit": "70fa66b856b693e405b9539bdf9adf7e4bbe358e",
+    "taskStateCommit": "1b8314472fe56e5e94b49c5ee2af494fa156c8fd",
+    "evidence": {
+      "path": ".codex/routego-program/evidence/streamline-4.1.json",
+      "sha256": "d675c05ce14f47a883e97bb6c51c092ae0fff7d6a32df4f6e67860d9118534d1"
+    },
+    "handoffAcceptanceObservableCompactions": 0,
+    "postActivationObservableCompactions": 1
+  }
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-4.1-implementation-validated-pending-task-state",
+  "status": "controller-generation-12-task-4.1-complete-task-4.2-locked",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-4.1-implementation-validated-pending-task-state",
+    "status": "authoritative-controller-generation-12-task-4.1-complete-task-4.2-locked",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -122,14 +122,14 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "activated-task-4.1-implementation-validated-pending-owner-task-state",
+      "status": "task-4.1-complete-no-active-product-task",
       "taskRef": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
       "threadId": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
       "generation": 1,
-      "taskId": "4.1",
+      "taskId": null,
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "edc3812022abd3ea76b3860c48c78cde2672f173",
+      "currentHead": "1b8314472fe56e5e94b49c5ee2af494fa156c8fd",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/integration-4.1.json",
         "sha256": "9eca7c0e04df053527c451c2e2405fcb215426bb0f9fc32a9ceff916385eced5"
@@ -139,7 +139,14 @@
         "sha256": "dc1d95b3e24dbc7705f650df9d2092ef1b867a354657f7b7f30514b2ac313f50",
         "rawFileSha256": "08e15ddac02dd39a12aa382074e6070a3aea974765a8e9b3f2ff4003cf56fae8"
       },
-      "authorizedScope": "task-4.1-exact-integration-public-regeneration-discovery-files"
+      "authorizedScope": "closed-after-task-4.1; Task 4.2 remains locked",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "4.1",
+      "completedEvidence": {
+        "path": ".codex/routego-program/evidence/streamline-4.1.json",
+        "sha256": "d675c05ce14f47a883e97bb6c51c092ae0fff7d6a32df4f6e67860d9118534d1"
+      }
     }
   },
   "laneSuccessors": {
@@ -174,12 +181,14 @@
       "generation": 1,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "edc3812022abd3ea76b3860c48c78cde2672f173",
-      "observableCompactions": 0,
+      "currentHead": "1b8314472fe56e5e94b49c5ee2af494fa156c8fd",
+      "observableCompactions": 1,
       "handoffCapsuleIntegrity": {
         "canonicalSha256": "dc1d95b3e24dbc7705f650df9d2092ef1b867a354657f7b7f30514b2ac313f50",
         "rawFileSha256": "08e15ddac02dd39a12aa382074e6070a3aea974765a8e9b3f2ff4003cf56fae8"
-      }
+      },
+      "lastCompletedTask": "4.1",
+      "status": "task-4.1-complete-no-active-product-task"
     }
   },
   "currentChange": {
@@ -187,7 +196,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 13,
+      "completedTasks": 14,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -201,34 +210,31 @@
         "3.2",
         "3.3",
         "3.4",
-        "3.5"
-      ],
-      "readyTaskIds": [
+        "3.5",
         "4.1"
       ],
-      "nextTaskId": "4.1"
+      "readyTaskIds": [],
+      "nextTaskId": "4.2"
     },
     "currentTask": {
-      "id": "4.1",
-      "locked": false,
-      "activationAuthorized": true,
-      "parallelReadyTaskIds": [
-        "4.1"
-      ],
-      "authorizedScope": "Task 4.1 is activated only for Integration thread 019f8ad0-5d83-72f2-b26c-7cad6b488289 in the existing controller-g12 worktree. Exact task-capsule files only; no new directory, worktree, provider, network, credentials, real data, migration, deletion, deployment, release, or future task scope."
+      "id": "4.2",
+      "locked": true,
+      "activationAuthorized": false,
+      "parallelReadyTaskIds": [],
+      "authorizedScope": "Task 4.2 remains locked. A future visible Integration owner may be activated only after a new Controller scope, unique-owner, clean-worktree, startup-budget, and zero-observable-compression acceptance in the existing controller-g12 worktree."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "streamline-integration",
-    "event": "TASK_4_1_IMPLEMENTATION_VALIDATED_PENDING_OWNER_TASK_STATE",
+    "event": "TASK_4_1_ACCEPTED_TASK_STATE_CONFIRMED",
     "implementationCommit": "70fa66b856b693e405b9539bdf9adf7e4bbe358e",
-    "controllerMergeCommit": null,
-    "taskStateCommit": "edc3812022abd3ea76b3860c48c78cde2672f173",
-    "openspecProgress": "13/33",
+    "controllerMergeCommit": "f313b062f9923b4f54ad333e03f2c8a621f0c9c1",
+    "taskStateCommit": "1b8314472fe56e5e94b49c5ee2af494fa156c8fd",
+    "openspecProgress": "14/33",
     "nextTaskIds": [
-      "4.1"
+      "4.2"
     ],
-    "verification": "The five direct Task 4.1 assertions passed through explicit Vitest selection; legacy later-task assertions were retained and not weakened. Governance references refreshed before the sole owner marks task state."
+    "verification": "Five direct Task 4.1 assertions passed in three files; 26 later-owned legacy assertions were retained and skipped by the approved explicit selection. Task 4.1 task-state commit is single-file and clean. Task 4.2 is locked."
   },
   "currentBlockers": [],
   "approvedDeviations": [
@@ -278,7 +284,8 @@
       ".codex/routego-program/evidence/streamline-3.2.json",
       ".codex/routego-program/evidence/streamline-3.3.json",
       ".codex/routego-program/evidence/streamline-3.4.json",
-      ".codex/routego-program/evidence/streamline-3.5.json"
+      ".codex/routego-program/evidence/streamline-3.5.json",
+      ".codex/routego-program/evidence/streamline-4.1.json"
     ]
   }
 }
