@@ -55,14 +55,11 @@ export interface StoredLibraryAsset {
   readonly id: string;
   readonly prompt: string;
   readonly model: string;
-  readonly kind: "generate" | "edit";
+  readonly kind: "generate";
   readonly status: LibraryAssetStatus;
-  readonly previousStatus?: Exclude<LibraryAssetStatus, "deleted">;
   readonly primaryArtifactId: string;
   readonly createdAt: string;
   readonly updatedAt: string;
-  readonly deletedAt?: string;
-  readonly purgeEligibleAt?: string;
   readonly requestedParams: LibraryOperationParameters;
   readonly effectiveParams: LibraryOperationParameters;
   readonly execution: OperationExecutionMetadata;
@@ -280,12 +277,9 @@ function parseAsset(value: unknown): StoredLibraryAsset {
       "model",
       "kind",
       "status",
-      "previousStatus",
       "primaryArtifactId",
       "createdAt",
       "updatedAt",
-      "deletedAt",
-      "purgeEligibleAt",
       "requestedParams",
       "effectiveParams",
       "execution",
@@ -314,8 +308,15 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   } catch {
     throw new LibraryError("config_corrupt", "Library asset operation metadata is invalid.");
   }
-  if (requestedParams.kind !== effectiveParams.kind || requestedParams.kind !== record["kind"]) {
-    throw new LibraryError("config_corrupt", "Library asset operation kinds disagree.");
+  if (
+    record["kind"] !== "generate" ||
+    requestedParams.kind !== "generate" ||
+    effectiveParams.kind !== "generate"
+  ) {
+    throw new LibraryError("config_corrupt", "Current Library indexes contain generation records only.");
+  }
+  if (status === "deleted") {
+    throw new LibraryError("config_corrupt", "Current Library indexes cannot contain Trash records.");
   }
   if (
     !Array.isArray(record["renditions"]) ||
@@ -365,38 +366,6 @@ function parseAsset(value: unknown): StoredLibraryAsset {
     throw new LibraryError("config_corrupt", "Library folder memberships are invalid.");
   }
   const folderIds = record["folderIds"].map((item) => parseId(item, "Folder membership"));
-  const deletedAt =
-    record["deletedAt"] === undefined
-      ? undefined
-      : parseTimestamp(record["deletedAt"], "Asset deletion time");
-  const purgeEligibleAt =
-    record["purgeEligibleAt"] === undefined
-      ? undefined
-      : parseTimestamp(record["purgeEligibleAt"], "Asset purge time");
-  let previousStatus: StoredLibraryAsset["previousStatus"];
-  if (record["previousStatus"] !== undefined) {
-    try {
-      const parsedPreviousStatus = libraryAssetStatusSchema.parse(record["previousStatus"]);
-      if (parsedPreviousStatus === "deleted") {
-        throw new Error("Deleted cannot be a previous status.");
-      }
-      previousStatus = parsedPreviousStatus;
-    } catch {
-      throw new LibraryError("config_corrupt", "Library asset previous status is invalid.");
-    }
-  }
-  if (
-    (status === "deleted") !==
-      (deletedAt !== undefined && purgeEligibleAt !== undefined && previousStatus !== undefined)
-  ) {
-    throw new LibraryError("config_corrupt", "Library asset deletion metadata is invalid.");
-  }
-  if (status === "deleted" && Date.parse(purgeEligibleAt!) <= Date.parse(deletedAt!)) {
-    throw new LibraryError("config_corrupt", "Library asset purge metadata is invalid.");
-  }
-  if (status !== "deleted" && (deletedAt || purgeEligibleAt || previousStatus)) {
-    throw new LibraryError("config_corrupt", "Only deleted assets can retain deletion metadata.");
-  }
   let error: RoutegoServiceError | undefined;
   if (record["error"] !== undefined) {
     try {
@@ -426,14 +395,11 @@ function parseAsset(value: unknown): StoredLibraryAsset {
     id: assetId,
     prompt: record["prompt"],
     model: record["model"].trim(),
-    kind: requestedParams.kind,
+    kind: "generate",
     status,
-    ...(previousStatus === undefined ? {} : { previousStatus }),
     primaryArtifactId,
     createdAt,
     updatedAt,
-    ...(deletedAt === undefined ? {} : { deletedAt }),
-    ...(purgeEligibleAt === undefined ? {} : { purgeEligibleAt }),
     requestedParams,
     effectiveParams,
     execution,
@@ -540,7 +506,7 @@ function parseVersionedImageLibraryIndex(
         : parseId(record["currentMarkRecordId"], "Current mark record identity");
     if (currentMarkRecordId !== undefined) {
       const marked = assets.find((asset) => asset.id === currentMarkRecordId);
-      if (!marked || marked.kind !== "generate" || marked.status === "deleted") {
+      if (!marked || marked.kind !== "generate") {
         throw new LibraryError("config_corrupt", "The current mark must reference an active generation record.");
       }
     }

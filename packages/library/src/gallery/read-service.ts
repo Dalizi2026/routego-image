@@ -142,19 +142,14 @@ function primaryBlob(index: ImageLibraryIndex, asset: StoredLibraryAsset): Store
 
 function allowedActions(asset: StoredLibraryAsset): LibraryAssetDetail["allowedActions"] {
   const actions: LibraryAssetDetail["allowedActions"][number][] = [];
-  if (asset.status !== "deleted") {
-    actions.push("assign-folders");
-    if (asset.folderIds.length > 0) actions.push("remove-folders");
-    if (asset.kind === "generate") actions.push("mark", "copy-generation-info");
-  }
+  actions.push("assign-folders");
+  if (asset.folderIds.length > 0) actions.push("remove-folders");
+  actions.push("mark", "copy-generation-info");
   actions.push("export-zip", "download");
   return actions;
 }
 
 function detailFromIndex(index: ImageLibraryIndex, asset: StoredLibraryAsset): LibraryAssetDetail {
-  if (asset.kind !== "generate") {
-    throw new LibraryError("conflict", "Legacy edit records cannot be projected through Library detail.");
-  }
   const blob = primaryBlob(index, asset);
   const foldersById = new Map(index.folders.map((folder) => [folder.id, folder]));
   const folders = asset.folderIds
@@ -179,7 +174,6 @@ function detailFromIndex(index: ImageLibraryIndex, asset: StoredLibraryAsset): L
     height: blob.height,
     createdAt: asset.createdAt,
     updatedAt: asset.updatedAt,
-    ...(asset.deletedAt === undefined ? {} : { deletedAt: asset.deletedAt }),
     requestedParams: asset.requestedParams,
     effectiveParams: asset.effectiveParams,
     execution: asset.execution,
@@ -264,7 +258,6 @@ export class LibraryReadService {
           status: asset.status,
           folderIds: [...asset.folderIds],
           createdAt: asset.createdAt,
-          ...(asset.deletedAt === undefined ? {} : { deletedAt: asset.deletedAt })
         };
       })
     );
@@ -293,7 +286,6 @@ export class LibraryReadService {
         status: asset.status,
         folderIds: [...asset.folderIds],
         createdAt: asset.createdAt,
-        ...(asset.deletedAt === undefined ? {} : { deletedAt: asset.deletedAt }),
         thumbnail: await this.#resources.registerImage(blob, "thumbnail")
       }))
     );

@@ -1,7 +1,4 @@
 import { randomUUID } from "node:crypto";
-import os from "node:os";
-import path from "node:path";
-import { lstat, unlink } from "node:fs/promises";
 
 import {
   executeLibraryMutationInputSchema,
@@ -18,53 +15,23 @@ import {
   type PreflightLibraryMutationResult,
   type RoutegoServiceError
 } from "@routego-image/contracts";
-import { createProtectedLegacyRoots } from "@routego-image/foundation";
-
-import { LibraryError, isNodeError } from "../errors";
-import {
-  listTransactionJournals,
-  markTransactionJournalCommitted,
-  removeTransactionJournal,
-  writeTransactionJournal,
-  type FileTransactionJournal
-} from "../fs/journal";
-import {
-  canonicalizePathIdentities,
-  canonicalizePathIdentity,
-  isPathIdentityContained,
-  normalizePathIdentity,
-  pathIdentitiesOverlap,
-  resolveApprovedPath
-} from "../fs/paths";
+import { LibraryError } from "../errors";
 import { ImageLibraryIndexStore, type ImageLibraryIndexContext } from "./index-store";
-import {
-  referencedBlobPaths,
-  type ImageLibraryIndex,
-  type StoredLibraryAsset
-} from "./model";
+import type { ImageLibraryIndex, StoredLibraryAsset } from "./model";
 
-export const LIBRARY_DELETE_TRANSACTION_KIND = "image-library-delete-v1";
 export const DEFAULT_LIBRARY_PREFLIGHT_TTL_MS = 5 * 60_000;
-export const LIBRARY_RECYCLE_RETENTION_MS = 30 * 24 * 60 * 60_000;
 
 type AssetMutationAction = Exclude<LibraryMutationRequest["action"], "import-zip">;
-type ExecutableAssetMutationAction = Exclude<AssetMutationAction, "export-zip">;
-
-export interface LibraryMutationStoreHooks {
-  readonly afterDeleteJournalPrepared?: (journal: FileTransactionJournal) => Promise<void>;
-  readonly afterDeleteIndexCommit?: (journal: FileTransactionJournal) => Promise<void>;
-  readonly beforeDeleteBackingFile?: (relativePath: string) => Promise<void>;
-}
+type SupportedAssetMutationAction = Extract<
+  AssetMutationAction,
+  "assign-folders" | "remove-folders" | "mark"
+>;
 
 export interface LibraryMutationStoreOptions {
   readonly indexStore: ImageLibraryIndexStore;
   readonly now?: () => Date;
-  readonly idFactory?: (kind: "preflight" | "transaction") => string;
+  readonly idFactory?: (kind: "preflight") => string;
   readonly preflightTtlMs?: number;
-  readonly platform?: NodeJS.Platform;
-  readonly homeDirectory?: string;
-  readonly protectedRoots?: readonly string[];
-  readonly hooks?: LibraryMutationStoreHooks;
 }
 
 interface StoredPreflight {
@@ -79,26 +46,6 @@ interface StoredPreflight {
 }
 
 type MutationItem = ExecuteLibraryMutationResult["items"][number];
-
-function platformKind(platform: NodeJS.Platform): "win32" | "posix" {
-  return platform === "win32" ? "win32" : "posix";
-}
-
-function pathApi(platform: NodeJS.Platform): typeof path.win32 | typeof path.posix {
-  return platform === "win32" ? path.win32 : path.posix;
-}
-
-function normalizedPath(value: string, platform: NodeJS.Platform): string {
-  return normalizePathIdentity(value, platformKind(platform));
-}
-
-function isContained(root: string, candidate: string, platform: NodeJS.Platform): boolean {
-  return isPathIdentityContained(root, candidate, platformKind(platform));
-}
-
-function overlaps(left: string, right: string, platform: NodeJS.Platform): boolean {
-  return pathIdentitiesOverlap(left, right, platformKind(platform));
-}
 
 function safeDate(now: () => Date): Date {
   const value = now();
@@ -121,12 +68,8 @@ function folderFingerprint(index: ImageLibraryIndex, folderIds: readonly string[
   );
 }
 
-function requiredConfirmation(
-  action: LibraryMutationRequest["action"]
-): "permanent-delete" | "zip-export" | "zip-import" | undefined {
-  return action === "permanent-delete"
-    ? "permanent-delete"
-    : action === "export-zip"
+function requiredConfirmation(action: LibraryMutationRequest["action"]): "zip-export" | "zip-import" | undefined {
+  return action === "export-zip"
       ? "zip-export"
       : action === "import-zip"
         ? "zip-import"
@@ -134,9 +77,6 @@ function requiredConfirmation(
 }
 
 function allowedActions(asset: StoredLibraryAsset): LibraryAssetDetail["allowedActions"] {
-  if (asset.status === "deleted") {
-    return ["export-zip", "download"];
-  }
   const actions: LibraryAssetDetail["allowedActions"][number][] = [];
   actions.push("assign-folders");
   if (asset.folderIds.length > 0) actions.push("remove-folders");
@@ -222,12 +162,8 @@ function topLevelResult(options: {
 export class LibraryMutationStore {
   readonly #indexStore: ImageLibraryIndexStore;
   readonly #now: () => Date;
-  readonly #idFactory: (kind: "preflight" | "transaction") => string;
+  readonly #idFactory: (kind: "preflight") => string;
   readonly #preflightTtlMs: number;
-  readonly #platform: NodeJS.Platform;
-  readonly #protectedRoots: readonly string[];
-  readonly #allowedDefaultRoot: string;
-  readonly #hooks: LibraryMutationStoreHooks;
   readonly #preflights = new Map<string, StoredPreflight>();
 
   constructor(options: LibraryMutationStoreOptions) {
@@ -243,65 +179,14 @@ export class LibraryMutationStore {
     ) {
       throw new LibraryError("invalid_input", "The Library preflight lifetime is invalid.");
     }
-    this.#platform = options.platform ?? process.platform;
-    const homeDirectory = options.homeDirectory ?? os.homedir();
-    this.#protectedRoots =
-      options.protectedRoots ?? createProtectedLegacyRoots(homeDirectory, platformKind(this.#platform));
-    this.#allowedDefaultRoot = pathApi(this.#platform).resolve(
-      homeDirectory,
-      "Pictures",
-      "routego-image",
-      "library"
-    );
-    this.#hooks = options.hooks ?? {};
-    this.#assertApprovedRoot();
   }
 
-  #assertApprovedRoot(): void {
-    const root = normalizedPath(this.#indexStore.paths.root, this.#platform);
-    const allowedDefault = normalizedPath(this.#allowedDefaultRoot, this.#platform);
-    for (const protectedRoot of this.#protectedRoots) {
-      const protectedComparable = normalizedPath(protectedRoot, this.#platform);
-      if (overlaps(root, protectedComparable, this.#platform) && root !== allowedDefault) {
-        throw new LibraryError("path_unsafe", "The Image Library mutation root overlaps protected legacy data.");
-      }
-    }
-  }
-
-  async #assertCanonicalRootDoesNotAliasProtectedData(): Promise<void> {
-    let canonicalRoot: string;
-    const platform = platformKind(this.#platform);
-    try {
-      canonicalRoot = await canonicalizePathIdentity(this.#indexStore.paths.root, { platform });
-    } catch (error) {
-      if (isNodeError(error, "ENOENT")) return;
-      throw new LibraryError("path_unsafe", "The Image Library mutation root is unavailable.", {
-        cause: error
-      });
-    }
-    const canonicalComparable = normalizedPath(canonicalRoot, this.#platform);
-    const [canonicalAllowedDefault, canonicalProtectedRoots] = await Promise.all([
-      canonicalizePathIdentity(this.#allowedDefaultRoot, { platform }),
-      canonicalizePathIdentities(this.#protectedRoots, { platform })
-    ]);
-    if (canonicalComparable === normalizedPath(canonicalAllowedDefault, this.#platform)) return;
-    if (canonicalProtectedRoots.some((root) => overlaps(canonicalComparable, root, this.#platform))) {
-      throw new LibraryError(
-        "path_unsafe",
-        "The Image Library mutation root resolves to protected legacy data."
-      );
-    }
-  }
-
-  #newId(kind: "preflight" | "transaction"): string {
+  #newId(kind: "preflight"): string {
     let value: string;
     try {
       value = identifierSchema.parse(this.#idFactory(kind));
     } catch {
       throw new LibraryError("internal_contract", `The ${kind} identifier factory returned an invalid value.`);
-    }
-    if (kind === "transaction" && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,159}$/u.test(value)) {
-      throw new LibraryError("internal_contract", "The transaction identifier is not filesystem safe.");
     }
     return value;
   }
@@ -322,15 +207,12 @@ export class LibraryMutationStore {
 
   async preflight(input: PreflightLibraryMutationInput): Promise<PreflightLibraryMutationResult> {
     const parsed = preflightLibraryMutationInputSchema.parse(input);
-    await this.#assertCanonicalRootDoesNotAliasProtectedData();
     const now = safeDate(this.#now);
     this.#cleanupExpiredPreflights(now.getTime());
-    const index = await this.#indexStore.read();
-    await this.#assertCanonicalRootDoesNotAliasProtectedData();
     const mutation = parsed.mutation;
+    const index = await this.#indexStore.read();
     const targets = targetIds(mutation);
     const confirmation = requiredConfirmation(mutation.action);
-    const selectedIds = new Set(targets);
     const selectedFolders =
       "folderIds" in mutation
         ? mutation.folderIds.map((folderId) => index.folders.find((folder) => folder.id === folderId))
@@ -368,37 +250,15 @@ export class LibraryMutationStore {
         );
       } else if (
         (mutation.action === "assign-folders" || mutation.action === "remove-folders") &&
-        (!foldersValid || asset.status === "deleted")
+        !foldersValid
       ) {
         error = !foldersValid
           ? libraryMutationError("not_found", "A selected active Library folder does not exist.")
-          : libraryMutationError("conflict", "Recycle-bin assets cannot change folder membership.");
-      } else if (mutation.action === "soft-delete" && asset.status === "deleted") {
-        error = libraryMutationError("conflict", "The Library asset is already in the recycle bin.");
-      } else if (
-        mutation.action === "mark" &&
-        (asset.kind !== "generate" || asset.status === "deleted")
-      ) {
+          : undefined;
+      } else if (mutation.action === "mark" && asset.kind !== "generate") {
         error = libraryMutationError(
           "conflict",
           "Only an active generation record can be marked."
-        );
-      } else if (
-        (mutation.action === "restore" || mutation.action === "permanent-delete") &&
-        asset.status !== "deleted"
-      ) {
-        error = libraryMutationError("conflict", "The Library asset is not in the recycle bin.");
-      } else if (
-        mutation.action === "permanent-delete" &&
-        index.assets.some(
-          (survivor) =>
-            !selectedIds.has(survivor.id) &&
-            survivor.relationships.some((relationship) => relationship.relatedAssetId === asset.id)
-        )
-      ) {
-        error = libraryMutationError(
-          "conflict",
-          "The Library asset is still referenced by an asset outside this deletion."
         );
       }
       if (error) errors.set(targetId, error);
@@ -409,10 +269,7 @@ export class LibraryMutationStore {
         ...(asset === undefined ? {} : { currentStatus: asset.status }),
         allowedActions: asset === undefined ? [] : allowedActions(asset),
         requiredConfirmations: confirmation ? [confirmation] : [],
-        warnings:
-          mutation.action === "permanent-delete"
-            ? ["Permanent deletion cannot be undone."]
-            : [],
+        warnings: [],
         ...(error === undefined ? {} : { error })
       };
     });
@@ -445,17 +302,13 @@ export class LibraryMutationStore {
       expiresAt: new Date(expiresAtMs).toISOString(),
       requiredConfirmations: confirmation ? [confirmation] : [],
       items,
-      warnings:
-        mutation.action === "permanent-delete"
-          ? ["Permanent deletion removes unreferenced image files after index commit."]
-          : [],
+      warnings: [],
       ...(topError === undefined ? {} : { error: topError })
     });
   }
 
   async execute(input: ExecuteLibraryMutationInput): Promise<ExecuteLibraryMutationResult> {
     const parsed = executeLibraryMutationInputSchema.parse(input);
-    await this.#assertCanonicalRootDoesNotAliasProtectedData();
     const now = safeDate(this.#now);
     const preflight = this.#preflights.get(parsed.preflightId);
     if (!preflight || preflight.expiresAtMs <= now.getTime() || preflight.action !== parsed.action) {
@@ -483,23 +336,19 @@ export class LibraryMutationStore {
   }
 
   async recover(): Promise<void> {
-    await this.#assertCanonicalRootDoesNotAliasProtectedData();
-    await this.#indexStore.runExclusive(async ({ index }) => {
-      await this.#recoverDeleteJournals(index);
-    });
+    // Legacy cleanup is owned exclusively by the confirmation-bound migration flow.
   }
 
   async #executeAssetMutation(
     preflight: StoredPreflight,
     now: Date
   ): Promise<ExecuteLibraryMutationResult> {
-    const action = preflight.action as ExecutableAssetMutationAction;
+    const action = preflight.action as SupportedAssetMutationAction;
     const mutation = preflight.mutation as Extract<
       LibraryMutationRequest,
-      { action: ExecutableAssetMutationAction }
+      { action: SupportedAssetMutationAction }
     >;
     return await this.#indexStore.runExclusive(async (context) => {
-      await this.#recoverDeleteJournals(context.index);
       const items = new Map<string, MutationItem>();
       const candidates: string[] = [];
       const folderIds = "folderIds" in mutation ? mutation.folderIds : [];
@@ -529,13 +378,7 @@ export class LibraryMutationStore {
           );
           continue;
         }
-        if (
-          (action === "soft-delete" && asset.status === "deleted") ||
-          ((action === "restore" || action === "permanent-delete") && asset.status !== "deleted") ||
-          ((action === "assign-folders" || action === "remove-folders" || action === "mark") &&
-            asset.status === "deleted") ||
-          (action === "mark" && asset.kind !== "generate")
-        ) {
+        if (action === "mark" && asset.kind !== "generate") {
           items.set(
             targetId,
             failedItem(
@@ -548,12 +391,7 @@ export class LibraryMutationStore {
         candidates.push(targetId);
       }
 
-      let cleanupWarning: string | undefined;
-      if (action === "permanent-delete") {
-        cleanupWarning = await this.#permanentlyDelete(context, candidates, items, now);
-      } else {
-        await this.#commitNonDestructiveMutation(context, action, candidates, folderIds, items, now);
-      }
+      await this.#commitMutation(context, action, candidates, folderIds, items, now);
       const orderedItems = preflight.targetIds.map(
         (targetId) =>
           items.get(targetId) ??
@@ -565,15 +403,14 @@ export class LibraryMutationStore {
       return topLevelResult({
         preflightId: preflight.id,
         action,
-        items: orderedItems,
-        ...(cleanupWarning === undefined ? {} : { warnings: [cleanupWarning] })
+        items: orderedItems
       });
     });
   }
 
-  async #commitNonDestructiveMutation(
+  async #commitMutation(
     context: ImageLibraryIndexContext,
-    action: Exclude<ExecutableAssetMutationAction, "permanent-delete">,
+    action: SupportedAssetMutationAction,
     candidates: readonly string[],
     folderIds: readonly string[],
     items: Map<string, MutationItem>,
@@ -603,24 +440,6 @@ export class LibraryMutationStore {
     const updatedAt = now.toISOString();
     const assets = context.index.assets.map((asset) => {
       if (!selected.has(asset.id)) return asset;
-      if (action === "soft-delete") {
-        changed = true;
-        items.set(asset.id, successItem(asset.id));
-        return {
-          ...asset,
-          status: "deleted" as const,
-          previousStatus: asset.status as Exclude<typeof asset.status, "deleted">,
-          deletedAt: updatedAt,
-          purgeEligibleAt: new Date(now.getTime() + LIBRARY_RECYCLE_RETENTION_MS).toISOString(),
-          updatedAt
-        };
-      }
-      if (action === "restore") {
-        changed = true;
-        items.set(asset.id, successItem(asset.id));
-        const { previousStatus, deletedAt, purgeEligibleAt, ...rest } = asset;
-        return { ...rest, status: previousStatus!, updatedAt };
-      }
       const memberships = new Set(asset.folderIds);
       const changedFolderIds: string[] = [];
       if (action === "assign-folders") {
@@ -667,155 +486,4 @@ export class LibraryMutationStore {
     }
   }
 
-  async #permanentlyDelete(
-    context: ImageLibraryIndexContext,
-    candidatesInput: readonly string[],
-    items: Map<string, MutationItem>,
-    now: Date
-  ): Promise<string | undefined> {
-    const candidates = new Set(candidatesInput);
-    let changed = true;
-    while (changed) {
-      changed = false;
-      for (const targetId of [...candidates]) {
-        const referencedBySurvivor = context.index.assets.some(
-          (asset) =>
-            !candidates.has(asset.id) &&
-            asset.relationships.some((relationship) => relationship.relatedAssetId === targetId)
-        );
-        if (referencedBySurvivor) {
-          candidates.delete(targetId);
-          items.set(
-            targetId,
-            failedItem(
-              targetId,
-              libraryMutationError(
-                "conflict",
-                "The Library asset remains referenced by an asset that will survive deletion."
-              )
-            )
-          );
-          changed = true;
-        }
-      }
-    }
-    if (candidates.size === 0) return undefined;
-
-    const nextAssets = context.index.assets.filter((asset) => !candidates.has(asset.id));
-    const referencedShas = new Set(
-      nextAssets.flatMap((asset) => asset.renditions.map((rendition) => rendition.blobSha256))
-    );
-    const deletedBlobs = context.index.blobs.filter((blob) => !referencedShas.has(blob.sha256));
-    const nextBlobs = context.index.blobs.filter((blob) => referencedShas.has(blob.sha256));
-    const deletePaths = [...new Set(deletedBlobs.map((blob) => blob.relativePath))];
-    let journal: FileTransactionJournal | undefined;
-    if (deletePaths.length > 0) {
-      journal = {
-        schemaVersion: 1,
-        id: this.#newId("transaction"),
-        kind: LIBRARY_DELETE_TRANSACTION_KIND,
-        state: "prepared",
-        createdAt: now.toISOString(),
-        createdPaths: [],
-        deleteAfterCommitPaths: deletePaths,
-        metadata: { expectedRevision: context.index.revision + 1 }
-      };
-      await writeTransactionJournal(this.#indexStore.paths.root, journal);
-      if (this.#hooks.afterDeleteJournalPrepared) {
-        await this.#hooks.afterDeleteJournalPrepared(journal);
-      }
-    }
-    await context.commit({ blobs: nextBlobs, assets: nextAssets, folders: context.index.folders });
-    for (const targetId of candidates) items.set(targetId, successItem(targetId));
-    if (!journal) return undefined;
-    if (this.#hooks.afterDeleteIndexCommit) await this.#hooks.afterDeleteIndexCommit(journal);
-    try {
-      const committed = await markTransactionJournalCommitted(this.#indexStore.paths.root, journal);
-      await this.#cleanupDeleteJournal(committed);
-      return undefined;
-    } catch {
-      return "Image metadata was deleted; unreferenced file cleanup is deferred to recovery.";
-    }
-  }
-
-  #validateDeleteJournal(journal: FileTransactionJournal): number {
-    const expectedRevision = journal.metadata?.["expectedRevision"];
-    if (
-      journal.kind !== LIBRARY_DELETE_TRANSACTION_KIND ||
-      journal.createdPaths.length !== 0 ||
-      journal.deleteAfterCommitPaths.length < 1 ||
-      new Set(journal.deleteAfterCommitPaths).size !== journal.deleteAfterCommitPaths.length ||
-      journal.deleteAfterCommitPaths.some(
-        (candidate) =>
-          candidate.includes("\\") ||
-          candidate.split("/").includes("..") ||
-          !/^blobs\/\d{4}\/(?:0[1-9]|1[0-2])\/[^/]+\.(?:png|jpg|webp)$/u.test(candidate)
-      ) ||
-      !Number.isSafeInteger(expectedRevision) ||
-      (expectedRevision as number) < 1
-    ) {
-      throw new LibraryError("config_corrupt", "An Image Library deletion journal is invalid.");
-    }
-    return expectedRevision as number;
-  }
-
-  async #recoverDeleteJournals(index: ImageLibraryIndex): Promise<void> {
-    const referenced = referencedBlobPaths(index);
-    for (const journal of await listTransactionJournals(this.#indexStore.paths.root)) {
-      if (journal.kind !== LIBRARY_DELETE_TRANSACTION_KIND) continue;
-      const expectedRevision = this.#validateDeleteJournal(journal);
-      if (index.revision >= expectedRevision) {
-        const unreferencedPaths = journal.deleteAfterCommitPaths.filter(
-          (relativePath) => !referenced.has(relativePath)
-        );
-        if (unreferencedPaths.length > 0) {
-          await this.#cleanupDeletePaths(unreferencedPaths);
-        }
-      }
-      await removeTransactionJournal(this.#indexStore.paths.root, journal.id);
-    }
-  }
-
-  async #cleanupDeleteJournal(journal: FileTransactionJournal): Promise<void> {
-    this.#validateDeleteJournal(journal);
-    await this.#cleanupDeletePaths(journal.deleteAfterCommitPaths);
-    await removeTransactionJournal(this.#indexStore.paths.root, journal.id);
-  }
-
-  async #cleanupDeletePaths(relativePaths: readonly string[]): Promise<void> {
-    const platform = platformKind(this.#platform);
-    const canonicalRoot = await canonicalizePathIdentity(this.#indexStore.paths.root, {
-      platform
-    }).catch((error: unknown) => {
-      throw new LibraryError("path_unsafe", "The Image Library root is unavailable for cleanup.", {
-        cause: error
-      });
-    });
-    for (const relativePath of relativePaths) {
-      if (this.#hooks.beforeDeleteBackingFile) {
-        await this.#hooks.beforeDeleteBackingFile(relativePath);
-      }
-      const candidate = resolveApprovedPath({
-        root: this.#indexStore.paths.root,
-        candidate: relativePath,
-        operation: "delete",
-        platform: platformKind(this.#platform)
-      });
-      let metadata;
-      try {
-        metadata = await lstat(candidate);
-      } catch (error) {
-        if (isNodeError(error, "ENOENT")) continue;
-        throw error;
-      }
-      if (!metadata.isFile() || metadata.isSymbolicLink()) {
-        throw new LibraryError("path_unsafe", "A deletion journal points to an unsafe file.");
-      }
-      const canonicalCandidate = await canonicalizePathIdentity(candidate, { platform });
-      if (!isContained(canonicalRoot, canonicalCandidate, this.#platform)) {
-        throw new LibraryError("path_unsafe", "A deletion journal escapes the Image Library root.");
-      }
-      await unlink(candidate);
-    }
-  }
 }

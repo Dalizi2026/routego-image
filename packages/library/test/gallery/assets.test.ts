@@ -188,7 +188,7 @@ describe("versioned Image Library index", () => {
   it("initializes only a missing index and preserves corrupt or future documents", async () => {
     const missing = await createHarness();
     expect(await missing.indexStore.read()).toEqual({
-      schemaVersion: 1,
+      schemaVersion: 2,
       revision: 0,
       blobs: [],
       assets: [],
@@ -204,7 +204,7 @@ describe("versioned Image Library index", () => {
     await mkdir(path.dirname(future.indexStore.paths.index), { recursive: true });
     await writeFile(
       future.indexStore.paths.index,
-      JSON.stringify({ schemaVersion: 2, revision: 0, blobs: [], assets: [], folders: [] }),
+      JSON.stringify({ schemaVersion: 3, revision: 0, blobs: [], assets: [], folders: [] }),
       "utf8"
     );
     await expect(future.indexStore.read()).rejects.toMatchObject({ code: "unsupported_version" });
@@ -276,6 +276,31 @@ describe("validated asset ingestion and deduplication", () => {
       })
     ).rejects.toMatchObject({ code: "invalid_input" });
     expect((await indexStore.read()).assets).toHaveLength(3);
+  });
+
+  it("rejects stale edit-record ingestion before publishing a blob or mutating the index", async () => {
+    const { assets, sourceRoot, indexStore } = await createHarness();
+    await writeSource(sourceRoot, "legacy-edit.png", validPng());
+    const params = operationParameters("Legacy edit");
+    const staleEdit = { ...params, kind: "edit" } as unknown as typeof params;
+
+    await expect(
+      assets.ingestAsset({
+        prompt: "Legacy edit",
+        model: "synthetic-image-model",
+        requestedParams: staleEdit,
+        effectiveParams: staleEdit,
+        execution,
+        renditions: [{ phase: "final", sourceRoot, sourceRelativePath: "legacy-edit.png" }]
+      })
+    ).rejects.toBeDefined();
+    expect(await indexStore.read()).toEqual({
+      schemaVersion: 2,
+      revision: 0,
+      blobs: [],
+      assets: [],
+      folders: []
+    });
   });
 
   it("keeps distinct logical histories while sharing one SHA-256 blob", async () => {

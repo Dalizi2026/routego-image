@@ -291,23 +291,13 @@ function remapParameters(
   parameters: LibraryOperationParameters,
   assetMap: ReadonlyMap<string, string>
 ): LibraryOperationParameters {
-  const { references, supportingImages, target, maskAssetId, ...rest } = parameters;
+  const { references, ...rest } = parameters;
   return {
     ...rest,
     references: references.map((reference) => ({
       ...reference,
       assetId: assetMap.get(reference.assetId) ?? reference.assetId
-    })),
-    supportingImages: supportingImages.map((reference) => ({
-      ...reference,
-      assetId: assetMap.get(reference.assetId) ?? reference.assetId
-    })),
-    ...(target === undefined
-      ? {}
-      : { target: { ...target, assetId: assetMap.get(target.assetId) ?? target.assetId } }),
-    ...(maskAssetId === undefined
-      ? {}
-      : { maskAssetId: assetMap.get(maskAssetId) ?? maskAssetId })
+    }))
   };
 }
 

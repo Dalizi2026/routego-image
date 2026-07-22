@@ -200,6 +200,19 @@ function mimeForFormat(format: LibraryOperationParameters["format"]): LibraryIma
   return "image/webp";
 }
 
+function parseGenerationParameters(value: LibraryOperationParameters): LibraryOperationParameters {
+  const { action: _action, imageIds: _imageIds, fileIds: _fileIds, ...parameters } = value as
+    LibraryOperationParameters & {
+      readonly action?: unknown;
+      readonly imageIds?: unknown;
+      readonly fileIds?: unknown;
+    };
+  void _action;
+  void _imageIds;
+  void _fileIds;
+  return libraryOperationParametersSchema.parse(parameters);
+}
+
 function crc32(bytes: Uint8Array): number {
   let crc = 0xffff_ffff;
   for (const byte of bytes) {
@@ -830,8 +843,14 @@ export class LibraryAssetStore {
       );
     }
     const assetId = input.assetId === undefined ? this.#newId("asset") : identifierSchema.parse(input.assetId);
-    const requestedParams = libraryOperationParametersSchema.parse(input.requestedParams);
-    const effectiveParams = libraryOperationParametersSchema.parse(input.effectiveParams);
+    const requestedParams = parseGenerationParameters(input.requestedParams);
+    const effectiveParams = parseGenerationParameters(input.effectiveParams);
+    if (requestedParams.kind !== "generate" || effectiveParams.kind !== "generate") {
+      throw new LibraryError(
+        "invalid_input",
+        "Library ingestion accepts generation records only; legacy edits require confirmed migration cleanup."
+      );
+    }
     const execution = operationExecutionMetadataSchema.parse(input.execution);
     const relationships = (input.relationships ?? []).map((item) =>
       libraryAssetRelationshipSchema.parse(item)
@@ -1063,7 +1082,7 @@ export class LibraryAssetStore {
         id: asset.assetId,
         prompt: asset.prompt,
         model: asset.model,
-        kind: asset.requestedParams.kind,
+        kind: "generate",
         status: asset.status,
         primaryArtifactId: asset.primaryArtifactId,
         createdAt: asset.createdAt,
@@ -1137,9 +1156,6 @@ export class LibraryAssetStore {
     }
     if (!asset || !artifactId) {
       throw new LibraryError("not_found", "The Library resource does not exist.");
-    }
-    if (asset.status === "deleted") {
-      throw new LibraryError("not_found", "The Library resource is in the recycle bin.");
     }
     const rendition = asset.renditions.find((item) => item.artifactId === artifactId);
     const blob = index.blobs.find((item) => item.sha256 === rendition?.blobSha256);
