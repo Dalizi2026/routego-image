@@ -82,6 +82,41 @@ export interface ImageLibraryIndex {
   readonly currentMarkRecordId?: string;
 }
 
+/**
+ * The last on-disk Library format that can contain Trash and edit records.
+ * It is deliberately separate from `ImageLibraryIndex`: normal Library reads
+ * continue to reject it until a later, confirmation-bound migration promotes
+ * a verified replacement index.
+ */
+export interface LegacyImageLibraryIndex {
+  readonly schemaVersion: 1;
+  readonly revision: number;
+  readonly blobs: readonly StoredImageBlob[];
+  readonly assets: readonly LegacyStoredLibraryAsset[];
+  readonly folders: readonly StoredLibraryFolder[];
+}
+
+/**
+ * The small, safe projection needed to plan removal of a v1 record. Legacy
+ * operation parameters are intentionally opaque: current generation-only
+ * contracts must not validate or revive removed edit inputs during preflight.
+ */
+export interface LegacyStoredLibraryAsset {
+  readonly id: string;
+  readonly kind: "generate" | "edit";
+  readonly status: LibraryAssetStatus;
+  readonly renditions: readonly StoredAssetRendition[];
+  readonly relationships: readonly LegacyLibraryRelationship[];
+}
+
+export interface LegacyLibraryRelationship {
+  readonly id: string;
+  readonly role: string;
+  readonly relatedAssetId: string;
+  readonly artifactId?: string;
+  readonly order: number;
+}
+
 function asRecord(value: unknown, label: string): Record<string, unknown> {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
     throw new LibraryError("config_corrupt", `${label} is invalid.`);
@@ -409,21 +444,31 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   };
 }
 
-export function parseImageLibraryIndex(value: unknown): ImageLibraryIndex {
+interface ParsedLibraryIndex {
+  readonly revision: number;
+  readonly blobs: readonly StoredImageBlob[];
+  readonly assets: readonly StoredLibraryAsset[];
+  readonly folders: readonly StoredLibraryFolder[];
+  readonly currentMarkRecordId?: string;
+}
+
+function parseVersionedImageLibraryIndex(
+  value: unknown,
+  schemaVersion: 1 | 2
+): ParsedLibraryIndex {
   const record = asRecord(value, "Image Library index");
-  if (
-    typeof record["schemaVersion"] === "number" &&
-    record["schemaVersion"] !== IMAGE_LIBRARY_SCHEMA_VERSION
-  ) {
+  if (typeof record["schemaVersion"] === "number" && record["schemaVersion"] !== schemaVersion) {
     throw new LibraryError("unsupported_version", "Image Library index uses an unsupported version.");
   }
   exact(
     record,
-    ["schemaVersion", "revision", "blobs", "assets", "folders", "currentMarkRecordId"],
+    schemaVersion === IMAGE_LIBRARY_SCHEMA_VERSION
+      ? ["schemaVersion", "revision", "blobs", "assets", "folders", "currentMarkRecordId"]
+      : ["schemaVersion", "revision", "blobs", "assets", "folders"],
     "Image Library index"
   );
   if (
-    record["schemaVersion"] !== IMAGE_LIBRARY_SCHEMA_VERSION ||
+    record["schemaVersion"] !== schemaVersion ||
     !Number.isSafeInteger(record["revision"]) ||
     (record["revision"] as number) < 0 ||
     !Array.isArray(record["blobs"]) ||
@@ -488,23 +533,137 @@ export function parseImageLibraryIndex(value: unknown): ImageLibraryIndex {
       }
     }
   }
-  const currentMarkRecordId =
-    record["currentMarkRecordId"] === undefined
-      ? undefined
-      : parseId(record["currentMarkRecordId"], "Current mark record identity");
-  if (currentMarkRecordId !== undefined) {
-    const marked = assets.find((asset) => asset.id === currentMarkRecordId);
-    if (!marked || marked.kind !== "generate" || marked.status === "deleted") {
-      throw new LibraryError("config_corrupt", "The current mark must reference an active generation record.");
+  if (schemaVersion === IMAGE_LIBRARY_SCHEMA_VERSION) {
+    const currentMarkRecordId =
+      record["currentMarkRecordId"] === undefined
+        ? undefined
+        : parseId(record["currentMarkRecordId"], "Current mark record identity");
+    if (currentMarkRecordId !== undefined) {
+      const marked = assets.find((asset) => asset.id === currentMarkRecordId);
+      if (!marked || marked.kind !== "generate" || marked.status === "deleted") {
+        throw new LibraryError("config_corrupt", "The current mark must reference an active generation record.");
+      }
     }
+    return {
+      revision: record["revision"] as number,
+      blobs,
+      assets,
+      folders,
+      ...(currentMarkRecordId === undefined ? {} : { currentMarkRecordId })
+    };
   }
+
   return {
-    schemaVersion: IMAGE_LIBRARY_SCHEMA_VERSION,
     revision: record["revision"] as number,
     blobs,
     assets,
-    folders,
-    ...(currentMarkRecordId === undefined ? {} : { currentMarkRecordId })
+    folders
+  };
+}
+
+export function parseImageLibraryIndex(value: unknown): ImageLibraryIndex {
+  const parsed = parseVersionedImageLibraryIndex(value, IMAGE_LIBRARY_SCHEMA_VERSION);
+  return {
+    schemaVersion: IMAGE_LIBRARY_SCHEMA_VERSION,
+    revision: parsed.revision,
+    blobs: parsed.blobs,
+    assets: parsed.assets,
+    folders: parsed.folders,
+    ...(parsed.currentMarkRecordId === undefined
+      ? {}
+      : { currentMarkRecordId: parsed.currentMarkRecordId })
+  };
+}
+
+function parseLegacyRelationship(value: unknown): LegacyLibraryRelationship {
+  const record = asRecord(value, "Legacy asset relationship");
+  if (
+    typeof record["role"] !== "string" ||
+    record["role"].trim() === "" ||
+    record["role"].length > 100 ||
+    !Number.isSafeInteger(record["order"]) ||
+    (record["order"] as number) < 0 ||
+    (record["order"] as number) > 255
+  ) {
+    throw new LibraryError("config_corrupt", "Legacy asset relationship is invalid.");
+  }
+  const artifactId =
+    record["artifactId"] === undefined
+      ? undefined
+      : parseId(record["artifactId"], "Legacy relationship artifact identity");
+  return {
+    id: parseId(record["id"], "Legacy relationship identity"),
+    role: record["role"].trim(),
+    relatedAssetId: parseId(record["relatedAssetId"], "Legacy relationship target identity"),
+    ...(artifactId === undefined ? {} : { artifactId }),
+    order: record["order"] as number
+  };
+}
+
+function parseLegacyAsset(value: unknown): LegacyStoredLibraryAsset {
+  const record = asRecord(value, "Legacy Library asset");
+  if (record["kind"] !== "generate" && record["kind"] !== "edit") {
+    throw new LibraryError("config_corrupt", "Legacy Library asset kind is invalid.");
+  }
+  let status: LibraryAssetStatus;
+  try {
+    status = libraryAssetStatusSchema.parse(record["status"]);
+  } catch {
+    throw new LibraryError("config_corrupt", "Legacy Library asset status is invalid.");
+  }
+  if (
+    !Array.isArray(record["renditions"]) ||
+    record["renditions"].length < 1 ||
+    record["renditions"].length > MAX_LIBRARY_ASSET_RENDITIONS ||
+    !Array.isArray(record["relationships"]) ||
+    record["relationships"].length > 128
+  ) {
+    throw new LibraryError("config_corrupt", "Legacy Library asset graph is invalid.");
+  }
+  return {
+    id: parseId(record["id"], "Legacy Library asset identity"),
+    kind: record["kind"],
+    status,
+    renditions: record["renditions"].map(parseRendition),
+    relationships: record["relationships"].map(parseLegacyRelationship)
+  };
+}
+
+/** Parses a legacy index for a read-only migration preflight only. */
+export function parseLegacyImageLibraryIndex(value: unknown): LegacyImageLibraryIndex {
+  const record = asRecord(value, "Legacy Image Library index");
+  exact(record, ["schemaVersion", "revision", "blobs", "assets", "folders"], "Legacy Image Library index");
+  if (
+    record["schemaVersion"] !== 1 ||
+    !Number.isSafeInteger(record["revision"]) ||
+    (record["revision"] as number) < 0 ||
+    !Array.isArray(record["blobs"]) ||
+    !Array.isArray(record["assets"]) ||
+    !Array.isArray(record["folders"]) ||
+    record["blobs"].length > 100_000 ||
+    record["assets"].length > 100_000 ||
+    record["folders"].length > 1_000
+  ) {
+    throw new LibraryError("unsupported_version", "Legacy Image Library index is invalid.");
+  }
+  const blobs = record["blobs"].map(parseBlob);
+  const assets = record["assets"].map(parseLegacyAsset);
+  const folders = record["folders"].map(parseFolder);
+  if (new Set(blobs.map((blob) => blob.sha256)).size !== blobs.length) {
+    throw new LibraryError("config_corrupt", "Legacy Library blob checksums contain duplicates.");
+  }
+  if (new Set(assets.map((asset) => asset.id)).size !== assets.length) {
+    throw new LibraryError("config_corrupt", "Legacy Library asset identities contain duplicates.");
+  }
+  if (new Set(folders.map((folder) => folder.id)).size !== folders.length) {
+    throw new LibraryError("config_corrupt", "Legacy Library folder identities contain duplicates.");
+  }
+  return {
+    schemaVersion: 1,
+    revision: record["revision"] as number,
+    blobs,
+    assets,
+    folders
   };
 }
 

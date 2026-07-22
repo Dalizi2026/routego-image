@@ -16,6 +16,7 @@ export * from "./image/metadata";
 export * from "./upload/model";
 export * from "./upload/store";
 export * from "./gallery/model";
+export * from "./gallery/migration";
 export * from "./gallery/index-store";
 export * from "./gallery/assets";
 export * from "./gallery/query";
