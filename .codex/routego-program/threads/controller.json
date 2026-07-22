@@ -2,9 +2,9 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-12-workspace-consolidated-task-4.1-locked",
-  "threadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
-  "predecessorThreadId": "019f8275-18a6-7061-8a46-e177bf0bd3bc",
+  "status": "authoritative-controller-generation-12-project-local-task-4.1-locked",
+  "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+  "predecessorThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
@@ -14,14 +14,14 @@
   "lastCompactionFingerprint": null,
   "lastHealthAudit": {
     "status": "passed",
-    "libraryHead": "2f04291f27487ef1083d56309ea96032612bb5d8",
-    "openspecProgress": "6/33",
-    "acceptedTask": "3.1",
-    "readyTasks": ["2.2", "3.2"],
-    "independentVerification": "Exact Library model and mutations tests passed 6/6; scope and git diff --check passed."
+    "workspaceHead": "8a01c07f7eac148b17dd8668cb2d90c878cc1e6e",
+    "openspecProgress": "13/33",
+    "acceptedTask": "3.5",
+    "readyTasks": ["4.1"],
+    "independentVerification": "Task 4.1 handoff validator passed with 12 startup files / 71665 normalized UTF-8 bytes and a clean Git worktree; the task remains locked."
   },
   "currentOperation": {
-    "id": "workspace-consolidated-task-4.1-locked",
+    "id": "project-local-controller-re-registered-task-4.1-locked",
     "allowedNext": "A future visible Integration thread may use only this existing controller-g12 worktree after Controller completes the locked Task 4.1 handoff acceptance; it may not create a worktree or directory.",
     "forbidden": [
       "Product code outside each task's exact owner scope",

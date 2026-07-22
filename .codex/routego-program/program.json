@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-workspace-consolidated-streamline-integration-4.1-registered-locked",
+  "status": "controller-generation-12-project-local-re-registered-streamline-integration-4.1-locked",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -49,14 +49,14 @@
     "externalStateAuthorized": false
   },
   "controller": {
-    "threadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
-    "predecessorThreadId": "019f8275-18a6-7061-8a46-e177bf0bd3bc",
+    "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "predecessorThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
     "generation": 12,
     "role": "program-controller",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-streamline-task-1.4-accepted",
+    "status": "authoritative-controller-generation-12-project-local-task-4.1-locked",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -113,8 +113,8 @@
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "currentHead": "5f1f67caf4296925a4b5a914777bfb1adbbc8267",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/integration-4.1.json", "sha256": "7bf4509f07bd0205e39d6a472f021d2b4f30cb4424746304208393dcb92b055c" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json", "sha256": "54cf0e8480db9da590235095f2a94ef69e52727e307a1a74acdf350d3272abfb", "rawFileSha256": "f9fe9624ca64b5856747515bed8ea1dec48c09097a4f9ecfb48d2fa44bcc7c75" },
+      "taskCapsule": { "path": ".codex/routego-program/tasks/integration-4.1.json", "sha256": "1e8ee24282986bd395825ee5be821d5b00785b714c29d616fd1fae3aeeff5f6b" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json", "sha256": "f92eea6fa0eb6992415c463de605607923056a8fbec5a27736b524e64a547dc2", "rawFileSha256": "7f9bce7ec9681106c0e8688bb119f58deee2123fd8f8a9ad30b49081d3bf8a8e" },
       "authorizedScope": "none-task-4.1-locked-pending-visible-integration-thread-zero-compaction-acceptance-in-existing-controller-worktree"
     }
   },
@@ -146,7 +146,7 @@
       "plannedBranch": "codex/routego-controller-g12",
       "currentHead": "5f1f67caf4296925a4b5a914777bfb1adbbc8267",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "54cf0e8480db9da590235095f2a94ef69e52727e307a1a74acdf350d3272abfb", "rawFileSha256": "f9fe9624ca64b5856747515bed8ea1dec48c09097a4f9ecfb48d2fa44bcc7c75" }
+      "handoffCapsuleIntegrity": { "canonicalSha256": "f92eea6fa0eb6992415c463de605607923056a8fbec5a27736b524e64a547dc2", "rawFileSha256": "7f9bce7ec9681106c0e8688bb119f58deee2123fd8f8a9ad30b49081d3bf8a8e" }
     }
   },
   "currentChange": {
@@ -169,13 +169,13 @@
   },
   "latestDirectCheckpoint": {
     "lane": "creation-library-and-streamline-integration",
-    "event": "WORKSPACE_CONSOLIDATED_STREAMLINE_INTEGRATION_4_1_RE_REGISTERED_LOCKED",
+    "event": "CONTROLLER_G12_PROJECT_LOCAL_RE_REGISTERED_TASK_4_1_LOCKED",
     "implementationCommit": "24c1e8483a66262b9075fc3621b682878aef3ea3",
     "controllerMergeCommit": "30857ba5f495b39342af55347459a95f14dd4fff",
     "taskStateCommit": "9db7c998da60ea7bf4b0e4cb75b58c046a4a795a",
     "openspecProgress": "13/33",
     "nextTaskIds": ["4.1"],
-    "verification": "Library Task 3.5 focused regressions passed 38/38 within the exact eleven-file scope. Public Trash/delete/restore/permanent-delete and edit-record creation paths were removed while folder/ZIP/download/read remain. The full Library suite retains 32 and typecheck 17 known out-of-scope failures from forbidden zip/manifest.ts old edit fields and old conformance/source-renditions expectations, so no full-suite-green claim is made. The workspace is now consolidated under Routego Image 1.0. Task 4.1 is re-registered as locked pending a real visible Integration thread and zero-compaction acceptance in the existing controller-g12 worktree; no new directory or worktree is an authority path."
+    "verification": "The project-local Controller G12 was re-registered after the prior Controller thread entered a system error outside the project. The Task 4.1 task/handoff capsules, controller and streamlineIntegration state now target the project-local Controller and passed the handoff validator while Git was clean. Task 4.1 remains locked pending a real visible Integration thread and zero-compaction acceptance in the existing controller-g12 worktree; no new directory or worktree is an authority path."
   },
   "currentBlockers": [],
   "approvedDeviations": [
