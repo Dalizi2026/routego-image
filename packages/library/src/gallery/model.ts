@@ -17,7 +17,7 @@ import {
 
 import { LibraryError } from "../errors";
 
-export const IMAGE_LIBRARY_SCHEMA_VERSION = 1 as const;
+export const IMAGE_LIBRARY_SCHEMA_VERSION = 2 as const;
 
 export type LibraryAssetStatus = LibraryAssetDetail["status"];
 export type LibraryImageMimeType = LibraryAssetDetail["mimeType"];
@@ -73,11 +73,13 @@ export interface StoredLibraryAsset {
 }
 
 export interface ImageLibraryIndex {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 2;
   readonly revision: number;
   readonly blobs: readonly StoredImageBlob[];
   readonly assets: readonly StoredLibraryAsset[];
   readonly folders: readonly StoredLibraryFolder[];
+  /** The sole selected active generation record, when one has been marked. */
+  readonly currentMarkRecordId?: string;
 }
 
 function asRecord(value: unknown, label: string): Record<string, unknown> {
@@ -409,12 +411,19 @@ function parseAsset(value: unknown): StoredLibraryAsset {
 
 export function parseImageLibraryIndex(value: unknown): ImageLibraryIndex {
   const record = asRecord(value, "Image Library index");
-  if (typeof record["schemaVersion"] === "number" && record["schemaVersion"] !== 1) {
+  if (
+    typeof record["schemaVersion"] === "number" &&
+    record["schemaVersion"] !== IMAGE_LIBRARY_SCHEMA_VERSION
+  ) {
     throw new LibraryError("unsupported_version", "Image Library index uses an unsupported version.");
   }
-  exact(record, ["schemaVersion", "revision", "blobs", "assets", "folders"], "Image Library index");
+  exact(
+    record,
+    ["schemaVersion", "revision", "blobs", "assets", "folders", "currentMarkRecordId"],
+    "Image Library index"
+  );
   if (
-    record["schemaVersion"] !== 1 ||
+    record["schemaVersion"] !== IMAGE_LIBRARY_SCHEMA_VERSION ||
     !Number.isSafeInteger(record["revision"]) ||
     (record["revision"] as number) < 0 ||
     !Array.isArray(record["blobs"]) ||
@@ -479,11 +488,28 @@ export function parseImageLibraryIndex(value: unknown): ImageLibraryIndex {
       }
     }
   }
-  return { schemaVersion: 1, revision: record["revision"] as number, blobs, assets, folders };
+  const currentMarkRecordId =
+    record["currentMarkRecordId"] === undefined
+      ? undefined
+      : parseId(record["currentMarkRecordId"], "Current mark record identity");
+  if (currentMarkRecordId !== undefined) {
+    const marked = assets.find((asset) => asset.id === currentMarkRecordId);
+    if (!marked || marked.kind !== "generate" || marked.status === "deleted") {
+      throw new LibraryError("config_corrupt", "The current mark must reference an active generation record.");
+    }
+  }
+  return {
+    schemaVersion: IMAGE_LIBRARY_SCHEMA_VERSION,
+    revision: record["revision"] as number,
+    blobs,
+    assets,
+    folders,
+    ...(currentMarkRecordId === undefined ? {} : { currentMarkRecordId })
+  };
 }
 
 export function createEmptyImageLibraryIndex(): ImageLibraryIndex {
-  return { schemaVersion: 1, revision: 0, blobs: [], assets: [], folders: [] };
+  return { schemaVersion: IMAGE_LIBRARY_SCHEMA_VERSION, revision: 0, blobs: [], assets: [], folders: [] };
 }
 
 export function referencedBlobPaths(index: ImageLibraryIndex): ReadonlySet<string> {

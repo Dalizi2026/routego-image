@@ -330,7 +330,7 @@ export function parsePortableLibraryManifest(value: unknown): PortableLibraryMan
   let parsedIndex: ImageLibraryIndex;
   try {
     parsedIndex = parseImageLibraryIndex({
-      schemaVersion: 1,
+      schemaVersion: 2,
       revision: 0,
       blobs: blobs.map((blob) => ({
         sha256: blob.sha256,

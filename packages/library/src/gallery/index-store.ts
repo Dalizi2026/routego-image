@@ -43,7 +43,10 @@ export interface ImageLibraryIndexStoreOptions {
   readonly hooks?: ImageLibraryIndexStoreHooks;
 }
 
-export type ImageLibraryIndexState = Pick<ImageLibraryIndex, "blobs" | "assets" | "folders">;
+export type ImageLibraryIndexState = Pick<ImageLibraryIndex, "blobs" | "assets" | "folders"> & {
+  /** Omit to retain the current mark; pass undefined explicitly to clear it. */
+  readonly currentMarkRecordId?: string | undefined;
+};
 
 export interface ImageLibraryIndexContext {
   readonly index: ImageLibraryIndex;
@@ -290,12 +293,16 @@ export class ImageLibraryIndexStore {
           if (committed) {
             throw new LibraryError("conflict", "The Image Library transaction is already committed.");
           }
+          const currentMarkRecordId = Object.hasOwn(next, "currentMarkRecordId")
+            ? next.currentMarkRecordId
+            : index.currentMarkRecordId;
           const validated = parseImageLibraryIndex({
-            schemaVersion: 1,
+            schemaVersion: 2,
             revision: index.revision + 1,
             blobs: next.blobs,
             assets: next.assets,
-            folders: next.folders
+            folders: next.folders,
+            ...(currentMarkRecordId === undefined ? {} : { currentMarkRecordId })
           });
           if (this.#hooks.beforeIndexCommit) await this.#hooks.beforeIndexCommit(validated);
           await writeJsonAtomic(this.#paths.index, validated);

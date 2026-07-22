@@ -14,7 +14,7 @@
 
 ## 3. Durable Library And Safe Regeneration
 
-- [ ] 3.1 [Lane: Library] [Depends: 1.4] Introduce the next Library index version with zero-or-one persistent current generation mark and atomic replace/cancel behavior; generation ingestion must not clear it. [Verify: `pnpm --filter @routego-image/library test -- gallery/model.test.ts gallery/mutations.test.ts`]
+- [x] 3.1 [Lane: Library] [Depends: 1.4] Introduce the next Library index version with zero-or-one persistent current generation mark and atomic replace/cancel behavior; generation ingestion must not clear it. [Verify: `pnpm --filter @routego-image/library test -- gallery/model.test.ts gallery/mutations.test.ts`]
 - [ ] 3.2 [Lane: Library] [Depends: 3.1] Implement allowlisted generation-information projection and read-only recipe preparation for explicit record ID or current mark with eligible zero-to-five references. [Verify: `pnpm --filter @routego-image/library test -- gallery/service.test.ts gallery/query.test.ts`]
 - [ ] 3.3 [Lane: Library] [Depends: 3.1] Implement read-only legacy cleanup preflight, reverse dependency graph, conflict list, projected removals, and deterministic confirmation fingerprint using synthetic fixtures only. [Verify: `pnpm --filter @routego-image/library test -- gallery/migration.test.ts`]
 - [ ] 3.4 [Lane: Library] [Depends: 3.3] Implement confirmation-bound migration execution with lock, journal, recovery copy, atomic index promotion, unreferenced-file deletion, verification, and injected-failure rollback tests; do not execute against real data. [Verify: `pnpm --filter @routego-image/library test -- gallery/migration.test.ts fs/permissions-journal.test.ts`]
