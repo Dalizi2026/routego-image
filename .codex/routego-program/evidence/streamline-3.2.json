@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "c763740adb06152acadbaf4c7fe2b4ff90d546d86461a5f60f7a38b7326cb533",
+  "event": "streamline-task-3.2-accepted",
+  "lane": "library",
+  "change": "streamline-routego-image-generation",
+  "taskId": "3.2",
+  "status": "accepted-merged-with-known-out-of-scope-suite-failures",
+  "implementationCommit": "2244ca2df0e0b1777014e9e1647f468c298601fe",
+  "controllerMergeCommit": "14e22811a280ffb2ccef5c6d677ecd5248bd97e7",
+  "taskStateCommit": "cdd48c7aa92402d18d12a753cf1d1971304efc51",
+  "tests": [
+    { "command": "pnpm --filter @routego-image/library exec vitest run test/gallery/service.test.ts test/gallery/query.test.ts", "result": "pass", "passed": 13, "retester": "controller-g12-independent" },
+    { "command": "pnpm --filter @routego-image/library test -- gallery/service.test.ts gallery/query.test.ts", "result": "not-green-out-of-scope-legacy-suite", "detail": "The package script runs additional old suites outside Task 3.2. Their failures are recorded as residual work and do not make the full Library package suite green." }
+  ],
+  "scopeExact": true,
+  "scopeFiles": ["packages/library/src/gallery/query.ts", "packages/library/src/gallery/read-service.ts", "packages/library/src/gallery/service.ts", "packages/library/test/gallery/query.test.ts", "packages/library/test/gallery/service.test.ts"],
+  "gitCleanAtAcceptance": true,
+  "controllerAcceptance": "independent-focused-13-of-13-and-exact-five-file-scope-passed; full package suite explicitly not claimed green.",
+  "nextTask": { "id": "3.3", "status": "not-started-no-product-activation" },
+  "externalStateAuthorized": false,
+  "notes": "No real Library migration, provider, credentials, real image, dependency, deployment, or release action occurred during acceptance."
+}

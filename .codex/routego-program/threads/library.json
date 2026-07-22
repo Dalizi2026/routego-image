@@ -3,50 +3,22 @@
   "lane": "library",
   "change": "streamline-routego-image-generation",
   "role": "openspec-apply-owner",
-  "status": "task-3.2-active-unaccepted-safe-projection-only",
+  "status": "task-3.2-accepted-merged-no-successor-product-task-activated",
   "threadId": "/root/library_task_3_2",
   "worktree": "/Users/dalizi/Documents/routego-image-library-g2",
   "branch": "codex/routego-library-g2",
   "generation": 2,
-  "currentHead": "12968524786b947479ae84b294fe4e46a8bd4ea2",
+  "currentHead": "2244ca2df0e0b1777014e9e1647f468c298601fe",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
-  "currentTask": {
-    "id": "3.2",
-    "status": "authorized-unaccepted",
-    "taskCapsule": ".codex/routego-program/tasks/library-3.2.json",
-    "handoffCapsule": ".codex/routego-program/handoffs/library-generation-4.capsule.json",
-    "locked": false
-  },
-  "sourceOwner": {
-    "threadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
-    "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
-    "branch": "codex/routego-controller-g12",
-    "role": "controller-dispatch-baseline",
-    "soleApplyOwner": false,
-    "archived": true,
-    "authorityRevoked": true
-  },
-  "handoffCapsuleIntegrity": {
-    "canonicalSha256": "207c8eacfe9f868f040a2dbdfaff8bb21b112d77a9b9df93c4bd15b0a3aae56f",
-    "rawFileSha256": "c25638dc467bec9f9ec1eddbb28c533e1fe2662371de3143ce68d7fd4104f9b2"
-  },
-  "reportingContract": {
-    "currentControllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
-    "currentControllerGeneration": 12,
-    "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, implementation, delivery, or acceptance request",
-    "fallback": "routego-program-continuity remains missed-message fallback only",
-    "acknowledgementRequiredBeforeAcceptance": true
-  },
-  "lowContextPolicy": {
-    "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
-    "hardHandoffDecision": ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md",
-    "startupMaxFiles": 12,
-    "startupMaxUtf8Bytes": 122880,
-    "startupByteCounting": "utf8-after-crlf-to-lf-normalization",
-    "acceptanceObservableCompactions": 0
-  },
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
+  "currentTask": null,
+  "nextTask": { "id": "3.3", "status": "not-started-no-product-activation", "locked": true, "activationCondition": "A separate Controller decision and fresh task capsule/handoff are required; Task 3.2 acceptance alone does not authorize product work." },
+  "lastAcceptedTask": { "id": "3.2", "implementationCommit": "2244ca2df0e0b1777014e9e1647f468c298601fe", "controllerMergeCommit": "14e22811a280ffb2ccef5c6d677ecd5248bd97e7", "taskStateCommit": "cdd48c7aa92402d18d12a753cf1d1971304efc51", "evidence": ".codex/routego-program/evidence/streamline-3.2.json", "evidenceSha256": "c763740adb06152acadbaf4c7fe2b4ff90d546d86461a5f60f7a38b7326cb533", "focusedTests": "13/13 pass", "fullPackageSuite": "not-green because the pnpm task script runs out-of-scope legacy suites; see evidence" },
+  "sourceOwner": { "threadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd", "worktree": "/Users/dalizi/Documents/routego-image-controller-g12", "branch": "codex/routego-controller-g12", "role": "controller-dispatch-baseline", "soleApplyOwner": false, "archived": true, "authorityRevoked": true },
+  "handoffCapsuleIntegrity": { "canonicalSha256": "207c8eacfe9f868f040a2dbdfaff8bb21b112d77a9b9df93c4bd15b0a3aae56f", "rawFileSha256": "c25638dc467bec9f9ec1eddbb28c533e1fe2662371de3143ce68d7fd4104f9b2" },
+  "reportingContract": { "currentControllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd", "currentControllerGeneration": 12, "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, implementation, delivery, or acceptance request", "fallback": "routego-program-continuity remains missed-message fallback only", "acknowledgementRequiredBeforeAcceptance": true },
+  "lowContextPolicy": { "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md", "hardHandoffDecision": ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md", "startupMaxFiles": 12, "startupMaxUtf8Bytes": 122880, "startupByteCounting": "utf8-after-crlf-to-lf-normalization", "acceptanceObservableCompactions": 0 },
   "externalStateAuthorized": false
 }

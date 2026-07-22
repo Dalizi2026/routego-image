@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "74ecb277f6d1d01590daf8696c454b45edd33f8621b013314e27a66c2bbbb650",
+  "contentSha256": "1ed64005ec3ceb7ee52102f9934a4277e08825b9759355fddc196629c62c7442",
   "hashSemantics": {
     "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null"
   },
   "lane": "creation",
   "change": "streamline-routego-image-generation",
   "taskId": "2.3",
-  "status": "registered-awaiting-handoff-acceptance",
+  "status": "active-authorized-zero-compaction-handoff-accepted",
   "sourceCommit": "ca19db67723027f8c6c8c9e2820969240f5d6f40",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -41,7 +41,7 @@
     "node_modules/**"
   ],
   "requiredBehavior": [
-    "Task 2.2 is accepted and merged; do not write product code until this registered successor passes zero-compaction handoff acceptance and receives a real worker thread ID.",
+    "Task 2.2 is accepted and merged; this successor passed zero-compaction handoff acceptance and may write only the exact Task 2.3 allowed scope.",
     "Preserve zero-to-five input order for references and reject any non-generation batch before provider access.",
     "Use fixed internal concurrency two, preserve item IDs/order, and isolate per-item outcomes.",
     "Use existing local dependencies only and never call a provider, use real images, or change dependencies.",
@@ -75,13 +75,13 @@
   "activation": {
     "controllerThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
     "controllerGeneration": 12,
-    "workerThreadId": "pending",
+    "workerThreadId": "019f8a1d-d43d-78a3-b144-93b8711a27c9",
     "workerGeneration": 3,
-    "soleApplyOwner": false,
-    "applyAuthorized": false
+    "soleApplyOwner": true,
+    "applyAuthorized": true
   },
   "knownRisks": [
-    "This successor is registered only. A real successor task must verify the handoff from the stated baseline with zero observable compactions before it becomes the sole apply owner.",
+    "This successor accepted the handoff from the stated baseline with zero observable compactions and is the sole apply owner for Task 2.3 only.",
     "The full Creation package test command is not green at registration: the documented batch concurrency and stale edit/retry assertions remain planned Task 2.3/2.4 work and must not be suppressed."
   ],
   "externalStateAuthorized": false,
