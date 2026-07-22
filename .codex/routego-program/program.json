@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-authoritative-task-3.4-accepted-library-3.5-same-lane-g3-registered-locked",
+  "status": "controller-generation-12-authoritative-task-3.4-accepted-library-3.5-same-lane-g3-activated",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -82,17 +82,17 @@
       "authorizedScope": "task-2.4-accepted-merged-no-successor-product-task-active"
     },
     "library": {
-      "status": "registered-locked-current-g3-awaiting-in-thread-scope-acceptance",
+      "status": "activated-sole-owner-current-g3-task-3.5-authorized",
       "taskRef": "019f8a48-ee58-7f73-b362-947478c0c85a",
       "threadId": "019f8a48-ee58-7f73-b362-947478c0c85a",
       "generation": 3,
       "taskId": "3.5",
       "branch": "codex/routego-library-g3",
       "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
-      "currentHead": "c03c9730f8f1aad9a0ba09a7231f32dda6e49fbc",
-      "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.5.json", "sha256": "fdf7520c49bbefd8e6e1b17244cc6e461a1d2da1f137d7941443bb20682d4caa" },
-      "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-7.capsule.json", "sha256": "b339f18aaa9d7a0715c52ab4bec78bb085f71350a06fa4bf88d5efdd549566b2", "rawFileSha256": "162dceb0ef84d52b21d9bada9357bd7eec94254c335dbb18a42757ad3e203b77" },
-      "authorizedScope": "task-3.5-registered-locked-current-g3-no-product-apply-before-in-thread-scope-acceptance-and-explicit-controller-activation"
+      "currentHead": "d4efb8a7c9040d771ac16d1a7c29da5c5bb7d958",
+      "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.5.json", "sha256": "c499bce967917e71b1f060f75c0d9e92c4bd4c78cb25419d7dc10fc5546f15b3" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-7.capsule.json", "sha256": "4ac3d5c7fcb6c7015352a69a1170057e8e37974c988d12b398fab3a31331afdc", "rawFileSha256": "8a28c8638e173a0d689b696b793eb2f58637c86155aa98d3d8c3045188a8e031" },
+      "authorizedScope": "task-3.5-activated-sole-owner-current-g3-exact-capsule-scope"
     }
   },
   "laneSuccessors": {
@@ -110,9 +110,9 @@
       "generation": 3,
       "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
       "plannedBranch": "codex/routego-library-g3",
-      "currentHead": "c03c9730f8f1aad9a0ba09a7231f32dda6e49fbc",
+      "currentHead": "d4efb8a7c9040d771ac16d1a7c29da5c5bb7d958",
       "observableCompactions": 0,
-      "handoffCapsuleIntegrity": { "canonicalSha256": "b339f18aaa9d7a0715c52ab4bec78bb085f71350a06fa4bf88d5efdd549566b2", "rawFileSha256": "162dceb0ef84d52b21d9bada9357bd7eec94254c335dbb18a42757ad3e203b77" }
+      "handoffCapsuleIntegrity": { "canonicalSha256": "4ac3d5c7fcb6c7015352a69a1170057e8e37974c988d12b398fab3a31331afdc", "rawFileSha256": "8a28c8638e173a0d689b696b793eb2f58637c86155aa98d3d8c3045188a8e031" }
     }
   },
   "currentChange": {
@@ -127,21 +127,21 @@
     },
     "currentTask": {
       "id": "3.5",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": ["3.5"],
-      "authorizedScope": "Task 3.4 is accepted and merged. Current Library G3 reuses its thread/worktree for Task 3.5 but remains locked until in-thread scope acceptance with zero observable compactions and explicit Controller activation. A new thread/worktree is mandatory only at the third observable compaction or earlier health handoff."
+      "authorizedScope": "Current Library G3 completed zero-compaction in-thread scope acceptance at d4efb8a7c9040d771ac16d1a7c29da5c5bb7d958 and is activated as the sole apply owner for Task 3.5 exact capsule scope. A new thread/worktree is mandatory only at the third observable compaction or earlier health handoff."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "creation-and-library",
-    "event": "TASK_3_4_ACCEPTED_TASK_3_5_REGISTERED_LOCKED",
+    "event": "TASK_3_5_ACTIVATED_SAME_LANE_G3",
     "implementationCommit": "9c4314c607b62309b7e93e78d496ad41a8c75194",
     "controllerMergeCommit": "0321bac53961d634f864b5daf2b97f0b79264d8e",
     "taskStateCommit": "c03c9730f8f1aad9a0ba09a7231f32dda6e49fbc",
     "openspecProgress": "12/33",
     "nextTaskIds": ["3.5"],
-    "verification": "Library Task 3.4 focused migration plus permissions-journal tests passed 14/14 within the exact two-file scope. Its executor accepts only absolute routego-migration-fixture-* temporary roots and exact confirmation fingerprints; acceptance performed no real or other synthetic Library data operation, Provider, network, or credential access. Library package-wide test and typecheck retain known out-of-scope v1/edit/Trash/ZIP failures, so no full-suite-green claim is made. Task 3.5 is registered and locked for in-thread scope acceptance by current G3; no new successor workspace is authorized before the third observable compaction."
+    "verification": "Library Task 3.4 focused migration plus permissions-journal tests passed 14/14 within the exact two-file scope. Its executor accepts only absolute routego-migration-fixture-* temporary roots and exact confirmation fingerprints; acceptance performed no real or other synthetic Library data operation, Provider, network, or credential access. Current G3 passed zero-compaction in-thread scope acceptance and is activated only for Task 3.5 exact capsule scope; no Controller-authorized real or synthetic Library data migration, cleanup, or deletion occurred."
   },
   "currentBlockers": [],
   "approvedDeviations": [
