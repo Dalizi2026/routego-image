@@ -69,21 +69,18 @@
   },
   "activeApplyOwners": {
     "creation": {
-      "status": "task-2.1-accepted",
-      "taskRef": "/root/creation_task_2_1",
-      "taskId": "2.1",
-      "branch": "codex/routego-creation-g1",
-      "worktree": "/Users/dalizi/Documents/routego-image-creation-g1",
-      "authorizedScope": "task-2.1-exact-creation-and-foundation-generation-only-routing"
+      "status": "pending-registration",
+      "taskId": "2.2",
+      "branch": "codex/routego-creation-g2",
+      "worktree": "/Users/dalizi/Documents/routego-image-creation-g2",
+      "authorizedScope": "task-2.2-exact-automatic-retry-removal"
     },
     "library": {
-      "status": "task-3.1-accepted",
-      "taskRef": "/root/library_task_3_1",
-      "taskId": "3.1",
-      "branch": "codex/routego-library-g1",
-      "worktree": "/Users/dalizi/Documents/routego-image-library-g1",
-      "authorizedScope": "task-3.1-exact-library-generation-mark-persistence",
-      "approvedDeviation": "User-approved obsolete Trash/delete/restore/permanent-delete test cleanup was limited to mutations.test.ts and is complete; runtime Trash product code was not changed."
+      "status": "pending-registration",
+      "taskId": "3.2",
+      "branch": "codex/routego-library-g2",
+      "worktree": "/Users/dalizi/Documents/routego-image-library-g2",
+      "authorizedScope": "task-3.2-exact-safe-generation-information-projection-and-recipe-preparation"
     }
   },
   "currentChange": {
