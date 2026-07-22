@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "1b7f70437860b2c04574db0c916871acae3087aa68b3ba146705d4bfb0f0a6da",
+  "contentSha256": "48fee3c4118cd15b7d62542cf6b51d62e9250387361322a4b19122fa1140f0d1",
   "hashSemantics": {
     "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null",
     "rawFileSha256RecordedAt": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json#currentState.taskCapsule.rawFileSha256"
@@ -58,17 +58,17 @@
     {
       "path": "openspec/changes/streamline-routego-image-generation/specs/regeneration-preparation/spec.md",
       "sha256": "010f5e42ce8d842a17791f7d885dc36248b226fc4f6773ea8fe5cc5d1767cb03",
-      "reason": "prepare_regeneration contract"
+      "reason": "prepare_regeneration public tool surface"
     },
     {
       "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
       "sha256": "aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529",
-      "reason": "generation-only request and batch inputs"
+      "reason": "generation-only batch and shared request surface"
     },
     {
       "path": "openspec/changes/streamline-routego-image-generation/design.md",
       "sha256": "e252fa8eafdacb6099740cb47ef16c3906ef4162172d02bd5f7fe7ebb5fe87ed",
-      "reason": "tool surface redesign boundaries"
+      "reason": "tool redesign boundaries"
     }
   ],
   "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",

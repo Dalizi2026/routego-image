@@ -1,5 +1,7 @@
 {
   "schemaVersion": 1,
+  "contentSha256": "a1f96905c4cb03537cedaf43df30612063b56baf53dd47762f869aa08ca2b553",
+  "event": "streamline-task-1.1-accepted",
   "lane": "streamline",
   "change": "streamline-routego-image-generation",
   "taskId": "1.1",
@@ -21,5 +23,5 @@
   "observableCompactions": 0,
   "controllerAcceptance": "independent-retest-and-scope-audit-passed",
   "nextTaskId": "1.2",
-  "contentSha256": "e403efce1930bb67f61cf7c29114f01c1330d1b7faf03d101363f6984357945e"
+  "externalStateAuthorized": false
 }

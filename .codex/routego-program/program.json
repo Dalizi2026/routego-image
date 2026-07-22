@@ -102,8 +102,8 @@
     "dependencyInstallationScope": "offline-local-cache-only",
     "statusNote": "User authorized resume; retain existing local offline node_modules only.",
     "handoffCapsuleIntegrity": {
-      "canonicalSha256": "a48b50ce6d4a24def11d04d1357a1d5c91117b1a9054ce1ded91c0c416dd6f20",
-      "rawFileSha256": "b6f20374d8994b525e179850128de31d986d2fcdfca88526cbf1d935b8cd2834"
+      "canonicalSha256": "3a77aea4b08a7954cbe546ed2c109c437802b106a5a7998d7201c58df3a7f494",
+      "rawFileSha256": "22e1d12c6e4c6fc389f10a4d481e0ddab25df3dab4736322db3234e9c5db6260"
     }
   },
   "externalBlockedApplyOwner": {
@@ -166,8 +166,8 @@
       "lastCompactionFingerprint": null,
       "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
       "handoffCapsuleIntegrity": {
-        "canonicalSha256": "a48b50ce6d4a24def11d04d1357a1d5c91117b1a9054ce1ded91c0c416dd6f20",
-        "rawFileSha256": "b6f20374d8994b525e179850128de31d986d2fcdfca88526cbf1d935b8cd2834"
+        "canonicalSha256": "3a77aea4b08a7954cbe546ed2c109c437802b106a5a7998d7201c58df3a7f494",
+        "rawFileSha256": "22e1d12c6e4c6fc389f10a4d481e0ddab25df3dab4736322db3234e9c5db6260"
       },
       "failedRegistrationAttempts": [
         {
@@ -266,7 +266,7 @@
     "openspecProgress": "1/33",
     "nextTaskId": "1.2",
     "evidence": ".codex/routego-program/evidence/streamline-1.1.json",
-    "evidenceSha256": "e403efce1930bb67f61cf7c29114f01c1330d1b7faf03d101363f6984357945e"
+    "evidenceSha256": "a1f96905c4cb03537cedaf43df30612063b56baf53dd47762f869aa08ca2b553"
   },
   "controllerSuccessor": {
     "lane": "controller",
