@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "5b203a8e67f721162e64a28f092610f2c04f53b1f056d28ab8e93ac7f0a25d83",
+  "capsuleSha256": "a48b50ce6d4a24def11d04d1357a1d5c91117b1a9054ce1ded91c0c416dd6f20",
   "hashSemantics": {
     "capsuleSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting capsuleSha256 to null",
     "rawFileSha256RecordedAt": ".codex/routego-program/threads/streamline.json#handoffCapsuleIntegrity.rawFileSha256",
@@ -28,25 +28,27 @@
     "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
     "plannedBranch": "codex/routego-streamline-g1",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "registrationStatus": "activated-sole-owner-task-1.1-offline-deps-authorized",
+    "registrationStatus": "activated-sole-owner-task-1.2-authorized",
     "registrationAttempt": 2,
-    "verifiedHeadBeforeContainingCommit": "3c0c706314a8c8f7ca81855c94d795e7e1470e66",
+    "verifiedHeadBeforeContainingCommit": "a1a90b7683eb9be437c4cd7e38adf8776f3c3b83",
     "incorporationCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06"
   },
   "currentState": {
     "openspecTotal": 33,
-    "openspecCompleted": 0,
-    "completedTaskIds": [],
-    "nextTaskId": "1.1",
+    "openspecCompleted": 1,
+    "completedTaskIds": [
+      "1.1"
+    ],
+    "nextTaskId": "1.2",
     "taskCapsule": {
-      "path": ".codex/routego-program/tasks/streamline-1.1.json",
-      "sha256": "a6117610a097920c4aaaeabbd4726367395d84029a588061eb1a453904d55267",
-      "rawFileSha256": "a03e2768eebfdeea6141d41abedd6ab363b49981c797179d680d88b1d47bca4f"
+      "path": ".codex/routego-program/tasks/streamline-1.2.json",
+      "sha256": "1b7f70437860b2c04574db0c916871acae3087aa68b3ba146705d4bfb0f0a6da",
+      "rawFileSha256": "bb25efa0df4a862f2af441b7f30da40c180a157fb8f259b2c8cc1ac4904de0ce"
     },
     "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
     "successorApplyAuthorized": true,
-    "continuation": "resume-task-1.1-with-offline-local-deps-and-exact-authorized-scope"
+    "continuation": "execute-task-1.2-with-exact-authorized-scope"
   },
   "completedEvidence": [
     {
@@ -55,13 +57,20 @@
       "taskIds": [
         "planning"
       ]
+    },
+    {
+      "path": ".codex/routego-program/evidence/streamline-1.1.json",
+      "sha256": "e403efce1930bb67f61cf7c29114f01c1330d1b7faf03d101363f6984357945e",
+      "taskIds": [
+        "1.1"
+      ]
     }
   ],
   "authority": {
     "summaryPath": ".codex/routego-program/authority-summary.md",
     "summarySha256": "3121480259a6560ac37fa63182c70d23f6c9bcfab9fc56963564eed4372b1382",
     "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
-    "ownershipFingerprint": "streamline-task-1.1-exact-contract-files",
+    "ownershipFingerprint": "streamline-task-1.2-exact-tools-files",
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
   "gates": {
@@ -75,8 +84,9 @@
     "dependencyInstallationAuthorized": true,
     "realLibraryMigrationAuthorized": false,
     "targetPluginInstallationAuthorized": false,
-    "task1_1Locked": false,
-    "dependencyInstallationScope": "offline-local-cache-only-retain-existing-node_modules"
+    "task1_1Locked": true,
+    "dependencyInstallationScope": "offline-local-cache-only-retain-existing-node_modules",
+    "task1_2Locked": false
   },
   "context": {
     "sourceObservableCompactions": 2,
@@ -106,7 +116,7 @@
       ".codex/routego-program/program.json",
       ".codex/routego-program/threads/streamline.json",
       ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
-      ".codex/routego-program/tasks/streamline-1.1.json",
+      ".codex/routego-program/tasks/streamline-1.2.json",
       "openspec/changes/streamline-routego-image-generation/tasks.md",
       "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
       "openspec/changes/streamline-routego-image-generation/design.md",
@@ -116,8 +126,8 @@
     "maxFiles": 11,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 88184,
-    "fallbackSourceCommit": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
+    "expectedNormalizedUtf8Bytes": 87964,
+    "fallbackSourceCommit": "a1a90b7683eb9be437c4cd7e38adf8776f3c3b83",
     "authoritySummaryMaxBytes": 16384,
     "handoffCapsuleMaxBytes": 24576,
     "directGovernanceMessageMaxBytes": 12288,
