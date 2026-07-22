@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "1b7f70437860b2c04574db0c916871acae3087aa68b3ba146705d4bfb0f0a6da",
+  "hashSemantics": {
+    "contentSha256": "sha256 of recursively key-sorted UTF-8 JSON after setting contentSha256 to null",
+    "rawFileSha256RecordedAt": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json#currentState.taskCapsule.rawFileSha256"
+  },
+  "lane": "streamline",
+  "change": "streamline-routego-image-generation",
+  "taskId": "1.2",
+  "status": "active-authorized",
+  "sourceCommit": "a1a90b7683eb9be437c4cd7e38adf8776f3c3b83",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "153ffa3c6bba10eadc69174839204bbc37a9bb6856e9552e23ea3b9d6fb01f64",
+    "lineSha256": "ff00f8ce1ba2427b269950b20b6276392747344c8121ca88a038ac6906e13300"
+  },
+  "dependencies": [
+    "1.1"
+  ],
+  "allowedFiles": [
+    "packages/contracts/src/tools.ts",
+    "packages/contracts/src/index.ts",
+    "packages/contracts/test/tools-service.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "allowedFileMode": "update only the exact task 1.2 public tools contract/tests and post-implementation task-state checkbox",
+  "forbiddenFileGlobs": [
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/integration/**",
+    "packages/studio/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".codex-plugin/**",
+    "plugin/**",
+    "dist/**",
+    "node_modules/**",
+    "packages/contracts/src/image.ts"
+  ],
+  "requiredBehavior": [
+    "Confirm Task 1.1 is complete and Task 1.2 is next.",
+    "Replace public routego_edit with read-only routego_prepare_regeneration.",
+    "Make routego_batch generation-only with fixed concurrency two.",
+    "Keep exactly seven public operations.",
+    "Use retained offline local dependencies only; no network download; no lockfile changes.",
+    "Run focused tools-service tests, inspect scope, commit implementation, then check Task 1.2.",
+    "Hard handoff if observableCompactions reaches 3 (PD-014)."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/contracts exec vitest run test/tools-service.test.ts",
+    "git diff --check",
+    "exact allowed-file scope and no credentials/user images/generated artifacts"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/regeneration-preparation/spec.md",
+      "sha256": "010f5e42ce8d842a17791f7d885dc36248b226fc4f6773ea8fe5cc5d1767cb03",
+      "reason": "prepare_regeneration contract"
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529",
+      "reason": "generation-only request and batch inputs"
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "e252fa8eafdacb6099740cb47ef16c3906ef4162172d02bd5f7fe7ebb5fe87ed",
+      "reason": "tool surface redesign boundaries"
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-1.2-exact-tools-files",
+  "activation": {
+    "controllerThreadId": "019f8275-18a6-7061-8a46-e177bf0bd3bc",
+    "controllerGeneration": 12,
+    "workerThreadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
+    "workerGeneration": 1,
+    "soleApplyOwner": true,
+    "applyAuthorized": true
+  },
+  "knownRisks": [
+    "Downstream packages may still import routego_edit; do not broaden into creation/library/studio in this task.",
+    "If exports require broader package changes beyond allowed files, report PLAN_DEVIATION."
+  ],
+  "externalStateAuthorized": false,
+  "dependencyInstallationAuthorized": true,
+  "dependencyAuthorization": {
+    "scope": "offline-local-cache-only",
+    "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
+    "networkDownloadForbidden": true,
+    "lockfileMutationForbidden": true
+  }
+}

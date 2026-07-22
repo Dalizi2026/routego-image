@@ -67,7 +67,7 @@
     "worktree": "/Users/dalizi/Documents/routego-image-controller-g12",
     "branch": "codex/routego-controller-g12",
     "verifiedHeadBeforeContainingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-streamline-task-1.1-resumed-offline-deps",
+    "status": "authoritative-controller-generation-12-streamline-1.1-accepted-1.2-authorized",
     "authoritative": true,
     "observableCompactions": 2,
     "lastCompactionFingerprint": "controller-g12|streamline-routego-image-generation|ac20892014fb7beb3bf053a903670d4d634d956a|context-compaction-2-registration-attempt-2-reconciliation|0/33"
@@ -81,18 +81,18 @@
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
     "registrationCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06",
     "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
-    "taskCapsule": ".codex/routego-program/tasks/streamline-1.1.json",
+    "taskCapsule": ".codex/routego-program/tasks/streamline-1.2.json",
     "change": "streamline-routego-image-generation",
-    "nextTaskId": "1.1",
-    "openspecProgress": "0/33",
+    "nextTaskId": "1.2",
+    "openspecProgress": "1/33",
     "soleApplyOwner": true,
     "frozen": false,
     "applyAuthorized": true,
-    "authorizedScope": "task-1.1-exact-contract-files-with-offline-local-deps",
+    "authorizedScope": "task-1.2-exact-tools-files-with-offline-local-deps",
     "authorizedFiles": [
-      "packages/contracts/src/image.ts",
-      "packages/contracts/test/image-errors.test.ts",
-      "packages/contracts/test/fixtures.ts",
+      "packages/contracts/src/tools.ts",
+      "packages/contracts/src/index.ts",
+      "packages/contracts/test/tools-service.test.ts",
       "openspec/changes/streamline-routego-image-generation/tasks.md"
     ],
     "externalStateAuthorized": false,
@@ -102,8 +102,8 @@
     "dependencyInstallationScope": "offline-local-cache-only",
     "statusNote": "User authorized resume; retain existing local offline node_modules only.",
     "handoffCapsuleIntegrity": {
-      "canonicalSha256": "5b203a8e67f721162e64a28f092610f2c04f53b1f056d28ab8e93ac7f0a25d83",
-      "rawFileSha256": "59dd1dad07d5c2dec31365599673b3d5df4bcaf70379f25977b1d6cada302983"
+      "canonicalSha256": "a48b50ce6d4a24def11d04d1357a1d5c91117b1a9054ce1ded91c0c416dd6f20",
+      "rawFileSha256": "b6f20374d8994b525e179850128de31d986d2fcdfca88526cbf1d935b8cd2834"
     }
   },
   "externalBlockedApplyOwner": {
@@ -148,7 +148,7 @@
     "streamline": {
       "lane": "streamline",
       "generation": 1,
-      "status": "activated-sole-owner-task-1.1-offline-deps-authorized",
+      "status": "activated-sole-owner-task-1.2-authorized",
       "threadId": "019f8526-d457-72b0-81a9-5fb3ce8dca08",
       "worktree": "/Users/dalizi/Documents/routego-image-streamline-g1",
       "plannedBranch": "codex/routego-streamline-g1",
@@ -156,18 +156,18 @@
       "registrationAttempt": 2,
       "registrationCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06",
       "incorporationCommit": "aa87b8e22819f420fac898b39d498b7ce1884e06",
-      "currentHead": "3c0c706314a8c8f7ca81855c94d795e7e1470e66",
-      "acceptedHead": "aa87b8e22819f420fac898b39d498b7ce1884e06",
+      "currentHead": "a1a90b7683eb9be437c4cd7e38adf8776f3c3b83",
+      "acceptedHead": "a1a90b7683eb9be437c4cd7e38adf8776f3c3b83",
       "soleApplyOwner": true,
       "applyAuthorized": true,
-      "authorizedScope": "task-1.1-exact-contract-files",
+      "authorizedScope": "task-1.2-exact-tools-files-with-offline-local-deps",
       "gitClean": true,
       "observableCompactions": 0,
       "lastCompactionFingerprint": null,
       "handoffCapsule": ".codex/routego-program/handoffs/streamline-generation-1.capsule.json",
       "handoffCapsuleIntegrity": {
-        "canonicalSha256": "5b203a8e67f721162e64a28f092610f2c04f53b1f056d28ab8e93ac7f0a25d83",
-        "rawFileSha256": "59dd1dad07d5c2dec31365599673b3d5df4bcaf70379f25977b1d6cada302983"
+        "canonicalSha256": "a48b50ce6d4a24def11d04d1357a1d5c91117b1a9054ce1ded91c0c416dd6f20",
+        "rawFileSha256": "b6f20374d8994b525e179850128de31d986d2fcdfca88526cbf1d935b8cd2834"
       },
       "failedRegistrationAttempts": [
         {
@@ -178,7 +178,9 @@
         }
       ],
       "dependencyInstallationAuthorized": true,
-      "dependencyInstallationScope": "offline-local-cache-only"
+      "dependencyInstallationScope": "offline-local-cache-only",
+      "openspecProgress": "1/33",
+      "nextTaskId": "1.2"
     },
     "library": {
       "lane": "library",
@@ -219,21 +221,23 @@
     "cleanPlanningCheckpoint": "8abbd1632ea1b7a49a92fad917b3052e58e22b95",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 0,
-      "completedTaskIds": [],
-      "nextTaskId": "1.1"
+      "completedTasks": 1,
+      "completedTaskIds": [
+        "1.1"
+      ],
+      "nextTaskId": "1.2"
     },
     "currentTask": {
-      "id": "1.1",
-      "capsule": ".codex/routego-program/tasks/streamline-1.1.json",
+      "id": "1.2",
+      "capsule": ".codex/routego-program/tasks/streamline-1.2.json",
       "locked": false,
       "activationAuthorized": true,
-      "started": true,
-      "authorizedScope": "task-1.1-exact-contract-files",
+      "started": false,
+      "authorizedScope": "task-1.2-exact-tools-files",
       "authorizedFiles": [
-        "packages/contracts/src/image.ts",
-        "packages/contracts/test/image-errors.test.ts",
-        "packages/contracts/test/fixtures.ts",
+        "packages/contracts/src/tools.ts",
+        "packages/contracts/src/index.ts",
+        "packages/contracts/test/tools-service.test.ts",
         "openspec/changes/streamline-routego-image-generation/tasks.md"
       ],
       "dependencyInstallationAuthorized": true,
@@ -256,12 +260,13 @@
   },
   "latestDirectCheckpoint": {
     "lane": "streamline",
-    "event": "TASK_1_1_RESUME_AUTHORIZED_AFTER_OFFLINE_DEPS_DISPOSITION",
-    "controllerHead": "34157b0c7cb748de490c77e0295f82bb6319b8ca",
-    "workerHeadBeforeResume": "3c0c706314a8c8f7ca81855c94d795e7e1470e66",
-    "backupPath": "/Users/dalizi/Documents/routego-image-backups/streamline-task-1.1-20260722-190113",
-    "openspecProgress": "0/33",
-    "notes": "User authorized continue development with backup and interrupt automation; retain existing local offline deps only."
+    "event": "TASK_1_1_ACCEPTED",
+    "implementationCommit": "68d03b8522efaa0e42c5a1811a8685bcdd067576",
+    "taskStateCommit": "a1a90b7683eb9be437c4cd7e38adf8776f3c3b83",
+    "openspecProgress": "1/33",
+    "nextTaskId": "1.2",
+    "evidence": ".codex/routego-program/evidence/streamline-1.1.json",
+    "evidenceSha256": "e403efce1930bb67f61cf7c29114f01c1330d1b7faf03d101363f6984357945e"
   },
   "controllerSuccessor": {
     "lane": "controller",
