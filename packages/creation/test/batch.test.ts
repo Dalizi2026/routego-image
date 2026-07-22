@@ -79,18 +79,17 @@ function itemResult(
   });
 }
 
-function batchInput(count: number, concurrency: number) {
+function batchInput(count: number) {
   return {
     tasks: Array.from({ length: count }, (_, index) => ({
       id: `task-${index}`,
       operation: operation(index)
-    })),
-    concurrency
+    }))
   };
 }
 
 describe("bounded ordered batch scheduling", () => {
-  it("honors concurrency and preserves exact input order and identity", async () => {
+  it("uses fixed concurrency two and preserves exact input order and identity", async () => {
     let active = 0;
     let maximumActive = 0;
     const executor: ResolvedImageExecutor = {
@@ -106,9 +105,10 @@ describe("bounded ordered batch scheduling", () => {
     const result = await createBatchExecutor({
       executor,
       createBatchRequestId: () => "batch-request-order"
-    }).execute(batchInput(6, 2));
+    }).execute(batchInput(6));
     expect(maximumActive).toBe(2);
     expect(result.status).toBe("succeeded");
+    expect(result.concurrency).toBe(2);
     expect(result.items.map((item) => item.id)).toEqual([
       "task-0",
       "task-1",
@@ -135,7 +135,7 @@ describe("bounded ordered batch scheduling", () => {
         );
       }
     };
-    const result = await createBatchExecutor({ executor }).execute(batchInput(4, 3));
+    const result = await createBatchExecutor({ executor }).execute(batchInput(4));
     expect(result.status).toBe("partial");
     expect(result.items.map((item) => item.result.status)).toEqual([
       "succeeded",
@@ -157,7 +157,7 @@ describe("bounded ordered batch scheduling", () => {
         return itemResult(request, 0, "succeeded");
       }
     };
-    const result = await createBatchExecutor({ executor }).execute(batchInput(5, 1), {
+    const result = await createBatchExecutor({ executor }).execute(batchInput(5), {
       signal: controller.signal
     });
     expect(started).toEqual(["Batch operation 0"]);
@@ -172,7 +172,22 @@ describe("bounded ordered batch scheduling", () => {
     expect(result.items.slice(1).every((item) => item.result.execution.providerRequestCount === 0)).toBe(true);
   });
 
-  it("fails closed on invalid batch input and invalid executor output", async () => {
+  it("rejects caller concurrency and non-generation tasks before starting the executor", async () => {
+    const executor = {
+      execute: vi.fn(async (request: ImageOperationRequest) => itemResult(request, 0, "succeeded"))
+    } satisfies ResolvedImageExecutor;
+    const batch = createBatchExecutor({ executor });
+
+    await expect(batch.execute({ ...batchInput(1), concurrency: 3 })).rejects.toThrow();
+    await expect(
+      batch.execute({
+        tasks: [{ id: "edit-is-not-a-batch-operation", operation: { kind: "edit", prompt: "Removed" } }]
+      })
+    ).rejects.toThrow();
+    expect(executor.execute).not.toHaveBeenCalled();
+  });
+
+  it("fails closed on duplicate identifiers and invalid executor output", async () => {
     const executor = {
       execute: vi.fn(async () => ({ invalid: true }) as unknown as ImageOperationResult)
     } satisfies ResolvedImageExecutor;
@@ -182,12 +197,11 @@ describe("bounded ordered batch scheduling", () => {
         tasks: [
           { id: "duplicate", operation: operation(0) },
           { id: "duplicate", operation: operation(1) }
-        ],
-        concurrency: 2
+        ]
       })
     ).rejects.toThrow(/unique/u);
 
-    const result = await batch.execute(batchInput(1, 1));
+    const result = await batch.execute(batchInput(1));
     expect(result).toMatchObject({
       status: "failed",
       items: [{ id: "task-0", result: { status: "failed", error: { code: "internal_contract" } } }]
@@ -218,8 +232,9 @@ describe("public Creation batch service", () => {
       retry: { maxAttempts: 1, baseDelayMs: 1, maxDelayMs: 1 }
     };
     const service = createCreationImageService({ providerContext: provider });
-    const result = await service.batch(batchInput(2, 2));
+    const result = await service.batch(batchInput(2));
     expect(result.status).toBe("succeeded");
+    expect(result.concurrency).toBe(2);
     expect(result.items.map((item) => item.result.execution.providerRequestCount)).toEqual([1, 1]);
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });

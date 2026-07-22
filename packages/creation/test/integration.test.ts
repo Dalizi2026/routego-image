@@ -1,8 +1,4 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
   providerCapabilityRecordSchema,
@@ -31,56 +27,6 @@ import {
 } from "../src/index";
 
 const OBSERVED_AT = "2026-07-18T10:00:00.000Z";
-
-let fixtureDirectory = "";
-let targetPath = "";
-let supportingPath = "";
-let maskPath = "";
-
-function uint32Be(value: number): Buffer {
-  const output = Buffer.alloc(4);
-  output.writeUInt32BE(value);
-  return output;
-}
-
-function pngChunk(type: string, data: Uint8Array): Buffer {
-  return Buffer.concat([
-    uint32Be(data.byteLength),
-    Buffer.from(type, "ascii"),
-    Buffer.from(data),
-    Buffer.alloc(4)
-  ]);
-}
-
-function syntheticPng(width = 2, height = 2): Buffer {
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(width, 0);
-  ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = 8;
-  ihdr[9] = 6;
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    pngChunk("IHDR", ihdr),
-    pngChunk("IEND", Buffer.alloc(0))
-  ]);
-}
-
-beforeAll(async () => {
-  fixtureDirectory = await mkdtemp(join(tmpdir(), "routego-creation-integration-"));
-  targetPath = join(fixtureDirectory, "target.png");
-  supportingPath = join(fixtureDirectory, "supporting.png");
-  maskPath = join(fixtureDirectory, "mask.png");
-  const image = syntheticPng();
-  await Promise.all([
-    writeFile(targetPath, image),
-    writeFile(supportingPath, image),
-    writeFile(maskPath, image)
-  ]);
-});
-
-afterAll(async () => {
-  await rm(fixtureDirectory, { recursive: true, force: true });
-});
 
 function endpoint(server: MockRelayTestServer, pathname: string): string {
   return `${server.url}${pathname}`;
@@ -177,11 +123,11 @@ describe("Creation package integration", () => {
     expect(tools).toHaveLength(7);
   });
 
-  it("runs Tier A text and evidenced single-image requests through the offline relay", async () => {
-    const textServer = await startMockRelayTestServer({ fixture: "single-endpoint-text" });
+  it("runs Tier A text generation through the offline relay", async () => {
+    const server = await startMockRelayTestServer({ fixture: "single-endpoint-text" });
     try {
       const service = createCreationImageService(
-        dependencies(providerRuntime(textServer), "tier-a-text")
+        dependencies(providerRuntime(server), "tier-a-text")
       );
       const generated = await service.generate({
         kind: "generate",
@@ -191,89 +137,30 @@ describe("Creation package integration", () => {
         status: "succeeded",
         execution: { transport: "single-endpoint-json", providerRequestCount: 1 }
       });
-      expect(textServer.relay.observations).toHaveLength(1);
-      expect(textServer.relay.observations[0]).toMatchObject({
+      expect(server.relay.observations).toHaveLength(1);
+      expect(server.relay.observations[0]).toMatchObject({
         method: "POST",
         pathname: "/v1/images/generations",
         headers: { authorization: "[REDACTED]" }
       });
     } finally {
-      await close(textServer);
-    }
-
-    const imageServer = await startMockRelayTestServer({ fixture: "single-endpoint-image" });
-    try {
-      const generationEndpoint = endpoint(imageServer, "/v1/images/generations");
-      const shape = PROVIDER_REQUEST_SHAPES.singleEndpointImage;
-      const runtime = providerRuntime(imageServer, {
-        capabilities: ["single-image-input", "data-url-input", "target-edit"].map((name) =>
-          capability(name as ProviderCapability, generationEndpoint, "single-endpoint-json", shape)
-        )
-      });
-      const edited = await createCreationImageService(
-        dependencies(runtime, "tier-a-image")
-      ).edit({
-        kind: "edit",
-        prompt: "Offline Tier A image edit",
-        targetImage: { path: targetPath },
-        invariants: { preserve: ["subject identity"] }
-      });
-      expect(edited).toMatchObject({
-        status: "succeeded",
-        execution: { transport: "single-endpoint-json", providerRequestCount: 1 }
-      });
-      expect(JSON.stringify(imageServer.relay.observations[0]?.bodyShape)).toContain(
-        "image-data-url"
-      );
-    } finally {
-      await close(imageServer);
+      await close(server);
     }
   });
 
-  it("runs explicit Images multipart with target-first ordering and mask slot zero", async () => {
-    const server = await startMockRelayTestServer({ fixture: "openai-images" });
+  it("rejects a non-generation batch before the offline relay is accessed", async () => {
+    const server = await startMockRelayTestServer({ fixture: "single-endpoint-text" });
     try {
-      const editsEndpoint = endpoint(server, "/v1/images/edits");
-      const shape = PROVIDER_REQUEST_SHAPES.imagesEditsMultipart;
-      const runtime = providerRuntime(server, {
-        endpoints: {
-          generation: {
-            mode: "exact-generation-endpoint",
-            value: endpoint(server, "/v1/images/generations")
-          },
-          edits: editsEndpoint
-        },
-        preferredTransports: ["openai-images"],
-        capabilities: ["multi-image-input", "multipart-input", "target-edit", "mask-edit"].map(
-          (name) => capability(name as ProviderCapability, editsEndpoint, "openai-images", shape)
-        )
-      });
-      const result = await createCreationImageService(
-        dependencies(runtime, "images-multipart")
-      ).edit({
-        kind: "edit",
-        prompt: "Offline multipart edit",
-        targetImage: { path: targetPath },
-        supportingImages: [{ path: supportingPath }],
-        maskPath,
-        invariants: { preserve: ["layout", "subject"] }
-      });
-      expect(result).toMatchObject({
-        status: "succeeded",
-        execution: { transport: "openai-images", providerRequestCount: 1 }
-      });
-      const bodyShape = server.relay.observations[0]?.bodyShape as {
-        entries?: Array<{ name: string }>;
-      };
-      expect(bodyShape.entries?.map((entry) => entry.name)).toEqual([
-        "model",
-        "prompt",
-        "image",
-        "mask",
-        "image[]",
-        "n",
-        "size"
-      ]);
+      const service = createCreationImageService(
+        dependencies(providerRuntime(server), "generation-only-batch")
+      );
+      const unsafeBatch = service.batch as (input: unknown) => Promise<unknown>;
+      await expect(
+        unsafeBatch({
+          tasks: [{ id: "removed-edit", operation: { kind: "edit", prompt: "Removed edit" } }]
+        })
+      ).rejects.toThrow();
+      expect(server.relay.observations).toHaveLength(0);
     } finally {
       await close(server);
     }
@@ -401,10 +288,10 @@ describe("Creation package integration", () => {
             id: "batch-second",
             operation: { kind: "generate", prompt: "Offline batch second" }
           }
-        ],
-        concurrency: 2
+        ]
       });
       expect(result.status).toBe("succeeded");
+      expect(result.concurrency).toBe(2);
       expect(result.items.map((item) => item.id)).toEqual(["batch-first", "batch-second"]);
       expect(result.items.map((item) => item.result.execution.providerRequestCount)).toEqual([1, 1]);
       expect(server.relay.observations).toHaveLength(2);

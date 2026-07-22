@@ -201,6 +201,18 @@ describe("generation-only provider request preparation", () => {
     expect(value.submission.body).not.toHaveProperty("mask");
   });
 
+  it("rejects a sixth generation reference before provider routing or file access", async () => {
+    const result = await prepareProviderRequest(context(), {
+      kind: "generate",
+      prompt: "Too many references",
+      references: Array.from({ length: 6 }, (_, index) => ({
+        path: join(fixtureDirectory, `missing-${index}.png`),
+        role: "reference"
+      }))
+    });
+    expect(result).toMatchObject({ prepared: false, error: { code: "invalid_input", mayHaveBilled: false } });
+  });
+
   it("uses the Images generation adapter only for text-only generation", async () => {
     const value = prepared(await prepareProviderRequest(
       context([], { preferredTransports: ["openai-images"] }),

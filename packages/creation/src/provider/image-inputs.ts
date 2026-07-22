@@ -16,6 +16,7 @@ import {
 
 const PNG_SIGNATURE = Uint8Array.of(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a);
 const MAX_IMAGE_DIMENSION = 65_535;
+const MAX_GENERATION_REFERENCES = 5;
 
 function matches(bytes: Uint8Array, offset: number, expected: Uint8Array): boolean {
   if (offset + expected.length > bytes.length) {
@@ -382,18 +383,20 @@ export async function prepareImageInputs(
   options: PrepareImageInputOptions = {}
 ): Promise<PreparedImageInputs> {
   const maxFileBytes = options.maxFileBytes ?? MAX_PROVIDER_INPUT_BYTES;
-  const maxTotalBytes = options.maxTotalBytes ?? MAX_PROVIDER_INPUTS * MAX_PROVIDER_INPUT_BYTES;
+  const maxTotalBytes =
+    options.maxTotalBytes ??
+    Math.min(MAX_PROVIDER_INPUTS, MAX_GENERATION_REFERENCES) * MAX_PROVIDER_INPUT_BYTES;
   const descriptors = request.references.map((value, sourceIndex) => ({
-      kind: "reference" as const,
-      sourceIndex,
-      role: value.role,
-      value
-    }));
-  if (descriptors.length > MAX_PROVIDER_INPUTS) {
+    kind: "reference" as const,
+    sourceIndex,
+    role: value.role,
+    value
+  }));
+  if (descriptors.length > MAX_GENERATION_REFERENCES) {
     throw new ProviderPreparationError(
       "too-many-images",
-      "A provider request can contain at most 16 physical image inputs.",
-      { requested: descriptors.length, maximum: MAX_PROVIDER_INPUTS }
+      "A generation request can contain at most five ordered reference images.",
+      { requested: descriptors.length, maximum: MAX_GENERATION_REFERENCES }
     );
   }
 
