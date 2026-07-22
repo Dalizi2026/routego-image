@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-authoritative-task-3.5-accepted-integration-4.1-cross-lane-locked-pending-visible-worktree",
+  "status": "controller-generation-12-authoritative-streamline-integration-4.1-registered-locked-pending-visible-worktree",
   "projectPath": "/Users/dalizi/Documents/routego-image-controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -93,6 +93,19 @@
       "taskCapsule": { "path": ".codex/routego-program/tasks/library-3.5.json", "sha256": "c499bce967917e71b1f060f75c0d9e92c4bd4c78cb25419d7dc10fc5546f15b3" },
       "handoffCapsule": { "path": ".codex/routego-program/handoffs/library-generation-7.capsule.json", "sha256": "4ac3d5c7fcb6c7015352a69a1170057e8e37974c988d12b398fab3a31331afdc", "rawFileSha256": "8a28c8638e173a0d689b696b793eb2f58637c86155aa98d3d8c3045188a8e031" },
       "authorizedScope": "task-3.5-accepted-merged-no-successor-library-product-task-active"
+    },
+    "streamlineIntegration": {
+      "status": "registered-locked-pending-visible-worktree-and-zero-compaction-handoff",
+      "taskRef": "pending",
+      "threadId": "pending",
+      "generation": 1,
+      "taskId": "4.1",
+      "branch": "pending",
+      "worktree": "pending",
+      "currentHead": "eb637cb0e20f229c6a3a713241b4ace86e449dad",
+      "taskCapsule": { "path": ".codex/routego-program/tasks/integration-4.1.json", "sha256": "3ba0b3f08a92ab0fa83a15c8b9cf29004b697364c3c6038fb97a3a5cccce3177" },
+      "handoffCapsule": { "path": ".codex/routego-program/handoffs/integration-generation-1-streamline.capsule.json", "sha256": "3b3665541c4c62dcc4ca2e87ef5178f496cd7b28db8293b4894ec7047e46a790", "rawFileSha256": "76a07d6d3d8a0d357997c4648858dcb33ba713877b6d3bc17155705565d66314" },
+      "authorizedScope": "none-task-4.1-locked-pending-visible-integration-worktree-and-zero-compaction-handoff"
     }
   },
   "laneSuccessors": {
@@ -113,6 +126,15 @@
       "currentHead": "d4efb8a7c9040d771ac16d1a7c29da5c5bb7d958",
       "observableCompactions": 0,
       "handoffCapsuleIntegrity": { "canonicalSha256": "4ac3d5c7fcb6c7015352a69a1170057e8e37974c988d12b398fab3a31331afdc", "rawFileSha256": "8a28c8638e173a0d689b696b793eb2f58637c86155aa98d3d8c3045188a8e031" }
+    },
+    "streamlineIntegration": {
+      "threadId": "pending",
+      "generation": 1,
+      "worktree": "pending",
+      "plannedBranch": "pending",
+      "currentHead": "eb637cb0e20f229c6a3a713241b4ace86e449dad",
+      "observableCompactions": 0,
+      "handoffCapsuleIntegrity": { "canonicalSha256": "3b3665541c4c62dcc4ca2e87ef5178f496cd7b28db8293b4894ec7047e46a790", "rawFileSha256": "76a07d6d3d8a0d357997c4648858dcb33ba713877b6d3bc17155705565d66314" }
     }
   },
   "currentChange": {
@@ -130,18 +152,18 @@
       "locked": true,
       "activationAuthorized": false,
       "parallelReadyTaskIds": ["4.1"],
-      "authorizedScope": "Task 4.1 is Integration Lane work. It requires a new visible Integration worktree/thread, clean registration, and zero-compaction handoff acceptance before explicit Controller activation; Library G3 cannot reuse its ownership across the Lane boundary."
+      "authorizedScope": "Task 4.1 is locked current streamline Integration work. Its task capsule, successor capsule, and isolated streamlineIntegration state are registered; a real visible Integration worktree/thread, clean registration, and zero-compaction handoff acceptance remain required before explicit Controller activation. Library G3 and the legacy integrate-routego-image-plugin Integration state cannot authorize this scope."
     }
   },
   "latestDirectCheckpoint": {
-    "lane": "creation-and-library",
-    "event": "TASK_3_5_ACCEPTED_INTEGRATION_4_1_CROSS_LANE_LOCKED",
+    "lane": "creation-library-and-streamline-integration",
+    "event": "TASK_3_5_ACCEPTED_STREAMLINE_INTEGRATION_4_1_REGISTERED_LOCKED",
     "implementationCommit": "24c1e8483a66262b9075fc3621b682878aef3ea3",
     "controllerMergeCommit": "30857ba5f495b39342af55347459a95f14dd4fff",
     "taskStateCommit": "9db7c998da60ea7bf4b0e4cb75b58c046a4a795a",
     "openspecProgress": "13/33",
     "nextTaskIds": ["4.1"],
-    "verification": "Library Task 3.5 focused regressions passed 38/38 within the exact eleven-file scope. Public Trash/delete/restore/permanent-delete and edit-record creation paths were removed while folder/ZIP/download/read remain. The full Library suite retains 32 and typecheck 17 known out-of-scope failures from forbidden zip/manifest.ts old edit fields and old conformance/source-renditions expectations, so no full-suite-green claim is made. Task 4.1 is cross-Lane Integration work and remains locked pending a new visible Integration worktree/thread and zero-compaction handoff acceptance."
+    "verification": "Library Task 3.5 focused regressions passed 38/38 within the exact eleven-file scope. Public Trash/delete/restore/permanent-delete and edit-record creation paths were removed while folder/ZIP/download/read remain. The full Library suite retains 32 and typecheck 17 known out-of-scope failures from forbidden zip/manifest.ts old edit fields and old conformance/source-renditions expectations, so no full-suite-green claim is made. Streamline Task 4.1 now has an isolated current task capsule, successor handoff capsule, and streamlineIntegration state, but remains locked pending a real visible Integration worktree/thread and zero-compaction handoff acceptance; legacy Integration history is not an authority for this scope."
   },
   "currentBlockers": [],
   "approvedDeviations": [
@@ -154,7 +176,8 @@
   ],
   "currentRisks": [
     "Only local, offline contract work is currently authorized; real providers, credentials, images, migrations, installation, deployment and release remain prohibited.",
-    "The legacy integrate-routego-image-plugin change remains separately blocked at task 9.1 by missing Windows and Ubuntu CI evidence."
+    "The legacy integrate-routego-image-plugin change remains separately blocked at task 9.1 by missing Windows and Ubuntu CI evidence.",
+    "Task 4.1 must read only .codex/routego-program/threads/streamline-integration.json through its explicit state-routing key; .codex/routego-program/threads/integration.json is legacy history and must not be used to activate or authorize streamline work."
   ],
   "externalApprovalGates": {
     "tasks": ["6.1", "7.2", "8.2", "9.1"],

@@ -128,6 +128,21 @@ try {
   process.exit(1);
 }
 
+const defaultLaneStatePath = ".codex/routego-program/threads/" + capsule.lane + ".json";
+const stateRouting = capsule.stateRouting ?? {};
+const programLaneKey = stateRouting.programLaneKey ?? capsule.lane;
+const laneStatePath = stateRouting.laneStatePath ?? defaultLaneStatePath;
+if (
+  typeof programLaneKey !== "string" ||
+  !/^[A-Za-z0-9_-]+$/.test(programLaneKey) ||
+  typeof laneStatePath !== "string" ||
+  !laneStatePath.startsWith(".codex/routego-program/threads/") ||
+  !laneStatePath.endsWith(".json") ||
+  laneStatePath.includes("..")
+) {
+  fail("state routing is invalid");
+}
+
 requireFields(
   capsule,
   [
@@ -374,17 +389,17 @@ let program;
 let lane;
 try {
   program = readJson(".codex/routego-program/program.json");
-  lane = readJson(".codex/routego-program/threads/" + capsule.lane + ".json");
+  lane = readJson(laneStatePath);
 } catch (error) {
   fail("cannot read compact current state: " + error.message);
 }
 
 if (program && lane) {
-  const activeApplyOwner = program.activeApplyOwners?.[capsule.lane];
+  const activeApplyOwner = program.activeApplyOwners?.[programLaneKey];
   const programSuccessor =
     program.successor?.lane === capsule.lane
       ? program.successor
-      : program.laneSuccessors?.[capsule.lane];
+      : program.laneSuccessors?.[programLaneKey];
   const correctionSourceRetired = capsule.currentState.correctionSourceRetired === true;
   const successorIsCurrent = /^(registered|accepted|activated)/.test(
     capsule.successor.registrationStatus,
@@ -567,7 +582,7 @@ const fixedBudgetFiles = [
   [capsule.authority.summaryPath, budgets.authoritySummary],
   [capsulePath, budgets.handoffCapsule],
   [".codex/routego-program/program.json", budgets.program],
-  [".codex/routego-program/threads/" + capsule.lane + ".json", budgets.lane],
+  [laneStatePath, budgets.lane],
 ];
 
 for (const [filePath, limit] of fixedBudgetFiles) {
@@ -642,7 +657,7 @@ const scanFiles = [
   capsule.authority.summaryPath,
   ".codex/routego-program/program.json",
   ".codex/routego-program/threads/controller.json",
-  ".codex/routego-program/threads/" + capsule.lane + ".json",
+  laneStatePath,
   ...capsule.completedEvidence.map((evidence) => evidence.path),
 ];
 const forbiddenPayloadPatterns = [
@@ -671,7 +686,7 @@ if (capsule.capsuleSha256 !== capsuleCalculated) {
 if (capsule.hashSemantics !== undefined) {
   const rawFileSha256 = sha256(capsuleBytes);
   const laneIntegrity = lane?.handoffCapsuleIntegrity;
-  const programIntegrity = program?.laneSuccessors?.[capsule.lane]?.handoffCapsuleIntegrity;
+  const programIntegrity = program?.laneSuccessors?.[programLaneKey]?.handoffCapsuleIntegrity;
   if (
     laneIntegrity?.canonicalSha256 !== capsule.capsuleSha256 ||
     programIntegrity?.canonicalSha256 !== capsule.capsuleSha256 ||
