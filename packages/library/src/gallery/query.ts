@@ -1,8 +1,12 @@
 import { createHash } from "node:crypto";
 
 import {
+  generationInfoProjectionSchema,
+  generationRecipeSchema,
   identifierSchema,
   routegoSearchLibraryInputSchema,
+  type GenerationInfoProjection,
+  type GenerationRecipe,
   type RoutegoSearchLibraryInput
 } from "@routego-image/contracts";
 
@@ -39,6 +43,14 @@ export interface LibraryQueryPage {
   readonly total: number;
   readonly nextCursor?: string;
 }
+
+export interface SafeGenerationPreparation {
+  readonly projection: GenerationInfoProjection;
+  readonly recipe: GenerationRecipe;
+}
+
+const unsafeGenerationText =
+  /(?:[A-Za-z]:[\\/]|\\\\[A-Za-z]|\/(?:Users|home|tmp|var|private|opt|mnt)\/|file:|https?:\/\/|\/\/[A-Za-z0-9]|Authorization\s*:|Bearer\s|api[_-]?key|sk-[A-Za-z0-9]{10,}|data:image\/|base64,)/iu;
 
 function compareText(left: string, right: string): number {
   return left === right ? 0 : left < right ? -1 : 1;
@@ -154,6 +166,98 @@ function primaryItem(index: ImageLibraryIndex, asset: StoredLibraryAsset): Libra
     throw new LibraryError("config_corrupt", "The Library search metadata is inconsistent.");
   }
   return { asset, rendition, blob };
+}
+
+function eligibleGeneration(index: ImageLibraryIndex, recordId: string): StoredLibraryAsset {
+  const asset = index.assets.find((candidate) => candidate.id === recordId);
+  if (!asset) {
+    throw new LibraryError("not_found", "The requested generation record does not exist.");
+  }
+  if (asset.kind !== "generate" || asset.status === "deleted") {
+    throw new LibraryError("conflict", "The requested record is not an active generation record.");
+  }
+  primaryItem(index, asset);
+  return asset;
+}
+
+function safePrompt(asset: StoredLibraryAsset): string {
+  if (unsafeGenerationText.test(asset.prompt)) {
+    throw new LibraryError(
+      "conflict",
+      "The generation record cannot be projected as path-free information."
+    );
+  }
+  return asset.prompt;
+}
+
+function orderedEligibleReferenceIds(index: ImageLibraryIndex, asset: StoredLibraryAsset): readonly string[] {
+  const references = [...asset.relationships]
+    .filter((relationship) => relationship.role === "reference")
+    .sort((left, right) => left.order - right.order || left.id.localeCompare(right.id));
+  if (references.length > 5) {
+    throw new LibraryError("conflict", "The generation record has too many references to prepare.");
+  }
+  for (const reference of references) {
+    try {
+      eligibleGeneration(index, reference.relatedAssetId);
+    } catch (error) {
+      if (error instanceof LibraryError && (error.code === "not_found" || error.code === "conflict")) {
+        throw new LibraryError(
+          "conflict",
+          "A referenced generation record is no longer available for preparation.",
+          { details: { referenceId: reference.relatedAssetId } }
+        );
+      }
+      throw error;
+    }
+  }
+  return references.map((reference) => reference.relatedAssetId);
+}
+
+/**
+ * Builds only the browser- and tool-safe fields needed to copy or repeat a saved generation.
+ * It intentionally resolves metadata only: no blobs, filesystem paths, mutations, or providers.
+ */
+export function prepareSafeGeneration(
+  index: ImageLibraryIndex,
+  recordId: string
+): SafeGenerationPreparation {
+  const asset = eligibleGeneration(index, recordId);
+  const prompt = safePrompt(asset);
+  const referenceIds = orderedEligibleReferenceIds(index, asset);
+  const parameters = asset.effectiveParams;
+  const projection = generationInfoProjectionSchema.parse({
+    recordId: asset.id,
+    prompt,
+    referenceIds,
+    parameters: {
+      size: parameters.size,
+      aspectRatio: parameters.aspectRatio,
+      quality: parameters.quality,
+      format: parameters.format,
+      ...(parameters.compression === undefined ? {} : { compression: parameters.compression }),
+      count: parameters.count,
+      transparentMode: parameters.transparentMode,
+      moderation: parameters.moderation
+    }
+  });
+  const recipe = generationRecipeSchema.parse({
+    kind: "generate",
+    sourceRecordId: asset.id,
+    prompt,
+    referenceIds,
+    size: parameters.size,
+    aspectRatio: parameters.aspectRatio,
+    quality: parameters.quality,
+    format: parameters.format,
+    ...(parameters.compression === undefined ? {} : { compression: parameters.compression }),
+    count: parameters.count,
+    partialImages: parameters.partialImages,
+    transparentMode: parameters.transparentMode,
+    moderation: parameters.moderation,
+    saveToLibrary: parameters.saveToLibrary
+  });
+  return { projection, recipe };
 }
 
 function matches(input: ParsedSearchInput, item: LibraryQueryItem): boolean {

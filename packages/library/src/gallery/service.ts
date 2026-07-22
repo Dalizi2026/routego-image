@@ -3,6 +3,8 @@ import {
   routegoManageLibraryResultSchema,
   type ExecuteLibraryMutationInput,
   type ExecuteLibraryMutationResult,
+  type CopyGenerationInfoInput,
+  type CopyGenerationInfoResult,
   type GetAssetDetailInput,
   type GetAssetDetailResult,
   type GetBrowserResourceInput,
@@ -17,6 +19,8 @@ import {
   type RoutegoManageLibraryResult,
   type RoutegoSearchLibraryInput,
   type RoutegoSearchLibraryResult,
+  type RoutegoPrepareRegenerationInput,
+  type RoutegoPrepareRegenerationResult,
   type RoutegoService,
   type StudioLibrarySearchInput,
   type StudioLibrarySearchResult,
@@ -70,6 +74,16 @@ export class GalleryService
     input: StudioLibrarySearchInput
   ): Promise<StudioLibrarySearchResult> {
     return await this.#read.searchStudioLibrary(input);
+  }
+
+  async copyGenerationInfo(input: CopyGenerationInfoInput): Promise<CopyGenerationInfoResult> {
+    return await this.#read.copyGenerationInfo(input);
+  }
+
+  async prepareRegeneration(
+    input: RoutegoPrepareRegenerationInput
+  ): Promise<RoutegoPrepareRegenerationResult> {
+    return await this.#read.prepareRegeneration(input);
   }
 
   async listFolders(input: ListFoldersInput): Promise<ListFoldersResult> {

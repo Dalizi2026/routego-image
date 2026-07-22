@@ -1,4 +1,6 @@
 import {
+  copyGenerationInfoInputSchema,
+  copyGenerationInfoResultSchema,
   getAssetDetailInputSchema,
   getAssetDetailResultSchema,
   getBrowserResourceInputSchema,
@@ -8,9 +10,13 @@ import {
   reorderFoldersResultSchema,
   routegoSearchLibraryInputSchema,
   routegoSearchLibraryResultSchema,
+  routegoPrepareRegenerationInputSchema,
+  routegoPrepareRegenerationResultSchema,
   routegoServiceErrorSchema,
   studioLibrarySearchInputSchema,
   studioLibrarySearchResultSchema,
+  type CopyGenerationInfoInput,
+  type CopyGenerationInfoResult,
   type GetAssetDetailInput,
   type GetAssetDetailResult,
   type GetBrowserResourceInput,
@@ -23,6 +29,8 @@ import {
   type ReorderFoldersResult,
   type RoutegoSearchLibraryInput,
   type RoutegoSearchLibraryResult,
+  type RoutegoPrepareRegenerationInput,
+  type RoutegoPrepareRegenerationResult,
   type RoutegoServiceError,
   type StudioLibrarySearchInput,
   type StudioLibrarySearchResult
@@ -41,7 +49,7 @@ import type {
   StoredImageBlob,
   StoredLibraryAsset
 } from "./model";
-import { queryLibraryIndex } from "./query";
+import { prepareSafeGeneration, queryLibraryIndex } from "./query";
 import {
   BrowserResourceRegistry,
   type BrowserResourceRegistryOptions
@@ -133,21 +141,20 @@ function primaryBlob(index: ImageLibraryIndex, asset: StoredLibraryAsset): Store
 }
 
 function allowedActions(asset: StoredLibraryAsset): LibraryAssetDetail["allowedActions"] {
-  if (asset.status === "deleted") {
-    return ["restore", "permanent-delete", "export-zip", "download"];
-  }
   const actions: LibraryAssetDetail["allowedActions"][number][] = [];
-  if (asset.status === "succeeded" || asset.status === "partial") actions.push("edit");
-  if (asset.status === "succeeded" || asset.status === "partial" || asset.status === "failed") {
-    actions.push("retry");
+  if (asset.status !== "deleted") {
+    actions.push("assign-folders");
+    if (asset.folderIds.length > 0) actions.push("remove-folders");
+    if (asset.kind === "generate") actions.push("mark", "copy-generation-info");
   }
-  actions.push("assign-folders");
-  if (asset.folderIds.length > 0) actions.push("remove-folders");
-  actions.push("soft-delete", "export-zip", "download");
+  actions.push("export-zip", "download");
   return actions;
 }
 
 function detailFromIndex(index: ImageLibraryIndex, asset: StoredLibraryAsset): LibraryAssetDetail {
+  if (asset.kind !== "generate") {
+    throw new LibraryError("conflict", "Legacy edit records cannot be projected through Library detail.");
+  }
   const blob = primaryBlob(index, asset);
   const foldersById = new Map(index.folders.map((folder) => [folder.id, folder]));
   const folders = asset.folderIds
@@ -176,6 +183,7 @@ function detailFromIndex(index: ImageLibraryIndex, asset: StoredLibraryAsset): L
     requestedParams: asset.requestedParams,
     effectiveParams: asset.effectiveParams,
     execution: asset.execution,
+    currentMark: index.currentMarkRecordId === asset.id,
     ...(asset.error === undefined ? {} : { error: pathFreeStoredError(asset.error) }),
     renditions: [...asset.renditions]
       .sort(
@@ -294,6 +302,45 @@ export class LibraryReadService {
       items,
       ...(page.nextCursor === undefined ? {} : { nextCursor: page.nextCursor }),
       total: page.total
+    });
+  }
+
+  async copyGenerationInfo(input: CopyGenerationInfoInput): Promise<CopyGenerationInfoResult> {
+    const parsed = copyGenerationInfoInputSchema.parse(input);
+    try {
+      const prepared = prepareSafeGeneration(await this.#indexStore.read(), parsed.recordId);
+      return copyGenerationInfoResultSchema.parse({
+        schemaVersion: 1,
+        status: "succeeded",
+        projection: prepared.projection,
+        clipboardText: JSON.stringify(prepared.projection),
+        providerRequestCount: 0
+      });
+    } catch (error) {
+      return copyGenerationInfoResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        providerRequestCount: 0,
+        error: serviceError(error, "The generation information is unavailable.")
+      });
+    }
+  }
+
+  async prepareRegeneration(
+    input: RoutegoPrepareRegenerationInput
+  ): Promise<RoutegoPrepareRegenerationResult> {
+    const parsed = routegoPrepareRegenerationInputSchema.parse(input);
+    const index = await this.#indexStore.read();
+    const recordId = parsed.recordId ?? index.currentMarkRecordId;
+    if (recordId === undefined) {
+      throw new LibraryError("not_found", "No generation record is currently marked.");
+    }
+    const prepared = prepareSafeGeneration(index, recordId);
+    return routegoPrepareRegenerationResultSchema.parse({
+      schemaVersion: 1,
+      recipe: prepared.recipe,
+      providerRequestCount: 0,
+      markUnchanged: true
     });
   }
 
