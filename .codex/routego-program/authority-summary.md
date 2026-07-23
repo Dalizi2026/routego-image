@@ -47,9 +47,9 @@
 
 ## 双路径回报
 
-- 主链：当前 apply owner 每完成任务、任务组、安全 checkpoint、阻塞、偏差、handoff、activation 或 delivery，立即 send_message_to_thread 到 Controller G12 线程 019f8275-18a6-7061-8a46-e177bf0bd3bc，并 read_thread 确认。
-- 兜底：routego-program-continuity 每 30 分钟只检查紧凑状态中的漏报，以 latestDirectCheckpoint 去重并归档自己的运行任务。
-- task 创建、registration、acceptance、Controller/sole-owner activation 必须重复确认低上下文、无损 evidence、预算和双路径回报。final 标签不算送达，heartbeat 不自动继承。Controller G12 只调度和独立验收，不代替 streamline apply-owner 写产品实现或勾选其任务。
+- 唯一主链：当前 apply owner 每完成任务、任务组、安全 checkpoint、阻塞、偏差、handoff、activation 或 delivery，立即 `send_message_to_thread` 到当前 Controller；Controller 收到后必须 `read_thread` 确认，并在同一回合完成验收、激活、交接或归档。final 标签不算送达。
+- heartbeat、轮询或自动化只能检查遗漏回传，绝不得唤醒、激活、推进、验收或代替线程间回传；漏报时必须保持任务锁定并作为治理失败处理。
+- task 创建、registration、acceptance、Controller/sole-owner activation 必须重复确认低上下文、无损 evidence、预算和直接回传链。Controller 只调度和独立验收，不代替 streamline apply-owner 写产品实现或勾选其任务。
 
 ## 外部授权和安全
 

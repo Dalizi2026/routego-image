@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "1085d7392bf66ae680dabee1a85c0a3c8d86e83ed5f895e72d080230133de603",
+  "contentSha256": "a152a94ddbaf3ecd204201d3bf7f9233ad148179a1c35982eacab144f926ee20",
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "taskId": "4.5",
@@ -79,5 +79,5 @@
     "applyAuthorized": false
   },
   "externalStateAuthorized": false,
-  "reportingContract": "After every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request, send_message_to_thread to the Controller and then read_thread to confirm receipt."
+  "reportingContract": "After every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request, send_message_to_thread to the Controller and then read_thread to confirm receipt. Heartbeat, polling, automation, final answers, and user follow-up must never replace this direct thread-to-thread continuation chain."
 }

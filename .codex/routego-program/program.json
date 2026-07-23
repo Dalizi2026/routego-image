@@ -7,7 +7,7 @@
   "productPlan": "routego-image-1.0-plan.md",
   "authoritySummary": {
     "path": ".codex/routego-program/authority-summary.md",
-    "sha256": "3121480259a6560ac37fa63182c70d23f6c9bcfab9fc56963564eed4372b1382"
+    "sha256": "a71ad03124c05eded3c80d75ab1caa8dc6ad42a7774f87d077956902a4842d91"
   },
   "governance": {
     "activeDecisions": [
@@ -132,7 +132,7 @@
       "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/integration-4.5.json",
-        "sha256": "1085d7392bf66ae680dabee1a85c0a3c8d86e83ed5f895e72d080230133de603"
+        "sha256": "a152a94ddbaf3ecd204201d3bf7f9233ad148179a1c35982eacab144f926ee20"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json",

@@ -46,11 +46,11 @@ handoff capsule 必须通过 `.codex/routego-program/scripts/validate-handoff-ca
 - 子代理不得再创建新的用户顶层任务，除非上下文交接协议明确要求创建继任任务。
 - 常规步骤、读取进度和非阻塞发现不回传 Program Controller；只回传真实阻塞、契约变更请求和最终交付。
 - Program Controller 通过任务状态文件和 `read_thread` 主动检查进度，避免把所有工作日志灌入控制线程上下文。
-- 线程输出 final answer 后即进入 idle，不具备持续轮询能力。禁止写“你无需操作，其他任务完成后我会自动继续”，除非已经配置明确的 follow-up 发送方或 heartbeat。
+- 自动开发的唯一续接主链是线程间直接回传：任务线程在完成、阻塞、偏差、交付、交接或等待激活时，必须调用 `send_message_to_thread` 向 Controller 发送结构化消息，以该消息触发 Controller 的下一轮；Controller 必须立即调用 `read_thread` 确认并完成验收、激活、交接或归档。任务线程不得只输出 final answer 后静默 idle，也不得要求用户手动唤醒 Controller。
 - 强制线程清理：由自动化或 Controller 创建的任务线程在其交付被 Controller 验收、Git 已干净且不存在后续激活范围后，必须立即调用 `set_thread_archived` 归档。不得保留已完成、失败、取消或空闲的自动任务线程；不得归档当前 Controller、正在执行的唯一 apply owner，或仍在等待验收的交付线程。平台不支持物理删除时，归档视为唯一允许的清理动作。
 - 有依赖关系的任务必须在完成时调用 `send_message_to_thread`，向依赖线程发送结构化完成消息并触发新一轮。
 - 结构化完成消息至少包含任务类型、分支、完整 commit SHA、交付文件、验证结果和阻塞项。
-- 关键链路使用 heartbeat 兜底时，直接完成消息仍是主路径；依赖满足后立即删除或暂停 heartbeat。
+- heartbeat、轮询或自动化只能用于只读健康审计和漏报告警，绝不得用于唤醒、激活、推进、验收或代替线程间直接回传。直接回传失败即为治理失败，必须保留当前任务锁定并报告 Controller。
 
 ## OpenSpec 所有权
 
@@ -88,7 +88,7 @@ handoff capsule 必须通过 `.codex/routego-program/scripts/validate-handoff-ca
 - 交接前不得开始新的大型任务；在安全边界提交工作，并在 `.codex/routego-program/handoffs/` 写清单。
 - 继任任务必须从提交后的 branch/commit 创建，不使用携带完整旧历史的 fork。
 - 继任任务确认 commit、OpenSpec 状态和下一任务后，旧任务才允许归档。
-- 第 3 次可观测压缩或提前健康交接所创建的每一个继任任务，必须完整继承“直接回传主链 + 定时自动化兜底链”约束。Controller 必须在 task 创建提示、registration、handoff acceptance 和 sole-owner activation 中重复写明该约束。
+- 第 3 次可观测压缩或提前健康交接所创建的每一个继任任务，必须完整继承“线程间直接回传主链”约束。Controller 必须在 task 创建提示、registration、handoff acceptance 和 sole-owner activation 中重复写明：不得依赖 heartbeat、轮询或自动化推进任务。
 - 同一四个治理节点还必须重复确认：PD-008 分层读取、无损 history/evidence 引用、12 文件/120 KiB 启动预算和 acceptance 前零压缩门禁。
 - 继任任务的接管确认只有在其明确承诺：每个 OpenSpec 任务、任务组、安全检查点、阻塞、偏差、交接和交付完成后立即调用真实 `send_message_to_thread` 回传 Controller，并调用 `read_thread` 确认送达后才有效；仅输出 final 标签或等待自动化不算完成。
 - 若继任任务未确认上述回传契约，旧任务不得归档，继任任务不得成为唯一 apply-owner，也不得开始下一项产品任务。
