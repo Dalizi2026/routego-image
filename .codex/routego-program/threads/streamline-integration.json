@@ -2,35 +2,35 @@
   "schemaVersion": 2,
   "lane": "integration",
   "change": "streamline-routego-image-generation",
-  "role": "openspec-apply-owner-task-4.3-candidate-existing-controller-worktree",
-  "status": "task-4.3-activated-sole-apply-owner",
+  "role": "openspec-apply-owner-task-4.4-candidate-existing-controller-worktree",
+  "status": "task-4.4-registered-candidate-locked",
   "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-  "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
+  "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "generation": 1,
-  "currentHead": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
+  "generation": 2,
+  "currentHead": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
-    "id": "4.3",
-    "status": "active-exact-browser-library-route-scope",
-    "locked": false
+    "id": "4.4",
+    "status": "registered-atomic-provider-switch-scope",
+    "locked": true
   },
   "sourceOwner": {
-    "threadId": "019f8c69-762a-7241-b60c-4dbaae764102",
+    "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
-    "role": "task-4.2-completed-controller-accepted-archived",
+    "role": "task-4.3-completed-controller-accepted-archived",
     "soleApplyOwner": false,
     "archived": true,
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "status": "registration-pending-validator",
-    "path": ".codex/routego-program/handoffs/integration-generation-2-streamline.capsule.json"
+    "status": "registered-candidate-validator-pending",
+    "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json"
   },
   "reportingContract": {
     "currentControllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
@@ -48,9 +48,9 @@
   },
   "externalStateAuthorized": false,
   "lastCompletedTask": {
-    "id": "4.2",
-    "implementationCommit": "04434d178029f728632549be437ce9dfe54f4384",
-    "taskStateCommit": "eff27ba3dd0648f50dea386d7fa1d6725e56d5f9",
+    "id": "4.3",
+    "implementationCommit": "604f987f730815fcb2a6ea60ffa2a57ef5e11c99",
+    "taskStateCommit": "7a637977ad85c73a9414b04831ce25fbdaea09fc",
     "handoffAcceptanceObservableCompactions": 0
   }
 }

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "a5f6a3f229db81e351b5522f1749b3c5c05f0662d5b9fc2c3467b4e621d41a63",
+  "lane": "integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "4.4",
+  "status": "registered-candidate-locked-zero-compaction-acceptance-pending",
+  "sourceCommit": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "5a9bcdc09e99eb4958ade3cc4a680aa31d8f56a3ac6564f3eb09f8b614eb9e5f",
+    "lineSha256": "08b87a895b42bc5e17df78879b63e02ccc3c979ae1545f0b75104483f813f670"
+  },
+  "dependencies": ["4.2"],
+  "allowedFiles": [
+    "packages/contracts/src/service.ts",
+    "packages/contracts/test/settings-service.test.ts",
+    "packages/library/src/config/store.ts",
+    "packages/library/src/service.ts",
+    "packages/library/test/config/store.test.ts",
+    "packages/integration/src/composition/service.ts",
+    "packages/integration/test/provider.test.ts",
+    "packages/integration/test/routes.test.ts",
+    "packages/integration/test/service.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/studio/**",
+    "packages/contracts/src/settings.ts",
+    "packages/contracts/src/tools.ts",
+    "packages/library/src/gallery/**",
+    "packages/integration/src/runtime/**",
+    "packages/integration/src/composition/inputs.ts",
+    "packages/integration/src/composition/results.ts",
+    "packages/integration/src/image/**",
+    "packages/integration/src/provider/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Register the existing browser-safe provider-switch schemas as a Studio-only authenticated service operation without changing the seven public MCP/HTTP operations.",
+    "Validate the selected configured profile, retain the active model when it is valid for that profile, otherwise select a valid target default, then commit profile and model in one Library configuration lock and one revision.",
+    "Project only the safe switch result through Integration and preserve immutable provider/model/global-control snapshots for submissions already accepted before a switch.",
+    "Do not add a Creation dispatcher route, public MCP tool, Studio UI, provider request, credential access, external state, migration, deletion, installation, deployment, or release behavior."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/integration exec vitest run --config vitest.config.ts test/provider.test.ts test/routes.test.ts test/service.test.ts -t 'Task 4.4'",
+    "pnpm --filter @routego-image/library exec vitest run --config vitest.config.ts test/config/store.test.ts -t 'Task 4.4'",
+    "pnpm --filter @routego-image/contracts exec vitest run --config vitest.config.ts test/settings-service.test.ts -t 'Task 4.4'",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "d38323ef71751330d4d5f1efa9f1aa576e3c83f38c87dd0ba83ff1cda6008e69",
+      "reason": "Studio-only provider activation contract and frozen seven public operations."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-application-shell/spec.md",
+      "sha256": "97b70925bf28811730ed6efe4ed4b0c38769604dbcd7ac1b9231397480391900",
+      "reason": "Header same-model/default-fallback and future-submission behavior."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-creation-workbench/spec.md",
+      "sha256": "ae1a5e1809e045c9f5b00c9ee9931e1d8e322059224038c1de930a2e0090e9dc",
+      "reason": "Active request submission snapshots remain immutable after a switch."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-4.4-contracts-library-integration-atomic-provider-switch",
+  "activation": {
+    "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "controllerGeneration": 12,
+    "workerThreadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
+    "workerGeneration": 2,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
+  },
+  "externalStateAuthorized": false
+}

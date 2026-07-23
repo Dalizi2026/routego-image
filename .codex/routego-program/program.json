@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-4.3-activated",
+  "status": "controller-generation-12-task-4.4-registered-locked",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-4.3-activated",
+    "status": "authoritative-controller-generation-12-task-4.4-registered-locked",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -122,26 +122,26 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.3-activated-sole-apply-owner",
-      "taskRef": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
-      "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
-      "generation": 1,
-      "taskId": "4.3",
+      "status": "task-4.4-registered-candidate-locked",
+      "taskRef": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
+      "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
+      "generation": 2,
+      "taskId": "4.4",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
+      "currentHead": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/integration-4.3.json",
-        "sha256": "ed658151c558b7ef293aaf5e7d3af3daf0b05e8804561961ecccbc504655efef"
+        "path": ".codex/routego-program/tasks/integration-4.4.json",
+        "sha256": "a5f6a3f229db81e351b5522f1749b3c5c05f0662d5b9fc2c3467b4e621d41a63"
       },
       "handoffCapsule": {
-        "path": ".codex/routego-program/handoffs/integration-generation-2-streamline.capsule.json",
-        "sha256": "9cdbfe86b362fd5f635f2dff0b916da06ff1cbd6a3d7098f8fb3008d8dd76507"
+        "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json",
+        "sha256": "bb8d799a6a7c9cb047237049fae3f4590ac6e0e10bdbf15ec487197c60599a02"
       },
-      "authorizedScope": "Task 4.3 exact browser-safe mark/copy Library routes and stale-route rejection only.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "4.2"
+      "authorizedScope": "Task 4.4 registered scope: Contracts service registration, Library atomic profile/model persistence, and Integration projection only; product work remains locked pending validated zero-compaction acceptance.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "4.3"
     }
   },
   "laneSuccessors": {
@@ -172,14 +172,14 @@
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
-      "generation": 1,
+      "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
+      "generation": 2,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
+      "currentHead": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
       "observableCompactions": 0,
-      "lastCompletedTask": "4.2",
-      "status": "task-4.3-activated-sole-apply-owner"
+      "lastCompletedTask": "4.3",
+      "status": "task-4.4-registered-candidate-locked"
     }
   },
   "currentChange": {
@@ -187,7 +187,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 15,
+      "completedTasks": 16,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -203,30 +203,31 @@
         "3.4",
         "3.5",
         "4.1",
-        "4.2"
+        "4.2",
+        "4.3"
       ],
       "readyTaskIds": [],
-      "nextTaskId": "4.3"
+      "nextTaskId": "4.4"
     },
     "currentTask": {
-      "id": "4.3",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "4.4",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 4.3 is registered but locked. Only the existing candidate thread may be activated after the current-change capsule validates, the worktree is clean, and zero-observable-compression acceptance succeeds."
+      "authorizedScope": "Task 4.4 is registered and locked. Only the existing candidate thread may be activated after the current-change capsule validates, the worktree is clean, and zero-observable-compression acceptance succeeds."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "streamline-integration",
-    "event": "TASK_4_1_ACCEPTED_TASK_STATE_CONFIRMED",
-    "implementationCommit": "70fa66b856b693e405b9539bdf9adf7e4bbe358e",
-    "controllerMergeCommit": "f313b062f9923b4f54ad333e03f2c8a621f0c9c1",
-    "taskStateCommit": "1b8314472fe56e5e94b49c5ee2af494fa156c8fd",
-    "openspecProgress": "14/33",
+    "event": "TASK_4_3_ACCEPTED_TASK_STATE_CONFIRMED",
+    "implementationCommit": "604f987f730815fcb2a6ea60ffa2a57ef5e11c99",
+    "controllerMergeCommit": "7a637977ad85c73a9414b04831ce25fbdaea09fc",
+    "taskStateCommit": "7a637977ad85c73a9414b04831ce25fbdaea09fc",
+    "openspecProgress": "16/33",
     "nextTaskIds": [
-      "4.2"
+      "4.4"
     ],
-    "verification": "Five direct Task 4.1 assertions passed in three files; 26 later-owned legacy assertions were retained and skipped by the approved explicit selection. Task 4.1 task-state commit is single-file and clean. Task 4.2 is locked."
+    "verification": "Task 4.3 direct browser-route regressions and complete routes file passed; later-owned legacy assertions remain preserved. Task 4.4 is registered and locked pending fresh capsule acceptance."
   },
   "currentBlockers": [],
   "approvedDeviations": [
