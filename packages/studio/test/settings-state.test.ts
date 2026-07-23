@@ -9,6 +9,7 @@ import type {
 import {
   SettingsFormError,
   applySimpleConnectionEndpoint,
+  activeSettingsModel,
   activeSettingsProfile,
   buildCapabilityProbeInput,
   buildDefaultsSettingsInput,
@@ -18,10 +19,12 @@ import {
   clearOutputDirectorySensitiveDraft,
   createOutputDirectoryDraft,
   createProviderProfileDraft,
+  isValidatedActiveProviderResult,
   mergeActiveProviderProfile,
   mergeRefreshedModels,
   mergeRemovedProviderProfile,
-  mergeUpsertProviderProfile
+  mergeUpsertProviderProfile,
+  providerSwitchFeedback
 } from "../src/features/settings";
 
 const endpoint = {
@@ -194,6 +197,49 @@ describe("secret-safe Settings state and request construction", () => {
       activeProviderId: created.id
     });
     expect(removed.profiles.map((item) => item.id)).toEqual([created.id]);
+  });
+
+  it("previews retained/default models and trusts only the requested validated activation", () => {
+    const retainedTarget: ProviderProfileDescriptor = {
+      ...profile,
+      id: "provider-b",
+      name: "Synthetic relay B",
+      isActive: false,
+      defaultModel: "synthetic-image-model-v2",
+      models: ["synthetic-image-model", "synthetic-image-model-v2"]
+    };
+    const defaultTarget: ProviderProfileDescriptor = {
+      ...retainedTarget,
+      id: "provider-c",
+      name: "Synthetic relay C",
+      models: ["synthetic-image-model-v3"],
+      defaultModel: "synthetic-image-model-v3"
+    };
+    const current = { ...settings, profiles: [profile, retainedTarget, defaultTarget] };
+
+    expect(activeSettingsModel(current)).toBe("synthetic-image-model");
+    expect(providerSwitchFeedback(current, retainedTarget.id)).toEqual({
+      providerId: retainedTarget.id,
+      model: "synthetic-image-model",
+      retainedModel: true
+    });
+    expect(providerSwitchFeedback(current, defaultTarget.id)).toEqual({
+      providerId: defaultTarget.id,
+      model: "synthetic-image-model-v3",
+      retainedModel: false
+    });
+
+    const result = {
+      schemaVersion: 1 as const,
+      activeProviderId: defaultTarget.id,
+      profile: { ...defaultTarget, isActive: true }
+    };
+    expect(isValidatedActiveProviderResult(result, defaultTarget.id)).toBe(true);
+    expect(isValidatedActiveProviderResult(result, retainedTarget.id)).toBe(false);
+    const merged = mergeActiveProviderProfile(current, result);
+    expect(merged.activeProviderId).toBe(defaultTarget.id);
+    expect(merged.defaults.model).toBe("synthetic-image-model-v3");
+    expect(activeSettingsProfile(merged)?.id).toBe(defaultTarget.id);
   });
 
   it("builds complete defaults and all distinct output-directory operations", () => {

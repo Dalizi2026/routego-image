@@ -19,7 +19,8 @@ import type {
   OptionalProviderEndpointDraft,
   OutputDirectoryDraft,
   ProviderEndpointDraft,
-  ProviderProfileDraft
+  ProviderProfileDraft,
+  ProviderSwitchFeedback
 } from "./types";
 
 export class SettingsFormError extends Error {
@@ -247,8 +248,58 @@ export function mergeActiveProviderProfile(
   return {
     ...current,
     activeProviderId: result.activeProviderId,
-    profiles: alignActiveProfiles(profiles, result.activeProviderId)
+    profiles: alignActiveProfiles(profiles, result.activeProviderId),
+    defaults:
+      result.profile.defaultModel === undefined
+        ? current.defaults
+        : { ...current.defaults, model: result.profile.defaultModel }
   };
+}
+
+export function activeSettingsModel(settings: ReadSettingsResult): string | undefined {
+  const activeProfile = activeSettingsProfile(settings);
+  return (
+    settings.defaults.model?.trim() ||
+    activeProfile?.defaultModel?.trim() ||
+    activeProfile?.models[0]?.trim() ||
+    undefined
+  );
+}
+
+export function providerSwitchFeedback(
+  settings: ReadSettingsResult,
+  providerId: string
+): ProviderSwitchFeedback {
+  const target = settings.profiles.find((profile) => profile.id === providerId);
+  const currentModel = activeSettingsModel(settings);
+  if (target === undefined) {
+    return { providerId, retainedModel: false };
+  }
+  if (currentModel !== undefined && target.models.includes(currentModel)) {
+    return { providerId, model: currentModel, retainedModel: true };
+  }
+  const model = target.defaultModel?.trim() || target.models[0]?.trim() || undefined;
+  return {
+    providerId,
+    ...(model === undefined ? {} : { model }),
+    retainedModel: false
+  };
+}
+
+export function isValidatedActiveProviderResult(
+  value: unknown,
+  requestedProviderId: string
+): value is SetActiveProviderProfileResult {
+  if (typeof value !== "object" || value === null) return false;
+  const candidate = value as Partial<SetActiveProviderProfileResult>;
+  return (
+    candidate.schemaVersion === 1 &&
+    candidate.activeProviderId === requestedProviderId &&
+    typeof candidate.profile === "object" &&
+    candidate.profile !== null &&
+    candidate.profile.id === requestedProviderId &&
+    candidate.profile.isActive === true
+  );
 }
 
 export function mergeRefreshedModels(

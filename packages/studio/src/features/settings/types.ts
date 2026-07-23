@@ -60,6 +60,12 @@ export interface SettingsWorkspaceProps {
   readonly onOpenWorkbench?: (() => void) | undefined;
 }
 
+export interface ProviderSwitchFeedback {
+  readonly providerId: string;
+  readonly model?: string | undefined;
+  readonly retainedModel: boolean;
+}
+
 export interface CapabilityProbePresentation {
   readonly result: CapabilityProbeResult;
   readonly provider?: ProviderProfileDescriptor | undefined;

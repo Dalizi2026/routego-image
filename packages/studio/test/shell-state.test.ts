@@ -80,6 +80,45 @@ describe("Studio shell state and responsive helpers", () => {
     ).toMatchObject({ route: "library", notices: [] });
   });
 
+  it("tracks provider switching without changing route state", () => {
+    const loading = studioAppReducer(initialStudioAppState, {
+      type: "provider-switch-start",
+      providerId: "provider-2"
+    });
+    expect(loading).toMatchObject({
+      route: "workbench",
+      providerSwitch: { status: "loading", providerId: "provider-2" }
+    });
+
+    const success = studioAppReducer(loading, {
+      type: "provider-switch-success",
+      providerId: "provider-2",
+      model: "image-2",
+      retainedModel: false
+    });
+    expect(success.providerSwitch).toEqual({
+      status: "success",
+      providerId: "provider-2",
+      model: "image-2",
+      retainedModel: false
+    });
+
+    expect(
+      studioAppReducer(success, {
+        type: "provider-switch-failure",
+        providerId: "provider-1",
+        message: "Safe failure"
+      })
+    ).toMatchObject({
+      route: "workbench",
+      providerSwitch: {
+        status: "failure",
+        providerId: "provider-1",
+        message: "Safe failure"
+      }
+    });
+  });
+
   it("uses bottom navigation only below the mobile breakpoint", () => {
     expect(navigationModeForWidth(320)).toBe("bottom");
     expect(navigationModeForWidth(719)).toBe("bottom");

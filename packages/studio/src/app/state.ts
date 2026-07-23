@@ -18,16 +18,41 @@ export interface AppNotice {
 export interface StudioAppState {
   readonly route: StudioRoute;
   readonly notices: readonly AppNotice[];
+  readonly providerSwitch: ProviderSwitchState;
 }
+
+export type ProviderSwitchState =
+  | { readonly status: "idle" }
+  | { readonly status: "loading"; readonly providerId: string }
+  | {
+      readonly status: "success";
+      readonly providerId: string;
+      readonly model: string;
+      readonly retainedModel: boolean;
+    }
+  | { readonly status: "failure"; readonly providerId: string; readonly message: string };
 
 export type StudioAppAction =
   | { readonly type: "navigate"; readonly route: StudioRoute }
   | { readonly type: "replace-notices"; readonly notices: readonly AppNotice[] }
-  | { readonly type: "dismiss-notice"; readonly id: string };
+  | { readonly type: "dismiss-notice"; readonly id: string }
+  | { readonly type: "provider-switch-start"; readonly providerId: string }
+  | {
+      readonly type: "provider-switch-success";
+      readonly providerId: string;
+      readonly model: string;
+      readonly retainedModel: boolean;
+    }
+  | {
+      readonly type: "provider-switch-failure";
+      readonly providerId: string;
+      readonly message: string;
+    };
 
 export const initialStudioAppState: StudioAppState = {
   route: "workbench",
-  notices: []
+  notices: [],
+  providerSwitch: { status: "idle" }
 };
 
 export interface FirstRunReadiness {
@@ -69,6 +94,30 @@ export function studioAppReducer(
       return { ...state, notices: action.notices };
     case "dismiss-notice":
       return { ...state, notices: state.notices.filter((notice) => notice.id !== action.id) };
+    case "provider-switch-start":
+      return {
+        ...state,
+        providerSwitch: { status: "loading", providerId: action.providerId }
+      };
+    case "provider-switch-success":
+      return {
+        ...state,
+        providerSwitch: {
+          status: "success",
+          providerId: action.providerId,
+          model: action.model,
+          retainedModel: action.retainedModel
+        }
+      };
+    case "provider-switch-failure":
+      return {
+        ...state,
+        providerSwitch: {
+          status: "failure",
+          providerId: action.providerId,
+          message: action.message
+        }
+      };
   }
 }
 
