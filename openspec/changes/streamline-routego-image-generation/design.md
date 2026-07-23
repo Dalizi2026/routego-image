@@ -91,6 +91,8 @@ The migration has explicit phases:
 
 Any generation-to-edit dependency aborts the entire migration before mutation and returns record IDs, not paths. Development tests use synthetic temporary directories only. The shipped migration cannot infer consent from application startup, plugin installation, or a previous unrelated confirmation.
 
+The fixture-only migration implementation is not a browser route. Until a separately approved real-data migration change supplies a production gateway and its explicit authorization record, Integration SHALL reject migration-preflight and migration-confirmation URLs without reading or mutating Library data. Task 4.3 exposes only the already safe mark and copy-information operations; it must not turn a browser request into migration consent.
+
 Alternative considered: delete legacy entries while parsing schema v1. Rejected because parsing would become destructive and dependency conflicts could leave partial state.
 
 ### 6. Represent regeneration as safe data preparation
