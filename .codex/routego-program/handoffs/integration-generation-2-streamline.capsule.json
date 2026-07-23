@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "75370435a36dc3fd59718cd578de0042f76a6e02700b8cdafa02955a7221d9e1",
+  "capsuleSha256": "9cdbfe86b362fd5f635f2dff0b916da06ff1cbd6a3d7098f8fb3008d8dd76507",
   "lane": "integration",
   "stateRouting": {
     "programLaneKey": "streamlineIntegration",
@@ -23,7 +23,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
     "startingCommit": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
-    "registrationStatus": "registered-awaiting-zero-compaction-acceptance",
+    "registrationStatus": "activated-sole-apply-owner-zero-compaction-acceptance",
     "registrationAttempt": 1,
     "verifiedHeadBeforeContainingCommit": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
     "incorporationCommit": null
@@ -34,13 +34,13 @@
     "nextTaskId": "4.3",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.3.json",
-      "sha256": "55e3c4f799c5398f31fab31afd7e04a5c1eae775506d8274f4a67ed40c3fcb7e"
+      "sha256": "ed658151c558b7ef293aaf5e7d3af3daf0b05e8804561961ecccbc504655efef"
     },
-    "taskLocked": true,
+    "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
     "sourceArchived": true,
     "correctionSourceRetired": true,
-    "successorApplyAuthorized": false
+    "successorApplyAuthorized": true
   },
   "completedEvidence": [],
   "authority": {
@@ -54,7 +54,7 @@
     "blockers": [],
     "externalStateAuthorized": false,
     "networkAuthorized": false,
-    "task4_3Locked": true,
+    "task4_3Locked": false,
     "realLibraryMigrationAuthorized": false,
     "workspaceConsolidation": {
       "existingExecutionWorktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -96,7 +96,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 70556,
+    "expectedNormalizedUtf8Bytes": 70370,
     "fallbackSourceCommit": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8"
   }
 }

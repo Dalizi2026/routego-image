@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-4.2-complete-task-4.3-registered",
+  "status": "controller-generation-12-task-4.3-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-4.2-complete-task-4.3-registered",
+    "status": "authoritative-controller-generation-12-task-4.3-activated",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -122,7 +122,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.3-registered-awaiting-zero-compaction-acceptance",
+      "status": "task-4.3-activated-sole-apply-owner",
       "taskRef": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
       "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
       "generation": 1,
@@ -132,15 +132,15 @@
       "currentHead": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/integration-4.3.json",
-        "sha256": "55e3c4f799c5398f31fab31afd7e04a5c1eae775506d8274f4a67ed40c3fcb7e"
+        "sha256": "ed658151c558b7ef293aaf5e7d3af3daf0b05e8804561961ecccbc504655efef"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/integration-generation-2-streamline.capsule.json",
-        "sha256": "75370435a36dc3fd59718cd578de0042f76a6e02700b8cdafa02955a7221d9e1"
+        "sha256": "9cdbfe86b362fd5f635f2dff0b916da06ff1cbd6a3d7098f8fb3008d8dd76507"
       },
-      "authorizedScope": "Task 4.3 registration only: exact browser-safe mark/copy Library routes; no product edit before zero-compaction acceptance and explicit activation.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 4.3 exact browser-safe mark/copy Library routes and stale-route rejection only.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "4.2"
     }
   },
@@ -179,7 +179,7 @@
       "currentHead": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
       "observableCompactions": 0,
       "lastCompletedTask": "4.2",
-      "status": "task-4.3-registered-awaiting-zero-compaction-acceptance"
+      "status": "task-4.3-activated-sole-apply-owner"
     }
   },
   "currentChange": {
@@ -210,8 +210,8 @@
     },
     "currentTask": {
       "id": "4.3",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
       "authorizedScope": "Task 4.3 is registered but locked. Only the existing candidate thread may be activated after the current-change capsule validates, the worktree is clean, and zero-observable-compression acceptance succeeds."
     }
