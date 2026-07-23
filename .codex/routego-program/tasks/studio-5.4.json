@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "f7ec236ffc62fdae5a8d70871526e86c51f0a1c840898dd701c79950d54af36f",
+  "lane": "studio",
+  "change": "streamline-routego-image-generation",
+  "taskId": "5.4",
+  "status": "registered-locked-pending-handoff-acceptance",
+  "sourceCommit": "7305a360a7315f5b7c5e74821fd3da5ccb61d00d",
+  "taskSource": {"path": "openspec/changes/streamline-routego-image-generation/tasks.md", "fileSha256": "17d5f801e2e329a99823e6c99188c83f0ae9207182c240ecab5f0cc295485738", "lineSha256": "2f4d1685b4b3ac8d9e17f66c30cd65b647f35855d5345ad32e67e24c65d8b9f2"},
+  "dependencies": ["3.5", "4.3"],
+  "allowedFiles": ["packages/studio/src/features/library/LibraryWorkspace.tsx", "packages/studio/src/features/library/LibraryMutationPanel.tsx", "packages/studio/src/features/library/ImageComparison.tsx", "packages/studio/src/features/library/query.ts", "packages/studio/src/features/library/mutations.ts", "packages/studio/src/features/library/handoff.ts", "packages/studio/src/features/library/types.ts", "packages/studio/src/features/library/library.css", "packages/studio/test/library-query.test.ts", "packages/studio/test/library-detail.test.ts", "packages/studio/test/library-handoff.test.ts", "packages/studio/test/library-mutations.test.ts", "openspec/changes/streamline-routego-image-generation/tasks.md"],
+  "forbiddenFileGlobs": ["packages/contracts/**", "packages/creation/**", "packages/foundation/**", "packages/library/**", "packages/integration/**", "packages/studio/src/features/creation/**", "packages/studio/src/features/mask/**", "packages/studio/src/features/capabilities/**", "packages/studio/src/features/settings/**", "packages/studio/src/app/**", "package.json", "pnpm-lock.yaml", "node_modules/**"],
+  "requiredBehavior": ["Narrow Studio Library to search/filter/folders/scoped selection/ZIP/download/comparison/preview.", "Add only browser-safe copy-generation-information and replaceable/cancellable mark actions without direct generation.", "Do not add edit, upload, mask, Trash, destructive mutation, provider, public-tool, external-state, or future task behavior."],
+  "verification": ["openspec instructions apply --change streamline-routego-image-generation --json", "pnpm --filter @routego-image/studio exec vitest run test/library-query.test.ts test/library-detail.test.ts test/library-handoff.test.ts test/library-mutations.test.ts", "git diff --check"],
+  "directSpecifications": [{"path": "openspec/changes/streamline-routego-image-generation/specs/studio-library-experience/spec.md", "sha256": "e9415fcbe56ace8f1934d0a336c3ba330ca3a007abf1445d15762550dce9e5d0", "reason": "Narrow Library actions, safe mark replacement/cancellation, and copy-information behavior."}, {"path": "openspec/changes/streamline-routego-image-generation/design.md", "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca", "reason": "Studio scope and browser-safe Library boundary."}],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-5.4-exact-studio-library-simplification",
+  "activation": {"controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a", "controllerGeneration": 12, "workerThreadId": null, "workerGeneration": 7, "soleApplyOwner": false, "applyAuthorized": false},
+  "externalStateAuthorized": false,
+  "reportingContract": "Before audit or implementation, send [THREAD_HANDSHAKE] to the Controller with send_message_to_thread and then call read_thread to confirm receipt; the Controller must independently read it. After that every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request uses the same direct chain; heartbeat, polling, automation, final answers, and user follow-up cannot replace it."
+}
