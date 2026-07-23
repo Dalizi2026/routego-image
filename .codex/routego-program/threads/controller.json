@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-12-task-4.1-activated",
+  "status": "authoritative-controller-generation-12-task-5.1-locked-pending-studio-capsule",
   "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "predecessorThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -14,15 +14,15 @@
   "lastCompactionFingerprint": null,
   "lastHealthAudit": {
     "status": "passed",
-    "workspaceHead": "8a01c07f7eac148b17dd8668cb2d90c878cc1e6e",
-    "openspecProgress": "13/33",
-    "acceptedTask": "3.5",
-    "readyTasks": ["4.1"],
-    "independentVerification": "Task 4.1 handoff acceptance passed with 12 startup files / 71449 normalized UTF-8 bytes, clean Git, zero observable compactions, and direct worker-to-Controller receipt confirmation."
+    "workspaceHead": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+    "openspecProgress": "18/33",
+    "acceptedTask": "4.5",
+    "readyTasks": ["5.1"],
+    "independentVerification": "Task 4.5's controller-accepted eight-file generation-only Integration suite passed 147 tests; git diff --check and Git clean passed. The completed task thread was archived after direct delivery."
   },
   "currentOperation": {
-    "id": "task-4.1-activated-exact-integration-scope",
-    "allowedNext": "Only registered Integration thread 019f8ad0-5d83-72f2-b26c-7cad6b488289 may implement Task 4.1 within integration-4.1.json exact allowed files; it must report every checkpoint directly to this Controller and confirm receipt.",
+    "id": "task-5.1-locked-studio-registration",
+    "allowedNext": "Only a newly registered Studio thread may audit Task 5.1 after a current task capsule, direct-return handshake, clean-workspace check, and zero-compression acceptance. Product implementation remains locked until explicit Controller activation.",
     "forbidden": [
       "Product code outside each task's exact owner scope",
       "package.json or pnpm-lock.yaml changes",

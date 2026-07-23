@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-4.5-activated",
+  "status": "controller-generation-12-task-5.1-locked-pending-studio-capsule",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-4.5-activated",
+    "status": "authoritative-controller-generation-12-task-5.1-locked-pending-studio-capsule",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -122,14 +122,14 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.5-sole-apply-owner-activated",
+      "status": "task-4.5-completed-controller-accepted-archived-no-active-owner",
       "taskRef": "019f8e71-38ca-7e92-a831-d8a2803d2125",
       "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
       "generation": 3,
       "taskId": "4.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "b276322703af92504869f1d6caa78b72d67a7d26",
+      "currentHead": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/integration-4.5.json",
         "sha256": "7ac0dee995f01b598618597266d694589a4571d7fb30a75f3f894e72ced136d5"
@@ -138,10 +138,10 @@
         "path": ".codex/routego-program/handoffs/integration-generation-4-streamline.capsule.json",
         "sha256": "077cf83cb661bcb9a576c2661bd40f5df3bdd358d4d40128ad4b48dfafcfd75a"
       },
-      "authorizedScope": "Task 4.5 is activated after a clean zero-compression handoff acceptance. The sole apply owner may modify only the registered Task 4.5 files and must directly report every blocker, deviation, checkpoint, and delivery.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "4.4"
+      "authorizedScope": "Task 4.5 is completed and its accepted task thread is archived. Task 5.1 remains locked pending a fresh Studio capsule, direct-return handshake, and zero-compression acceptance.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "4.5"
     }
   },
   "laneSuccessors": {
@@ -176,10 +176,10 @@
       "generation": 3,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "b276322703af92504869f1d6caa78b72d67a7d26",
+      "currentHead": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
       "observableCompactions": 0,
-      "lastCompletedTask": "4.4",
-      "status": "task-4.5-sole-apply-owner-activated"
+      "lastCompletedTask": "4.5",
+      "status": "task-4.5-completed-controller-accepted-archived"
     }
   },
   "currentChange": {
@@ -187,7 +187,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 17,
+      "completedTasks": 18,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -205,30 +205,31 @@
         "4.1",
         "4.2",
         "4.3",
-        "4.4"
+        "4.4",
+        "4.5"
       ],
       "readyTaskIds": [],
-      "nextTaskId": "4.5"
+      "nextTaskId": "5.1"
     },
     "currentTask": {
-      "id": "4.5",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "5.1",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 4.5 is activated for the registered sole apply owner only; all edits remain constrained by the current task capsule and direct-return contract."
+      "authorizedScope": "Task 5.1 is locked. It may be activated only after a Studio task capsule validates, the direct-return handshake is confirmed, the workspace is clean, and zero-observable-compression acceptance succeeds."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "streamline-integration",
-    "event": "TASK_4_3_ACCEPTED_TASK_STATE_CONFIRMED",
-    "implementationCommit": "604f987f730815fcb2a6ea60ffa2a57ef5e11c99",
-    "controllerMergeCommit": "7a637977ad85c73a9414b04831ce25fbdaea09fc",
-    "taskStateCommit": "7a637977ad85c73a9414b04831ce25fbdaea09fc",
-    "openspecProgress": "16/33",
+    "event": "TASK_4_5_ACCEPTED_TASK_STATE_CONFIRMED",
+    "implementationCommit": "cef9c2de23705fa52e7ed5a828600ce8f19d1315",
+    "controllerMergeCommit": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+    "taskStateCommit": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+    "openspecProgress": "18/33",
     "nextTaskIds": [
-      "4.4"
+      "5.1"
     ],
-    "verification": "Task 4.3 direct browser-route regressions and complete routes file passed; later-owned legacy assertions remain preserved. Task 4.4 is registered and locked pending fresh capsule acceptance."
+    "verification": "Task 4.5's explicit eight-file generation-only Integration suite passed 147 tests; git diff --check passed; the workspace is clean. Full Integration typecheck and manifest-gated install smoke remain preserved for Tasks 7.2 and 7.3. Task 5.1 is locked pending fresh Studio registration and direct-return acceptance."
   },
   "currentBlockers": [],
   "approvedDeviations": [
