@@ -47,6 +47,7 @@ handoff capsule 必须通过 `.codex/routego-program/scripts/validate-handoff-ca
 - 常规步骤、读取进度和非阻塞发现不回传 Program Controller；只回传真实阻塞、契约变更请求和最终交付。
 - Program Controller 通过任务状态文件和 `read_thread` 主动检查进度，避免把所有工作日志灌入控制线程上下文。
 - 线程输出 final answer 后即进入 idle，不具备持续轮询能力。禁止写“你无需操作，其他任务完成后我会自动继续”，除非已经配置明确的 follow-up 发送方或 heartbeat。
+- 强制线程清理：由自动化或 Controller 创建的任务线程在其交付被 Controller 验收、Git 已干净且不存在后续激活范围后，必须立即调用 `set_thread_archived` 归档。不得保留已完成、失败、取消或空闲的自动任务线程；不得归档当前 Controller、正在执行的唯一 apply owner，或仍在等待验收的交付线程。平台不支持物理删除时，归档视为唯一允许的清理动作。
 - 有依赖关系的任务必须在完成时调用 `send_message_to_thread`，向依赖线程发送结构化完成消息并触发新一轮。
 - 结构化完成消息至少包含任务类型、分支、完整 commit SHA、交付文件、验证结果和阻塞项。
 - 关键链路使用 heartbeat 兜底时，直接完成消息仍是主路径；依赖满足后立即删除或暂停 heartbeat。
