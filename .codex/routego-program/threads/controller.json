@@ -2,27 +2,28 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-12-task-5.3-activated",
-  "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-  "predecessorThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
+  "status": "authoritative-controller-generation-13-task-5.5-registered-pending-acceptance",
+  "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+  "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+  "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-  "generation": 12,
+  "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+  "generation": 13,
   "authoritative": true,
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "lastHealthAudit": {
     "status": "passed",
-    "workspaceHead": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
-    "openspecProgress": "20/33",
-    "acceptedTask": "5.2",
-    "readyTasks": ["5.3"],
-    "independentVerification": "Task 5.2's controller-accepted explicit Studio batch suite passed 14 tests; git diff --check and Git clean passed. The completed task thread is ready for archival after direct delivery."
+    "workspaceHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+    "openspecProgress": "22/33",
+    "acceptedTask": "5.4",
+    "readyTasks": ["5.5"],
+    "independentVerification": "Task 5.4's controller-accepted explicit Studio Library suite passed 13 tests; git diff --check and Git clean passed. Task 5.5 is registered but locked until direct-return acceptance."
   },
   "currentOperation": {
-    "id": "task-5.3-activated-studio-header-provider-switch",
-    "allowedNext": "Only the activated Studio Task 5.3 owner may modify its exact Header/provider-switch scope. Every checkpoint and delivery must directly return to this Controller before the next task is registered.",
+    "id": "task-5.5-registered-studio-dead-surface-removal",
+    "allowedNext": "Only the reused Studio lane may accept Task 5.5. It remains locked until an explicit direct-return receipt is independently read by this Controller.",
     "forbidden": [
       "Product code outside each task's exact owner scope",
       "package.json or pnpm-lock.yaml changes",
@@ -45,7 +46,7 @@
   "lowContextLosslessHandoffAcknowledged": true,
   "externalStateAuthorized": false,
   "history": {
-    "previousStateCommit": "01886eb69e4fee0d9105aacd8732b3a3684c00fe",
-    "previousControllerGeneration": 8
+    "previousStateCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+    "previousControllerGeneration": 12
   }
 }

@@ -2,31 +2,32 @@
   "schemaVersion": 2,
   "lane": "studio",
   "change": "streamline-routego-image-generation",
-  "role": "task-5.3-sole-apply-owner-activated",
-  "status": "task-5.3-activated",
-  "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-  "threadId": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
+  "role": "task-5.5-reused-lane-candidate",
+  "status": "task-5.5-registered-locked-pending-task-acceptance",
+  "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+  "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+  "threadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "generation": 6,
-  "currentHead": "5e25953edeeaf014f01e091863522d284b16bdf2",
+  "generation": 7,
+  "currentHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
-  "currentTask": {"id": "5.3", "status": "active-header-provider-switch-scope", "locked": false},
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
+  "currentTask": {"id": "5.5", "status": "registered-dead-surface-removal", "locked": true},
   "sourceOwner": {
-    "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
-    "role": "program-controller-task-5.3-registration-source",
+    "role": "program-controller-g13-task-5.5-registration-source",
     "soleApplyOwner": false,
     "archived": true,
     "authorityRevoked": true
   },
-  "handoffCapsuleIntegrity": {"status": "activated-task-5.3-sole-apply-owner", "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"},
+  "handoffCapsuleIntegrity": {"status": "task-5.5-registered-pending-direct-return-acceptance", "path": ".codex/routego-program/handoffs/current-controller-handoff.md"},
   "reportingContract": {
-    "currentControllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "currentControllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
     "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
     "fallback": "No secondary continuation path exists; read-only governance audit cannot send messages, activate, or advance work.",
     "acknowledgementRequiredBeforeAcceptance": true
@@ -40,5 +41,5 @@
     "acceptanceObservableCompactions": 0
   },
   "externalStateAuthorized": false,
-  "lastCompletedTask": {"id": "5.2", "implementationCommit": "0afe30e2651f6b5674cf742266190c4957e8af8a", "taskStateCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba", "handoffAcceptanceObservableCompactions": 0}
+  "lastCompletedTask": {"id": "5.4", "implementationCommit": "2a3517986597854561d06636373e0fcb4b615fac", "taskStateCommit": "c5d4af9f9883cbd803fa42477e95dd72de38739c", "handoffAcceptanceObservableCompactions": 0}
 }

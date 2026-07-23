@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "transitionId": "controller-g13-studio-5.5-20260724-001",
+  "eventFingerprint": "task-5.4-c5d4af9-direct-handoff-g13",
+  "state": "awaiting-ack",
+  "resumeState": null,
+  "sourceThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+  "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+  "targetThreadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
+  "completedTaskId": "5.4",
+  "nextTaskId": "5.5",
+  "attemptCount": 1,
+  "lastAttemptAt": "2026-07-23T18:10:50.982Z",
+  "lastError": null,
+  "receiptPath": null,
+  "lastTransitionId": null,
+  "updatedAt": "2026-07-23T18:10:51.035Z"
+}

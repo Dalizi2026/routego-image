@@ -1,9 +1,58 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-5.3-activated",
+  "status": "controller-generation-13-task-5.5-registered-pending-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
+  "threadPolicy": {
+    "reuseThreadAcrossTasks": true,
+    "forbidWorktree": true,
+    "forbidClone": true,
+    "forbidNewExecutionDirectory": true,
+    "forbidPinning": true,
+    "newThreadOnlyFor": ["initial-role-registration", "mandatory-context-handoff"]
+  },
+  "automationPolicy": {
+    "primaryContinuation": "direct-thread-message-and-explicit-ack",
+    "fallbackOnly": true,
+    "preferredHeartbeatMode": "controller-attached-no-standalone-thread",
+    "standaloneRunThreadPolicy": "permanent-delete-or-disabled",
+    "mayAcceptWork": false,
+    "maySelectTasks": false,
+    "mayDispatchProductWork": false
+  },
+  "parallelPolicy": {
+    "enabled": true,
+    "maxConcurrentTasks": 3,
+    "mode": "bounded-lane-window-single-writer",
+    "requireConflictEvaluation": true,
+    "requireSameStageOrSatisfiedDependencies": true,
+    "requireDisjointWriteScopes": true,
+    "sharedFilesRequireExclusiveOwner": true,
+    "requireWriterLeaseForMutations": true,
+    "serializeCommits": true,
+    "revalidateBeforeLeaseAcquire": true
+  },
+  "planPolicy": {
+    "sourceOfTruth": "openspec-committed-stage-task-graph",
+    "allowUnplannedStages": false,
+    "allowUnplannedTasks": false,
+    "requireTaskCapsule": true,
+    "crossStageParallelism": "dependencies-satisfied-only",
+    "taskCompletionOrder": "verify-commit-then-checkoff"
+  },
+  "contextPolicy": {
+    "preHandoffAt": 3,
+    "mandatoryHandoffAt": 4,
+    "preflightBeforeSuccessorCreation": true,
+    "successorCreationMethod": "create-thread-local-no-fork",
+    "startupMaxFiles": 8,
+    "startupMaxBytes": 65536,
+    "controllerStartupMaxFiles": 6,
+    "controllerStartupMaxBytes": 49152,
+    "directMessageMaxBytes": 4096,
+    "projectHardHandoffAt": 3
+  },
   "productPlan": "routego-image-1.0-plan.md",
   "authoritySummary": {
     "path": ".codex/routego-program/authority-summary.md",
@@ -52,14 +101,14 @@
     "externalStateAuthorized": false
   },
   "controller": {
-    "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-    "predecessorThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
-    "generation": 12,
+    "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "generation": 13,
     "role": "program-controller",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
-    "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-5.3-activated",
+    "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+    "status": "authoritative-controller-generation-13-task-5.5-registered-pending-acceptance",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -80,25 +129,25 @@
   },
   "activeApplyOwners": {
     "studio": {
-      "status": "task-5.3-sole-apply-owner-activated",
-      "taskRef": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
-      "threadId": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
-      "generation": 6,
-      "taskId": "5.3",
+      "status": "task-5.5-registered-locked-pending-task-acceptance",
+      "taskRef": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
+      "threadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
+      "generation": 7,
+      "taskId": "5.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "5e25953edeeaf014f01e091863522d284b16bdf2",
+      "currentHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/studio-5.3.json",
-        "sha256": "8c46d9fb2980a56cdbbbf82f3e06c98216359d9dea6219099eb44dad5eccdd54"
+        "path": ".codex/routego-program/tasks/studio-5.5.json",
+        "sha256": "308c2016014746a9d0f99d1bc64deb8b1d6072e0dd8c618b1d33ad082485b12f"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"
       },
-      "authorizedScope": "Task 5.3 is activated for the registered Studio sole apply owner only.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "5.2"
+      "authorizedScope": "Task 5.5 is registered and locked until the reused Studio lane explicitly accepts this dispatch.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "5.4"
     },
     "creation": {
       "status": "accepted-historical-worktree-pruned-no-active-product-owner",
@@ -167,14 +216,14 @@
   },
   "laneSuccessors": {
     "studio": {
-      "threadId": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
-      "generation": 6,
+      "threadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
+      "generation": 7,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "5e25953edeeaf014f01e091863522d284b16bdf2",
+      "currentHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
       "observableCompactions": 0,
-      "lastCompletedTask": "5.2",
-      "status": "task-5.3-sole-apply-owner-activated"
+      "lastCompletedTask": "5.4",
+      "status": "task-5.5-registered-locked-pending-task-acceptance"
     },
     "creation": {
       "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
@@ -218,7 +267,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 20,
+      "completedTasks": 22,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -239,30 +288,32 @@
         "4.4",
         "4.5",
         "5.1",
-        "5.2"
+        "5.2",
+        "5.3",
+        "5.4"
       ],
-      "readyTaskIds": ["5.3"],
-      "nextTaskId": "5.3"
+      "readyTaskIds": ["5.5"],
+      "nextTaskId": "5.5"
     },
     "currentTask": {
-      "id": "5.3",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "5.5",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.3 is activated for the registered Studio sole apply owner only."
+      "authorizedScope": "Task 5.5 is registered for the reused Studio lane and remains locked pending its explicit direct-return acceptance."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "studio",
-    "event": "TASK_5_2_ACCEPTED_TASK_STATE_CONFIRMED",
-    "implementationCommit": "0afe30e2651f6b5674cf742266190c4957e8af8a",
-    "controllerMergeCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
-    "taskStateCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
-    "openspecProgress": "20/33",
+    "event": "TASK_5_4_ACCEPTED_TASK_STATE_CONFIRMED",
+    "implementationCommit": "2a3517986597854561d06636373e0fcb4b615fac",
+    "controllerMergeCommit": "c5d4af9f9883cbd803fa42477e95dd72de38739c",
+    "taskStateCommit": "c5d4af9f9883cbd803fa42477e95dd72de38739c",
+    "openspecProgress": "22/33",
     "nextTaskIds": [
-      "5.3"
+      "5.5"
     ],
-    "verification": "Task 5.2's explicit Studio batch suite passed 14 tests; git diff --check and Git clean passed. Task 5.3 is locked pending fresh Studio registration and direct-return acceptance."
+    "verification": "Task 5.4's explicit Studio Library suite passed 13 tests; git diff --check and Git clean passed. Task 5.5 is registered and locked pending direct-return acceptance."
   },
   "currentBlockers": [],
   "approvedDeviations": [

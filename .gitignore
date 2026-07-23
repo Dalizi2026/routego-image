@@ -50,3 +50,6 @@ Thumbs.db
 
 # Temporary OpenSpec/local work views
 .openspec-workset/
+
+# Routego Workflow local coordination lease
+.codex/routego-program/runtime/

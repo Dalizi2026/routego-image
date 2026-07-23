@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "308c2016014746a9d0f99d1bc64deb8b1d6072e0dd8c618b1d33ad082485b12f",
+  "lane": "studio",
+  "change": "streamline-routego-image-generation",
+  "taskId": "5.5",
+  "status": "registered-locked-pending-task-acceptance",
+  "sourceCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "17d5f801e2e329a99823e6c99188c83f0ae9207182c240ecab5f0cc295485738",
+    "lineSha256": "b8200616ed1ecfb714d6a802e6eb8695e90b7a368717072f500d08fe8652808f"
+  },
+  "dependencies": ["5.1", "5.4"],
+  "allowedFiles": [
+    "packages/studio/src/app/StudioApp.tsx",
+    "packages/studio/src/app/state.ts",
+    "packages/studio/src/components/AppNavigation.tsx",
+    "packages/studio/src/dev/mock-handler.ts",
+    "packages/studio/src/features/capabilities/",
+    "packages/studio/src/features/creation/",
+    "packages/studio/src/features/mask/",
+    "packages/studio/src/features/settings/SettingsWorkspace.tsx",
+    "packages/studio/src/i18n/dictionaries.ts",
+    "packages/studio/src/styles/",
+    "packages/studio/test/capability-state.test.ts",
+    "packages/studio/test/creation-upload.test.ts",
+    "packages/studio/test/mask-editor.test.ts",
+    "packages/studio/test/mask-png-upload.test.ts",
+    "packages/studio/test/mask-workbench-integration.test.ts",
+    "packages/studio/test/mock-bridge.test.ts",
+    "packages/studio/test/settings-state.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/integration/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Delete the Studio mask editor and all mask-only upload, bitmap, history, shortcut, viewport, style, export, and test surfaces.",
+    "Remove Studio image-upload and edit modes, edit/retry actions, Trash navigation and route, CapabilityLedger/CapabilityHint presentation, and inaccessible navigation.",
+    "Retain the generation-only workbench, header provider selector, Settings, and the narrowed browser-safe Library workflow without adding product behavior.",
+    "Delete only dead Studio exports, styles, mocks, translations, and tests made unreachable by this task; do not weaken preserved later-owned verification."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "rg -n 'routego_edit|MaskEditor|CapabilityLedger|CapabilityHint|route\\.trash' packages/studio/src",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-mask-editor/spec.md",
+      "sha256": "8df5c1c66b3c22980bbb8fe725c6e27119b44f3faa94edf5848da6aa4e0abe71",
+      "reason": "Removed mask editor and its independent controls."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-creation-workbench/spec.md",
+      "sha256": "ae1a5e1809e045c9f5b00c9ee9931e1d8e322059224038c1de930a2e0090e9dc",
+      "reason": "Generation-only workbench and capability presentation removal."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-application-shell/spec.md",
+      "sha256": "97b70925bf28811730ed6efe4ed4b0c38769604dbcd7ac1b9231397480391900",
+      "reason": "Removed Trash route and accessible remaining navigation."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "reason": "Studio dead-surface removal scope."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-5.5-exact-studio-dead-surface-removal",
+  "activation": {
+    "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "controllerGeneration": 13,
+    "workerThreadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
+    "workerGeneration": 7,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
+  },
+  "externalStateAuthorized": false,
+  "reportingContract": "Before audit or implementation, send [TASK_ACCEPTED] to the Controller with send_message_to_thread and then call read_thread to confirm receipt. The Controller independently reads the receipt before activation. After activation, every checkpoint, blocker, deviation, handoff, implementation, delivery, or acceptance request uses the same direct chain; heartbeat, polling, automation, final answers, and user follow-up cannot replace it."
+}
