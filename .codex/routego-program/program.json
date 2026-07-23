@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-5.2-activated",
+  "status": "controller-generation-12-task-5.3-locked-pending-studio-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-5.2-activated",
+    "status": "authoritative-controller-generation-12-task-5.3-locked-pending-studio-acceptance",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -80,28 +80,25 @@
   },
   "activeApplyOwners": {
     "studio": {
-      "status": "task-5.2-sole-apply-owner-activated",
-      "taskRef": "019f8f28-2622-7952-9f19-9012d2d0a8e0",
-      "threadId": "019f8f28-2622-7952-9f19-9012d2d0a8e0",
-      "generation": 5,
-      "taskId": "5.2",
+      "status": "task-5.3-registered-locked-candidate",
+      "taskRef": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
+      "threadId": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
+      "generation": 6,
+      "taskId": "5.3",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "de7b49bf638c0c417051f847f424a4d110ac1cd3",
+      "currentHead": "5e25953edeeaf014f01e091863522d284b16bdf2",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/studio-5.2.json",
-        "sha256": "9f5491969c7816c698eed8f83c68cc65f52a372f65196fc4a6bbc94a5f79b125"
+        "path": ".codex/routego-program/tasks/studio-5.3.json",
+        "sha256": "96960c00781a6183409e2f8bc6ab78c5827f6334612c15eda31988d1497887db"
       },
       "handoffCapsule": {
-        "path": ".codex/routego-program/handoffs/studio-generation-5-streamline.capsule.json",
-        "sha256": "74f057a3959fcdae851dbc6ad95e95a132783bdd1378d5e3e4c0021acaa1b143",
-        "rawFileSha256": "54eecbb518c644feb35495369d3ca08b830cef2db6d6fe441c650c10572f25a0",
-        "canonicalSha256": "74f057a3959fcdae851dbc6ad95e95a132783bdd1378d5e3e4c0021acaa1b143"
+        "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"
       },
-      "authorizedScope": "Task 5.2 is registered and locked pending a current handoff capsule, direct-return acceptance, clean Git, and zero observable compactions.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "5.1"
+      "authorizedScope": "Task 5.3 is registered and locked pending a current handoff capsule, direct-return acceptance, clean Git, and zero observable compactions.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "5.2"
     },
     "creation": {
       "status": "accepted-historical-worktree-pruned-no-active-product-owner",
@@ -170,18 +167,14 @@
   },
   "laneSuccessors": {
     "studio": {
-      "threadId": "019f8f28-2622-7952-9f19-9012d2d0a8e0",
-      "generation": 5,
+      "threadId": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
+      "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "de7b49bf638c0c417051f847f424a4d110ac1cd3",
+      "currentHead": "5e25953edeeaf014f01e091863522d284b16bdf2",
       "observableCompactions": 0,
-      "lastCompletedTask": "5.1",
-      "status": "task-5.2-sole-apply-owner-activated",
-      "handoffCapsuleIntegrity": {
-        "canonicalSha256": "74f057a3959fcdae851dbc6ad95e95a132783bdd1378d5e3e4c0021acaa1b143",
-        "rawFileSha256": "54eecbb518c644feb35495369d3ca08b830cef2db6d6fe441c650c10572f25a0"
-      }
+      "lastCompletedTask": "5.2",
+      "status": "task-5.3-registered-locked-candidate"
     },
     "creation": {
       "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
@@ -225,7 +218,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 19,
+      "completedTasks": 20,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -245,30 +238,31 @@
         "4.3",
         "4.4",
         "4.5",
-        "5.1"
+        "5.1",
+        "5.2"
       ],
-      "readyTaskIds": [],
-      "nextTaskId": "5.2"
+      "readyTaskIds": ["5.3"],
+      "nextTaskId": "5.3"
     },
     "currentTask": {
-      "id": "5.2",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "5.3",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.2 is activated for the registered Studio sole apply owner only."
+      "authorizedScope": "Task 5.3 is locked for the registered Studio candidate pending direct-return handoff acceptance and explicit Controller activation."
     }
   },
   "latestDirectCheckpoint": {
     "lane": "studio",
-    "event": "TASK_5_1_ACCEPTED_TASK_STATE_CONFIRMED",
-    "implementationCommit": "45dfe38bb04deecf88432bca3a4bad0c5a57bdbc",
-    "controllerMergeCommit": "c9ce2a804d5faa10da89574e09421781baeb6e2b",
-    "taskStateCommit": "c9ce2a804d5faa10da89574e09421781baeb6e2b",
-    "openspecProgress": "19/33",
+    "event": "TASK_5_2_ACCEPTED_TASK_STATE_CONFIRMED",
+    "implementationCommit": "0afe30e2651f6b5674cf742266190c4957e8af8a",
+    "controllerMergeCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
+    "taskStateCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
+    "openspecProgress": "20/33",
     "nextTaskIds": [
-      "5.2"
+      "5.3"
     ],
-    "verification": "Task 5.1's explicit Studio workbench suite passed 9 tests; git diff --check and Git clean passed. The package script's preserved later-owned edit/batch/mask/capability/mock-bridge assertions remain untouched. Task 5.2 is locked pending fresh Studio registration and direct-return acceptance."
+    "verification": "Task 5.2's explicit Studio batch suite passed 14 tests; git diff --check and Git clean passed. Task 5.3 is locked pending fresh Studio registration and direct-return acceptance."
   },
   "currentBlockers": [],
   "approvedDeviations": [

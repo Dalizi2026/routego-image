@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "capsuleType": "successor-handoff",
+  "capsuleSha256": "5430532ef0d570003f35c640674f1d6542d0b3b3317625dc5a53ca3578ee73c4",
+  "lane": "studio",
+  "stateRouting": {"programLaneKey": "studio", "laneStatePath": ".codex/routego-program/threads/studio.json"},
+  "role": "task-5.3-registered-locked-candidate",
+  "change": "streamline-routego-image-generation",
+  "generation": {"source": 5, "successor": 6},
+  "source": {
+    "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "acceptedProductCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
+    "handoffCommit": "5e25953edeeaf014f01e091863522d284b16bdf2",
+    "handoffParent": "fbe5bb45c47940863431c0b644b8bff128f8bdba"
+  },
+  "successor": {
+    "threadId": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "plannedBranch": "codex/routego-controller-g12",
+    "startingCommit": "5e25953edeeaf014f01e091863522d284b16bdf2",
+    "registrationStatus": "registered-locked-pending-handoff-acceptance",
+    "registrationAttempt": 1,
+    "verifiedHeadBeforeContainingCommit": "5e25953edeeaf014f01e091863522d284b16bdf2",
+    "incorporationCommit": null
+  },
+  "currentState": {
+    "openspecTotal": 33,
+    "openspecCompleted": 20,
+    "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1", "4.2", "4.3", "4.4", "4.5", "5.1", "5.2"],
+    "nextTaskId": "5.3",
+    "taskCapsule": {"path": ".codex/routego-program/tasks/studio-5.3.json", "sha256": "96960c00781a6183409e2f8bc6ab78c5827f6334612c15eda31988d1497887db"},
+    "taskLocked": true,
+    "sourceIsSoleApplyOwner": true,
+    "sourceArchived": false,
+    "correctionSourceRetired": false,
+    "successorApplyAuthorized": false
+  },
+  "completedEvidence": [{"path": ".codex/routego-program/evidence/streamline-4.5.json", "sha256": "6ab0e75c989a81d658421da8c96068da6a7980c6509b4b494a8999426ab0f1ed"}],
+  "authority": {
+    "summaryPath": ".codex/routego-program/authority-summary.md",
+    "summarySha256": "a71ad03124c05eded3c80d75ab1caa8dc6ad42a7774f87d077956902a4842d91",
+    "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+    "ownershipFingerprint": "streamline-task-5.3-exact-studio-header-provider-switch",
+    "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
+  },
+  "gates": {"blockers": [], "approvalRequiredTasks": ["6.1", "7.2", "8.2", "9.1"], "externalStateAuthorized": false, "networkAuthorized": false, "task5_3Locked": true},
+  "context": {"sourceObservableCompactions": 0, "sourceCompactionFingerprint": null, "successorObservableCompactions": 0, "handoffAcceptanceCompactionLimit": 0},
+  "git": {"sourceClean": true, "expectedSuccessorClean": true},
+  "reportingContract": {
+    "primary": "Before audit or implementation, call send_message_to_thread to Controller 019f8ab7-8af6-7181-a59d-2f662c037b1a and then call read_thread to confirm receipt.",
+    "fallback": "No secondary continuation path exists.",
+    "fallbackIntervalMinutes": 30,
+    "finalAnswerAloneIsInsufficient": true
+  },
+  "startup": {
+    "mandatoryFiles": ["AGENTS.md", ".codex/routego-program/authority-summary.md", ".codex/routego-program/program.json", ".codex/routego-program/threads/studio.json", ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json", ".codex/routego-program/tasks/studio-5.3.json", "openspec/changes/streamline-routego-image-generation/tasks.md", "openspec/changes/streamline-routego-image-generation/specs/studio-application-shell/spec.md", "openspec/changes/streamline-routego-image-generation/design.md", ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md", ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md"],
+    "maxFiles": 12,
+    "maxUtf8Bytes": 122880,
+    "byteCounting": "utf8-after-crlf-to-lf-normalization",
+    "expectedNormalizedUtf8Bytes": 81962,
+    "fallbackSourceCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
+    "escalationTriggers": [],
+    "fullAuditTriggers": [],
+    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED"
+  }
+}
