@@ -2,18 +2,18 @@
   "schemaVersion": 2,
   "lane": "integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-4.5-candidate-registered-locked-pending-handoff-acceptance",
-  "status": "task-4.5-locked-pending-handoff-acceptance",
+  "role": "task-4.5-sole-apply-owner-activated",
+  "status": "task-4.5-activated",
   "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 3,
-  "currentHead": "330cb974ddf7b47abb933b4a32c2204a08f86e8a",
+  "currentHead": "b276322703af92504869f1d6caa78b72d67a7d26",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "4.5",
     "status": "locked-integration-test-conformance-scope",
@@ -29,7 +29,7 @@
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "status": "registered-task-4.5-locked-pending-handoff-acceptance",
+    "status": "activated-task-4.5-sole-apply-owner",
     "path": ".codex/routego-program/handoffs/integration-generation-4-streamline.capsule.json"
   },
   "reportingContract": {

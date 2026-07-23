@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "55ae6de8ae604e3ddcfa33ae35c826f6d2621d5df1968c0968e387903d69169f",
+  "capsuleSha256": "077cf83cb661bcb9a576c2661bd40f5df3bdd358d4d40128ad4b48dfafcfd75a",
   "lane": "integration",
   "stateRouting": {
     "programLaneKey": "streamlineIntegration",
@@ -15,17 +15,17 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "acceptedProductCommit": "cf50f467ee961180a790ee937e2f1868728bab08",
-    "handoffCommit": "330cb974ddf7b47abb933b4a32c2204a08f86e8a",
-    "handoffParent": "9607bd7c812def20f8a366cd15bc5a8d6fc79ed2"
+    "handoffCommit": "b276322703af92504869f1d6caa78b72d67a7d26",
+    "handoffParent": "330cb974ddf7b47abb933b4a32c2204a08f86e8a"
   },
   "successor": {
     "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
-    "startingCommit": "330cb974ddf7b47abb933b4a32c2204a08f86e8a",
-    "registrationStatus": "registered-task-4.5-locked-pending-handoff-acceptance",
+    "startingCommit": "b276322703af92504869f1d6caa78b72d67a7d26",
+    "registrationStatus": "activated-task-4.5-sole-apply-owner",
     "registrationAttempt": 1,
-    "verifiedHeadBeforeContainingCommit": "330cb974ddf7b47abb933b4a32c2204a08f86e8a",
+    "verifiedHeadBeforeContainingCommit": "b276322703af92504869f1d6caa78b72d67a7d26",
     "incorporationCommit": null
   },
   "currentState": {
@@ -34,13 +34,13 @@
     "nextTaskId": "4.5",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.5.json",
-      "sha256": "2d932491aa62d8fa27a853e860ef8af296c3882331bfd1746588bb8dc06bb71f"
+      "sha256": "7ac0dee995f01b598618597266d694589a4571d7fb30a75f3f894e72ced136d5"
     },
-    "taskLocked": true,
+    "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
     "sourceArchived": true,
     "correctionSourceRetired": true,
-    "successorApplyAuthorized": false
+    "successorApplyAuthorized": true
   },
   "completedEvidence": [],
   "authority": {
@@ -54,7 +54,7 @@
     "blockers": [],
     "externalStateAuthorized": false,
     "networkAuthorized": false,
-    "task4_5Locked": true,
+    "task4_5Locked": false,
     "workspaceConsolidation": {
       "existingExecutionWorktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "newDirectoryOrWorktreeAuthorized": false
@@ -95,7 +95,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 90071,
+    "expectedNormalizedUtf8Bytes": 89848,
     "fallbackSourceCommit": "006206fe8e15a8a242c40b9ce19905b9a4cc636e"
   }
 }
