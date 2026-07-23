@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-12-task-5.1-activated",
+  "status": "authoritative-controller-generation-12-task-5.2-locked-pending-studio-capsule",
   "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "predecessorThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -14,15 +14,15 @@
   "lastCompactionFingerprint": null,
   "lastHealthAudit": {
     "status": "passed",
-    "workspaceHead": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
-    "openspecProgress": "18/33",
-    "acceptedTask": "4.5",
-    "readyTasks": ["5.1"],
-    "independentVerification": "Task 4.5's controller-accepted eight-file generation-only Integration suite passed 147 tests; git diff --check and Git clean passed. The completed task thread was archived after direct delivery."
+    "workspaceHead": "c9ce2a804d5faa10da89574e09421781baeb6e2b",
+    "openspecProgress": "19/33",
+    "acceptedTask": "5.1",
+    "readyTasks": ["5.2"],
+    "independentVerification": "Task 5.1's controller-accepted explicit Studio workbench suite passed 9 tests; git diff --check and Git clean passed. The completed task thread is ready for archival after direct delivery."
   },
   "currentOperation": {
-    "id": "task-5.1-activated-exact-studio-scope",
-    "allowedNext": "Only registered Studio thread 019f8ef0-1342-78b1-be4f-83f308a5ff99 may implement Task 5.1 within studio-5.1.json exact allowed files; it must directly report every checkpoint to this Controller and confirm receipt.",
+    "id": "task-5.2-locked-studio-registration",
+    "allowedNext": "Only a newly registered Studio thread may audit Task 5.2 after a current task capsule, direct-return handshake, clean-workspace check, and zero-compression acceptance. Product implementation remains locked until explicit Controller activation.",
     "forbidden": [
       "Product code outside each task's exact owner scope",
       "package.json or pnpm-lock.yaml changes",

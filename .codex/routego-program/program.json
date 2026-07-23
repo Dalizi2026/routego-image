@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-5.1-activated",
+  "status": "controller-generation-12-task-5.2-locked-pending-studio-capsule",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-5.1-activated",
+    "status": "authoritative-controller-generation-12-task-5.2-locked-pending-studio-capsule",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -80,14 +80,14 @@
   },
   "activeApplyOwners": {
     "studio": {
-      "status": "task-5.1-sole-apply-owner-activated",
+      "status": "task-5.1-completed-controller-accepted-archived-no-active-owner",
       "taskRef": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
       "threadId": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
       "generation": 4,
       "taskId": "5.1",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "e0c02d8b504b92c7324b65c144ae74c0337713ce",
+      "currentHead": "c9ce2a804d5faa10da89574e09421781baeb6e2b",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/studio-5.1.json",
         "sha256": "a172d1b207f6ae4f80d6303d3ebf8da958e3e1973f66e6e9251a0be1786fbf12"
@@ -97,10 +97,10 @@
         "sha256": "5e4dd8fa6080852d8bd41c7b97a64a3604eaa8d14b8ed395e7646b5bc0b39a2d",
         "rawFileSha256": "b4a9df7f7ff66e556a6aab6c4324e93a2df56da801f6c8df131964f7d6a564d1"
       },
-      "authorizedScope": "Task 5.1 is activated for the registered Studio sole apply owner only. It may modify only the capsule's exact files, must directly report every blocker, deviation, checkpoint, and delivery, and must not access external state.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "4.5"
+      "authorizedScope": "Task 5.1 is completed and its accepted task thread is archived. Task 5.2 remains locked pending a fresh Studio capsule, direct-return handshake, and zero-compression acceptance.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "5.1"
     },
     "creation": {
       "status": "accepted-historical-worktree-pruned-no-active-product-owner",
@@ -173,10 +173,10 @@
       "generation": 4,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "e0c02d8b504b92c7324b65c144ae74c0337713ce",
+      "currentHead": "c9ce2a804d5faa10da89574e09421781baeb6e2b",
       "observableCompactions": 0,
-      "lastCompletedTask": "4.5",
-      "status": "task-5.1-sole-apply-owner-activated",
+      "lastCompletedTask": "5.1",
+      "status": "task-5.1-completed-controller-accepted-archived",
       "handoffCapsuleIntegrity": {
         "canonicalSha256": "5e4dd8fa6080852d8bd41c7b97a64a3604eaa8d14b8ed395e7646b5bc0b39a2d",
         "rawFileSha256": "b4a9df7f7ff66e556a6aab6c4324e93a2df56da801f6c8df131964f7d6a564d1"
@@ -224,7 +224,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 18,
+      "completedTasks": 19,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -243,30 +243,31 @@
         "4.2",
         "4.3",
         "4.4",
-        "4.5"
+        "4.5",
+        "5.1"
       ],
       "readyTaskIds": [],
-      "nextTaskId": "5.1"
+      "nextTaskId": "5.2"
     },
     "currentTask": {
-      "id": "5.1",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "5.2",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.1 is activated for the registered Studio sole apply owner only; all edits remain constrained by the current task capsule and direct-return contract."
+      "authorizedScope": "Task 5.2 is locked. It may be activated only after a Studio task capsule validates, the direct-return handshake is confirmed, the workspace is clean, and zero-observable-compression acceptance succeeds."
     }
   },
   "latestDirectCheckpoint": {
-    "lane": "streamline-integration",
-    "event": "TASK_4_5_ACCEPTED_TASK_STATE_CONFIRMED",
-    "implementationCommit": "cef9c2de23705fa52e7ed5a828600ce8f19d1315",
-    "controllerMergeCommit": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
-    "taskStateCommit": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
-    "openspecProgress": "18/33",
+    "lane": "studio",
+    "event": "TASK_5_1_ACCEPTED_TASK_STATE_CONFIRMED",
+    "implementationCommit": "45dfe38bb04deecf88432bca3a4bad0c5a57bdbc",
+    "controllerMergeCommit": "c9ce2a804d5faa10da89574e09421781baeb6e2b",
+    "taskStateCommit": "c9ce2a804d5faa10da89574e09421781baeb6e2b",
+    "openspecProgress": "19/33",
     "nextTaskIds": [
-      "5.1"
+      "5.2"
     ],
-    "verification": "Task 4.5's explicit eight-file generation-only Integration suite passed 147 tests; git diff --check passed; the workspace is clean. Full Integration typecheck and manifest-gated install smoke remain preserved for Tasks 7.2 and 7.3. Task 5.1 is locked pending fresh Studio registration and direct-return acceptance."
+    "verification": "Task 5.1's explicit Studio workbench suite passed 9 tests; git diff --check and Git clean passed. The package script's preserved later-owned edit/batch/mask/capability/mock-bridge assertions remain untouched. Task 5.2 is locked pending fresh Studio registration and direct-return acceptance."
   },
   "currentBlockers": [],
   "approvedDeviations": [
