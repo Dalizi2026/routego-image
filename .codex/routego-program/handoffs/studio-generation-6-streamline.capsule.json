@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "5430532ef0d570003f35c640674f1d6542d0b3b3317625dc5a53ca3578ee73c4",
+  "capsuleSha256": "1db47d5dd97a2da172178d486c42cc4eba660bfee585fa257342ea3c2f003196",
   "lane": "studio",
   "stateRouting": {"programLaneKey": "studio", "laneStatePath": ".codex/routego-program/threads/studio.json"},
-  "role": "task-5.3-registered-locked-candidate",
+  "role": "task-5.3-sole-apply-owner-activated",
   "change": "streamline-routego-image-generation",
   "generation": {"source": 5, "successor": 6},
   "source": {
@@ -20,7 +20,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
     "startingCommit": "5e25953edeeaf014f01e091863522d284b16bdf2",
-    "registrationStatus": "registered-locked-pending-handoff-acceptance",
+    "registrationStatus": "activated-task-5.3-sole-apply-owner",
     "registrationAttempt": 1,
     "verifiedHeadBeforeContainingCommit": "5e25953edeeaf014f01e091863522d284b16bdf2",
     "incorporationCommit": null
@@ -30,12 +30,12 @@
     "openspecCompleted": 20,
     "completedTaskIds": ["1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "3.1", "3.2", "3.3", "3.4", "3.5", "4.1", "4.2", "4.3", "4.4", "4.5", "5.1", "5.2"],
     "nextTaskId": "5.3",
-    "taskCapsule": {"path": ".codex/routego-program/tasks/studio-5.3.json", "sha256": "96960c00781a6183409e2f8bc6ab78c5827f6334612c15eda31988d1497887db"},
-    "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
-    "sourceArchived": false,
+    "taskCapsule": {"path": ".codex/routego-program/tasks/studio-5.3.json", "sha256": "8c46d9fb2980a56cdbbbf82f3e06c98216359d9dea6219099eb44dad5eccdd54"},
+    "taskLocked": false,
+    "sourceIsSoleApplyOwner": false,
+    "sourceArchived": true,
     "correctionSourceRetired": false,
-    "successorApplyAuthorized": false
+    "successorApplyAuthorized": true
   },
   "completedEvidence": [{"path": ".codex/routego-program/evidence/streamline-4.5.json", "sha256": "6ab0e75c989a81d658421da8c96068da6a7980c6509b4b494a8999426ab0f1ed"}],
   "authority": {
@@ -45,7 +45,7 @@
     "ownershipFingerprint": "streamline-task-5.3-exact-studio-header-provider-switch",
     "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
   },
-  "gates": {"blockers": [], "approvalRequiredTasks": ["6.1", "7.2", "8.2", "9.1"], "externalStateAuthorized": false, "networkAuthorized": false, "task5_3Locked": true},
+  "gates": {"blockers": [], "approvalRequiredTasks": ["6.1", "7.2", "8.2", "9.1"], "externalStateAuthorized": false, "networkAuthorized": false, "task5_3Locked": false},
   "context": {"sourceObservableCompactions": 0, "sourceCompactionFingerprint": null, "successorObservableCompactions": 0, "handoffAcceptanceCompactionLimit": 0},
   "git": {"sourceClean": true, "expectedSuccessorClean": true},
   "reportingContract": {
@@ -59,7 +59,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 81962,
+    "expectedNormalizedUtf8Bytes": 81769,
     "fallbackSourceCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
     "escalationTriggers": [],
     "fullAuditTriggers": [],

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-12-task-5.3-locked-pending-studio-acceptance",
+  "status": "authoritative-controller-generation-12-task-5.3-activated",
   "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "predecessorThreadId": "019f89c3-44f2-75e2-8efd-9d473bc327cd",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -21,8 +21,8 @@
     "independentVerification": "Task 5.2's controller-accepted explicit Studio batch suite passed 14 tests; git diff --check and Git clean passed. The completed task thread is ready for archival after direct delivery."
   },
   "currentOperation": {
-    "id": "task-5.3-locked-studio-registration",
-    "allowedNext": "Only the registered Studio Task 5.3 candidate may audit its current capsule after a direct-return handshake, clean-workspace check, and zero-compression acceptance. Product implementation remains locked until explicit Controller activation.",
+    "id": "task-5.3-activated-studio-header-provider-switch",
+    "allowedNext": "Only the activated Studio Task 5.3 owner may modify its exact Header/provider-switch scope. Every checkpoint and delivery must directly return to this Controller before the next task is registered.",
     "forbidden": [
       "Product code outside each task's exact owner scope",
       "package.json or pnpm-lock.yaml changes",

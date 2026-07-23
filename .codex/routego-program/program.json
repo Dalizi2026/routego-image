@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-5.3-locked-pending-studio-acceptance",
+  "status": "controller-generation-12-task-5.3-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-5.3-locked-pending-studio-acceptance",
+    "status": "authoritative-controller-generation-12-task-5.3-activated",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -80,7 +80,7 @@
   },
   "activeApplyOwners": {
     "studio": {
-      "status": "task-5.3-registered-locked-candidate",
+      "status": "task-5.3-sole-apply-owner-activated",
       "taskRef": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
       "threadId": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
       "generation": 6,
@@ -90,14 +90,14 @@
       "currentHead": "5e25953edeeaf014f01e091863522d284b16bdf2",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/studio-5.3.json",
-        "sha256": "96960c00781a6183409e2f8bc6ab78c5827f6334612c15eda31988d1497887db"
+        "sha256": "8c46d9fb2980a56cdbbbf82f3e06c98216359d9dea6219099eb44dad5eccdd54"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"
       },
-      "authorizedScope": "Task 5.3 is registered and locked pending a current handoff capsule, direct-return acceptance, clean Git, and zero observable compactions.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 5.3 is activated for the registered Studio sole apply owner only.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "5.2"
     },
     "creation": {
@@ -174,7 +174,7 @@
       "currentHead": "5e25953edeeaf014f01e091863522d284b16bdf2",
       "observableCompactions": 0,
       "lastCompletedTask": "5.2",
-      "status": "task-5.3-registered-locked-candidate"
+      "status": "task-5.3-sole-apply-owner-activated"
     },
     "creation": {
       "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
@@ -246,10 +246,10 @@
     },
     "currentTask": {
       "id": "5.3",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.3 is locked for the registered Studio candidate pending direct-return handoff acceptance and explicit Controller activation."
+      "authorizedScope": "Task 5.3 is activated for the registered Studio sole apply owner only."
     }
   },
   "latestDirectCheckpoint": {

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "96960c00781a6183409e2f8bc6ab78c5827f6334612c15eda31988d1497887db",
+  "contentSha256": "8c46d9fb2980a56cdbbbf82f3e06c98216359d9dea6219099eb44dad5eccdd54",
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "taskId": "5.3",
-  "status": "registered-locked-pending-handoff-acceptance",
+  "status": "activated-task-5.3-sole-apply-owner",
   "sourceCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -57,10 +57,10 @@
   "activation": {
     "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
     "controllerGeneration": 12,
-    "workerThreadId": null,
+    "workerThreadId": "019f8f4d-7f05-7b11-a1ca-f0798071e222",
     "workerGeneration": 6,
-    "soleApplyOwner": false,
-    "applyAuthorized": false
+    "soleApplyOwner": true,
+    "applyAuthorized": true
   },
   "externalStateAuthorized": false,
   "reportingContract": "Before audit or implementation, send [THREAD_HANDSHAKE] to the Controller with send_message_to_thread and then call read_thread to confirm receipt; the Controller must independently read it. After that every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request uses the same direct chain; heartbeat, polling, automation, final answers, and user follow-up cannot replace it."
