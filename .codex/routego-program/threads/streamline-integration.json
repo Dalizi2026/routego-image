@@ -3,21 +3,21 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "openspec-apply-owner-task-4.4-candidate-existing-controller-worktree",
-  "status": "task-4.4-registered-candidate-locked",
+  "status": "task-4.4-activated-sole-apply-owner",
   "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 2,
-  "currentHead": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
+  "currentHead": "5eeb41841293bbd0e33c66dcda3cb0cb1643d873",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "4.4",
-    "status": "registered-atomic-provider-switch-scope",
-    "locked": true
+    "status": "active-atomic-provider-switch-scope",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
@@ -29,7 +29,7 @@
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "status": "registered-candidate-validator-pending",
+    "status": "activated-candidate-validator-accepted",
     "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json"
   },
   "reportingContract": {

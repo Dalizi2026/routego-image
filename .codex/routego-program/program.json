@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-4.4-registered-locked",
+  "status": "controller-generation-12-task-4.4-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-4.4-registered-locked",
+    "status": "authoritative-controller-generation-12-task-4.4-activated",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -122,25 +122,25 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.4-registered-candidate-locked",
+      "status": "task-4.4-activated-sole-apply-owner",
       "taskRef": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
       "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
       "generation": 2,
       "taskId": "4.4",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
+      "currentHead": "5eeb41841293bbd0e33c66dcda3cb0cb1643d873",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/integration-4.4.json",
-        "sha256": "a5f6a3f229db81e351b5522f1749b3c5c05f0662d5b9fc2c3467b4e621d41a63"
+        "sha256": "8d855071743b41e5db398dca66bb61b56a2b562ad25f1fff1d4f926e6987384a"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json",
-        "sha256": "bb8d799a6a7c9cb047237049fae3f4590ac6e0e10bdbf15ec487197c60599a02"
+        "sha256": "857648837d84f023f5f1b874816caedbd85b597cd9f8d2ab9357e7c1d839867d"
       },
-      "authorizedScope": "Task 4.4 registered scope: Contracts service registration, Library atomic profile/model persistence, and Integration projection only; product work remains locked pending validated zero-compaction acceptance.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 4.4 active scope: Contracts service registration, Library atomic profile/model persistence, and Integration projection only.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "4.3"
     }
   },
@@ -176,10 +176,10 @@
       "generation": 2,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
+      "currentHead": "5eeb41841293bbd0e33c66dcda3cb0cb1643d873",
       "observableCompactions": 0,
       "lastCompletedTask": "4.3",
-      "status": "task-4.4-registered-candidate-locked"
+      "status": "task-4.4-activated-sole-apply-owner"
     }
   },
   "currentChange": {
@@ -211,8 +211,8 @@
     },
     "currentTask": {
       "id": "4.4",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
       "authorizedScope": "Task 4.4 is registered and locked. Only the existing candidate thread may be activated after the current-change capsule validates, the worktree is clean, and zero-observable-compression acceptance succeeds."
     }

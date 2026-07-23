@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "bb8d799a6a7c9cb047237049fae3f4590ac6e0e10bdbf15ec487197c60599a02",
+  "capsuleSha256": "857648837d84f023f5f1b874816caedbd85b597cd9f8d2ab9357e7c1d839867d",
   "lane": "integration",
   "stateRouting": {
     "programLaneKey": "streamlineIntegration",
@@ -23,9 +23,9 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
     "startingCommit": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
-    "registrationStatus": "registered-task-4.4-candidate-zero-compaction-acceptance-pending",
+    "registrationStatus": "activated-task-4.4-sole-apply-owner-zero-compaction-acceptance",
     "registrationAttempt": 1,
-    "verifiedHeadBeforeContainingCommit": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
+    "verifiedHeadBeforeContainingCommit": "5eeb41841293bbd0e33c66dcda3cb0cb1643d873",
     "incorporationCommit": null
   },
   "currentState": {
@@ -34,13 +34,13 @@
     "nextTaskId": "4.4",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/integration-4.4.json",
-      "sha256": "a5f6a3f229db81e351b5522f1749b3c5c05f0662d5b9fc2c3467b4e621d41a63"
+      "sha256": "8d855071743b41e5db398dca66bb61b56a2b562ad25f1fff1d4f926e6987384a"
     },
-    "taskLocked": true,
+    "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
     "sourceArchived": true,
     "correctionSourceRetired": true,
-    "successorApplyAuthorized": false
+    "successorApplyAuthorized": true
   },
   "completedEvidence": [],
   "authority": {
@@ -54,7 +54,7 @@
     "blockers": [],
     "externalStateAuthorized": false,
     "networkAuthorized": false,
-    "task4_4Locked": true,
+    "task4_4Locked": false,
     "realLibraryMigrationAuthorized": false,
     "workspaceConsolidation": {
       "existingExecutionWorktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -96,7 +96,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 71740,
+    "expectedNormalizedUtf8Bytes": 71630,
     "fallbackSourceCommit": "b2a80fd25a685fca58db8e3cb5812ab4108e9872"
   }
 }

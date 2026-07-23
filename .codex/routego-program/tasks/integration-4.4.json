@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "a5f6a3f229db81e351b5522f1749b3c5c05f0662d5b9fc2c3467b4e621d41a63",
+  "contentSha256": "8d855071743b41e5db398dca66bb61b56a2b562ad25f1fff1d4f926e6987384a",
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "taskId": "4.4",
-  "status": "registered-candidate-locked-zero-compaction-acceptance-pending",
+  "status": "activated-sole-apply-owner-zero-compaction-handoff-accepted",
   "sourceCommit": "b2a80fd25a685fca58db8e3cb5812ab4108e9872",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -77,8 +77,8 @@
     "controllerGeneration": 12,
     "workerThreadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
     "workerGeneration": 2,
-    "soleApplyOwner": false,
-    "applyAuthorized": false
+    "soleApplyOwner": true,
+    "applyAuthorized": true
   },
   "externalStateAuthorized": false
 }
