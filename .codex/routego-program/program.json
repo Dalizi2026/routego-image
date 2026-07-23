@@ -132,7 +132,7 @@
       "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/integration-4.5.json",
-        "sha256": "a152a94ddbaf3ecd204201d3bf7f9233ad148179a1c35982eacab144f926ee20"
+        "sha256": "548f23531406874d4795ead3447d8cc9c8b49ac962c0da7ebe3d324f2c445ea4"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json",

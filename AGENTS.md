@@ -47,6 +47,7 @@ handoff capsule 必须通过 `.codex/routego-program/scripts/validate-handoff-ca
 - 常规步骤、读取进度和非阻塞发现不回传 Program Controller；只回传真实阻塞、契约变更请求和最终交付。
 - Program Controller 通过任务状态文件和 `read_thread` 主动检查进度，避免把所有工作日志灌入控制线程上下文。
 - 自动开发的唯一续接主链是线程间直接回传：任务线程在完成、阻塞、偏差、交付、交接或等待激活时，必须调用 `send_message_to_thread` 向 Controller 发送结构化消息，以该消息触发 Controller 的下一轮；Controller 必须立即调用 `read_thread` 确认并完成验收、激活、交接或归档。任务线程不得只输出 final answer 后静默 idle，也不得要求用户手动唤醒 Controller。
+- **直接回传握手门禁**：Controller 创建或接管每个任务线程后，线程在任何审计或实现前必须先实际调用 `send_message_to_thread` 发送 `[THREAD_HANDSHAKE]`，再调用 `read_thread` 证实送达；Controller 必须独立 `read_thread` 看到该消息。未通过握手、工具不可用、送达不可确认或只输出 final answer 的线程不得成为 apply owner，必须保持任务锁定并立即归档。
 - 强制线程清理：由自动化或 Controller 创建的任务线程在其交付被 Controller 验收、Git 已干净且不存在后续激活范围后，必须立即调用 `set_thread_archived` 归档。不得保留已完成、失败、取消或空闲的自动任务线程；不得归档当前 Controller、正在执行的唯一 apply owner，或仍在等待验收的交付线程。平台不支持物理删除时，归档视为唯一允许的清理动作。
 - 有依赖关系的任务必须在完成时调用 `send_message_to_thread`，向依赖线程发送结构化完成消息并触发新一轮。
 - 结构化完成消息至少包含任务类型、分支、完整 commit SHA、交付文件、验证结果和阻塞项。
