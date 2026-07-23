@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "3f30c657780dde351312a971076788dea36f49cbada02b119fc56b0a345735ec",
+  "lane": "studio",
+  "change": "streamline-routego-image-generation",
+  "taskId": "5.3",
+  "status": "registered-locked-pending-handoff-acceptance",
+  "sourceCommit": "fbe5bb45c47940863431c0b644b8bff128f8bdba",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "a0dfb200b6bb08644059bbafbb958abfe222ac0d516b12c923be837a14b87759",
+    "lineSha256": "cff90d3cd37efd9ce44f471b521718d17fbb5db7d8c24696a61c30a8f94c7311"
+  },
+  "dependencies": ["4.4"],
+  "allowedFiles": [
+    "packages/studio/src/app/StudioApp.tsx",
+    "packages/studio/src/app/state.ts",
+    "packages/studio/src/features/settings/state.ts",
+    "packages/studio/src/features/settings/types.ts",
+    "packages/studio/src/styles/shell.css",
+    "packages/studio/test/shell-state.test.ts",
+    "packages/studio/test/shell-markup.test.ts",
+    "packages/studio/test/settings-state.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**", "packages/creation/**", "packages/foundation/**", "packages/library/**", "packages/integration/**",
+    "packages/studio/src/features/creation/**", "packages/studio/src/features/library/**", "packages/studio/src/features/mask/**", "packages/studio/src/features/capabilities/**",
+    "packages/studio/src/features/settings/SettingsWorkspace.tsx", "packages/studio/src/features/settings/settings.css",
+    "package.json", "pnpm-lock.yaml", "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Add only the Header provider selector backed by the existing Studio-only browser-safe provider-switch operation.",
+    "Show active configured profile, retained-model or target-default feedback, and explicit disabled, loading, success, and failure states; Header selection changes only from a validated response.",
+    "Clearly state that already submitted single and batch requests retain their provider/model submission snapshots and the new selection affects future submissions only.",
+    "Do not add public MCP tools, edit/upload/mask/capability/Library/batch behavior, provider transport/probing, external-state access, or future task behavior."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/studio exec vitest run test/shell-state.test.ts test/shell-markup.test.ts test/settings-state.test.ts",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-application-shell/spec.md",
+      "sha256": "97b70925bf28811730ed6efe4ed4b0c38769604dbcd7ac1b9231397480391900",
+      "reason": "Header provider switching, future-only effect, retained/default model feedback, loading and failure semantics."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "reason": "Provider/model atomic persistence and immutable active-request snapshot boundary."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-5.3-exact-studio-header-provider-switch",
+  "activation": {
+    "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "controllerGeneration": 12,
+    "workerThreadId": null,
+    "workerGeneration": 6,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
+  },
+  "externalStateAuthorized": false,
+  "reportingContract": "Before audit or implementation, send [THREAD_HANDSHAKE] to the Controller with send_message_to_thread and then call read_thread to confirm receipt; the Controller must independently read it. After that every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request uses the same direct chain; heartbeat, polling, automation, final answers, and user follow-up cannot replace it."
+}
