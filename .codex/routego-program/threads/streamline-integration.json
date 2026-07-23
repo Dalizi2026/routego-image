@@ -2,47 +2,38 @@
   "schemaVersion": 2,
   "lane": "integration",
   "change": "streamline-routego-image-generation",
-  "role": "openspec-cross-lane-sole-apply-owner-existing-controller-worktree",
-  "status": "task-4.1-complete-no-active-product-task-4.2-locked",
+  "role": "openspec-apply-owner-task-4.3-candidate-existing-controller-worktree",
+  "status": "task-4.3-registered-awaiting-zero-compaction-acceptance",
   "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-  "threadId": "019f8ad0-5d83-72f2-b26c-7cad6b488289",
+  "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 1,
-  "currentHead": "1b8314472fe56e5e94b49c5ee2af494fa156c8fd",
-  "observableCompactions": 1,
-  "lastCompactionFingerprint": "thread:019f8ad0-5d83-72f2-b26c-7cad6b488289/turn:019f8af0-3f8a-7360-9e6d-5e380df0ae1c/item:65",
+  "currentHead": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
   "soleApplyOwner": false,
   "applyAuthorized": false,
   "currentTask": {
-    "id": "4.2",
-    "status": "locked-awaiting-separate-controller-scope-and-owner-acceptance",
+    "id": "4.3",
+    "status": "locked-awaiting-current-capsule-validation-and-zero-compaction-acceptance",
     "locked": true
   },
   "sourceOwner": {
-    "threadId": "019f8a48-ee58-7f73-b362-947478c0c85a",
-    "worktree": "/Users/dalizi/Documents/routego-image-library-g3",
-    "branch": "codex/routego-library-g3",
-    "role": "task-3.5-accepted-source-owner-cross-lane-archived-during-workspace-consolidation",
+    "threadId": "019f8c69-762a-7241-b60c-4dbaae764102",
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "role": "task-4.2-completed-controller-accepted-archived",
     "soleApplyOwner": false,
     "archived": true,
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "canonicalSha256": "dc1d95b3e24dbc7705f650df9d2092ef1b867a354657f7b7f30514b2ac313f50",
-    "rawFileSha256": "08e15ddac02dd39a12aa382074e6070a3aea974765a8e9b3f2ff4003cf56fae8",
-    "status": "historical-task-4.1-handoff; not an activation authority for Task 4.2"
-  },
-  "crossLaneIsolation": {
-    "legacyStatePath": ".codex/routego-program/threads/integration.json",
-    "legacyChange": "integrate-routego-image-plugin",
-    "legacyStateMayNotAuthorizeThisTask": true,
-    "currentStateRoutingKey": "streamlineIntegration",
-    "workspaceConsolidation": "Only the existing controller-g12 worktree may host a future visible Integration thread; new directories and worktrees require fresh user approval."
+    "status": "registration-pending-validator",
+    "path": ".codex/routego-program/handoffs/integration-generation-2-streamline.capsule.json"
   },
   "reportingContract": {
     "currentControllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-    "currentControllerGeneration": 12,
     "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
     "fallback": "routego-program-continuity remains missed-message fallback only",
     "acknowledgementRequiredBeforeAcceptance": true
@@ -57,14 +48,9 @@
   },
   "externalStateAuthorized": false,
   "lastCompletedTask": {
-    "id": "4.1",
-    "implementationCommit": "70fa66b856b693e405b9539bdf9adf7e4bbe358e",
-    "taskStateCommit": "1b8314472fe56e5e94b49c5ee2af494fa156c8fd",
-    "evidence": {
-      "path": ".codex/routego-program/evidence/streamline-4.1.json",
-      "sha256": "d675c05ce14f47a883e97bb6c51c092ae0fff7d6a32df4f6e67860d9118534d1"
-    },
-    "handoffAcceptanceObservableCompactions": 0,
-    "postActivationObservableCompactions": 1
+    "id": "4.2",
+    "implementationCommit": "04434d178029f728632549be437ce9dfe54f4384",
+    "taskStateCommit": "eff27ba3dd0648f50dea386d7fa1d6725e56d5f9",
+    "handoffAcceptanceObservableCompactions": 0
   }
 }

@@ -1,156 +1,81 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "0d1bdb5d05cc6a07c26f878840befc46b4878d5addfb93d82e046fa8b74049c3",
+  "contentSha256": "55e3c4f799c5398f31fab31afd7e04a5c1eae775506d8274f4a67ed40c3fcb7e",
   "lane": "integration",
-  "change": "integrate-routego-image-plugin",
+  "change": "streamline-routego-image-generation",
   "taskId": "4.3",
-  "status": "completed-controller-accepted",
-  "sourceCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
+  "status": "registered-awaiting-zero-compaction-handoff-acceptance",
+  "sourceCommit": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
   "taskSource": {
-    "path": "openspec/changes/integrate-routego-image-plugin/tasks.md",
-    "fileSha256": "1d8734b2108fb1b7e5c82dba584cc77c71cb0fd0bcea5186f1ee30ac295f80e6",
-    "lineSha256": "4e2ae1180c5e22eed19e09b8b07a250c53b818b91502f2cd483d72b1fa8b18d3",
-    "lineBytes": 1050
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "a9635f6336d646b42755a2557884aaec6118cf7b6bacb00a6a50b43682ed5b84",
+    "lineSha256": "e89a483264b520d98cbedc8e9fc35f0aad5e63420a795814083abca6fc7188d9"
   },
-  "dependencies": ["4.2"],
+  "dependencies": ["4.1"],
   "allowedFiles": [
-    "packages/integration/src/runtime/mcp-process.ts",
-    "packages/integration/src/cli.ts",
-    "packages/integration/src/index.ts",
-    "packages/integration/test/mcp-process.test.ts"
+    "packages/integration/src/runtime/routes.ts",
+    "packages/integration/test/routes.test.ts",
+    "packages/integration/test/security.test.ts",
+    "packages/integration/test/end-to-end.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
   ],
-  "allowedFileMode": "create or modify exactly the four task-4.3 files; their parent directories already exist at the source commit",
   "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
     "packages/library/**",
     "packages/studio/**",
-    "packages/creation/**",
-    "packages/contracts/**",
-    "packages/integration/src/runtime/sessions.ts",
-    "packages/integration/src/runtime/static.ts",
+    "packages/integration/src/composition/**",
+    "packages/integration/src/image/**",
+    "packages/integration/src/provider/**",
+    "packages/integration/src/runtime/ephemeral-resources.ts",
     "packages/integration/src/runtime/http-host.ts",
     "packages/integration/src/runtime/lifecycle.ts",
-    "packages/integration/src/runtime/routes.ts",
+    "packages/integration/src/runtime/mcp-process.ts",
+    "packages/integration/src/runtime/sessions.ts",
+    "packages/integration/src/runtime/static.ts",
     "packages/integration/src/runtime/stream-route.ts",
-    "openspec/**",
-    ".codex-plugin/**",
-    "skills/**",
-    "scripts/**",
     "package.json",
     "pnpm-lock.yaml",
-    "**/binding.gyp"
+    "node_modules/**"
   ],
   "requiredBehavior": [
-    "Wrap Creation's RoutegoMcpServer with the accepted ProductionLocalRoutegoService and Integration HTTP lifecycle without duplicating business logic or changing the frozen seven-tool public contract.",
-    "Implement the plugin process and CLI entrypoint with UTF-8 protocol framing, protocol-only stdout and recursively redacted diagnostics on stderr.",
-    "Keep MCP and the local Studio HTTP host alive together, continue serving after recoverable call failures and shut down both within bounded SIGINT or SIGTERM handling.",
-    "Release normal resources without forcing business process.exit(), replaying uncertain work or exposing credentials, Authorization values, paths, image bytes or Base64.",
-    "Do not add MCP tools or SDK dependencies, rewrite service business behavior, edit packaging or Skill files, terminate the real test process, or implement task 5.1 and later work."
+    "Expose authenticated, same-origin browser endpoints for the existing safe mark and copy-generation-information Library operations, using strict schemas, bounded UTF-8 JSON bodies, no-store JSON responses, and path/credential/image-byte-free diagnostics.",
+    "Mark must atomically toggle only one eligible generation record through the existing Library preflight and execution flow; copy must project only the existing allowlisted generation information and neither operation may invoke Creation or a Provider.",
+    "Reject stale edit, Trash, delete, restore, permanent-delete, and migration preflight/confirmation routes without reading or mutating Library data. Production migration remains unavailable until a separately approved real-data migration change supplies its gateway.",
+    "Do not alter public MCP discovery, the seven public operations, contracts, Creation, Library, Studio, external state, or any Task 4.4 and later behavior."
   ],
   "verification": [
-    "openspec instructions apply --change integrate-routego-image-plugin --json",
-    "pnpm --filter @routego-image/integration typecheck",
-    "pnpm --filter @routego-image/integration test",
-    "pnpm --filter @routego-image/integration build",
-    "initialize, tools/list, tools/call, invalid request and schema-error framing cases",
-    "exact seven public names, schemas and content projection",
-    "MCP and HTTP coexistence, continued serving after recoverable failures and Windows multi-fetch regression",
-    "SIGINT and SIGTERM bounded shutdown, listener cleanup and handler removal",
-    "protocol-only stdout, recursively redacted stderr and no forced business process exit",
-    "pnpm typecheck",
-    "pnpm build",
-    "pnpm test",
-    "node scripts/check-package-exports.mjs",
-    "node scripts/check-repository-safety.mjs",
-    "openspec validate --all --strict --no-interactive",
-    "git diff --check",
-    "exact four-file implementation scope"
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/integration test -- routes.test.ts security.test.ts end-to-end.test.ts",
+    "git diff --check"
   ],
   "directSpecifications": [
     {
-      "path": "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
-      "sha256": "7ea6069220347f8a434abf21b930ee026e5d7b9bb763b67bf4a50cbf0a3b9f15",
-      "bytes": 10937,
-      "reason": "Plugin process, CLI, stdio framing, lifecycle coexistence and local runtime requirements."
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "aaefa707cc22fd3480acba4e068976198ca49d931b8648957a04ea928bccb529",
+      "reason": "Strict browser-safe contracts and removed public edit surface."
     },
     {
-      "path": "openspec/specs/creation-runtime-transports/spec.md",
-      "sha256": "c98c87cffaca6dd3c4af7d449b03f7519847964780c0e03ae1ad1524552248cd",
-      "bytes": 6650,
-      "reason": "Creation-owned RoutegoMcpServer transport, framing, error and seven-tool behavior."
+      "path": "openspec/changes/streamline-routego-image-generation/specs/durable-image-library/spec.md",
+      "sha256": "a1430b378e7147a5e9a828b0529d1cd164060a0994b953b8c9b8bf9359a98a85",
+      "reason": "Atomic current mark and path-free Library identity boundary."
     },
     {
-      "path": "openspec/specs/local-service-boundaries/spec.md",
-      "sha256": "b594eb13b4b0f771859dfcda5eb6b748dc9c30c459ebd714287d5ee72af7fa42",
-      "bytes": 10007,
-      "reason": "Frozen production service composition and lifecycle delegation boundaries."
-    },
-    {
-      "path": "openspec/specs/shared-image-contracts/spec.md",
-      "sha256": "ee211f7caff8be45fadc1717fca141baf306d0d3953fd0cd34fef037ac0c2e39",
-      "bytes": 21363,
-      "reason": "Frozen seven-tool schemas, result content and browser-safe public image contracts."
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-library-experience/spec.md",
+      "sha256": "e9415fcbe56ace8f1934d0a336c3ba330ca3a007abf1445d15762550dce9e5d0",
+      "reason": "Browser Library action scope and removed destructive/edit actions."
     }
   ],
-  "publicContractFingerprint": "1393f2d00a052e881afca0309021d20b1a17d7fc2e9c505410d4f712f4ec113c",
-  "ownershipFingerprint": "6d9fea6479060a36c028a943ae2e3da659e5c548ddbdb4d51bdded346f940cfc",
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-4.3-exact-integration-browser-library-routes",
   "activation": {
-    "controllerThreadId": "019f7978-0c86-7453-af3c-f5bcd3c13da0",
-    "controllerGeneration": 8,
-    "integrationThreadId": "019f79a6-ba30-73e3-9875-33ba707af137",
-    "integrationGeneration": 7,
-    "acceptedPreviousTaskImplementationCommit": "60df6b9a6fdb7587171b893e2a658d25ade17bdd",
-    "acceptedHostCorrectionImplementationCommit": "3e04958f145f2207cc6bdf369af6198eedfb71b2",
-    "acceptedPreviousTaskStateCommit": "7ba03291adf26c28ac84abfe8cd5a8f5794ea089",
-    "acceptedPreviousTaskCheckpointCommit": "5cbf49bd01d6016e3ed9daf54e8d03169a8f62bf",
-    "acceptedHead": "92752bda589635460b0c48e297df4d9c8c920a92",
-    "sourceOwnerArchived": true,
-    "soleApplyOwner": true,
-    "applyAuthorized": true,
-    "reviewAuthorized": false,
-    "authorizedScope": "task-4.3-four-file-implementation",
-    "correctionAccepted": true,
-    "correctionCommit": "57f1af97cf801b848ef89297654db6c0449f9d2a",
-    "started": true,
-    "completed": true,
-    "implementationCommit": "4abf0dc004f91cb4bd6fc3a16f1fadafcf92f6b3",
-    "task3_4GateCorrectionCommit": "012220a358559df4e14247cb674a8f09bf20aa2a",
-    "task4_2GateCorrectionCommit": "4238ec2e5a5b2ffd9eef98e059990fac4a5d85f7",
-    "taskStateCommit": "0ab41a799a54ab03c3b2a6e5c720eb1ca1a90d6b",
-    "controllerAccepted": true
+    "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "controllerGeneration": 12,
+    "workerThreadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
+    "workerGeneration": 1,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
   },
-  "planDeviation": {
-    "id": "PD-012",
-    "decision": ".codex/routego-program/deviations/PD-012-task-4.3-creation-mcp-public-success-projection.md",
-    "finding": "Creation MCP diagnostic redaction mutates an already validated public routego_open_studio URL and removes its required one-time token query.",
-    "wipCheckpointCommit": "4f9cce26f6608c25679cd4b3639c72b52d65b59c",
-    "wipCheckpointParent": "3ca84ef0868cf6e6e33a32686b76cd300547224e",
-    "wipCheckpointSemantics": "NON_COMPLETION_WIP_SAFETY_CHECKPOINT_ONLY",
-    "planningScope": [
-      "openspec/changes/integrate-routego-image-plugin/design.md",
-      "openspec/changes/integrate-routego-image-plugin/specs/codex-plugin-runtime/spec.md",
-      "openspec/changes/integrate-routego-image-plugin/tasks.md"
-    ],
-    "planningAuthorized": true,
-    "planningCommit": "2b62dac6d86c8ca0fef6b52eea81019ba5749430",
-    "planningAccepted": true,
-    "planningAcceptedByControllerThreadId": "019f77b8-1e24-74c0-8102-66dd2cdd5f20",
-    "planningAcceptedByControllerGeneration": 7,
-    "correctiveAllowedFiles": [
-      "packages/creation/src/runtime/mcp/server.ts",
-      "packages/creation/test/mcp.test.ts"
-    ],
-    "correctiveCodeAuthorized": true,
-    "p1ReviewStatus": "accepted-all-three-classes-after-correction",
-    "p1ReviewEvidence": ".codex/routego-program/evidence/integration-generation-7-p1-review.json",
-    "taskResumeAuthorized": true,
-    "reactivationGovernanceParent": "51984c667fd5b290e256c56116a612cc164b8e8d",
-    "requiredSequence": "The exact owner-only three-file PD-012 OpenSpec update is accepted at 2b62dac6d86c8ca0fef6b52eea81019ba5749430. Incorporate and validate the separate Controller authorization, then implement and commit exactly packages/creation/src/runtime/mcp/server.ts and packages/creation/test/mcp.test.ts. The four task-4.3 files remain locked until the corrective commit is independently accepted."
-  },
-  "unresolvedIssues": [],
-  "knownRisks": [
-    "Task 4.3 must preserve the accepted service, HTTP-host, session, upload, resource and streaming semantics without reopening task 4.2.",
-    "Signal and process tests must use injected boundaries and must not terminate the real test runner.",
-    "All tests remain synthetic and offline; external credentials, real images, real relay and billable requests are prohibited."
-  ],
   "externalStateAuthorized": false
 }

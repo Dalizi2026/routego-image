@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "capsuleType": "successor-handoff",
+  "capsuleSha256": "75370435a36dc3fd59718cd578de0042f76a6e02700b8cdafa02955a7221d9e1",
+  "lane": "integration",
+  "stateRouting": {
+    "programLaneKey": "streamlineIntegration",
+    "laneStatePath": ".codex/routego-program/threads/streamline-integration.json"
+  },
+  "role": "openspec-apply-owner-task-4.3-candidate-existing-controller-worktree",
+  "change": "streamline-routego-image-generation",
+  "generation": { "source": 1, "successor": 1 },
+  "source": {
+    "threadId": "019f8c69-762a-7241-b60c-4dbaae764102",
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "acceptedProductCommit": "04434d178029f728632549be437ce9dfe54f4384",
+    "handoffCommit": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
+    "handoffParent": "28dd5f8623f81c17745ce309c57275da3e2e768f"
+  },
+  "successor": {
+    "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "plannedBranch": "codex/routego-controller-g12",
+    "startingCommit": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
+    "registrationStatus": "registered-awaiting-zero-compaction-acceptance",
+    "registrationAttempt": 1,
+    "verifiedHeadBeforeContainingCommit": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8",
+    "incorporationCommit": null
+  },
+  "currentState": {
+    "openspecTotal": 33,
+    "openspecCompleted": 15,
+    "nextTaskId": "4.3",
+    "taskCapsule": {
+      "path": ".codex/routego-program/tasks/integration-4.3.json",
+      "sha256": "55e3c4f799c5398f31fab31afd7e04a5c1eae775506d8274f4a67ed40c3fcb7e"
+    },
+    "taskLocked": true,
+    "sourceIsSoleApplyOwner": false,
+    "sourceArchived": true,
+    "correctionSourceRetired": true,
+    "successorApplyAuthorized": false
+  },
+  "completedEvidence": [],
+  "authority": {
+    "summaryPath": ".codex/routego-program/authority-summary.md",
+    "summarySha256": "3121480259a6560ac37fa63182c70d23f6c9bcfab9fc56963564eed4372b1382",
+    "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+    "ownershipFingerprint": "streamline-task-4.3-exact-integration-browser-library-routes",
+    "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
+  },
+  "gates": {
+    "blockers": [],
+    "externalStateAuthorized": false,
+    "networkAuthorized": false,
+    "task4_3Locked": true,
+    "realLibraryMigrationAuthorized": false,
+    "workspaceConsolidation": {
+      "existingExecutionWorktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+      "newDirectoryOrWorktreeAuthorized": false
+    }
+  },
+  "context": {
+    "sourceObservableCompactions": 0,
+    "sourceCompactionFingerprint": null,
+    "successorObservableCompactions": 0,
+    "handoffAcceptanceCompactionLimit": 0,
+    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED",
+    "auditFailure": "HANDOFF_AUDIT_FAILED",
+    "hardHandoffAtObservableCompactions": 3,
+    "hardHandoffPolicy": "PD-014"
+  },
+  "git": { "sourceClean": true, "expectedSuccessorClean": true },
+  "reportingContract": {
+    "primary": "After every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request, call send_message_to_thread to Controller G12 thread 019f8ab7-8af6-7181-a59d-2f662c037b1a and then call read_thread to confirm receipt.",
+    "fallback": "routego-program-continuity is missed-message fallback only and cannot approve product work.",
+    "fallbackIntervalMinutes": 30,
+    "finalAnswerAloneIsInsufficient": true
+  },
+  "startup": {
+    "mandatoryFiles": [
+      "AGENTS.md",
+      ".codex/routego-program/authority-summary.md",
+      ".codex/routego-program/program.json",
+      ".codex/routego-program/threads/streamline-integration.json",
+      ".codex/routego-program/handoffs/integration-generation-2-streamline.capsule.json",
+      ".codex/routego-program/tasks/integration-4.3.json",
+      "openspec/changes/streamline-routego-image-generation/tasks.md",
+      "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/durable-image-library/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/studio-library-experience/spec.md",
+      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+      ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md"
+    ],
+    "maxFiles": 12,
+    "maxUtf8Bytes": 122880,
+    "byteCounting": "utf8-after-crlf-to-lf-normalization",
+    "expectedNormalizedUtf8Bytes": 70556,
+    "fallbackSourceCommit": "0ca2935b3f3c76c7f785635f18a53696e4bc07e8"
+  }
+}
