@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "6ab0e75c989a81d658421da8c96068da6a7980c6509b4b494a8999426ab0f1ed",
+  "event": "streamline-task-4.5-accepted",
+  "lane": "integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "4.5",
+  "status": "accepted-with-task-owned-generation-only-regressions",
+  "implementationCommit": "cef9c2de23705fa52e7ed5a828600ce8f19d1315",
+  "verificationPlanningCommit": "331afabec3235689e3a9f501f750f8b39cc18160",
+  "taskStateCommit": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+  "tests": [
+    {
+      "command": "pnpm --filter @routego-image/integration exec vitest run --config vitest.config.ts test/inputs.test.ts test/provider.test.ts test/results.test.ts test/routes.test.ts test/security.test.ts test/service.test.ts test/stream-route.test.ts test/end-to-end.test.ts",
+      "result": "pass",
+      "files": 8,
+      "passed": 147
+    },
+    {
+      "command": "git diff --check",
+      "result": "pass"
+    }
+  ],
+  "scopeExact": true,
+  "scopeFiles": [
+    "packages/integration/src/composition/results.ts",
+    "packages/integration/test/end-to-end.test.ts",
+    "packages/integration/test/inputs.test.ts",
+    "packages/integration/test/provider.test.ts",
+    "packages/integration/test/results.test.ts",
+    "packages/integration/test/security.test.ts",
+    "packages/integration/test/service.test.ts",
+    "packages/integration/test/stream-route.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "behaviorAudit": [
+    "Generation-only Integration regressions preserve the seven public operations and partial/final artifact phases.",
+    "Removed edit, mask, target, reference-image, stale-client, cancellation, redaction, request-count, and partial-result paths are covered at the Task 4.5 boundary.",
+    "Full Integration typecheck remains preserved for Task 7.2; manifest-gated install smoke remains preserved for Packaging Task 7.3."
+  ],
+  "nextTaskIds": ["5.1"],
+  "nextTaskLocked": true,
+  "externalStateAuthorized": false
+}

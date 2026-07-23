@@ -1,22 +1,58 @@
 {
   "schemaVersion": 2,
   "lane": "studio",
-  "change": "add-routego-studio",
-  "role": "openspec-apply-owner",
-  "status": "completed-merged-synced-archived",
-  "threadId": "019f7296-ee8d-7bd1-aa0f-376914e35408",
-  "worktree": "C:\\Users\\MLTZ\\.codex\\worktrees\\3cf3\\生图插件",
-  "branch": "codex/routego-studio-g3",
-  "generation": 3,
-  "completion": {
-    "openspecProgress": "11/11",
-    "deliveryCommit": "ef7dc14df9a1fd58566faa92334a1697d9ab2589",
-    "mergeCommit": "987fd2207fde599be85b5dc64b039fb09f500e61",
-    "archiveCommit": "5612c2b2c7a5491a5ab8c94b3e1ac918c4db45fb",
-    "archivePath": "openspec/changes/archive/2026-07-18-add-routego-studio"
+  "change": "streamline-routego-image-generation",
+  "role": "openspec-apply-owner-task-5.1-candidate-existing-controller-worktree",
+  "status": "task-5.1-registered-locked-pending-zero-compaction-acceptance",
+  "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+  "threadId": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
+  "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+  "branch": "codex/routego-controller-g12",
+  "generation": 4,
+  "currentHead": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
+  "currentTask": {
+    "id": "5.1",
+    "status": "locked-generation-only-workbench-scope",
+    "locked": true
   },
-  "applyOwner": false,
-  "successor": null,
+  "sourceOwner": {
+    "threadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "role": "program-controller-task-5.1-registration-source",
+    "soleApplyOwner": true,
+    "archived": false,
+    "authorityRevoked": false
+  },
+  "handoffCapsuleIntegrity": {
+    "status": "registered-task-5.1-locked-pending-zero-compaction-acceptance",
+    "path": ".codex/routego-program/handoffs/studio-generation-4-streamline.capsule.json",
+    "canonicalSha256": "40f398e316bb1b9903e605ee950bdf9fb153a4d1a06b1410ca35443d49e2bf7f",
+    "rawFileSha256": "4ff85c4468fe1e083e579f53621c4d9dd229023342dfb2ecd6867b2e8f68e7d8"
+  },
+  "reportingContract": {
+    "currentControllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
+    "fallback": "No secondary continuation path exists; read-only governance audit cannot send messages, activate, or advance work.",
+    "acknowledgementRequiredBeforeAcceptance": true
+  },
+  "lowContextPolicy": {
+    "decision": ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
+    "hardHandoffDecision": ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md",
+    "startupMaxFiles": 12,
+    "startupMaxUtf8Bytes": 122880,
+    "startupByteCounting": "utf8-after-crlf-to-lf-normalization",
+    "acceptanceObservableCompactions": 0
+  },
   "externalStateAuthorized": false,
-  "history": { "sourceCommit": "428c1a904299f7043feb3fd08d5c0265f3098243", "sourceSha256": "12c26d576a51c3df6044fecd5e4a25ef8cc2cd944c8ac9a341e75393295986b1", "index": ".codex/routego-program/history/pre-pd008-state-index.json" }
+  "lastCompletedTask": {
+    "id": "4.5",
+    "implementationCommit": "cef9c2de23705fa52e7ed5a828600ce8f19d1315",
+    "taskStateCommit": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+    "handoffAcceptanceObservableCompactions": 0
+  }
 }

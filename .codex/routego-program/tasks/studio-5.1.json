@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "79542763097ccaab8f47914e1e6d97d1860b2215a66301297bbd28f073b80a7e",
+  "lane": "studio",
+  "change": "streamline-routego-image-generation",
+  "taskId": "5.1",
+  "status": "registered-locked-pending-zero-compaction-acceptance",
+  "sourceCommit": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "a71e51e322cd3f6ae4ebb38ae1a916b20317688d1a5fbf3895c7e62652810b34",
+    "lineSha256": "db8e1a25f4d0a9883cb612c8f2d02de6b21efd33b90ddc1bc0ab1f7f3b48f553"
+  },
+  "dependencies": ["1.4", "4.2"],
+  "allowedFiles": [
+    "packages/studio/src/features/creation/CreationWorkbench.tsx",
+    "packages/studio/src/features/creation/creation.css",
+    "packages/studio/src/features/creation/draft.ts",
+    "packages/studio/src/features/creation/types.ts",
+    "packages/studio/test/creation-request.test.ts",
+    "packages/studio/test/settings-workbench-sync.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/integration/**",
+    "packages/studio/src/features/creation/batch.ts",
+    "packages/studio/src/features/creation/BatchEditor.tsx",
+    "packages/studio/src/features/capabilities/**",
+    "packages/studio/src/features/mask/**",
+    "packages/studio/src/features/library/**",
+    "packages/studio/src/app/**",
+    "packages/studio/src/features/settings/**",
+    "packages/studio/test/creation-batch.test.ts",
+    "packages/studio/test/creation-result.test.ts",
+    "packages/studio/test/creation-stream.test.ts",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Replace the single-workbench draft and visible controls with generation-only prompt, size, aspect ratio, format, count, and transparency behavior using the frozen Studio schemas.",
+    "Selecting a non-auto size resets aspect ratio to auto; selecting a non-auto aspect ratio resets size to auto; enabling transparency forces PNG; selecting JPEG or WebP disables transparency.",
+    "Visible prompt and controls are validated with field-level guidance before dispatch. Hidden Settings defaults such as model, quality, partialImages, moderation, saveToLibrary, compression, and other advanced values must not be included in browser submissions.",
+    "Do not add edit, upload, mask, capability, retry, provider, public-tool, batch, Library, or Settings behavior. Preserve seven public MCP tools and ImageArtifact phases.",
+    "No network, provider request, credential, real image or data, installation, migration, deletion, deployment, publication, or release is authorized."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/studio test -- creation-request.test.ts settings-workbench-sync.test.ts",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-creation-workbench/spec.md",
+      "sha256": "ae1a5e1809e045c9f5b00c9ee9931e1d8e322059224038c1de930a2e0090e9dc",
+      "reason": "Generation-only Studio controls, interaction rules, validation, and hidden-default boundary."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "d38323ef71751330d4d5f1efa9f1aa576e3c83f38c87dd0ba83ff1cda6008e69",
+      "reason": "Frozen generation-only Studio request contract and removed edit fields."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "reason": "Studio ownership, immutable submission design, and public-contract boundaries."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-5.1-exact-studio-workbench-generation-controls",
+  "activation": {
+    "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "controllerGeneration": 12,
+    "workerThreadId": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
+    "workerGeneration": 4,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
+  },
+  "externalStateAuthorized": false,
+  "reportingContract": "Before audit or implementation, send [THREAD_HANDSHAKE] to the Controller with send_message_to_thread and then call read_thread to confirm receipt; the Controller must independently read it. After that, every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request must use the same direct chain. Heartbeat, polling, automation, final answers, and user follow-up must never replace it. A thread without a confirmed handshake remains locked and is archived."
+}

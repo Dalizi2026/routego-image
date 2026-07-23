@@ -79,6 +79,29 @@
     "lastCompactionFingerprint": null
   },
   "activeApplyOwners": {
+    "studio": {
+      "status": "task-5.1-registered-locked-pending-zero-compaction-acceptance",
+      "taskRef": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
+      "threadId": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
+      "generation": 4,
+      "taskId": "5.1",
+      "branch": "codex/routego-controller-g12",
+      "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+      "currentHead": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
+      "taskCapsule": {
+        "path": ".codex/routego-program/tasks/studio-5.1.json",
+        "sha256": "79542763097ccaab8f47914e1e6d97d1860b2215a66301297bbd28f073b80a7e"
+      },
+      "handoffCapsule": {
+        "path": ".codex/routego-program/handoffs/studio-generation-4-streamline.capsule.json",
+        "sha256": "40f398e316bb1b9903e605ee950bdf9fb153a4d1a06b1410ca35443d49e2bf7f",
+        "rawFileSha256": "4ff85c4468fe1e083e579f53621c4d9dd229023342dfb2ecd6867b2e8f68e7d8"
+      },
+      "authorizedScope": "Task 5.1 is registered and locked. The Studio candidate may perform no audit or implementation until its current capsule validates, the direct-return handshake is independently confirmed, the workspace is clean, and zero-observable-compression acceptance succeeds.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "4.5"
+    },
     "creation": {
       "status": "accepted-historical-worktree-pruned-no-active-product-owner",
       "taskRef": "019f8a35-481e-7150-9c45-70fae241ac87",
@@ -145,6 +168,20 @@
     }
   },
   "laneSuccessors": {
+    "studio": {
+      "threadId": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
+      "generation": 4,
+      "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+      "plannedBranch": "codex/routego-controller-g12",
+      "currentHead": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
+      "observableCompactions": 0,
+      "lastCompletedTask": "4.5",
+      "status": "task-5.1-registered-locked-pending-zero-compaction-acceptance",
+      "handoffCapsuleIntegrity": {
+        "canonicalSha256": "40f398e316bb1b9903e605ee950bdf9fb153a4d1a06b1410ca35443d49e2bf7f",
+        "rawFileSha256": "4ff85c4468fe1e083e579f53621c4d9dd229023342dfb2ecd6867b2e8f68e7d8"
+      }
+    },
     "creation": {
       "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
       "generation": 4,
