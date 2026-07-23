@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "1085d7392bf66ae680dabee1a85c0a3c8d86e83ed5f895e72d080230133de603",
+  "lane": "integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "4.5",
+  "status": "registered-locked-pending-handoff-acceptance",
+  "sourceCommit": "006206fe8e15a8a242c40b9ce19905b9a4cc636e",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "e31bb3bc2cf6bc9ff4442d2b474bc7ceb28d3755f153a26de57f794d02df7e05",
+    "lineSha256": "4a05da05cbcc244790511e3d7fe2138984c686d5de391d289761aaba24619856"
+  },
+  "dependencies": ["4.1", "4.2", "4.3", "4.4"],
+  "allowedFiles": [
+    "packages/mock-relay/src/service/mock-service.ts",
+    "packages/integration/src/composition/service.ts",
+    "packages/integration/src/composition/results.ts",
+    "packages/integration/test/inputs.test.ts",
+    "packages/integration/test/provider.test.ts",
+    "packages/integration/test/results.test.ts",
+    "packages/integration/test/routes.test.ts",
+    "packages/integration/test/security.test.ts",
+    "packages/integration/test/service.test.ts",
+    "packages/integration/test/stream-route.test.ts",
+    "packages/integration/test/end-to-end.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/studio/**",
+    "packages/integration/src/runtime/**",
+    "packages/integration/src/image/**",
+    "packages/integration/src/provider/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Migrate stale mock-relay and Integration tests to the existing generation-only and Studio-only provider-switch contracts without changing the seven public MCP/HTTP operations or ImageArtifact phases.",
+    "Add and preserve regressions for removed surfaces, redaction, provider request counts, stale clients, cancellation, and partial results.",
+    "Fix a production composition/result fault only when an exact Task 4.5 regression demonstrates it; do not introduce compatibility fields or weaken assertions.",
+    "Run the full Integration typecheck and test commands before task completion; no external state, provider request, credential access, installation, migration, deletion, deployment, or release is authorized."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/integration typecheck",
+    "pnpm --filter @routego-image/integration test",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "d38323ef71751330d4d5f1efa9f1aa576e3c83f38c87dd0ba83ff1cda6008e69",
+      "reason": "Generation-only public and Studio contract boundary."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/image-job-execution/spec.md",
+      "sha256": "5cd0ebea97edb6f900ae96d2090b8f8adde70b4e5471a482db115c266b260d15",
+      "reason": "Request count, cancellation, partial-result, and snapshot requirements."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "reason": "Frozen public-tool and provider-snapshot design decisions."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-4.5-integration-test-conformance-and-mock-relay",
+  "activation": {
+    "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "controllerGeneration": 12,
+    "workerThreadId": "pending",
+    "workerGeneration": 3,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
+  },
+  "externalStateAuthorized": false,
+  "reportingContract": "After every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request, send_message_to_thread to the Controller and then read_thread to confirm receipt."
+}

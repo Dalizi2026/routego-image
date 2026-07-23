@@ -131,8 +131,8 @@
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/integration-4.4.json",
-        "sha256": "8d855071743b41e5db398dca66bb61b56a2b562ad25f1fff1d4f926e6987384a"
+        "path": ".codex/routego-program/tasks/integration-4.5.json",
+        "sha256": "1085d7392bf66ae680dabee1a85c0a3c8d86e83ed5f895e72d080230133de603"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json",
