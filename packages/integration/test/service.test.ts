@@ -113,6 +113,7 @@ const LOCAL_METHODS = [
   "upsertProviderProfile",
   "removeProviderProfile",
   "setActiveProviderProfile",
+  "studioProviderSwitch",
   "refreshModels",
   "probeCapabilities",
   "updateSettings",
@@ -360,7 +361,7 @@ async function collectEvents(source: AsyncIterable<StudioImageOperationEvent>) {
 describe("task 3.5 contract surface and recovery", () => {
   it("implements the exact local method matrix while preserving seven public tools and phases", async () => {
     const { service } = await createHarness();
-    expect(LOCAL_METHODS).toHaveLength(28);
+    expect(LOCAL_METHODS).toHaveLength(29);
     for (const method of LOCAL_METHODS) expect(typeof service[method]).toBe("function");
     expect(routegoOperationNames).toEqual([
       "status", "generate", "prepareRegeneration", "batch", "searchLibrary", "manageLibrary", "openStudio"
@@ -423,6 +424,43 @@ describe("task 3.5 contract surface and recovery", () => {
     expect(events.map((event) => event.type)).toEqual(["started", "failed"]);
     expect(events[1]).toMatchObject({ type: "failed", error: { code: "config_corrupt" } });
     expect(execute).not.toHaveBeenCalled();
+  });
+});
+
+describe("Task 4.4 provider activation projection", () => {
+  it("returns safe fallback selection and preserves prior snapshots for submitted work", async () => {
+    const { service, library } = await createHarness();
+    await library.upsertProviderProfile({
+      profileId: "provider-a",
+      name: "Provider A",
+      endpoints: { generation: { mode: "legacy-api-base", value: "https://a.example/v1" } },
+      defaultModel: "active-model",
+      apiKey: { operation: "unchanged" },
+      setActive: true
+    });
+    await library.upsertProviderProfile({
+      profileId: "provider-b",
+      name: "Provider B",
+      endpoints: { generation: { mode: "legacy-api-base", value: "https://b.example/v1" } },
+      defaultModel: "fallback-model",
+      apiKey: { operation: "unchanged" },
+      setActive: false
+    });
+    const switched = await service.studioProviderSwitch({
+      profileId: "provider-b",
+      preferredModel: "active-model"
+    });
+    const failed = await service.studioProviderSwitch({ profileId: "missing-provider" });
+    expect(switched).toMatchObject({
+      status: "succeeded",
+      activeProviderId: "provider-b",
+      selectedModel: "fallback-model",
+      modelPreserved: false,
+      appliesToFutureSubmissionsOnly: true
+    });
+    expect(JSON.stringify(switched)).not.toMatch(/credential|apiKey|authorization/u);
+    expect(failed).toMatchObject({ status: "failed", error: { code: "not_found" } });
+    expect(failed).not.toHaveProperty("activeProviderId");
   });
 });
 

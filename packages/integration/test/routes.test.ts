@@ -6,6 +6,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 
 import {
   studioGenerateInputSchema,
+  studioProviderSwitchResultSchema,
   routegoPrepareRegenerationResultSchema,
   studioServiceErrorSchema,
   type LocalRoutegoService,
@@ -726,6 +727,65 @@ describe("task 4.2 protected upload and resource routes", () => {
     await vi.waitFor(() => {
       expect(closeLease).toHaveBeenCalledTimes(1);
     });
+  });
+});
+
+describe("Task 4.4 Studio provider switch route", () => {
+  it("uses the registered authenticated Studio route and returns only the safe switch projection", async () => {
+    const studioProviderSwitch = vi.fn(async () => studioProviderSwitchResultSchema.parse({
+      schemaVersion: 1,
+      status: "succeeded",
+      activeProviderId: "provider-b",
+      selectedModel: "fallback-model",
+      modelPreserved: false,
+      profile: {
+        id: "provider-b",
+        name: "Synthetic provider B",
+        endpoints: {
+          generation: {
+            mode: "legacy-api-base",
+            origin: "https://relay.example",
+            pathname: "/v1",
+            hasQuery: false,
+            display: "https://relay.example/v1"
+          }
+        },
+        defaultModel: "fallback-model",
+        models: ["fallback-model"],
+        hasApiKey: true,
+        isActive: true,
+        createdAt: new Date(BASE_NOW).toISOString(),
+        updatedAt: new Date(BASE_NOW).toISOString()
+      },
+      appliesToFutureSubmissionsOnly: true
+    }));
+    const dispatcher = createRoutegoHttpDispatcher({
+      service: unusedService(),
+      localService: new Proxy({ studioProviderSwitch }, {
+        get(target, property) {
+          if (property in target) return target[property as keyof typeof target];
+          return async () => { throw new Error(`Unexpected local call: ${String(property)}`); };
+        }
+      }) as unknown as LocalRoutegoService,
+      expectedSessionToken: TOKEN_A,
+      allowedOrigins: [ORIGIN]
+    });
+    const response = await dispatcher.dispatch(jsonRequest("/api/v1/studio/provider-switch", {
+      profileId: "provider-b",
+      preferredModel: "active-model"
+    }));
+    expect(response.status).toBe(200);
+    expect(json(response)).toMatchObject({
+      activeProviderId: "provider-b",
+      selectedModel: "fallback-model",
+      appliesToFutureSubmissionsOnly: true
+    });
+    expect(studioProviderSwitch).toHaveBeenCalledWith({
+      schemaVersion: 1,
+      profileId: "provider-b",
+      preferredModel: "active-model"
+    });
+    expect(JSON.stringify(json(response))).not.toMatch(/credential|apiKey|authorization/u);
   });
 });
 

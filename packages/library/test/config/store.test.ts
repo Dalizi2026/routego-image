@@ -139,6 +139,72 @@ describe("Library settings persistence", () => {
     expect(await store.readSettings({})).not.toHaveProperty("activeProviderId");
   });
 
+  it("Task 4.4 atomically switches provider and model in one configuration revision", async () => {
+    const { root, store } = await createStore();
+    await store.upsertProviderProfile({
+      profileId: "provider-a",
+      name: "Synthetic A",
+      endpoints,
+      defaultModel: "shared-model",
+      apiKey: { operation: "unchanged" },
+      setActive: true
+    });
+    await store.upsertProviderProfile({
+      profileId: "provider-b",
+      name: "Synthetic B",
+      endpoints,
+      defaultModel: "fallback-model",
+      apiKey: { operation: "unchanged" },
+      setActive: false
+    });
+    await store.persistModelRefresh({
+      schemaVersion: 1,
+      providerId: "provider-b",
+      status: "succeeded",
+      billable: false,
+      models: ["shared-model", "fallback-model"],
+      refreshedAt: now.toISOString()
+    });
+    const settings = await store.readSettings({});
+    await store.updateSettings({ defaults: { ...settings.defaults, model: "shared-model" } });
+    const before = JSON.parse(await readFile(store.paths.config, "utf8")) as { revision: number };
+
+    const preserved = await store.studioProviderSwitch({ profileId: "provider-b" });
+    const afterPreserved = JSON.parse(await readFile(store.paths.config, "utf8")) as {
+      revision: number;
+      activeProviderId: string;
+      defaults: { model: string };
+    };
+    expect(preserved).toMatchObject({
+      status: "succeeded",
+      activeProviderId: "provider-b",
+      selectedModel: "shared-model",
+      modelPreserved: true,
+      appliesToFutureSubmissionsOnly: true
+    });
+    expect(afterPreserved).toMatchObject({
+      revision: before.revision + 1,
+      activeProviderId: "provider-b",
+      defaults: { model: "shared-model" }
+    });
+
+    await store.updateSettings({ defaults: { ...(await store.readSettings({})).defaults, model: "a-only-model" } });
+    const beforeFallback = JSON.parse(await readFile(store.paths.config, "utf8")) as { revision: number };
+    const fallback = await store.studioProviderSwitch({ profileId: "provider-b" });
+    const afterFallback = JSON.parse(await readFile(store.paths.config, "utf8")) as {
+      revision: number;
+      activeProviderId: string;
+      defaults: { model: string };
+    };
+    expect(fallback).toMatchObject({ selectedModel: "fallback-model", modelPreserved: false });
+    expect(afterFallback).toMatchObject({
+      revision: beforeFallback.revision + 1,
+      activeProviderId: "provider-b",
+      defaults: { model: "fallback-model" }
+    });
+    expect(JSON.stringify(afterFallback)).not.toContain(root);
+  });
+
   it("serializes concurrent profile writes without losing either profile", async () => {
     const { store } = await createStore();
     await Promise.all([

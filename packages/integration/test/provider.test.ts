@@ -401,6 +401,27 @@ describe("Library-owned provider runtime context and status", () => {
     ).rejects.toMatchObject({ serviceError: { code: "invalid_input" } });
   });
 
+  it("Task 4.4 loads the atomically selected fallback profile and model", async () => {
+    const { store } = await createStore({ defaultModel: "active-model" });
+    await store.upsertProviderProfile({
+      profileId: "provider-fallback",
+      name: "Fallback provider",
+      endpoints: {
+        generation: { mode: "legacy-api-base", value: "https://fallback.example/v1" }
+      },
+      defaultModel: "fallback-model",
+      apiKey: { operation: "replace", value: credential },
+      setActive: false
+    });
+    const switched = await store.studioProviderSwitch({
+      profileId: "provider-fallback",
+      preferredModel: "active-model"
+    });
+    const context = await loadProviderContext(store);
+    expect(switched).toMatchObject({ selectedModel: "fallback-model", modelPreserved: false });
+    expect(context).toMatchObject({ providerId: "provider-fallback", model: "fallback-model" });
+  });
+
   it("builds redacted status snapshots and drops evidence scoped to stale endpoints", async () => {
     const { store, profileId } = await createStore();
     const runtime = await store.getRuntimeProviderProfile();

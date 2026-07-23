@@ -46,6 +46,8 @@ import {
   type SetActiveProviderProfileResult,
   type StudioLibrarySearchInput,
   type StudioLibrarySearchResult,
+  type StudioProviderSwitchInput,
+  type StudioProviderSwitchResult,
   type StudioLibraryService,
   type StudioSettingsService,
   type StudioUploadService,
@@ -97,6 +99,7 @@ export type LibrarySettingsService = Pick<
   | "upsertProviderProfile"
   | "removeProviderProfile"
   | "setActiveProviderProfile"
+  | "studioProviderSwitch"
   | "updateSettings"
 >;
 
@@ -803,6 +806,12 @@ export class RoutegoLibraryService implements LibraryApplicationService {
     input: SetActiveProviderProfileInput
   ): Promise<SetActiveProviderProfileResult> {
     return await this.settingsStore.setActiveProviderProfile(input);
+  }
+
+  async studioProviderSwitch(
+    input: StudioProviderSwitchInput
+  ): Promise<StudioProviderSwitchResult> {
+    return await this.settingsStore.studioProviderSwitch(input);
   }
 
   async updateSettings(input: UpdateSettingsInput): Promise<UpdateSettingsResult> {

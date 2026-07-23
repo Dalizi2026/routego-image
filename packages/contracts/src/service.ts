@@ -41,6 +41,8 @@ import {
   removeProviderProfileResultSchema,
   setActiveProviderProfileInputSchema,
   setActiveProviderProfileResultSchema,
+  studioProviderSwitchInputSchema,
+  studioProviderSwitchResultSchema,
   upsertProviderProfileInputSchema,
   upsertProviderProfileResultSchema,
   updateSettingsInputSchema,
@@ -55,6 +57,8 @@ import {
   type RemoveProviderProfileResult,
   type SetActiveProviderProfileInput,
   type SetActiveProviderProfileResult,
+  type StudioProviderSwitchInput,
+  type StudioProviderSwitchResult,
   type UpsertProviderProfileInput,
   type UpsertProviderProfileResult,
   type UpdateSettingsInput,
@@ -136,6 +140,7 @@ export const studioOperationNames = [
   "upsertProviderProfile",
   "removeProviderProfile",
   "setActiveProviderProfile",
+  "studioProviderSwitch",
   "refreshModels",
   "probeCapabilities",
   "listFolders",
@@ -230,6 +235,11 @@ export const studioOperationDefinitions = {
     http: { method: "POST", path: "/api/v1/settings/providers/set-active" },
     inputSchema: setActiveProviderProfileInputSchema,
     outputSchema: setActiveProviderProfileResultSchema
+  },
+  studioProviderSwitch: {
+    http: { method: "POST", path: "/api/v1/studio/provider-switch" },
+    inputSchema: studioProviderSwitchInputSchema,
+    outputSchema: studioProviderSwitchResultSchema
   },
   refreshModels: {
     http: { method: "POST", path: "/api/v1/settings/providers/refresh-models" },
@@ -342,6 +352,7 @@ export interface StudioSettingsService {
   setActiveProviderProfile(
     input: SetActiveProviderProfileInput
   ): Promise<SetActiveProviderProfileResult>;
+  studioProviderSwitch(input: StudioProviderSwitchInput): Promise<StudioProviderSwitchResult>;
   refreshModels(input: RefreshModelsInput): Promise<RefreshModelsResult>;
   probeCapabilities(input: CapabilityProbeInput): Promise<CapabilityProbeResult>;
   updateSettings(input: UpdateSettingsInput): Promise<UpdateSettingsResult>;

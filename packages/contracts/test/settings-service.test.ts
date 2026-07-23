@@ -437,6 +437,7 @@ describe("separate Studio operation registry", () => {
       "upsertProviderProfile",
       "removeProviderProfile",
       "setActiveProviderProfile",
+      "studioProviderSwitch",
       "refreshModels",
       "probeCapabilities",
       "listFolders",
@@ -494,5 +495,16 @@ describe("separate Studio operation registry", () => {
         outputDirectory: { configured: false }
       })
     ).toMatchObject({ defaults });
+  });
+
+  it("Task 4.4 registers provider switching as Studio-only without changing public tools", () => {
+    expect(studioOperationDefinitions.studioProviderSwitch).toMatchObject({
+      http: { method: "POST", path: "/api/v1/studio/provider-switch" },
+      inputSchema: studioProviderSwitchInputSchema,
+      outputSchema: studioProviderSwitchResultSchema
+    });
+    expect(studioOperationNames).toContain("studioProviderSwitch");
+    expect(routegoOperationNames).toHaveLength(7);
+    expect(routegoOperationNames).not.toContain("studioProviderSwitch" as never);
   });
 });

@@ -15,6 +15,8 @@ import {
   removeProviderProfileResultSchema,
   setActiveProviderProfileInputSchema,
   setActiveProviderProfileResultSchema,
+  studioProviderSwitchInputSchema,
+  studioProviderSwitchResultSchema,
   updateSettingsInputSchema,
   updateSettingsResultSchema,
   upsertProviderProfileInputSchema,
@@ -30,6 +32,8 @@ import {
   type RemoveProviderProfileResult,
   type SetActiveProviderProfileInput,
   type SetActiveProviderProfileResult,
+  type StudioProviderSwitchInput,
+  type StudioProviderSwitchResult,
   type UpdateSettingsInput,
   type UpdateSettingsResult,
   type UpsertProviderProfileInput,
@@ -690,6 +694,44 @@ export class LibrarySettingsStore {
         schemaVersion: 1,
         activeProviderId: parsed.profileId,
         profile: this.#descriptor(updated, nextState)
+      });
+    });
+  }
+
+  async studioProviderSwitch(
+    input: StudioProviderSwitchInput
+  ): Promise<StudioProviderSwitchResult> {
+    const parsed = studioProviderSwitchInputSchema.parse(input);
+    return this.#withLocks(async () => {
+      const state = await this.#loadUnderLocks();
+      const selected = state.config.profiles.find((profile) => profile.id === parsed.profileId);
+      if (!selected) throw new LibraryError("not_found", "The provider profile does not exist.");
+
+      const preferredModel = parsed.preferredModel ?? state.config.defaults.model;
+      const modelPreserved = selected.models.includes(preferredModel);
+      const selectedModel = modelPreserved ? preferredModel : selected.defaultModel;
+      if (selectedModel === undefined || !selected.models.includes(selectedModel)) {
+        throw new LibraryError("invalid_input", "The target provider has no valid default model.");
+      }
+
+      const updated: StoredProviderProfile = { ...selected, updatedAt: timestamp(this.#now()) };
+      const nextConfig: ConfigDocument = {
+        ...state.config,
+        revision: state.config.revision + 1,
+        activeProviderId: selected.id,
+        profiles: state.config.profiles.map((profile) => profile.id === selected.id ? updated : profile),
+        defaults: { ...state.config.defaults, model: selectedModel }
+      };
+      await this.#commitConfig(state.config, nextConfig);
+      const nextState = { config: nextConfig, credentials: state.credentials };
+      return studioProviderSwitchResultSchema.parse({
+        schemaVersion: 1,
+        status: "succeeded",
+        activeProviderId: selected.id,
+        selectedModel,
+        modelPreserved,
+        profile: this.#descriptor(updated, nextState),
+        appliesToFutureSubmissionsOnly: true
       });
     });
   }

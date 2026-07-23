@@ -51,6 +51,8 @@ import {
   routegoServiceHealthSchema,
   setActiveProviderProfileInputSchema,
   setActiveProviderProfileResultSchema,
+  studioProviderSwitchInputSchema,
+  studioProviderSwitchResultSchema,
   studioBatchInputSchema,
   studioBatchResultSchema,
   studioEditInputSchema,
@@ -114,6 +116,8 @@ import {
   type RoutegoStatusResult,
   type SetActiveProviderProfileInput,
   type SetActiveProviderProfileResult,
+  type StudioProviderSwitchInput,
+  type StudioProviderSwitchResult,
   type StudioBatchInput,
   type StudioBatchResult,
   type StudioEditInput,
@@ -733,6 +737,19 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
 
   async setActiveProviderProfile(input: SetActiveProviderProfileInput): Promise<SetActiveProviderProfileResult> {
     return setActiveProviderProfileResultSchema.parse(await this.#options.library.setActiveProviderProfile(setActiveProviderProfileInputSchema.parse(input)));
+  }
+
+  async studioProviderSwitch(input: StudioProviderSwitchInput): Promise<StudioProviderSwitchResult> {
+    const parsed = studioProviderSwitchInputSchema.parse(input);
+    try {
+      return studioProviderSwitchResultSchema.parse(await this.#options.library.studioProviderSwitch(parsed));
+    } catch (error) {
+      return studioProviderSwitchResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: errorFromUnknown(error, "config_missing")
+      });
+    }
   }
 
   async refreshModels(input: RefreshModelsInput): Promise<RefreshModelsResult> {
