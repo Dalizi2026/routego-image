@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { useI18n } from "../../i18n";
-import { describeBatchResult } from "./batch";
+import { describeBatchResult, STUDIO_BATCH_CONCURRENCY } from "./batch";
 import type { BatchDraftItem, BatchSubmissionState } from "./types";
 
 const copy = {
@@ -11,9 +11,6 @@ const copy = {
     body: "每个任务保留稳定标识和顺序；混合结果不会被合并成虚假的成功。",
     add: "新增任务",
     remove: "移除",
-    moveUp: "上移",
-    moveDown: "下移",
-    concurrency: "并发数",
     selected: "正在编辑",
     draft: "草稿",
     queued: "排队中",
@@ -24,6 +21,7 @@ const copy = {
     submit: "提交整个批次",
     submitAgain: "作为新批次再次提交",
     submitting: "批次处理中…",
+    cancel: "取消批次",
     replayWarning: "部分任务已收到输出或可能计费。再次提交会创建全新的明确请求。",
     acknowledge: "我确认要创建一个新的批量请求",
     untitled: "未填写提示词"
@@ -34,9 +32,6 @@ const copy = {
     body: "Every task keeps a stable identity and order; mixed outcomes are never collapsed into false success.",
     add: "Add task",
     remove: "Remove",
-    moveUp: "Move up",
-    moveDown: "Move down",
-    concurrency: "Concurrency",
     selected: "Editing",
     draft: "Draft",
     queued: "Queued",
@@ -47,6 +42,7 @@ const copy = {
     submit: "Submit batch",
     submitAgain: "Submit again as a new batch",
     submitting: "Batch in progress…",
+    cancel: "Cancel batch",
     replayWarning: "Some tasks produced output or may have billed. Submitting again creates a new explicit request.",
     acknowledge: "I understand this creates a new batch request",
     untitled: "Prompt not entered"
@@ -56,11 +52,10 @@ const copy = {
 function taskStatus(
   itemId: string,
   index: number,
-  concurrency: number,
   submission: BatchSubmissionState
 ): "draft" | "queued" | "processing" | "succeeded" | "partial" | "failed" {
   if (submission.status === "submitting") {
-    return index < concurrency ? "processing" : "queued";
+    return index < STUDIO_BATCH_CONCURRENCY ? "processing" : "queued";
   }
   if (submission.status === "result") {
     return submission.result.items.find((item) => item.id === itemId)?.result.status ?? "failed";
@@ -71,26 +66,22 @@ function taskStatus(
 export function BatchEditor({
   items,
   selectedId,
-  concurrency,
   submission,
   onSelect,
   onAdd,
   onRemove,
-  onMove,
-  onConcurrencyChange,
   onReplayAcknowledged,
+  onCancel,
   onSubmit
 }: {
   readonly items: readonly BatchDraftItem[];
   readonly selectedId: string;
-  readonly concurrency: number;
   readonly submission: BatchSubmissionState;
   readonly onSelect: (item: BatchDraftItem) => void;
   readonly onAdd: () => void;
   readonly onRemove: (item: BatchDraftItem) => void;
-  readonly onMove: (itemId: string, direction: -1 | 1) => void;
-  readonly onConcurrencyChange: (value: number) => void;
   readonly onReplayAcknowledged: (value: boolean) => void;
+  readonly onCancel?: (() => void) | undefined;
   readonly onSubmit: () => void;
 }) {
   const { language } = useI18n();
@@ -115,16 +106,6 @@ export function BatchEditor({
           <span>{labels.body}</span>
         </div>
         <div className="batch-editor__controls">
-          <label className="field">
-            <span>{labels.concurrency}</span>
-            <input
-              type="number"
-              min={1}
-              max={10}
-              value={concurrency}
-              onChange={(event) => onConcurrencyChange(Number(event.target.value))}
-            />
-          </label>
           <button type="button" disabled={items.length >= 20} onClick={onAdd}>
             {labels.add} · {items.length}/20
           </button>
@@ -133,7 +114,7 @@ export function BatchEditor({
 
       <ol className="batch-editor__list">
         {items.map((item, index) => {
-          const status = taskStatus(item.id, index, concurrency, submission);
+          const status = taskStatus(item.id, index, submission);
           const selected = item.id === selectedId;
           return (
             <li className={selected ? "is-selected" : undefined} key={item.id}>
@@ -144,23 +125,13 @@ export function BatchEditor({
                 onClick={() => onSelect(item)}
               >
                 <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{item.draft.prompt.trim() || labels.untitled}</strong>
+                <strong>{item.prompt.trim() || labels.untitled}</strong>
                 <small>
                   {selected ? `${labels.selected} · ` : ""}
-                  {item.draft.mode} · {labels[status]}
+                  {labels[status]}
                 </small>
               </button>
               <div className="batch-editor__item-actions">
-                <button type="button" disabled={index === 0} onClick={() => onMove(item.id, -1)}>
-                  {labels.moveUp}
-                </button>
-                <button
-                  type="button"
-                  disabled={index === items.length - 1}
-                  onClick={() => onMove(item.id, 1)}
-                >
-                  {labels.moveDown}
-                </button>
                 <button type="button" disabled={items.length === 1} onClick={() => onRemove(item)}>
                   {labels.remove}
                 </button>
@@ -196,6 +167,11 @@ export function BatchEditor({
             {labels.acknowledge}
           </span>
         </label>
+      ) : null}
+      {submission.status === "submitting" && onCancel !== undefined ? (
+        <button className="studio-button" type="button" onClick={onCancel}>
+          {labels.cancel}
+        </button>
       ) : null}
       <button className="creation-submit" type="button" disabled={submitDisabled} onClick={onSubmit}>
         {submission.status === "submitting"

@@ -3,8 +3,14 @@ import {
   type StudioBatchResult
 } from "@routego-image/contracts";
 
-import { buildStudioCreationRequest, CreationDraftError } from "./draft";
+import {
+  buildStudioCreationRequest,
+  CreationDraftError,
+  normalizeVisibleControls
+} from "./draft";
 import type { BatchDraftItem, CreationDraft } from "./types";
+
+export const STUDIO_BATCH_CONCURRENCY = 2;
 
 export class BatchDraftError extends Error {
   readonly taskId?: string | undefined;
@@ -24,56 +30,45 @@ export class BatchDraftError extends Error {
   }
 }
 
-export function cloneCreationDraft(draft: CreationDraft): CreationDraft {
-  return {
-    ...draft,
-    references: draft.references.map((reference) => ({ ...reference })),
-    target: draft.target === undefined ? undefined : { ...draft.target },
-    supportingImages: draft.supportingImages.map((supporting) => ({ ...supporting })),
-    mask:
-      draft.mask === undefined
-        ? undefined
-        : { image: { ...draft.mask.image }, targetSlot: 0 },
-    maskUpload: draft.maskUpload === undefined ? undefined : { ...draft.maskUpload },
-    invariants: {
-      allowedChanges: [...draft.invariants.allowedChanges],
-      preserve: [...draft.invariants.preserve],
-      forbiddenChanges: [...draft.invariants.forbiddenChanges]
-    },
-    controls: { ...draft.controls }
-  };
-}
-
 export function createBatchDraftItem(
-  draft: CreationDraft,
+  draft: Pick<CreationDraft, "prompt" | "controls">,
   id: string = globalThis.crypto.randomUUID()
 ): BatchDraftItem {
-  return { id, draft: cloneCreationDraft(draft) };
-}
-
-export function moveBatchDraftItem(
-  items: readonly BatchDraftItem[],
-  itemId: string,
-  direction: -1 | 1
-): readonly BatchDraftItem[] {
-  const index = items.findIndex((item) => item.id === itemId);
-  const target = index + direction;
-  if (index < 0 || target < 0 || target >= items.length) {
-    return items;
-  }
-  const next = [...items];
-  const [item] = next.splice(index, 1);
-  if (item !== undefined) next.splice(target, 0, item);
-  return next;
+  return {
+    id,
+    prompt: draft.prompt,
+    size: draft.controls.size,
+    aspectRatio: draft.controls.aspectRatio,
+    count: draft.controls.count
+  };
 }
 
 export function buildStudioBatchRequest(
   items: readonly BatchDraftItem[],
-  concurrency: number
+  submissionDraft: CreationDraft
 ): ReturnType<typeof studioBatchInputSchema.parse> {
   const tasks = items.map((item) => {
     try {
-      return { id: item.id, operation: buildStudioCreationRequest(item.draft) };
+      return {
+        id: item.id,
+        operation: buildStudioCreationRequest({
+          ...submissionDraft,
+          mode: "generate",
+          prompt: item.prompt,
+          references: [],
+          target: undefined,
+          supportingImages: [],
+          mask: undefined,
+          maskUpload: undefined,
+          invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
+          controls: normalizeVisibleControls({
+            ...submissionDraft.controls,
+            size: item.size,
+            aspectRatio: item.aspectRatio,
+            count: item.count
+          })
+        })
+      };
     } catch (error) {
       if (error instanceof CreationDraftError) {
         throw new BatchDraftError(`批量任务 ${item.id} 的输入无效。`, {
@@ -84,7 +79,7 @@ export function buildStudioBatchRequest(
       throw error;
     }
   });
-  const parsed = studioBatchInputSchema.safeParse({ tasks, concurrency });
+  const parsed = studioBatchInputSchema.safeParse({ tasks });
   if (!parsed.success) {
     throw new BatchDraftError("批量任务不符合本地契约。", {
       fields: Object.fromEntries(

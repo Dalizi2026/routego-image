@@ -67,13 +67,10 @@ export function synchronizeCreationDraftDefaults(
 
 export function synchronizeBatchDraftDefaults(
   items: readonly BatchDraftItem[],
-  defaults: ReadSettingsResult["defaults"],
-  resolve?: unknown
+  _defaults: ReadSettingsResult["defaults"],
+  _resolve?: unknown
 ): readonly BatchDraftItem[] {
-  return items.map((item) => ({
-    ...item,
-    draft: synchronizeCreationDraftDefaults(item.draft, defaults, resolve)
-  }));
+  return items;
 }
 
 const copy = {

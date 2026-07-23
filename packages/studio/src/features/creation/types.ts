@@ -98,7 +98,10 @@ export interface CreationDraft {
 
 export interface BatchDraftItem {
   readonly id: string;
-  readonly draft: CreationDraft;
+  readonly prompt: string;
+  readonly size: CreationVisibleControls["size"];
+  readonly aspectRatio: CreationVisibleControls["aspectRatio"];
+  readonly count: CreationVisibleControls["count"];
 }
 
 export type BatchSubmissionState =

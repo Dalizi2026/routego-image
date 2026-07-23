@@ -16,7 +16,8 @@ import {
   buildStudioBatchRequest,
   createBatchDraftItem,
   createInitialCreationDraft,
-  describeBatchResult
+  describeBatchResult,
+  STUDIO_BATCH_CONCURRENCY
 } from "../src/features/creation";
 
 const defaults = {
@@ -101,26 +102,75 @@ function result(
 }
 
 describe("ordered Studio batch editor", () => {
-  it("builds 1-20 tasks in stable order with concurrency 1-10", () => {
+  it("builds 1-20 generation-only tasks in stable order with fixed concurrency two", () => {
     const items = [
       createBatchDraftItem(operation("First"), "task-first"),
       createBatchDraftItem(operation("Second"), "task-second")
     ];
-    const request = buildStudioBatchRequest(items, 2);
+    const request = buildStudioBatchRequest(items, operation("Global defaults"));
     expect(request.tasks.map((task) => task.id)).toEqual(["task-first", "task-second"]);
     expect(request.tasks.map((task) => task.operation.prompt)).toEqual(["First", "Second"]);
+    expect(STUDIO_BATCH_CONCURRENCY).toBe(2);
+    expect(request.concurrency).toBe(STUDIO_BATCH_CONCURRENCY);
     expect(JSON.stringify(request)).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64|api[_-]?key)/u);
-    expect(() => buildStudioBatchRequest([items[0]!, { ...items[1]!, id: "task-first" }], 11)).toThrow(
-      BatchDraftError
-    );
+    expect(() =>
+      buildStudioBatchRequest([items[0]!, { ...items[1]!, id: "task-first" }], operation("Global defaults"))
+    ).toThrow(BatchDraftError);
     expect(() =>
       buildStudioBatchRequest(
         Array.from({ length: 21 }, (_, index) =>
           createBatchDraftItem(operation(`Task ${index + 1}`), `task-${index + 1}`)
         ),
-        3
+        operation("Global defaults")
       )
     ).toThrow(BatchDraftError);
+  });
+
+  it("injects global format and transparency only when the batch is submitted", () => {
+    const itemDraft = {
+      ...operation("First"),
+      controls: {
+        ...operation("First").controls,
+        size: "1024x1024" as const,
+        aspectRatio: "auto" as const,
+        count: 2 as const
+      }
+    };
+    const items = [createBatchDraftItem(itemDraft, "task-first")];
+    const firstSubmission = {
+      ...operation("Global defaults"),
+      controls: {
+        ...operation("Global defaults").controls,
+        size: "auto" as const,
+        aspectRatio: "landscape" as const,
+        count: 4 as const,
+        format: "jpeg" as const,
+        transparentMode: "off" as const
+      }
+    };
+    const secondSubmission = {
+      ...firstSubmission,
+      controls: { ...firstSubmission.controls, format: "png" as const, transparentMode: "native" as const }
+    };
+
+    const firstRequest = buildStudioBatchRequest(items, firstSubmission);
+    const secondRequest = buildStudioBatchRequest(items, secondSubmission);
+
+    expect(firstRequest.tasks[0]!.operation).toMatchObject({
+      size: "1024x1024",
+      aspectRatio: "auto",
+      count: 2,
+      format: "jpeg",
+      transparentMode: "off"
+    });
+    expect(secondRequest.tasks[0]!.operation).toMatchObject({
+      size: "1024x1024",
+      aspectRatio: "auto",
+      count: 2,
+      format: "png",
+      transparentMode: "native"
+    });
+    expect(items[0]).toMatchObject({ prompt: "First", size: "1024x1024", aspectRatio: "auto", count: 2 });
   });
 
   it("preserves mixed outcomes and requires explicit replay after output or billing risk", () => {
@@ -129,7 +179,7 @@ describe("ordered Studio batch editor", () => {
         createBatchDraftItem(operation("First"), "task-first"),
         createBatchDraftItem(operation("Second"), "task-second")
       ],
-      2
+      operation("Global defaults")
     );
     const batch = studioBatchResultSchema.parse({
       schemaVersion: 1,
@@ -155,7 +205,7 @@ describe("ordered Studio batch editor", () => {
       createBatchDraftItem(operation("First"), "task-first"),
       createBatchDraftItem(operation("Second"), "task-second")
     ];
-    const request = buildStudioBatchRequest(items, 2);
+    const request = buildStudioBatchRequest(items, operation("Global defaults"));
     const batch = studioBatchResultSchema.parse({
       schemaVersion: 1,
       requestId: "batch-markup",
@@ -174,13 +224,10 @@ describe("ordered Studio batch editor", () => {
         createElement(BatchEditor, {
           items,
           selectedId: "task-first",
-          concurrency: 2,
           submission: { status: "result", result: batch, replayAcknowledged: false },
           onSelect: () => undefined,
           onAdd: () => undefined,
           onRemove: () => undefined,
-          onMove: () => undefined,
-          onConcurrencyChange: () => undefined,
           onReplayAcknowledged: () => undefined,
           onSubmit: () => undefined
         })
@@ -189,6 +236,9 @@ describe("ordered Studio batch editor", () => {
     expect(markup.indexOf("First")).toBeLessThan(markup.indexOf("Second"));
     expect(markup).toContain("批量任务部分完成");
     expect(markup).toContain("我确认要创建一个新的批量请求");
+    expect(markup).not.toContain("上移");
+    expect(markup).not.toContain("下移");
+    expect(markup).not.toContain("并发数");
     expect(markup).toMatch(/<button[^>]*disabled=""[^>]*>作为新批次再次提交<\/button>/u);
   });
 });
