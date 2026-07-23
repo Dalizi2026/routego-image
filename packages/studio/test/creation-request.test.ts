@@ -4,6 +4,7 @@ import {
   buildStudioCreationRequest,
   CreationDraftError,
   createInitialCreationDraft,
+  normalizeVisibleControls,
   type CreationDraft
 } from "../src/features/creation";
 
@@ -11,91 +12,107 @@ const defaults = {
   model: "mock-image-model",
   size: "auto" as const,
   aspectRatio: "auto" as const,
-  quality: "auto" as const,
+  quality: "high" as const,
   format: "png" as const,
   count: 1 as const,
-  partialImages: 0 as const,
+  partialImages: 2 as const,
   transparentMode: "off" as const,
-  moderation: "auto" as const,
+  moderation: "low" as const,
   saveToLibrary: true
 };
 
-describe("path-free Studio creation request construction", () => {
-  it("constructs a text-only generate request with complete output controls", () => {
+describe("path-free Studio generation request construction", () => {
+  it("constructs a text-only generate request with visible output controls only", () => {
     const request = buildStudioCreationRequest({
       ...createInitialCreationDraft(defaults),
-      prompt: "A precise amber-lit product photograph"
+      prompt: "A precise amber-lit product photograph",
+      controls: {
+        size: "1024x1024",
+        aspectRatio: "auto",
+        format: "png",
+        count: 2,
+        transparentMode: "native",
+        quality: "high",
+        compression: 80,
+        partialImages: 2,
+        moderation: "low",
+        action: "generate",
+        previousResponseId: "response-should-not-leak",
+        saveToLibrary: true
+      }
     });
-    expect(request).toMatchObject({
+
+    expect(request).toEqual({
       kind: "generate",
       prompt: "A precise amber-lit product photograph",
-      references: [],
+      size: "1024x1024",
+      aspectRatio: "auto",
       format: "png",
-      count: 1,
-      saveToLibrary: true
+      count: 2,
+      transparentMode: "native"
     });
     expect(JSON.stringify(request)).not.toMatch(
-      /(?:C:\\|\/Users\/|data:image|base64|Authorization|api[_-]?key|rawBytes)/u
+      /quality|compression|partialImages|moderation|saveToLibrary|model|previousResponse|references|imageIds|fileIds|target|mask|data:image|base64|Authorization|api[_-]?key|rawBytes/u
     );
   });
 
-  it("keeps ordered upload locators and edit invariants without paths", () => {
+  it("enforces size and aspect ratio as mutually exclusive browser controls", () => {
     const draft: CreationDraft = {
       ...createInitialCreationDraft(defaults),
-      mode: "edit",
-      prompt: "Replace only the sky",
-      references: [
-        {
-          id: "ref-1",
-          role: "style",
-          locator: { source: "upload", uploadResourceId: "upload-reference" }
-        }
-      ],
-      target: {
-        id: "target-1",
-        role: "previous-output",
-        locator: { source: "artifact", artifactId: "artifact-target" }
-      },
-      supportingImages: [
-        {
-          id: "support-1",
-          role: "supporting",
-          locator: { source: "asset", assetId: "asset-support" }
-        }
-      ],
-      invariants: {
-        allowedChanges: ["sky color"],
-        preserve: ["subject", "text"],
-        forbiddenChanges: ["layout"]
+      prompt: "A clean Studio submission",
+      controls: {
+        size: "1024x1024",
+        aspectRatio: "portrait",
+        format: "png",
+        count: 1,
+        transparentMode: "off",
+        quality: "high",
+        partialImages: 2,
+        moderation: "low",
+        action: "auto",
+        saveToLibrary: true
       }
     };
-    const request = buildStudioCreationRequest(draft);
-    expect(request).toMatchObject({
-      kind: "edit",
-      target: { source: "artifact", artifactId: "artifact-target" },
-      references: [{ image: { uploadResourceId: "upload-reference" } }],
-      supportingImages: [{ image: { assetId: "asset-support" } }]
+
+    expect(() => buildStudioCreationRequest(draft)).toThrow(CreationDraftError);
+    expect(normalizeVisibleControls(draft.controls)).toMatchObject({
+      size: "auto",
+      aspectRatio: "auto"
     });
-    expect(JSON.stringify(request)).not.toContain("path");
   });
 
-  it("blocks incomplete uploads and empty edit invariants without mutating the draft", () => {
-    const draft: CreationDraft = {
-      ...createInitialCreationDraft(defaults),
-      mode: "edit",
-      prompt: "Edit safely",
-      target: {
-        id: "target-upload",
-        role: "previous-output",
-        upload: {
-          id: "target-upload",
-          purpose: "target",
-          source: { name: "synthetic.png", blob: new Blob(["x"], { type: "image/png" }) },
-          status: "uploading"
-        }
-      }
-    };
-    expect(() => buildStudioCreationRequest(draft)).toThrow(CreationDraftError);
-    expect(draft.target?.upload?.status).toBe("uploading");
+  it("forces transparent output to PNG and disables transparency for JPEG or WebP", () => {
+    expect(
+      normalizeVisibleControls({
+        size: "auto",
+        aspectRatio: "auto",
+        format: "webp",
+        count: 1,
+        transparentMode: "native"
+      })
+    ).toMatchObject({ format: "png", transparentMode: "native" });
+
+    expect(
+      normalizeVisibleControls({
+        size: "auto",
+        aspectRatio: "auto",
+        format: "jpeg",
+        count: 1,
+        transparentMode: "off"
+      })
+    ).toMatchObject({ format: "jpeg", transparentMode: "off" });
+  });
+
+  it("blocks empty prompts and non-generation workbench submissions", () => {
+    expect(() => buildStudioCreationRequest(createInitialCreationDraft(defaults))).toThrow(
+      CreationDraftError
+    );
+    expect(() =>
+      buildStudioCreationRequest({
+        ...createInitialCreationDraft(defaults),
+        mode: "edit",
+        prompt: "Try to edit from Studio"
+      })
+    ).toThrow(CreationDraftError);
   });
 });

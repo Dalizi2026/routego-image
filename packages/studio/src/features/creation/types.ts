@@ -57,15 +57,18 @@ export interface DraftImageInput {
   readonly upload?: UploadLifecycleItem | undefined;
 }
 
-export interface CreationControls {
+export interface CreationVisibleControls {
   readonly size: ReadSettingsResult["defaults"]["size"];
   readonly aspectRatio: ReadSettingsResult["defaults"]["aspectRatio"];
-  readonly quality: ReadSettingsResult["defaults"]["quality"];
   readonly format: ReadSettingsResult["defaults"]["format"];
-  readonly compression?: number | undefined;
   readonly count: ReadSettingsResult["defaults"]["count"];
-  readonly partialImages: ReadSettingsResult["defaults"]["partialImages"];
   readonly transparentMode: ReadSettingsResult["defaults"]["transparentMode"];
+}
+
+export interface CreationControls extends CreationVisibleControls {
+  readonly quality: ReadSettingsResult["defaults"]["quality"];
+  readonly compression?: number | undefined;
+  readonly partialImages: ReadSettingsResult["defaults"]["partialImages"];
   readonly moderation: ReadSettingsResult["defaults"]["moderation"];
   readonly action: "auto" | "generate" | "edit";
   readonly previousResponseId?: string | undefined;

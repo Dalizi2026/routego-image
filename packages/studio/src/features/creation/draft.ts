@@ -1,18 +1,11 @@
 import {
-  studioEditInputSchema,
   studioGenerateInputSchema,
   type ReadSettingsResult,
-  type StudioImageInputRef,
   type StudioImageOperationRequest,
   type StudioImageOperationResult
 } from "@routego-image/contracts";
 
-import type {
-  CreationDraft,
-  DraftImageInput,
-  EditInvariantsDraft
-} from "./types";
-import { uploadLocator } from "./upload";
+import type { CreationDraft, CreationVisibleControls } from "./types";
 
 export class CreationDraftError extends Error {
   readonly fields: Readonly<Record<string, string>>;
@@ -22,6 +15,18 @@ export class CreationDraftError extends Error {
     this.name = "CreationDraftError";
     this.fields = fields;
   }
+}
+
+export function visibleControlsFromDefaults(
+  defaults: ReadSettingsResult["defaults"]
+): CreationVisibleControls {
+  return normalizeVisibleControls({
+    size: defaults.size,
+    aspectRatio: defaults.aspectRatio,
+    format: defaults.format,
+    count: defaults.count,
+    transparentMode: defaults.transparentMode
+  });
 }
 
 export function createInitialCreationDraft(
@@ -34,13 +39,9 @@ export function createInitialCreationDraft(
     supportingImages: [],
     invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
     controls: {
-      size: defaults.size,
-      aspectRatio: defaults.aspectRatio,
+      ...visibleControlsFromDefaults(defaults),
       quality: defaults.quality,
-      format: defaults.format,
-      count: defaults.count,
       partialImages: defaults.partialImages,
-      transparentMode: defaults.transparentMode,
       moderation: defaults.moderation,
       action: "auto",
       saveToLibrary: defaults.saveToLibrary
@@ -48,55 +49,17 @@ export function createInitialCreationDraft(
   };
 }
 
-export function draftImageLocator(image: DraftImageInput): StudioImageInputRef | undefined {
-  return image.locator ?? (image.upload === undefined ? undefined : uploadLocator(image.upload));
-}
-
-function requiredLocator(image: DraftImageInput, field: string): StudioImageInputRef {
-  const locator = draftImageLocator(image);
-  if (locator === undefined) {
-    throw new CreationDraftError("图像仍在上传或上传失败。", {
-      [field]: "请等待该图像完成上传，或安全重试/移除。"
-    });
-  }
-  return locator;
-}
-
-function nonEmptyInvariants(invariants: EditInvariantsDraft): boolean {
-  return (
-    invariants.allowedChanges.some((value) => value.trim() !== "") ||
-    invariants.preserve.some((value) => value.trim() !== "") ||
-    invariants.forbiddenChanges.some((value) => value.trim() !== "")
-  );
-}
-
-function commonRequest(draft: CreationDraft) {
-  const references = draft.references.map((reference, index) => ({
-    image: requiredLocator(reference, `references.${index}`),
-    role: reference.role,
-    ...(reference.label?.trim() ? { label: reference.label.trim() } : {})
-  }));
+export function normalizeVisibleControls(
+  controls: CreationVisibleControls
+): CreationVisibleControls {
+  const format = controls.transparentMode === "off" ? controls.format : "png";
+  const transparentMode = format === "png" ? controls.transparentMode : "off";
   return {
-    prompt: draft.prompt.trim(),
-    references,
-    size: draft.controls.size,
-    aspectRatio: draft.controls.aspectRatio,
-    quality: draft.controls.quality,
-    format: draft.controls.format,
-    ...(draft.controls.compression === undefined
-      ? {}
-      : { compression: draft.controls.compression }),
-    count: draft.controls.count,
-    partialImages: draft.controls.partialImages,
-    transparentMode: draft.controls.transparentMode,
-    moderation: draft.controls.moderation,
-    action: draft.controls.action,
-    ...(draft.controls.previousResponseId === undefined
-      ? {}
-      : { previousResponseId: draft.controls.previousResponseId }),
-    imageIds: [],
-    fileIds: [],
-    saveToLibrary: draft.controls.saveToLibrary
+    size: controls.aspectRatio === "auto" ? controls.size : "auto",
+    aspectRatio: controls.size === "auto" ? controls.aspectRatio : "auto",
+    format,
+    count: controls.count,
+    transparentMode
   };
 }
 
@@ -108,36 +71,38 @@ function fieldsFromIssues(issues: readonly { readonly path: PropertyKey[]; reado
 
 export function buildStudioCreationRequest(draft: CreationDraft): StudioImageOperationRequest {
   try {
-    if (draft.prompt.trim() === "") {
+    const prompt = draft.prompt.trim();
+    if (prompt === "") {
       throw new CreationDraftError("请输入提示词。", { prompt: "提示词不能为空。" });
     }
-    if (draft.mode === "generate") {
-      return studioGenerateInputSchema.parse({ kind: "generate", ...commonRequest(draft) });
-    }
-    if (draft.target === undefined) {
-      throw new CreationDraftError("编辑需要一张目标图。", { target: "请添加目标图。" });
-    }
-    if (!nonEmptyInvariants(draft.invariants)) {
-      throw new CreationDraftError("请明确至少一项编辑约束。", {
-        invariants: "填写允许修改、必须保留或禁止修改中的至少一项。"
+    if (draft.mode !== "generate") {
+      throw new CreationDraftError("Studio 工作台只支持文本生成。", {
+        mode: "请选择生成模式。"
       });
     }
-    return studioEditInputSchema.parse({
-      kind: "edit",
-      ...commonRequest(draft),
-      target: requiredLocator(draft.target, "target"),
-      supportingImages: draft.supportingImages.map((supporting, index) => ({
-        image: requiredLocator(supporting, `supportingImages.${index}`),
-        role: supporting.role,
-        ...(supporting.label?.trim() ? { label: supporting.label.trim() } : {})
-      })),
-      ...(draft.mask === undefined ? {} : { mask: draft.mask }),
-      invariants: {
-        allowedChanges: draft.invariants.allowedChanges.filter((value) => value.trim() !== ""),
-        preserve: draft.invariants.preserve.filter((value) => value.trim() !== ""),
-        forbiddenChanges: draft.invariants.forbiddenChanges.filter((value) => value.trim() !== "")
-      }
-    });
+    if (draft.controls.size !== "auto" && draft.controls.aspectRatio !== "auto") {
+      throw new CreationDraftError("尺寸和画幅只能指定一个。", {
+        size: "选择具体尺寸时画幅必须为 auto。",
+        aspectRatio: "选择具体画幅时尺寸必须为 auto。"
+      });
+    }
+    if (draft.controls.format !== "png" && draft.controls.transparentMode !== "off") {
+      throw new CreationDraftError("JPEG/WebP 不支持透明背景。", {
+        format: "透明背景需要 PNG。",
+        transparentMode: "选择 JPEG 或 WebP 时透明背景必须关闭。"
+      });
+    }
+    const request = {
+      kind: "generate",
+      prompt,
+      size: draft.controls.size,
+      aspectRatio: draft.controls.aspectRatio,
+      format: draft.controls.format,
+      count: draft.controls.count,
+      transparentMode: draft.controls.transparentMode
+    } satisfies Record<string, unknown>;
+    studioGenerateInputSchema.parse(request);
+    return request as unknown as StudioImageOperationRequest;
   } catch (error) {
     if (error instanceof CreationDraftError) {
       throw error;
@@ -157,52 +122,27 @@ export function buildStudioCreationRequest(draft: CreationDraft): StudioImageOpe
 
 export function createEditHandoff(
   result: StudioImageOperationResult,
-  artifactId: string
+  _artifactId: string
 ): CreationDraft {
-  const artifact = [...result.finalArtifacts, ...result.partialArtifacts].find(
-    (candidate) => candidate.artifactId === artifactId
-  );
-  if (artifact === undefined) {
-    throw new CreationDraftError("无法找到要继续编辑的结果。");
-  }
-  const effective = result.effectiveParams;
-  const targetLocator: StudioImageInputRef = artifact.assetId
-    ? { source: "asset", assetId: artifact.assetId }
-    : { source: "artifact", artifactId: artifact.artifactId };
   return {
-    mode: "edit",
-    prompt: effective.prompt,
-    references: effective.references.map((reference, index) => ({
-      id: `handoff-reference-${index}`,
-      role: reference.role,
-      ...(reference.label ? { label: reference.label } : {}),
-      locator: reference.image
-    })),
-    target: {
-      id: `handoff-target-${artifact.artifactId}`,
-      role: "previous-output",
-      locator: targetLocator,
-      resource: artifact.resource
-    },
+    mode: "generate",
+    prompt: result.effectiveParams.prompt,
+    references: [],
     supportingImages: [],
-    mask: undefined,
-    maskUpload: undefined,
     invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
     controls: {
-      size: effective.size,
-      aspectRatio: effective.aspectRatio,
-      quality: effective.quality,
-      format: effective.format,
-      ...(effective.compression === undefined ? {} : { compression: effective.compression }),
-      count: effective.count,
-      partialImages: effective.partialImages,
-      transparentMode: effective.transparentMode,
-      moderation: effective.moderation,
-      action: effective.action,
-      ...(effective.previousResponseId === undefined
-        ? {}
-        : { previousResponseId: effective.previousResponseId }),
-      saveToLibrary: effective.saveToLibrary
+      ...normalizeVisibleControls({
+        size: result.effectiveParams.size,
+        aspectRatio: result.effectiveParams.aspectRatio,
+        format: result.effectiveParams.format,
+        count: result.effectiveParams.count,
+        transparentMode: result.effectiveParams.transparentMode
+      }),
+      quality: "auto",
+      partialImages: 0,
+      moderation: "auto",
+      action: "auto",
+      saveToLibrary: true
     }
   };
 }
