@@ -3,6 +3,7 @@ import path from "node:path";
 import { access, writeFile } from "node:fs/promises";
 
 import {
+  studioGenerateInputSchema,
   studioImageOperationEventSchema,
   studioServiceErrorSchema,
   type StudioImageOperationEvent
@@ -16,7 +17,6 @@ import {
   createOfflineHarness,
   readableSse,
   sseRecord,
-  studioGenerate,
   syntheticArtifact,
   syntheticPng,
   syntheticResult,
@@ -44,7 +44,14 @@ function started(requestId = "request-sse", sequence = 0): StudioImageOperationE
     requestId,
     sequence,
     occurredAt: new Date(FIXED_NOW).toISOString(),
-    requestedParams: studioGenerate()
+    requestedParams: studioTextGenerate()
+  });
+}
+
+function studioTextGenerate() {
+  return studioGenerateInputSchema.parse({
+    kind: "generate",
+    prompt: "一张完全离线的合成图片"
   });
 }
 
@@ -120,7 +127,7 @@ describe("task 6.1 strict Studio stream and security boundaries", () => {
         );
       }
     });
-    const events = await collectStudioEvents(created.service.executeStudioStream(studioGenerate()));
+    const events = await collectStudioEvents(created.service.executeStudioStream(studioTextGenerate()));
     expect(events.map((event) => event.type)).toEqual(["started", "partial", "failed"]);
     expect(events.at(-1)).toMatchObject({
       type: "failed",
@@ -140,7 +147,7 @@ describe("task 6.1 strict Studio stream and security boundaries", () => {
     });
     const status = await created.service.status({});
     expect(status.service.status).toBe("degraded");
-    const events = await collectStudioEvents(created.service.executeStudioStream(studioGenerate()));
+    const events = await collectStudioEvents(created.service.executeStudioStream(studioTextGenerate()));
     expect(events.map((event) => event.type)).toEqual(["started", "failed"]);
     expect(events.at(-1)).toMatchObject({ type: "failed", error: { code: "config_corrupt" } });
     expect(execute).not.toHaveBeenCalled();
@@ -156,13 +163,14 @@ describe("task 6.1 strict Studio stream and security boundaries", () => {
       saveToLibrary: false
     });
     expect(publicResult).toMatchObject({ status: "failed", error: { code: "invalid_input" } });
-    const studioResult = await created.service.studioGenerate(studioGenerate({
+    await expect(created.service.studioGenerate({
+      kind: "generate",
+      prompt: "Stale upload identity must be rejected",
       references: [{
         image: { source: "upload", uploadResourceId: "missing-upload" },
         role: "reference"
       }]
-    }));
-    expect(studioResult).toMatchObject({ status: "failed", error: { code: "invalid_input" } });
+    } as never)).rejects.toThrow(/references/u);
     expect(execute).not.toHaveBeenCalled();
   });
 

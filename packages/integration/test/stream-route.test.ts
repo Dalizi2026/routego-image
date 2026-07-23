@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
-  studioEditInputSchema,
   studioGenerateInputSchema,
   studioImageOperationResultSchema,
   studioServiceErrorSchema,
@@ -24,34 +23,13 @@ const TOKEN = "synthetic-session-token-that-is-long-enough";
 const ORIGIN = "http://127.0.0.1:43119";
 const TIMESTAMP = "2026-07-18T12:00:00.000Z";
 
-function generateRequest(): StudioImageOperationRequest {
+function generateRequest(
+  overrides: Partial<Extract<StudioImageOperationRequest, { kind: "generate" }>> = {}
+): StudioImageOperationRequest {
   return studioGenerateInputSchema.parse({
     kind: "generate",
-    prompt: "生成一只浏览器安全的宇航猫"
-  });
-}
-
-function editRequest(): StudioImageOperationRequest {
-  return studioEditInputSchema.parse({
-    kind: "edit",
-    prompt: "只替换天空并保留主体",
-    target: { source: "artifact", artifactId: "artifact-target" },
-    supportingImages: [
-      {
-        image: { source: "upload", uploadResourceId: "upload-supporting" },
-        role: "supporting"
-      }
-    ],
-    mask: {
-      image: { source: "upload", uploadResourceId: "upload-mask" },
-      targetSlot: 0
-    },
-    invariants: {
-      allowedChanges: ["sky"],
-      preserve: ["subject and composition"],
-      forbiddenChanges: ["text"]
-    },
-    action: "edit"
+    prompt: "生成一只浏览器安全的宇航猫",
+    ...overrides
   });
 }
 
@@ -284,14 +262,14 @@ describe("authenticated Studio creation stream route", () => {
     expect(consumed.chunks.join("")).not.toMatch(/\[DONE\]|sentinel/u);
   });
 
-  it("accepts frozen edit input, zero-or-more partials, and one failed terminal", async () => {
-    const input = editRequest();
+  it("accepts frozen generation input, zero-or-more partials, and one failed terminal", async () => {
+    const input = generateRequest({ prompt: "生成一组可中途失败的浏览器安全图片" });
     const execute = vi.fn<StudioCreationStreamExecutor>(async (actual) =>
       values(
-        started(actual, "edit-stream", 4),
-        partial("edit-stream", 7, "artifact-edit-partial-1"),
-        partial("edit-stream", 9, "artifact-edit-partial-2"),
-        failed("edit-stream", 12, true)
+        started(actual, "generate-stream", 4),
+        partial("generate-stream", 7, "artifact-generate-partial-1"),
+        partial("generate-stream", 9, "artifact-generate-partial-2"),
+        failed("generate-stream", 12, true)
       )
     );
     const response = await dispatcher(execute).dispatch(request(STUDIO_CREATION_STREAM_PATH, input));
@@ -427,7 +405,8 @@ describe("authenticated Studio creation stream route", () => {
     },
     {
       name: "started input drift",
-      source: (input: StudioImageOperationRequest) => values(started(editRequest()), completed(input))
+      source: (input: StudioImageOperationRequest) =>
+        values(started(generateRequest({ prompt: "不同的生成请求" })), completed(input))
     },
     {
       name: "request ID drift",

@@ -993,25 +993,15 @@ function studioRequestWithEffectiveControls(
   effective: ImageOperationRequest
 ): StudioImageOperationRequest {
   return studioImageOperationRequestSchema.parse({
-    ...request,
+    schemaVersion: request.schemaVersion,
+    kind: "generate",
     prompt: effective.prompt,
     size: effective.size,
-    aspectRatio: effective.aspectRatio,
-    quality: effective.quality,
     format: effective.format,
-    ...(effective.compression === undefined
-      ? { compression: undefined }
-      : { compression: effective.compression }),
     count: effective.count,
-    partialImages: effective.partialImages,
     transparentMode: effective.transparentMode,
-    moderation: effective.moderation,
-    action: effective.action,
-    ...(effective.previousResponseId === undefined
-      ? { previousResponseId: undefined }
-      : { previousResponseId: effective.previousResponseId }),
-    imageIds: effective.imageIds,
-    fileIds: effective.fileIds
+    saveToLibrary: effective.saveToLibrary,
+    aspectRatio: effective.aspectRatio
   });
 }
 

@@ -607,6 +607,10 @@ describe("explicit non-billable model refresh", () => {
 });
 
 describe("exact confirmed capability probes", () => {
+  const generationProbePairs = CAPABILITY_PROBE_PAIRS.filter(
+    (pair) => pair.requestShape !== undefined
+  );
+
   it("rejects an unconfirmed probe before profile or network access", async () => {
     const owner = {
       getRuntimeProviderProfile: vi.fn<() => Promise<RuntimeProviderProfile>>(),
@@ -626,7 +630,7 @@ describe("exact confirmed capability probes", () => {
     expect(owner.getRuntimeProviderProfile).not.toHaveBeenCalled();
   });
 
-  it.each(CAPABILITY_PROBE_PAIRS.map((pair) => [
+  it.each(generationProbePairs.map((pair) => [
     `${pair.transport} ${pair.requestShape} ${pair.capability}`,
     pair
   ] as const))("materially exercises and proves allowed pair %s", async (_label, pair) => {
@@ -688,11 +692,6 @@ describe("exact confirmed capability probes", () => {
       {
         transport: "single-endpoint-json",
         requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
-        capability: "canvas-expansion"
-      },
-      {
-        transport: "openai-images",
-        requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart,
         capability: "canvas-expansion"
       },
       ...[
@@ -950,29 +949,18 @@ describe("exact confirmed capability probes", () => {
     expect(readSpy).not.toHaveBeenCalled();
   });
 
-  it("sends deterministic primary plus image[] bytes for an Edits multi-image probe", async () => {
+  it("rejects the removed OpenAI Images edits multi-image probe before network access", async () => {
     const { owner } = mockProbeOwner();
-    const synthetic = createDeterministicSyntheticPngInputs();
-    const fetchImpl = vi.fn<typeof fetch>(async (_input, init) => {
-      const form = init?.body as FormData;
-      const primary = form.get("image") as File;
-      const additional = form.getAll("image[]") as File[];
-      expect(Buffer.from(await primary.arrayBuffer())).toEqual(Buffer.from(synthetic.image.bytes));
-      expect(additional).toHaveLength(1);
-      expect(Buffer.from(await additional[0]!.arrayBuffer())).toEqual(Buffer.from(synthetic.mask.bytes));
-      expect(form.get("mask")).toBeNull();
-      return successfulProbeResponse({
-        capability: "multi-image-input",
-        transport: "openai-images"
-      });
-    });
-    await probeProviderCapability(owner, probeInput({
+    const fetchImpl = vi.fn<typeof fetch>();
+    await expect(probeProviderCapability(owner, probeInput({
       providerId: "provider-synthetic",
       capability: "multi-image-input",
       transport: "openai-images",
       requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
-    }), { fetch: fetchImpl, now: () => now });
-    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    }), { fetch: fetchImpl, now: () => now })).rejects.toMatchObject({
+      serviceError: { code: "invalid_request" }
+    });
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   it("sends exactly two deterministic input_image entries for a Responses multi-image probe", async () => {
@@ -1098,7 +1086,7 @@ describe("exact confirmed capability probes", () => {
     expect(JSON.stringify([unsupported, transient])).not.toContain(credential);
   });
 
-  it("uses the exact configured Edits endpoint with deterministic PNG image and mask parts", async () => {
+  it("rejects the removed exact Edits endpoint probe before network access", async () => {
     const editsEndpoint = "https://relay.example/v1/images/edits?tenant=synthetic";
     const { store, profileId } = await createStore({
       endpoints: {
@@ -1106,32 +1094,16 @@ describe("exact confirmed capability probes", () => {
         edits: editsEndpoint
       }
     });
-    const synthetic = createDeterministicSyntheticPngInputs();
-    const fetchImpl = vi.fn<typeof fetch>(async (input, init) => {
-      expect(input).toBe(editsEndpoint);
-      expect(init?.body).toBeInstanceOf(FormData);
-      const body = init?.body as FormData;
-      const image = body.get("image");
-      const mask = body.get("mask");
-      expect(image).toBeInstanceOf(File);
-      expect(mask).toBeInstanceOf(File);
-      expect((image as File).type).toBe("image/png");
-      expect((mask as File).type).toBe("image/png");
-      expect(Buffer.from(await (image as File).arrayBuffer())).toEqual(Buffer.from(synthetic.image.bytes));
-      expect(Buffer.from(await (mask as File).arrayBuffer())).toEqual(Buffer.from(synthetic.mask.bytes));
-      return successfulProbeResponse({
-        capability: "mask-edit",
-        transport: "openai-images"
-      });
-    });
-    const result = await probeProviderCapability(store, probeInput({
+    const fetchImpl = vi.fn<typeof fetch>();
+    await expect(probeProviderCapability(store, probeInput({
       providerId: profileId!,
       capability: "mask-edit",
       transport: "openai-images",
       requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
-    }), { fetch: fetchImpl, now: () => now });
-    expect(fetchImpl).toHaveBeenCalledTimes(1);
-    expect(result).toMatchObject({ status: "completed", mayHaveBilled: true, record: { state: "supported" } });
+    }), { fetch: fetchImpl, now: () => now })).rejects.toMatchObject({
+      serviceError: { code: "invalid_request" }
+    });
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -1158,7 +1130,7 @@ describe("exact confirmed capability probes", () => {
     expect(JSON.stringify(result)).not.toContain(credential);
   });
 
-  it("does not derive an Edits endpoint and never submits a mismatched capability shape", async () => {
+  it("does not submit removed Edits or mismatched capability shapes", async () => {
     const { store, profileId } = await createStore();
     const fetchImpl = vi.fn<typeof fetch>();
     await expect(probeProviderCapability(store, probeInput({
@@ -1167,7 +1139,7 @@ describe("exact confirmed capability probes", () => {
       transport: "openai-images",
       requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
     }), { fetch: fetchImpl })).rejects.toMatchObject({
-      serviceError: { code: "config_missing" }
+      serviceError: { code: "invalid_request" }
     });
     await expect(probeProviderCapability(store, probeInput({
       providerId: profileId!,

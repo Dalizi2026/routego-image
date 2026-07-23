@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import path from "node:path";
 import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 
@@ -6,7 +5,7 @@ import {
   imageArtifactPhaseSchema,
   routegoOperationDefinitions,
   routegoOperationNames,
-  studioEditInputSchema,
+  studioGenerateInputSchema,
   studioImageOperationEventSchema,
   type ImageOperationRequest,
   type StudioImageOperationEvent
@@ -23,7 +22,6 @@ import {
   createOfflineHarness,
   publicGenerate,
   responseText,
-  studioGenerate,
   syntheticArtifact,
   syntheticPng,
   syntheticResult,
@@ -77,8 +75,15 @@ function decodeSse(text: string): StudioImageOperationEvent[] {
   });
 }
 
+function studioTextGenerate() {
+  return studioGenerateInputSchema.parse({
+    kind: "generate",
+    prompt: "一张完全离线的合成图片"
+  });
+}
+
 describe("task 6.1 offline production composition", () => {
-  it("shares one saved asset identity across public creation, Studio search, detail and retry data", async () => {
+  it("shares one saved asset identity across public creation, Studio search, detail and generation-copy data", async () => {
     const { service } = await harness();
     const publicResult = await service.generate(publicGenerate());
     expect(publicResult.status).toBe("succeeded");
@@ -96,27 +101,17 @@ describe("task 6.1 offline production composition", () => {
       requestedParams: { prompt: "A deterministic offline Routego image" },
       effectiveParams: { prompt: "A deterministic offline Routego image" }
     });
-    expect(detail.asset?.allowedActions).toEqual(expect.arrayContaining(["edit", "retry", "export-zip"]));
-    const moduleUrl = new URL("../../studio/src/features/library/handoff.ts", import.meta.url).href;
-    const { createLibraryRetryHandoff, isIdentifierOnlyLibraryHandoff } = await import(moduleUrl) as {
-      createLibraryRetryHandoff(asset: NonNullable<typeof detail.asset>): {
-        readonly action: string;
-        readonly assetId: string;
-        readonly draft: { readonly prompt: string };
-      };
-      isIdentifierOnlyLibraryHandoff(value: unknown): boolean;
-    };
-    const retry = createLibraryRetryHandoff(detail.asset!);
-    expect(retry).toMatchObject({
-      action: "retry",
-      assetId,
-      draft: { prompt: "A deterministic offline Routego image" }
-    });
-    expect(isIdentifierOnlyLibraryHandoff(retry)).toBe(true);
+    expect(detail.asset?.allowedActions).toEqual(expect.arrayContaining([
+      "mark",
+      "copy-generation-info",
+      "export-zip",
+      "download"
+    ]));
+    expect(detail.asset?.allowedActions).not.toEqual(expect.arrayContaining(["edit", "retry"]));
     expect(JSON.stringify({ studioSearch, detail })).not.toMatch(/data:image|base64|"path"/u);
   });
 
-  it("stages direct target, supporting and mask inputs and preserves degraded continuation metadata", async () => {
+  it("stages direct generation references and preserves provider execution metadata", async () => {
     const calls: ImageOperationRequest[] = [];
     const created = await harness({
       executeCreation: async (request, context) => {
@@ -126,26 +121,21 @@ describe("task 6.1 offline production composition", () => {
     });
     const sourceRoot = path.join(created.root, "synthetic-inputs");
     await mkdir(sourceRoot, { recursive: true });
-    const target = path.join(sourceRoot, "target.png");
-    const supporting = path.join(sourceRoot, "supporting.png");
-    const mask = path.join(sourceRoot, "mask.png");
+    const referenceOne = path.join(sourceRoot, "reference-one.png");
+    const referenceTwo = path.join(sourceRoot, "reference-two.png");
     await Promise.all([
-      writeFile(target, syntheticPng(3, 3, 0x31)),
-      writeFile(supporting, syntheticPng(3, 3, 0x41)),
-      writeFile(mask, syntheticPng(3, 3, 0x51))
+      writeFile(referenceOne, syntheticPng(3, 3, 0x31)),
+      writeFile(referenceTwo, syntheticPng(3, 3, 0x41))
     ]);
 
-    const result = await created.service.edit({
-      kind: "edit",
-      prompt: "Continue a deterministic edit without a previous provider response",
-      targetImage: { path: target },
-      supportingImages: [{ path: supporting, role: "supporting" }],
-      maskPath: mask,
-      invariants: { allowedChanges: ["background"], preserve: ["subject"], forbiddenChanges: ["text"] },
-      action: "edit",
-      previousResponseId: "previous-response-unavailable",
+    const result = await created.service.generate(publicGenerate({
+      prompt: "Generate with deterministic local references",
+      references: [
+        { path: referenceOne, role: "reference" },
+        { path: referenceTwo, role: "style" }
+      ],
       saveToLibrary: true
-    });
+    }));
 
     expect(result).toMatchObject({
       status: "succeeded",
@@ -153,16 +143,15 @@ describe("task 6.1 offline production composition", () => {
     });
     expect(calls).toHaveLength(1);
     const executed = calls[0]!;
-    expect(executed.targetImage?.path).not.toBe(target);
-    expect(executed.supportingImages[0]?.path).not.toBe(supporting);
-    expect(executed.maskPath).not.toBe(mask);
+    expect(executed.references.map((item) => item.path)).not.toContain(referenceOne);
+    expect(executed.references.map((item) => item.path)).not.toContain(referenceTwo);
     const canonicalRoot = await realpath(created.root);
-    expect([executed.targetImage?.path, executed.supportingImages[0]?.path, executed.maskPath])
+    expect(executed.references.map((item) => item.path))
       .toSatisfy((paths: Array<string | undefined>) =>
         paths.every((value) => value !== undefined && path.relative(canonicalRoot, value).startsWith("staging/")));
   });
 
-  it("snapshots a finalized upload reference before creation and preserves its source relationship", async () => {
+  it("keeps Studio generation text-only without upload source relationships", async () => {
     const calls: ImageOperationRequest[] = [];
     const created = await harness({
       executeCreation: async (request, context) => {
@@ -170,37 +159,15 @@ describe("task 6.1 offline production composition", () => {
         return syntheticResult(request, context.requestId);
       }
     });
-    const bytes = syntheticPng(3, 2, 0x67);
-    const sha256 = createHash("sha256").update(bytes).digest("hex");
-    const reserved = await created.service.reserveUploadResource({
-      purpose: "reference",
-      declaredMimeType: "image/png",
-      declaredByteLength: bytes.byteLength,
-      expectedSha256: sha256
-    });
-    const uploadResourceId = reserved.resource!.uploadResourceId;
-    await created.library.stageUpload(uploadResourceId, (async function* () {
-      yield bytes.subarray(0, 9);
-      yield bytes.subarray(9);
-    })());
-    const finalized = await created.service.finalizeUploadResource({ uploadResourceId });
-    expect(finalized).toMatchObject({
-      status: "succeeded",
-      resource: { finalized: { sha256, detectedMimeType: "image/png" } }
-    });
 
-    const result = await created.service.studioGenerate(studioGenerate({
-      references: [{ image: { source: "upload", uploadResourceId }, role: "reference" }],
-      saveToLibrary: true
-    }));
+    const result = await created.service.studioGenerate(studioTextGenerate());
     expect(result.status).toBe("succeeded");
     expect(calls).toHaveLength(1);
-    expect(calls[0]!.references[0]?.path).toContain("/staging/");
+    expect(calls[0]!.references).toEqual([]);
     const assetId = result.finalArtifacts[0]!.assetId!;
     const detail = (await created.service.getAssetDetail({ assetId })).asset!;
-    expect(detail.renditions.filter((item) => item.phase === "source")).toHaveLength(1);
+    expect(detail.renditions.filter((item) => item.phase === "source")).toHaveLength(0);
     expect(detail.relationships).toEqual(expect.arrayContaining([
-      expect.objectContaining({ role: "reference", relatedAssetId: assetId }),
       expect.objectContaining({ role: "output", relatedAssetId: assetId })
     ]));
   });
@@ -219,7 +186,6 @@ describe("task 6.1 offline production composition", () => {
     });
     const ids = ["offline-1", "offline-2", "offline-3", "offline-4"];
     const result = await created.service.batch({
-      concurrency: 2,
       tasks: ids.map((id) => ({
         id,
         operation: publicGenerate({ prompt: id, saveToLibrary: false, outputDir: created.outputRoot })
@@ -230,45 +196,39 @@ describe("task 6.1 offline production composition", () => {
     expect(result.items.map((item) => item.result.partialArtifacts.length)).toEqual([1, 1, 1, 1]);
   });
 
-  it("persists exactly 17 source plus 12 partial plus 4 final renditions on one chromakey identity", async () => {
+  it("persists five generation sources plus 12 partial and 4 final renditions on one identity", async () => {
     const created = await harness({
       executeCreation: async (request, context) =>
         syntheticResult(request, context.requestId, { partialCount: 12, finalCount: 4 })
     });
     const sourceRoot = path.join(created.root, "maximum-inputs");
     await mkdir(sourceRoot, { recursive: true });
-    const sources = Array.from({ length: 17 }, (_, index) => path.join(sourceRoot, `source-${index}.png`));
+    const sources = Array.from({ length: 5 }, (_, index) => path.join(sourceRoot, `source-${index}.png`));
     await Promise.all(sources.map(async (source, index) =>
       await writeFile(source, syntheticPng(2, 2, 0x20 + index))));
 
-    const result = await created.service.edit({
-      kind: "edit",
-      prompt: "Maximum bounded chromakey graph",
-      targetImage: { path: sources[0]! },
-      references: sources.slice(1, 16).map((source) => ({ path: source, role: "reference" as const })),
-      maskPath: sources[16],
-      invariants: { preserve: ["single operation identity"] },
-      action: "edit",
-      transparentMode: "chromakey",
+    const result = await created.service.generate(publicGenerate({
+      prompt: "Maximum bounded generation graph",
+      references: sources.map((source) => ({ path: source, role: "reference" as const })),
       count: 4,
       partialImages: 3,
       saveToLibrary: true
-    });
+    }));
     expect(["succeeded", "partial"]).toContain(result.status);
     expect(result.partialArtifacts).toHaveLength(12);
     expect(result.finalArtifacts).toHaveLength(4);
     const assetId = (await created.service.searchLibrary({})).items[0]!.id;
     const detail = (await created.service.getAssetDetail({ assetId })).asset!;
-    expect(detail.renditions).toHaveLength(33);
-    expect(detail.renditions.filter((item) => item.phase === "source")).toHaveLength(17);
+    expect(detail.renditions).toHaveLength(21);
+    expect(detail.renditions.filter((item) => item.phase === "source")).toHaveLength(5);
     expect(detail.renditions.filter((item) => item.phase === "partial")).toHaveLength(12);
     expect(detail.renditions.filter((item) => item.phase === "final")).toHaveLength(4);
-    expect(new Set(detail.renditions.map((item) => item.artifactId)).size).toBe(33);
+    expect(new Set(detail.renditions.map((item) => item.artifactId)).size).toBe(21);
     expect(new Set(detail.relationships.map((item) => item.relatedAssetId))).toEqual(new Set([assetId]));
     expect(detail.relationships.map((item) => item.role)).not.toContain("transparent-original");
   });
 
-  it("round-trips a saved asset through ZIP without overwriting an existing project copy", async () => {
+  it("copies a saved asset to a project without overwriting an existing file", async () => {
     const created = await harness();
     const result = await created.service.generate(publicGenerate());
     const assetId = (await created.service.searchLibrary({})).items[0]!.id;
@@ -280,13 +240,6 @@ describe("task 6.1 offline production composition", () => {
     expect(path.basename(copied.finalArtifacts[0]!.path!)).toBe("routego-final-0-2.png");
     expect(await readFile(collision, "utf8")).toBe("existing-project-file");
 
-    const zipPath = path.join(created.root, "portable.zip");
-    const exported = await created.service.manageLibrary({ action: "export-zip", assetIds: [assetId], outputPath: zipPath });
-    expect(exported.outputPath).toBe(zipPath);
-    expect((await readFile(zipPath)).subarray(0, 2)).toEqual(Buffer.from("PK"));
-    const imported = await created.service.manageLibrary({ action: "import-zip", zipPath });
-    expect(imported.importedCount).toBe(0);
-    expect(imported.skippedCount).toBe(1);
     expect((await created.service.searchLibrary({})).items.map((item) => item.id)).toContain(assetId);
     expect(result.finalArtifacts[0]?.id).toBeDefined();
   });
@@ -305,7 +258,7 @@ describe("task 6.1 offline production composition", () => {
         return syntheticResult(request, context.requestId, { partialCount: 1 });
       }
     });
-    const response = await created.dispatchStudio(studioGenerate());
+    const response = await created.dispatchStudio(studioTextGenerate());
     expect(response.status).toBe(200);
     expect(response.headers?.["content-type"]).toBe("text/event-stream; charset=utf-8");
     const events = decodeSse(await responseText(response));
@@ -313,7 +266,7 @@ describe("task 6.1 offline production composition", () => {
     expect(events.map((event) => event.sequence)).toEqual([0, 1, 2]);
     expect(new Set(events.map((event) => event.requestId)).size).toBe(1);
 
-    const alternate = await created.dispatchStudio(studioGenerate(), {
+    const alternate = await created.dispatchStudio(studioTextGenerate(), {
       pathname: "/api/v1/studio/creation/events"
     });
     expect(alternate.status).toBe(404);

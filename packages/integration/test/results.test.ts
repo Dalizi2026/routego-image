@@ -97,7 +97,6 @@ function request(
   return imageOperationRequestSchema.parse({
     kind: "generate",
     prompt: "A synthetic result projection",
-    action: "generate",
     ...overrides
   });
 }
@@ -335,109 +334,63 @@ async function realpathForTest(value: string): Promise<string> {
 }
 
 describe("task 3.4 stable upload-source staging", () => {
-  it("revalidates and snapshots upload sources before provider use and survives later discard", async () => {
-    const root = await createRoot("source-stage");
-    const uploadPath = path.join(root, "upload.png");
-    const bytes = pngBytes(4, 3, 0x61);
-    await writeFile(uploadPath, bytes);
-    const resource: ResolvedStableImageResource = {
-      source: "upload",
-      uploadResourceId: "upload-reference",
-      purpose: "reference",
-      path: uploadPath,
-      mimeType: "image/png",
-      byteLength: bytes.byteLength,
-      sha256: createHash("sha256").update(bytes).digest("hex"),
-      width: 4,
-      height: 3,
-      expiresAt: "2026-07-18T12:05:00.000Z",
-      reusePolicy: "reusable-until-expiry"
-    };
+  it("leaves Studio text-only generation without source staging or Library resolution", async () => {
+    const root = await createRoot("studio-text-stage");
+    const resolveImageResource = vi.fn(async () => {
+      throw new Error("Studio text generation must not resolve image resources.");
+    });
     const original = await resolveStudioOperationInput(
+      { kind: "generate", prompt: "A synthetic text-only Studio request" },
       {
-        kind: "generate",
-        prompt: "Use a synthetic upload reference",
-        references: [
-          {
-            image: { source: "upload", uploadResourceId: "upload-reference" },
-            role: "reference"
-          }
-        ]
-      },
-      {
-        library: { resolveImageResource: async () => resource },
+        library: { resolveImageResource },
         idFactory: inputIdFactory,
         now: () => new Date(BASE_NOW)
       }
     );
     const transaction = await createOutputMaterializationTransaction({
       stagingRoot: path.join(root, "staging"),
-      requestId: "request-source-stage"
+      requestId: "request-studio-text-stage"
     });
     const staged = await stagePreparedStudioOperationSources(original, {
-      library: { resolveImageResource: async () => resource },
+      library: { resolveImageResource },
       transaction,
       now: () => new Date(BASE_NOW)
     });
-    expect(staged.creationRequest.references[0]?.path).toBe(staged.graph.inputs[0]?.path);
-    expect(staged.creationRequest.references[0]?.path).not.toBe(uploadPath);
-    expect(staged.graph.sourceRenditions[0]?.sourceRoot).toBe(transaction.directory);
-    await unlink(uploadPath);
-    expect(await readFile(staged.creationRequest.references[0]!.path)).toEqual(bytes);
+    expect(resolveImageResource).not.toHaveBeenCalled();
+    expect(staged.graph.inputs).toEqual([]);
+    expect(staged.graph.sourceRenditions).toEqual([]);
+    expect(staged.creationRequest.references).toEqual([]);
     await transaction.cleanup();
   });
 
-  it("fails closed and cleans the transaction when the upload expires during staging", async () => {
-    const root = await createRoot("source-expiry");
-    const uploadPath = path.join(root, "upload.png");
-    const bytes = pngBytes(2, 2, 0x62);
-    await writeFile(uploadPath, bytes);
-    const resource: ResolvedStableImageResource = {
-      source: "upload",
-      uploadResourceId: "upload-expiring",
-      purpose: "reference",
-      path: uploadPath,
-      mimeType: "image/png",
-      byteLength: bytes.byteLength,
-      sha256: createHash("sha256").update(bytes).digest("hex"),
-      width: 2,
-      height: 2,
-      expiresAt: "2026-07-18T12:00:00.500Z",
-      reusePolicy: "reusable-until-expiry"
-    };
-    const original = await resolveStudioOperationInput(
-      {
-        kind: "generate",
-        prompt: "Use an expiring synthetic upload",
-        references: [
-          {
-            image: { source: "upload", uploadResourceId: "upload-expiring" },
-            role: "reference"
-          }
-        ]
-      },
-      {
-        library: { resolveImageResource: async () => resource },
-        idFactory: inputIdFactory,
-        now: () => new Date(BASE_NOW)
-      }
-    );
+  it("rejects stale Studio image references before source staging", async () => {
+    const root = await createRoot("studio-stale-source");
+    const resolveImageResource = vi.fn();
     const transaction = await createOutputMaterializationTransaction({
       stagingRoot: path.join(root, "staging"),
-      requestId: "request-source-expiry"
+      requestId: "request-studio-stale-source"
     });
-    let tick = 0;
     await expect(
-      stagePreparedStudioOperationSources(original, {
-        library: { resolveImageResource: async () => resource },
-        transaction,
-        now: () => new Date(BASE_NOW.getTime() + tick++ * 1_000)
-      })
-    ).rejects.toSatisfy(
-      (error: unknown) =>
-        error instanceof ResultCompositionError && error.code === "source-unavailable"
-    );
-    await expect(access(transaction.directory)).rejects.toThrow();
+      resolveStudioOperationInput(
+        {
+          kind: "generate",
+          prompt: "Use an expired synthetic upload",
+          references: [
+            {
+              image: { source: "upload", uploadResourceId: "upload-expiring" },
+              role: "reference"
+            }
+          ]
+        },
+        {
+          library: { resolveImageResource },
+          idFactory: inputIdFactory,
+          now: () => new Date(BASE_NOW)
+        }
+      )
+    ).rejects.toMatchObject({ code: "invalid-request" });
+    expect(resolveImageResource).not.toHaveBeenCalled();
+    await transaction.cleanup();
   });
 
   it("snapshots approved public path inputs into the same request-owned transaction", async () => {
@@ -445,42 +398,68 @@ describe("task 3.4 stable upload-source staging", () => {
     const sourcePath = path.join(root, "public-reference.png");
     const bytes = pngBytes(3, 3, 0x63);
     await writeFile(sourcePath, bytes);
-    const resource: ResolvedStableImageResource = {
-      source: "upload",
-      uploadResourceId: "public-source",
-      purpose: "reference",
-      path: sourcePath,
-      mimeType: "image/png",
-      byteLength: bytes.byteLength,
-      sha256: createHash("sha256").update(bytes).digest("hex"),
-      width: 3,
-      height: 3,
-      expiresAt: "2026-07-18T12:05:00.000Z",
-      reusePolicy: "reusable-until-expiry"
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
+    const requestWithReference = request({
+      references: [
+        {
+          id: "artifact-public-source",
+          path: sourcePath,
+          role: "reference"
+        }
+      ]
+    });
+    const relationship = {
+      id: "relationship-public-source",
+      role: "reference" as const,
+      relatedAssetId: "asset-public-source",
+      artifactId: "artifact-public-source",
+      order: 0
     };
-    const prepared = await resolveStudioOperationInput(
-      {
-        kind: "generate",
-        prompt: "A synthetic public-style path request",
-        references: [
-          {
-            image: { source: "upload", uploadResourceId: "public-source" },
-            role: "reference"
-          }
-        ]
-      },
-      {
-        library: { resolveImageResource: async () => resource },
-        idFactory: inputIdFactory,
-        now: () => new Date(BASE_NOW)
+    const sourceRendition = {
+      artifactId: "artifact-public-source",
+      phase: "source" as const,
+      sourceRoot: root,
+      sourceRelativePath: "public-reference.png",
+      expected: {
+        mimeType: "image/png" as const,
+        byteLength: bytes.byteLength,
+        sha256,
+        width: 3,
+        height: 3
       }
-    );
+    };
+    const graph: DurableInputGraphPlan = Object.freeze({
+      operationAssetId: "asset-public-operation",
+      inputs: Object.freeze([
+        Object.freeze({
+          key: "reference:0" as const,
+          role: "reference" as const,
+          order: 0,
+          origin: "upload" as const,
+          relatedAssetId: "asset-public-source",
+          artifactId: "artifact-public-source",
+          path: sourcePath,
+          mimeType: "image/png" as const,
+          byteLength: bytes.byteLength,
+          sha256,
+          width: 3,
+          height: 3,
+          referenceRole: "reference" as const,
+          relationship,
+          sourceRendition
+        })
+      ]),
+      sourceRenditions: Object.freeze([sourceRendition]),
+      relationships: Object.freeze([relationship]),
+      physicalImageCount: 1,
+      maskCount: 0
+    });
     const transaction = await createOutputMaterializationTransaction({
       stagingRoot: path.join(root, "staging"),
       requestId: "request-public-source-stage"
     });
     const staged = await stagePreparedPublicOperationSources(
-      { request: prepared.creationRequest, graph: prepared.graph },
+      { request: requestWithReference, graph },
       { transaction }
     );
     await unlink(sourcePath);
@@ -537,124 +516,26 @@ describe("task 3.4 Studio result projection", () => {
     await registry.shutdown();
   });
 
-  it("atomically preserves existing owners, staged upload sources, partial output, and exact relationships", async () => {
-    const root = await createRoot("studio-source-graph");
+  it("atomically preserves text-only partial output and exact output relationships", async () => {
+    const root = await createRoot("studio-text-partial-graph");
     const library = await createLibrary(root);
-    const existingRoot = path.join(root, "existing-source");
-    await mkdir(existingRoot, { recursive: true });
-    const existingBytes = pngBytes(5, 4, 0x31);
-    await writeFile(path.join(existingRoot, "existing.png"), existingBytes);
-    const prompt = "Existing synthetic target";
-    await library.assetStore.ingestAsset({
-      assetId: "asset-existing-target",
-      primaryArtifactId: "artifact-existing-target",
-      prompt,
-      model: "synthetic-model",
-      requestedParams: {
-        kind: "generate",
-        prompt,
-        references: [],
-        supportingImages: [],
-        size: "auto",
-        aspectRatio: "auto",
-        quality: "auto",
-        format: "png",
-        count: 1,
-        partialImages: 0,
-        transparentMode: "off",
-        moderation: "auto",
-        action: "generate",
-        imageIds: [],
-        fileIds: [],
-        outputDirectoryMode: "default",
-        saveToLibrary: true
-      },
-      effectiveParams: {
-        kind: "generate",
-        prompt,
-        references: [],
-        supportingImages: [],
-        size: "auto",
-        aspectRatio: "auto",
-        quality: "auto",
-        format: "png",
-        count: 1,
-        partialImages: 0,
-        transparentMode: "off",
-        moderation: "auto",
-        action: "generate",
-        imageIds: [],
-        fileIds: [],
-        outputDirectoryMode: "default",
-        saveToLibrary: true
-      },
-      execution: {
-        attemptCount: 1,
-        providerRequestCount: 1,
-        receivedAnyOutput: true,
-        mayHaveBilled: true,
-        degradedContinuation: false,
-        providerImageIds: []
-      },
-      renditions: [
-        {
-          artifactId: "artifact-existing-target",
-          phase: "final",
-          sourceRoot: existingRoot,
-          sourceRelativePath: "existing.png"
-        }
-      ]
-    });
-    const uploadPath = path.join(root, "supporting-upload.png");
-    const uploadBytes = pngBytes(4, 3, 0x42);
-    await writeFile(uploadPath, uploadBytes);
-    const upload: ResolvedStableImageResource = {
-      source: "upload",
-      uploadResourceId: "upload-supporting",
-      purpose: "supporting",
-      path: uploadPath,
-      mimeType: "image/png",
-      byteLength: uploadBytes.byteLength,
-      sha256: createHash("sha256").update(uploadBytes).digest("hex"),
-      width: 4,
-      height: 3,
-      expiresAt: "2026-07-18T12:05:00.000Z",
-      reusePolicy: "reusable-until-expiry"
-    };
-    const resolver = async (
-      locator: Parameters<RoutegoLibraryService["resolveImageResource"]>[0],
-      purposes?: Parameters<RoutegoLibraryService["resolveImageResource"]>[1]
-    ) => {
-      if (locator.source === "upload") return upload;
-      return await library.resolveImageResource(locator, purposes);
-    };
-    const original = await resolveStudioOperationInput(
-      studioImageOperationRequestSchema.parse({
-        kind: "edit",
-        prompt: "Preserve the synthetic target and apply the supporting guide",
-        target: { source: "asset", assetId: "asset-existing-target" },
-        supportingImages: [
-          {
-            image: { source: "upload", uploadResourceId: "upload-supporting" },
-            role: "supporting",
-            label: "Guide"
-          }
-        ],
-        invariants: { preserve: ["target identity"] },
-        saveToLibrary: true
-      }),
-      { library: { resolveImageResource: resolver }, idFactory: inputIdFactory, now: () => new Date(BASE_NOW) }
-    );
+    const original = await textOnlyPrepared(studioRequest({
+      prompt: "A text-only Studio operation with a partial terminal",
+      saveToLibrary: true
+    }));
     const transaction = await createOutputMaterializationTransaction({
       stagingRoot: path.join(root, "staging"),
       requestId: "request-source-graph"
     });
     const prepared = await stagePreparedStudioOperationSources(original, {
-      library: { resolveImageResource: resolver },
+      library: {
+        resolveImageResource: async () => {
+          throw new Error("Text-only Studio staging must not resolve resources.");
+        }
+      },
       transaction,
       now: () => new Date(BASE_NOW)
     });
-    await unlink(uploadPath);
     const partial = artifact("artifact-source-graph-partial", 0, "partial");
     const providerError = {
       code: "provider_5xx" as const,
@@ -701,7 +582,6 @@ describe("task 3.4 Studio result projection", () => {
     const saved = index.assets.find((item) => item.id === prepared.graph.operationAssetId)!;
     expect(saved.status).toBe("partial");
     expect(saved.renditions.map((item) => ({ id: item.artifactId, phase: item.phase }))).toEqual([
-      { id: prepared.graph.sourceRenditions[0]!.artifactId, phase: "source" },
       { id: partial.id, phase: "partial" }
     ]);
     expect(saved.relationships.map((relationship) => ({
@@ -709,16 +589,6 @@ describe("task 3.4 Studio result projection", () => {
       owner: relationship.relatedAssetId,
       artifactId: relationship.artifactId
     }))).toEqual([
-      {
-        role: "target",
-        owner: "asset-existing-target",
-        artifactId: "artifact-existing-target"
-      },
-      {
-        role: "supporting",
-        owner: prepared.graph.operationAssetId,
-        artifactId: prepared.graph.sourceRenditions[0]!.artifactId
-      },
       {
         role: "output",
         owner: prepared.graph.operationAssetId,
@@ -1062,18 +932,18 @@ describe("task 3.4 public saved and unsaved projection", () => {
 });
 
 describe("task 3.4 graph bounds and chromakey identity", () => {
-  it("persists the exact 17 source plus 12 partial plus 4 final bound without a second identity", async () => {
-    const root = await createRoot("bound-33");
+  it("persists the generation-only five-reference source graph plus partial and final outputs without a second identity", async () => {
+    const root = await createRoot("bound-generation");
     const library = await createLibrary(root);
     const sourceRoot = path.join(root, "sources");
     await mkdir(sourceRoot, { recursive: true });
     const sourceBytes = pngBytes(2, 2, 0x71);
     await Promise.all(
-      Array.from({ length: 17 }, async (_, index) => {
+      Array.from({ length: 5 }, async (_, index) => {
         await writeFile(path.join(sourceRoot, `source-${index}.png`), sourceBytes);
       })
     );
-    const sourceRenditions = Array.from({ length: 17 }, (_, index) => ({
+    const sourceRenditions = Array.from({ length: 5 }, (_, index) => ({
       artifactId: `artifact-source-${index}`,
       phase: "source" as const,
       sourceRoot,
@@ -1088,17 +958,17 @@ describe("task 3.4 graph bounds and chromakey identity", () => {
     }));
     const inputRelationships = sourceRenditions.map((source, index) => ({
       id: `relationship-source-${index}`,
-      role: index === 0 ? "target" as const : index === 16 ? "mask" as const : "reference" as const,
-      relatedAssetId: "asset-bound-33",
+      role: "reference" as const,
+      relatedAssetId: "asset-bound-generation",
       artifactId: source.artifactId,
       order: index
     }));
     const inputs = sourceRenditions.map((source, index) => ({
-      key: index === 0 ? "target" as const : index === 16 ? "mask" as const : `reference:${index - 1}` as const,
-      role: index === 0 ? "target" as const : index === 16 ? "mask" as const : "reference" as const,
+      key: `reference:${index}` as const,
+      role: "reference" as const,
       order: index,
       origin: "upload" as const,
-      relatedAssetId: "asset-bound-33",
+      relatedAssetId: "asset-bound-generation",
       artifactId: source.artifactId,
       path: path.join(sourceRoot, source.sourceRelativePath),
       mimeType: "image/png" as const,
@@ -1107,17 +977,16 @@ describe("task 3.4 graph bounds and chromakey identity", () => {
       width: 2,
       height: 2,
       relationship: inputRelationships[index]!,
-      ...(index > 0 && index < 16 ? { referenceRole: "reference" as const } : {}),
-      ...(index === 16 ? { targetSlot: 0 as const } : {}),
+      referenceRole: "reference" as const,
       sourceRendition: source
     }));
     const graph: DurableInputGraphPlan = Object.freeze({
-      operationAssetId: "asset-bound-33",
+      operationAssetId: "asset-bound-generation",
       inputs: Object.freeze(inputs),
       sourceRenditions: Object.freeze(sourceRenditions),
       relationships: Object.freeze(inputRelationships),
-      physicalImageCount: 16,
-      maskCount: 1
+      physicalImageCount: 5,
+      maskCount: 0
     });
     const partial = Array.from({ length: 12 }, (_, index) =>
       artifact(`artifact-partial-${index}`, index % 4, "partial", pngBytes(3, 2, 0x20 + index))
@@ -1126,21 +995,12 @@ describe("task 3.4 graph bounds and chromakey identity", () => {
       artifact(`artifact-final-${index}`, index, "final", pngBytes(4, 3, 0x50 + index))
     );
     const operation = request({
-      kind: "edit",
-      prompt: "A maximum bounded synthetic edit",
-      targetImage: { id: "artifact-source-0", path: path.join(sourceRoot, "source-0.png") },
-      references: Array.from({ length: 15 }, (_, index) => ({
-        id: `artifact-source-${index + 1}`,
-        path: path.join(sourceRoot, `source-${index + 1}.png`),
+      prompt: "A maximum bounded synthetic generation",
+      references: Array.from({ length: 5 }, (_, index) => ({
+        id: `artifact-source-${index}`,
+        path: path.join(sourceRoot, `source-${index}.png`),
         role: "reference" as const
       })),
-      maskPath: path.join(sourceRoot, "source-16.png"),
-      invariants: {
-        allowedChanges: [],
-        preserve: ["synthetic identity"],
-        forbiddenChanges: []
-      },
-      action: "edit",
       saveToLibrary: true,
       count: 4,
       partialImages: 3
@@ -1156,7 +1016,7 @@ describe("task 3.4 graph bounds and chromakey identity", () => {
     const operationResult = result(staged.request, { status: "succeeded", partial, final });
     const materialization = await transaction.materializeArtifacts(
       [...partial, ...final],
-      { sourceCount: 17, mayHaveBilled: true }
+      { sourceCount: 5, mayHaveBilled: true }
     );
     const originalFinal = materialization.outputs.find(
       (output) => output.artifactId === "artifact-final-0"
@@ -1184,15 +1044,13 @@ describe("task 3.4 graph bounds and chromakey identity", () => {
     });
     expect(projected.status).toBe("succeeded");
     const index = await library.indexStore.read();
-    expect(index.assets[0]?.renditions).toHaveLength(33);
-    expect(new Set(index.assets[0]?.renditions.map((item) => item.artifactId))).toHaveLength(33);
-    expect(index.assets[0]?.relationships).toHaveLength(33);
-    expect(index.assets[0]?.relationships.slice(0, 17).map((item) => item.role)).toEqual([
-      "target",
-      ...Array.from({ length: 15 }, () => "reference"),
-      "mask"
-    ]);
-    expect(index.assets[0]?.relationships.slice(17).every((item) => item.role === "output")).toBe(true);
+    expect(index.assets[0]?.renditions).toHaveLength(21);
+    expect(new Set(index.assets[0]?.renditions.map((item) => item.artifactId))).toHaveLength(21);
+    expect(index.assets[0]?.relationships).toHaveLength(21);
+    expect(index.assets[0]?.relationships.slice(0, 5).map((item) => item.role)).toEqual(
+      Array.from({ length: 5 }, () => "reference")
+    );
+    expect(index.assets[0]?.relationships.slice(5).every((item) => item.role === "output")).toBe(true);
     expect(projected.finalArtifacts.map((item) => item.id)).toEqual(
       final.map((item) => item.id)
     );

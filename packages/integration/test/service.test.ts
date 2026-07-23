@@ -347,7 +347,6 @@ function studioRequest(
   return studioGenerateInputSchema.parse({
     kind: "generate",
     prompt: "A synthetic production service result",
-    references: [],
     ...overrides
   });
 }
@@ -375,7 +374,7 @@ describe("task 3.5 contract surface and recovery", () => {
       "routego_manage_library",
       "routego_open_studio"
     ]);
-    expect(studioOperationNames).toHaveLength(21);
+    expect(studioOperationNames).toHaveLength(22);
     expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
     expect(imageArtifactPhaseSchema.safeParse("source").success).toBe(false);
   });
@@ -514,7 +513,6 @@ describe("task 3.5 public composition", () => {
     const { service, output } = await createHarness({ executeCreation: execute });
     const ids = ["task-1", "task-2", "task-3", "task-4"];
     const result = await service.batch({
-      concurrency: 2,
       tasks: ids.map((id) => ({
         id,
         operation: publicRequest({ prompt: id, saveToLibrary: false, outputDir: output })
