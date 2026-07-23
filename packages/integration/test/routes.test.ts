@@ -259,6 +259,11 @@ async function createHarness(options: {
         const resource = durable.get(resourceId);
         if (resource === undefined) throw new LibraryError("not_found", "Synthetic resource missing");
         return resource;
+      },
+      preflightLibraryMutation: (input) => library.preflightLibraryMutation(input),
+      executeLibraryMutation: (input) => library.executeLibraryMutation(input),
+      galleryService: {
+        copyGenerationInfo: (input) => library.galleryService.copyGenerationInfo(input)
       }
     },
     ephemeralResources,
@@ -636,7 +641,12 @@ describe("task 4.2 protected upload and resource routes", () => {
       service: routeService,
       library: {
         stageUpload: async () => { throw new Error("Unexpected upload call"); },
-        resolveBrowserResource: () => { throw new Error("Unexpected durable call"); }
+        resolveBrowserResource: () => { throw new Error("Unexpected durable call"); },
+        preflightLibraryMutation: async () => { throw new Error("Unexpected Library preflight"); },
+        executeLibraryMutation: async () => { throw new Error("Unexpected Library execution"); },
+        galleryService: {
+          copyGenerationInfo: async () => { throw new Error("Unexpected Library copy"); }
+        }
       },
       ephemeralResources: {
         open: async () => ({
@@ -714,6 +724,180 @@ describe("task 4.2 protected upload and resource routes", () => {
     await vi.waitFor(() => {
       expect(closeLease).toHaveBeenCalledTimes(1);
     });
+  });
+});
+
+describe("Task 4.3 browser-safe Library routes", () => {
+  it("marks through the Library preflight/execution flow and copies only projected information", async () => {
+    const created = await createHarness();
+    const preflight = vi.spyOn(created.library, "preflightLibraryMutation").mockResolvedValue({
+      schemaVersion: 1,
+      preflightId: "mark-preflight",
+      action: "mark",
+      status: "ready",
+      expiresAt: new Date(BASE_NOW + 60_000).toISOString(),
+      requiredConfirmations: [],
+      items: [{
+        targetId: "asset-output",
+        targetKind: "asset",
+        eligible: true,
+        currentStatus: "succeeded",
+        allowedActions: ["mark", "copy-generation-info"],
+        requiredConfirmations: [],
+        warnings: []
+      }],
+      warnings: []
+    } as never);
+    const execute = vi.spyOn(created.library, "executeLibraryMutation").mockResolvedValue({
+      schemaVersion: 1,
+      preflightId: "mark-preflight",
+      action: "mark",
+      status: "succeeded",
+      items: [{
+        targetId: "asset-output",
+        status: "succeeded",
+        affectedAssetId: "asset-output",
+        affectedFolderIds: [],
+        warnings: []
+      }],
+      warnings: []
+    } as never);
+    const copy = vi.spyOn(created.library.galleryService, "copyGenerationInfo").mockResolvedValue({
+      schemaVersion: 1,
+      status: "succeeded",
+      projection: {
+        recordId: "asset-output",
+        prompt: "A safe deterministic prompt",
+        referenceIds: ["reference-one"],
+        parameters: {
+          size: "auto",
+          aspectRatio: "auto",
+          quality: "auto",
+          format: "png",
+          count: 1,
+          transparentMode: "off",
+          moderation: "auto"
+        }
+      },
+      clipboardText: "A safe deterministic prompt",
+      providerRequestCount: 0
+    } as never);
+    const runtime = created.dispatcher();
+
+    const preflightResponse = await runtime.dispatch(request("/api/v1/library/mark", {
+      method: "OPTIONS",
+      headers: { "access-control-request-method": "POST" }
+    }));
+    expect(preflightResponse.status).toBe(204);
+    expect(preflightResponse.headers?.["access-control-allow-methods"]).toBe("POST, OPTIONS");
+
+    const marked = await runtime.dispatch(jsonRequest("/api/v1/library/mark", { recordId: "asset-output" }));
+    expect(marked.status).toBe(200);
+    expect(json(marked)).toMatchObject({
+      recordId: "asset-output",
+      providerRequestCount: 0,
+      execution: { status: "succeeded", action: "mark" }
+    });
+    expect(preflight).toHaveBeenCalledWith({
+      schemaVersion: 1,
+      mutation: { action: "mark", assetIds: ["asset-output"] }
+    });
+    expect(execute).toHaveBeenCalledWith({
+      schemaVersion: 1,
+      preflightId: "mark-preflight",
+      action: "mark",
+      confirmations: []
+    });
+
+    const copied = await runtime.dispatch(jsonRequest("/api/v1/library/copy-generation-info", { recordId: "asset-output" }));
+    expect(copied.status).toBe(200);
+    expect(json(copied)).toMatchObject({
+      status: "succeeded",
+      projection: { recordId: "asset-output", referenceIds: ["reference-one"] },
+      providerRequestCount: 0
+    });
+    expect(copy).toHaveBeenCalledWith({ schemaVersion: 1, recordId: "asset-output" });
+    expect(JSON.stringify(json(copied))).not.toMatch(/path|Authorization|data:image|base64/u);
+  });
+
+  it("rejects invalid, cross-origin, oversized, and removed routes before Library work", async () => {
+    const created = await createHarness();
+    const preflight = vi.spyOn(created.library, "preflightLibraryMutation");
+    const execute = vi.spyOn(created.library, "executeLibraryMutation");
+    const copy = vi.spyOn(created.library.galleryService, "copyGenerationInfo");
+    const runtime = created.dispatcher();
+
+    const invalid = await runtime.dispatch(jsonRequest("/api/v1/library/mark", {
+      recordId: "asset-output",
+      unexpected: true
+    }));
+    expect(invalid.status).toBe(400);
+    const oversized = await runtime.dispatch(request("/api/v1/library/copy-generation-info", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: chunks(new Uint8Array(64 * 1024 + 1))
+    }));
+    expect(oversized.status).toBe(413);
+    const crossOrigin = await runtime.dispatch(jsonRequest("/api/v1/library/mark", { recordId: "asset-output" }, {
+      origin: "https://example.invalid"
+    }));
+    expect(crossOrigin.status).toBe(403);
+
+    for (const pathname of [
+      "/api/v1/edit",
+      "/api/v1/library/trash",
+      "/api/v1/library/delete",
+      "/api/v1/library/restore",
+      "/api/v1/library/permanent-delete",
+      "/api/v1/library/migration/preflight",
+      "/api/v1/library/migration/confirmation"
+    ]) {
+      const removed = await runtime.dispatch(jsonRequest(pathname, { recordId: "asset-output" }));
+      expect(removed.status).toBe(404);
+    }
+    expect(preflight).not.toHaveBeenCalled();
+    expect(execute).not.toHaveBeenCalled();
+    expect(copy).not.toHaveBeenCalled();
+  });
+
+  it("does not execute an ineligible mark preflight", async () => {
+    const created = await createHarness();
+    const preflight = vi.spyOn(created.library, "preflightLibraryMutation").mockResolvedValue({
+      schemaVersion: 1,
+      preflightId: "blocked-mark-preflight",
+      action: "mark",
+      status: "blocked",
+      expiresAt: new Date(BASE_NOW + 60_000).toISOString(),
+      requiredConfirmations: [],
+      items: [{
+        targetId: "missing-record",
+        targetKind: "asset",
+        eligible: false,
+        allowedActions: [],
+        requiredConfirmations: [],
+        warnings: [],
+        error: {
+          code: "not_found",
+          category: "persistence",
+          stage: "persist",
+          safeMessage: "The selected Library asset does not exist.",
+          retryDisposition: "never",
+          partialArtifacts: [],
+          receivedAnyOutput: false,
+          mayHaveBilled: false
+        }
+      }],
+      warnings: []
+    } as never);
+    const execute = vi.spyOn(created.library, "executeLibraryMutation");
+
+    const response = await created.dispatcher().dispatch(
+      jsonRequest("/api/v1/library/mark", { recordId: "missing-record" })
+    );
+    expect(response.status).toBe(409);
+    expect(json(response)).toMatchObject({ recordId: "missing-record", preflight: { status: "blocked" } });
+    expect(preflight).toHaveBeenCalledTimes(1);
+    expect(execute).not.toHaveBeenCalled();
   });
 });
 

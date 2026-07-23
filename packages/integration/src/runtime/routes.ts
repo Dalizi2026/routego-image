@@ -3,7 +3,9 @@ import { createHash } from "node:crypto";
 import { lstat, open, type FileHandle } from "node:fs/promises";
 
 import {
+  copyGenerationInfoInputSchema,
   identifierSchema,
+  markLibraryAssetInputSchema,
   type LocalRoutegoService,
   type StudioImageOperationRequest
 } from "@routego-image/contracts";
@@ -37,8 +39,21 @@ export const LIBRARY_RESOURCE_ROUTE_PATTERN =
 export const EPHEMERAL_RESOURCE_ROUTE_PATTERN =
   /^\/api\/v1\/resources\/([A-Za-z0-9][A-Za-z0-9._:-]*)$/u;
 
+const LIBRARY_MARK_ROUTE = "/api/v1/library/mark";
+const LIBRARY_COPY_INFORMATION_ROUTE = "/api/v1/library/copy-generation-info";
+const REMOVED_LIBRARY_ROUTE_PATHS = new Set([
+  "/api/v1/edit",
+  "/api/v1/library/trash",
+  "/api/v1/library/delete",
+  "/api/v1/library/restore",
+  "/api/v1/library/permanent-delete",
+  "/api/v1/library/migration/preflight",
+  "/api/v1/library/migration/confirmation"
+]);
+
 const DEFAULT_RESOURCE_CHUNK_BYTES = 64 * 1024;
 const MAXIMUM_RESOURCE_CHUNK_BYTES = 1024 * 1024;
+const MAXIMUM_LIBRARY_JSON_BODY_BYTES = 64 * 1024;
 
 export class StudioRequestSessionContext {
   readonly #storage = new AsyncLocalStorage<StudioSessionDescriptor>();
@@ -68,8 +83,13 @@ export interface IntegrationRuntimeRouteOptions {
     ProductionStudioStreamService;
   readonly library: Pick<
     RoutegoLibraryService,
-    "resolveBrowserResource" | "stageUpload"
-  >;
+    | "resolveBrowserResource"
+    | "stageUpload"
+    | "preflightLibraryMutation"
+    | "executeLibraryMutation"
+  > & {
+    readonly galleryService: Pick<RoutegoLibraryService["galleryService"], "copyGenerationInfo">;
+  };
   readonly ephemeralResources: Pick<EphemeralImageResourceRegistry, "open">;
   readonly sessions: Pick<StudioSessionManager, "authorizeSessionToken">;
   readonly sessionContext: StudioRequestSessionContext;
@@ -171,6 +191,20 @@ function safeRouteError(value: unknown, resource = false): RuntimeRouteError {
   );
 }
 
+function safeLibraryRouteError(value: unknown): RuntimeRouteError {
+  const code = errorCode(value);
+  if (code === "not_found" || code === "not-found") {
+    return new RuntimeRouteError(404, "not_found", "The Library record is unavailable.");
+  }
+  if (code === "invalid_input" || code === "invalid_request") {
+    return new RuntimeRouteError(400, "invalid_request", "The Library request is invalid.");
+  }
+  if (code === "conflict") {
+    return new RuntimeRouteError(409, "conflict", "The Library record is no longer eligible.");
+  }
+  return new RuntimeRouteError(500, "internal_contract", "The Library request failed safely.");
+}
+
 function parseContentLength(request: RoutegoHttpRequest): number {
   const value = header(request, "content-length");
   if (value === undefined || !/^\d+$/u.test(value)) {
@@ -255,6 +289,67 @@ async function* boundedUploadBody(
     }
   } finally {
     await closeIterator(iterator);
+  }
+}
+
+async function boundedJsonBody(request: RoutegoHttpRequest): Promise<unknown> {
+  if (request.body === undefined) {
+    throw new RuntimeRouteError(400, "invalid_request", "A JSON request body is required.");
+  }
+  const contentType = header(request, "content-type")?.trim().toLowerCase();
+  if (contentType === undefined || !contentType.startsWith("application/json")) {
+    throw new RuntimeRouteError(415, "invalid_request", "The Library request must be JSON.");
+  }
+  const iterator = request.body[Symbol.asyncIterator]();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const next = await nextWithAbort(iterator, request.signal);
+      if (next.done) break;
+      const bytes = typeof next.value === "string"
+        ? new TextEncoder().encode(next.value)
+        : next.value instanceof Uint8Array
+          ? next.value
+          : undefined;
+      if (bytes === undefined) {
+        throw new RuntimeRouteError(400, "invalid_request", "The Library JSON body is invalid.");
+      }
+      total += bytes.byteLength;
+      if (total > MAXIMUM_LIBRARY_JSON_BODY_BYTES) {
+        throw new RuntimeRouteError(413, "request_oversize", "The Library JSON body is too large.");
+      }
+      chunks.push(bytes);
+    }
+  } finally {
+    await closeIterator(iterator);
+  }
+  const body = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(body));
+  } catch {
+    throw new RuntimeRouteError(400, "invalid_request", "The Library JSON body is invalid.");
+  }
+}
+
+function parseMarkInput(value: unknown) {
+  try {
+    return markLibraryAssetInputSchema.parse(value);
+  } catch {
+    throw new RuntimeRouteError(400, "invalid_request", "The Library mark request is invalid.");
+  }
+}
+
+function parseCopyInput(value: unknown) {
+  try {
+    return copyGenerationInfoInputSchema.parse(value);
+  } catch {
+    throw new RuntimeRouteError(400, "invalid_request", "The Library copy request is invalid.");
   }
 }
 
@@ -408,12 +503,12 @@ function ephemeralBacking(resource: OpenEphemeralImageResource): ResourceBacking
   };
 }
 
-function preflightResponse(method: "GET" | "PUT"): RoutegoHttpResponse {
+function preflightResponse(method: "GET" | "POST" | "PUT"): RoutegoHttpResponse {
   return {
     status: 204,
     headers: {
       "access-control-allow-methods": `${method}, OPTIONS`,
-      "access-control-allow-headers": method === "PUT"
+      "access-control-allow-headers": method === "PUT" || method === "POST"
         ? "content-type, x-routego-session"
         : "x-routego-session"
     }
@@ -441,7 +536,11 @@ export function createIntegrationRuntimeRoutes(
     const libraryMatch = LIBRARY_RESOURCE_ROUTE_PATTERN.exec(request.url.pathname);
     const ephemeralMatch = EPHEMERAL_RESOURCE_ROUTE_PATTERN.exec(request.url.pathname);
     const isStream = request.url.pathname === STUDIO_CREATION_STREAM_PATH;
-    if (uploadMatch === null && libraryMatch === null && ephemeralMatch === null && !isStream) {
+    const isLibraryMark = request.url.pathname === LIBRARY_MARK_ROUTE;
+    const isLibraryCopy = request.url.pathname === LIBRARY_COPY_INFORMATION_ROUTE;
+    const isRemovedLibraryRoute = REMOVED_LIBRARY_ROUTE_PATHS.has(request.url.pathname);
+    if (uploadMatch === null && libraryMatch === null && ephemeralMatch === null && !isStream &&
+      !isLibraryMark && !isLibraryCopy && !isRemovedLibraryRoute) {
       return undefined;
     }
 
@@ -451,7 +550,8 @@ export function createIntegrationRuntimeRoutes(
 
     if (extensionContext.preflight) {
       if (isStream) return await streamRoute(request, extensionContext);
-      const expectedMethod = uploadMatch === null ? "GET" : "PUT";
+      const expectedMethod = uploadMatch !== null ? "PUT" :
+        isLibraryMark || isLibraryCopy ? "POST" : "GET";
       if (header(request, "access-control-request-method")?.trim().toUpperCase() !== expectedMethod) {
         return errorResponse(new RuntimeRouteError(405, "invalid_request", "The protected route preflight method is invalid."));
       }
@@ -470,6 +570,43 @@ export function createIntegrationRuntimeRoutes(
     }
 
     try {
+      if (isRemovedLibraryRoute) {
+        throw new RuntimeRouteError(404, "not_found", "The Library route was not found.");
+      }
+      if (isLibraryMark) {
+        if (request.method.toUpperCase() !== "POST") {
+          throw new RuntimeRouteError(405, "invalid_request", "The Library mark route accepts POST only.");
+        }
+        const input = parseMarkInput(await boundedJsonBody(request));
+        const preflight = await options.library.preflightLibraryMutation({
+          schemaVersion: 1,
+          mutation: { action: "mark", assetIds: [input.recordId] }
+        });
+        if (preflight.status !== "ready") {
+          return jsonResponse(409, { schemaVersion: 1, recordId: input.recordId, preflight });
+        }
+        const execution = await options.library.executeLibraryMutation({
+          schemaVersion: 1,
+          preflightId: preflight.preflightId,
+          action: "mark",
+          confirmations: []
+        });
+        return jsonResponse(execution.status === "succeeded" ? 200 : 409, {
+          schemaVersion: 1,
+          recordId: input.recordId,
+          preflight,
+          execution,
+          providerRequestCount: 0
+        });
+      }
+      if (isLibraryCopy) {
+        if (request.method.toUpperCase() !== "POST") {
+          throw new RuntimeRouteError(405, "invalid_request", "The Library copy route accepts POST only.");
+        }
+        return jsonResponse(200, await options.library.galleryService.copyGenerationInfo(
+          parseCopyInput(await boundedJsonBody(request))
+        ));
+      }
       if (uploadMatch !== null) {
         if (request.method.toUpperCase() !== "PUT") {
           throw new RuntimeRouteError(405, "invalid_request", "The upload content route accepts PUT only.");
@@ -546,7 +683,8 @@ export function createIntegrationRuntimeRoutes(
         body: resourceBody(validated, request.signal, resourceChunkBytes)
       };
     } catch (error) {
-      return errorResponse(error instanceof RuntimeRouteError ? error : safeRouteError(error, true));
+      return errorResponse(error instanceof RuntimeRouteError ? error :
+        (isLibraryMark || isLibraryCopy ? safeLibraryRouteError(error) : safeRouteError(error, true)));
     }
   };
 }
