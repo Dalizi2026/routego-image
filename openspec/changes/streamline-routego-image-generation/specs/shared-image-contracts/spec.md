@@ -68,6 +68,17 @@ Studio batch SHALL accept 1 through 20 unique ordered generation task IDs, use f
 - **WHEN** Studio exceeds task limits, repeats a task ID, includes edit behavior, or supplies a concurrency override
 - **THEN** input validation SHALL fail before execution
 
+### Requirement: Studio-only provider activation contract
+The shared service contract SHALL register the existing browser-safe provider-switch input and result schemas as an authenticated Studio-only HTTP operation. It SHALL NOT add an MCP operation or change the seven public operation contracts. The operation SHALL return only validated active profile/model state, whether the model was preserved, and that it applies to future submissions only; it SHALL NOT return credentials, profile internals, paths, or provider headers.
+
+#### Scenario: Activation is committed atomically
+- **WHEN** a configured target profile is activated
+- **THEN** the service SHALL validate the target, retain the current model when valid for it or select its valid default, and persist the profile/model pair in one atomic configuration revision
+
+#### Scenario: Activation validation or persistence fails
+- **WHEN** the target profile or fallback model is invalid, or the atomic write fails
+- **THEN** the operation SHALL return a browser-safe failure and retain the prior active profile/model pair
+
 ## REMOVED Requirements
 
 ### Requirement: Path-free Studio image input references

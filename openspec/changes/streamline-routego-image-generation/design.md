@@ -55,7 +55,7 @@ Alternative considered: hide edit controls and retain backend editing. Rejected 
 
 ### 3. Snapshot provider, model, and global controls at submission
 
-Integration resolves active provider/model exactly once per single request or batch submission. A batch captures provider, model, global format, and global transparency before workers start; every item receives that immutable snapshot. Active provider changes update Settings atomically for future resolutions only.
+Integration resolves active provider/model exactly once per single request or batch submission. A batch captures provider, model, global format, and global transparency before workers start; every item receives that immutable snapshot. Active provider changes update Settings atomically for future resolutions only. The Studio-only provider-switch operation is registered in Contracts, dispatched by the existing authenticated Studio dispatcher, and projected by Integration; it is not an MCP/public-tool operation. Library validates the target profile and commits the profile/model pair under one configuration lock in one revision, so no reader can observe a new profile with an old model. Creation's generic Studio dispatcher needs no route-specific change.
 
 Provider switch behavior is:
 
