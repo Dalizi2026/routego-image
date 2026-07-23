@@ -2,14 +2,14 @@
   "schemaVersion": 2,
   "lane": "integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-4.4-completed-controller-accepted-archived-no-active-owner",
-  "status": "task-4.5-locked-pending-capsule",
+  "role": "task-4.5-candidate-registered-locked-pending-handoff-acceptance",
+  "status": "task-4.5-locked-pending-handoff-acceptance",
   "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-  "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
+  "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "generation": 2,
-  "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
+  "generation": 3,
+  "currentHead": "330cb974ddf7b47abb933b4a32c2204a08f86e8a",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": false,
@@ -20,22 +20,22 @@
     "locked": true
   },
   "sourceOwner": {
-    "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
+    "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
-    "role": "task-4.3-completed-controller-accepted-archived",
+    "role": "task-4.4-completed-controller-accepted-archived",
     "soleApplyOwner": false,
     "archived": true,
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "status": "task-4.4-completed-awaiting-task-4.5-capsule",
-    "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json"
+    "status": "registered-task-4.5-locked-pending-handoff-acceptance",
+    "path": ".codex/routego-program/handoffs/integration-generation-4-streamline.capsule.json"
   },
   "reportingContract": {
     "currentControllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
     "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
-    "fallback": "routego-program-continuity remains missed-message fallback only",
+    "fallback": "No secondary continuation path exists; read-only governance audit cannot send messages, activate, or advance work.",
     "acknowledgementRequiredBeforeAcceptance": true
   },
   "lowContextPolicy": {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "548f23531406874d4795ead3447d8cc9c8b49ac962c0da7ebe3d324f2c445ea4",
+  "contentSha256": "2d932491aa62d8fa27a853e860ef8af296c3882331bfd1746588bb8dc06bb71f",
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "taskId": "4.5",
@@ -73,7 +73,7 @@
   "activation": {
     "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
     "controllerGeneration": 12,
-    "workerThreadId": "pending",
+    "workerThreadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
     "workerGeneration": 3,
     "soleApplyOwner": false,
     "applyAuthorized": false

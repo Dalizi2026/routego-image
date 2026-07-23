@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-4.5-locked-pending-capsule",
+  "status": "controller-generation-12-task-4.5-registered-locked-pending-handoff-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-4.5-locked-pending-capsule",
+    "status": "authoritative-controller-generation-12-task-4.5-registered-locked-pending-handoff-acceptance",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -122,23 +122,23 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.4-completed-controller-accepted-archived-no-active-owner",
-      "taskRef": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
-      "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
-      "generation": 2,
+      "status": "task-4.5-candidate-registered-locked-pending-handoff-acceptance",
+      "taskRef": "019f8e71-38ca-7e92-a831-d8a2803d2125",
+      "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
+      "generation": 3,
       "taskId": "4.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
+      "currentHead": "330cb974ddf7b47abb933b4a32c2204a08f86e8a",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/integration-4.5.json",
-        "sha256": "548f23531406874d4795ead3447d8cc9c8b49ac962c0da7ebe3d324f2c445ea4"
+        "sha256": "2d932491aa62d8fa27a853e860ef8af296c3882331bfd1746588bb8dc06bb71f"
       },
       "handoffCapsule": {
-        "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json",
-        "sha256": "857648837d84f023f5f1b874816caedbd85b597cd9f8d2ab9357e7c1d839867d"
+        "path": ".codex/routego-program/handoffs/integration-generation-4-streamline.capsule.json",
+        "sha256": "55ae6de8ae604e3ddcfa33ae35c826f6d2621d5df1968c0968e387903d69169f"
       },
-      "authorizedScope": "Task 4.4 is completed and its thread is archived. Task 4.5 is locked pending a new verified capsule and sole-owner activation.",
+      "authorizedScope": "Task 4.5 is registered but locked. The candidate may only complete the low-context handoff acceptance; implementation requires a separate Controller activation after a clean zero-compression acceptance.",
       "soleApplyOwner": false,
       "applyAuthorized": false,
       "lastCompletedTask": "4.4"
@@ -172,14 +172,14 @@
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
-      "generation": 2,
+      "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
+      "generation": 3,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
+      "currentHead": "330cb974ddf7b47abb933b4a32c2204a08f86e8a",
       "observableCompactions": 0,
       "lastCompletedTask": "4.4",
-      "status": "task-4.4-completed-controller-accepted-archived"
+      "status": "task-4.5-candidate-registered-locked-pending-handoff-acceptance"
     }
   },
   "currentChange": {
