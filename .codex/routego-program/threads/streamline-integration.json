@@ -2,22 +2,22 @@
   "schemaVersion": 2,
   "lane": "integration",
   "change": "streamline-routego-image-generation",
-  "role": "openspec-apply-owner-task-4.4-candidate-existing-controller-worktree",
-  "status": "task-4.4-activated-sole-apply-owner",
+  "role": "task-4.4-completed-controller-accepted-archived-no-active-owner",
+  "status": "task-4.5-locked-pending-capsule",
   "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 2,
-  "currentHead": "5eeb41841293bbd0e33c66dcda3cb0cb1643d873",
+  "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
-    "id": "4.4",
-    "status": "active-atomic-provider-switch-scope",
-    "locked": false
+    "id": "4.5",
+    "status": "locked-integration-test-conformance-scope",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f8d7a-3c5b-70d3-ab19-23cb9a251c60",
@@ -29,7 +29,7 @@
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "status": "activated-candidate-validator-accepted",
+    "status": "task-4.4-completed-awaiting-task-4.5-capsule",
     "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json"
   },
   "reportingContract": {
@@ -48,9 +48,9 @@
   },
   "externalStateAuthorized": false,
   "lastCompletedTask": {
-    "id": "4.3",
-    "implementationCommit": "604f987f730815fcb2a6ea60ffa2a57ef5e11c99",
-    "taskStateCommit": "7a637977ad85c73a9414b04831ce25fbdaea09fc",
+    "id": "4.4",
+    "implementationCommit": "9f94b600f41fde45c31a3afe9dfcdb979fe6080d",
+    "taskStateCommit": "cf50f467ee961180a790ee937e2f1868728bab08",
     "handoffAcceptanceObservableCompactions": 0
   }
 }

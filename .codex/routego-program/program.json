@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-4.4-activated",
+  "status": "controller-generation-12-task-4.5-locked-pending-capsule",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-4.4-activated",
+    "status": "authoritative-controller-generation-12-task-4.5-locked-pending-capsule",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -122,14 +122,14 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.4-activated-sole-apply-owner",
+      "status": "task-4.4-completed-controller-accepted-archived-no-active-owner",
       "taskRef": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
       "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
       "generation": 2,
-      "taskId": "4.4",
+      "taskId": "4.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "5eeb41841293bbd0e33c66dcda3cb0cb1643d873",
+      "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/integration-4.4.json",
         "sha256": "8d855071743b41e5db398dca66bb61b56a2b562ad25f1fff1d4f926e6987384a"
@@ -138,10 +138,10 @@
         "path": ".codex/routego-program/handoffs/integration-generation-3-streamline.capsule.json",
         "sha256": "857648837d84f023f5f1b874816caedbd85b597cd9f8d2ab9357e7c1d839867d"
       },
-      "authorizedScope": "Task 4.4 active scope: Contracts service registration, Library atomic profile/model persistence, and Integration projection only.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "4.3"
+      "authorizedScope": "Task 4.4 is completed and its thread is archived. Task 4.5 is locked pending a new verified capsule and sole-owner activation.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "4.4"
     }
   },
   "laneSuccessors": {
@@ -176,10 +176,10 @@
       "generation": 2,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "5eeb41841293bbd0e33c66dcda3cb0cb1643d873",
+      "currentHead": "d0d732d52cbd2648480de5a5b37f8bdf3b1df1e9",
       "observableCompactions": 0,
-      "lastCompletedTask": "4.3",
-      "status": "task-4.4-activated-sole-apply-owner"
+      "lastCompletedTask": "4.4",
+      "status": "task-4.4-completed-controller-accepted-archived"
     }
   },
   "currentChange": {
@@ -187,7 +187,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 33,
-      "completedTasks": 16,
+      "completedTasks": 17,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -204,17 +204,18 @@
         "3.5",
         "4.1",
         "4.2",
-        "4.3"
+        "4.3",
+        "4.4"
       ],
       "readyTaskIds": [],
-      "nextTaskId": "4.4"
+      "nextTaskId": "4.5"
     },
     "currentTask": {
-      "id": "4.4",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "4.5",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 4.4 is registered and locked. Only the existing candidate thread may be activated after the current-change capsule validates, the worktree is clean, and zero-observable-compression acceptance succeeds."
+      "authorizedScope": "Task 4.5 is locked. It may be activated only after its current capsule validates, the worktree is clean, and zero-observable-compression acceptance succeeds."
     }
   },
   "latestDirectCheckpoint": {
