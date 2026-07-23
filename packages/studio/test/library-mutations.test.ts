@@ -43,28 +43,28 @@ const folders: readonly LibraryFolderDescriptor[] = [
 
 const preflight: PreflightLibraryMutationResult = {
   schemaVersion: 1,
-  preflightId: "preflight-permanent-delete",
-  action: "permanent-delete",
+  preflightId: "preflight-assign-folders",
+  action: "assign-folders",
   status: "partial",
   expiresAt: "2026-07-18T01:00:00.000Z",
-  requiredConfirmations: ["permanent-delete"],
+  requiredConfirmations: [],
   items: [
     {
       targetId: "asset-a",
       targetKind: "asset",
       eligible: true,
-      currentStatus: "deleted",
-      allowedActions: ["permanent-delete"],
-      requiredConfirmations: ["permanent-delete"],
+      currentStatus: "succeeded",
+      allowedActions: ["assign-folders"],
+      requiredConfirmations: [],
       warnings: []
     },
     {
       targetId: "asset-b",
       targetKind: "asset",
       eligible: false,
-      currentStatus: "deleted",
-      allowedActions: ["permanent-delete"],
-      requiredConfirmations: ["permanent-delete"],
+      currentStatus: "succeeded",
+      allowedActions: ["assign-folders"],
+      requiredConfirmations: [],
       warnings: [],
       error: {
         code: "conflict",
@@ -84,8 +84,8 @@ const preflight: PreflightLibraryMutationResult = {
 
 const partialResult: ExecuteLibraryMutationResult = {
   schemaVersion: 1,
-  preflightId: "preflight-permanent-delete",
-  action: "permanent-delete",
+  preflightId: "preflight-assign-folders",
+  action: "assign-folders",
   status: "partial",
   items: [
     {
@@ -146,24 +146,8 @@ describe("Library folder ordering and safe mutation workflow", () => {
     );
   });
 
-  it("requires exact confirmation, rejects expiry, and preserves failed items after partial success", () => {
-    expect(() =>
-      executionConfirmations(preflight, "永久删除", Date.parse("2026-07-18T00:30:00.000Z"))
-    ).toThrow(/permanent-delete/u);
-    expect(
-      executionConfirmations(
-        preflight,
-        "permanent-delete",
-        Date.parse("2026-07-18T00:30:00.000Z")
-      )
-    ).toEqual(["permanent-delete"]);
-    expect(() =>
-      executionConfirmations(
-        preflight,
-        "permanent-delete",
-        Date.parse("2026-07-18T01:00:00.000Z")
-      )
-    ).toThrow(/过期/u);
+  it("preserves failed items after partial safe folder assignment", () => {
+    expect(executionConfirmations(preflight, "", Date.parse("2026-07-18T00:30:00.000Z"))).toEqual([]);
 
     expect(mutationResultCounts(partialResult)).toEqual({
       succeeded: 1,
@@ -175,7 +159,7 @@ describe("Library folder ordering and safe mutation workflow", () => {
     ]);
   });
 
-  it("prevents false ZIP resource reuse and renders accessible Library and Trash controls", () => {
+  it("prevents false ZIP resource reuse and renders only non-destructive Library controls", () => {
     expect(buildZipImportMutation("upload-zip-01", false)).toEqual({
       action: "import-zip",
       uploadResourceId: "upload-zip-01"
@@ -206,19 +190,8 @@ describe("Library folder ordering and safe mutation workflow", () => {
     expect(libraryMarkup).toContain('type="file"');
     expect(libraryMarkup).toContain('accept="application/zip,.zip"');
 
-    const trashMarkup = renderToStaticMarkup(
-      createElement(
-        I18nProvider,
-        {
-          initialLanguage: "en",
-          children: createElement(LibraryMutationPanel, { ...common, view: "trash" })
-        }
-      )
-    );
-    expect(trashMarkup).toContain("Restore selected");
-    expect(trashMarkup).toContain("Permanent delete");
-    expect(trashMarkup).toContain("30 days");
-    expect(`${libraryMarkup}${trashMarkup}`).not.toMatch(
+    expect(libraryMarkup).not.toMatch(/Trash|Restore selected|Permanent delete|Soft delete/u);
+    expect(libraryMarkup).not.toMatch(
       /(?:C:\\|\/Users\/|data:image|base64|Authorization)/u
     );
   });

@@ -47,9 +47,6 @@ const copy = {
     folderTargets: "变更目标档案夹",
     assign: "分配到档案夹",
     remove: "从档案夹移除",
-    softDelete: "移入回收站",
-    restore: "恢复所选项目",
-    permanentDelete: "永久删除",
     exportZip: "导出 ZIP",
     importZip: "导入 ZIP",
     chooseZip: "选择 ZIP 文件",
@@ -71,7 +68,6 @@ const copy = {
     busy: "正在处理…",
     noFolders: "当前没有可用档案夹。",
     selectAssets: "请先在当前图库页选择项目。",
-    retention: "回收站默认保留 30 天；永久删除不可恢复。",
     imported: "已导入",
     skippedCount: "已跳过"
   },
@@ -94,9 +90,6 @@ const copy = {
     folderTargets: "Target folders",
     assign: "Assign folders",
     remove: "Remove folders",
-    softDelete: "Move to Trash",
-    restore: "Restore selected",
-    permanentDelete: "Permanent delete",
     exportZip: "Export ZIP",
     importZip: "Import ZIP",
     chooseZip: "Choose ZIP file",
@@ -118,7 +111,6 @@ const copy = {
     busy: "Working…",
     noFolders: "No active folders are available.",
     selectAssets: "Select items on the current Library page first.",
-    retention: "Trash retains items for 30 days by default; permanent deletion cannot be undone.",
     imported: "Imported",
     skippedCount: "Skipped"
   }
@@ -434,7 +426,7 @@ export function LibraryMutationPanel({
             <button type="button" disabled={busy || folderOrder.length === 0} onClick={() => void saveFolderOrder()}>{labels.saveOrder}</button>
           </section>
         </div>
-      ) : <p className="library-mutation-panel__retention">{labels.retention}</p>}
+      ) : null}
 
       <div className="library-mutation-panel__actions">
         {view === "library" ? (
@@ -453,18 +445,10 @@ export function LibraryMutationPanel({
           </fieldset>
         ) : null}
         <div className="library-mutation-panel__buttons">
-          {view === "library" ? (
-            <>
-              <button type="button" disabled={busy || selectedAssetIds.length === 0 || targetFolderIds.length === 0} onClick={() => void startAssetMutation("assign-folders")}>{labels.assign}</button>
-              <button type="button" disabled={busy || selectedAssetIds.length === 0 || targetFolderIds.length === 0} onClick={() => void startAssetMutation("remove-folders")}>{labels.remove}</button>
-              <button type="button" disabled={busy || selectedAssetIds.length === 0} onClick={() => void startAssetMutation("soft-delete")}>{labels.softDelete}</button>
-            </>
-          ) : (
-            <>
-              <button type="button" disabled={busy || selectedAssetIds.length === 0} onClick={() => void startAssetMutation("restore")}>{labels.restore}</button>
-              <button className="is-danger" type="button" disabled={busy || selectedAssetIds.length === 0} onClick={() => void startAssetMutation("permanent-delete")}>{labels.permanentDelete}</button>
-            </>
-          )}
+          <>
+            <button type="button" disabled={busy || selectedAssetIds.length === 0 || targetFolderIds.length === 0} onClick={() => void startAssetMutation("assign-folders")}>{labels.assign}</button>
+            <button type="button" disabled={busy || selectedAssetIds.length === 0 || targetFolderIds.length === 0} onClick={() => void startAssetMutation("remove-folders")}>{labels.remove}</button>
+          </>
           <button type="button" disabled={busy || selectedAssetIds.length === 0} onClick={() => void startAssetMutation("export-zip")}>{labels.exportZip}</button>
         </div>
         {selectedAssetIds.length === 0 ? <p>{labels.selectAssets}</p> : null}

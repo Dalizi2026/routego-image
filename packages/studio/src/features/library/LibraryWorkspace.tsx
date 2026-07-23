@@ -25,9 +25,12 @@ import {
 } from "./comparison";
 import { fetchLibraryDownload, triggerLibraryDownload } from "./download";
 import {
-  createLibraryEditHandoff,
-  createLibraryRetryHandoff,
-  isIdentifierOnlyLibraryHandoff
+  copiedGenerationInformation,
+  createCopyGenerationInfoRequest,
+  createMarkImageRequest,
+  nextCurrentMarkRecordId,
+  type CopyGenerationInfoResult,
+  type MarkImageResult
 } from "./handoff";
 import {
   advanceLibraryPage,
@@ -50,14 +53,22 @@ import type {
 } from "./types";
 import "./library.css";
 
+function invokeBrowserSafeLibraryAction<Result>(
+  gateway: StudioGateway,
+  path: "/api/v1/library/copy-generation-info" | "/api/v1/library/mark",
+  input: { readonly schemaVersion: 1; readonly recordId: string }
+): Promise<Result> {
+  return (gateway.invoke as unknown as (operation: string, payload: typeof input) => Promise<Result>)(
+    path,
+    input
+  );
+}
+
 const copy = {
   zh: {
     libraryEyebrow: "ARCHIVE / 02",
-    trashEyebrow: "RETENTION / 03",
     libraryTitle: "底片档案与成片图库",
-    trashTitle: "回收站与保留记录",
     librarySubtitle: "用受保护缩略图、稳定标识符和契约筛选浏览本地作品，不读取任意文件路径。",
-    trashSubtitle: "软删除内容在这里单独浏览。默认保留策略为 30 天，恢复和永久删除将在后续安全流程中执行。",
     filterTitle: "检索暗袋",
     query: "提示词检索",
     queryPlaceholder: "搜索提示词内容",
@@ -85,7 +96,6 @@ const copy = {
     next: "下一页",
     total: "总数",
     openDetail: "查看详情",
-    deletedAt: "删除时间",
     createdAt: "创建时间",
     close: "关闭详情",
     detailLoading: "正在装载档案详情",
@@ -100,8 +110,6 @@ const copy = {
     comparisonControl: "调整源图与结果图的对比分隔线",
     source: "源图",
     output: "结果",
-    edit: "继续编辑",
-    retryRequest: "按此参数重试",
     download: "下载受保护图像",
     downloading: "正在准备下载…",
     handoffFailure: "无法建立安全的工作台接力。",
@@ -110,8 +118,6 @@ const copy = {
     partial: "部分结果",
     error: "结构化错误",
     foldersEmpty: "未归入档案夹",
-    retention: "30 天保留策略",
-    mutationLater: "使用图库多选和安全变更台执行文件夹、回收站与 ZIP 操作。",
     selectItem: "选择图库项目",
     selectPage: "选择当前页",
     clearPage: "取消当前页选择",
@@ -119,11 +125,8 @@ const copy = {
   },
   en: {
     libraryEyebrow: "ARCHIVE / 02",
-    trashEyebrow: "RETENTION / 03",
     libraryTitle: "Negative archive & finished Library",
-    trashTitle: "Trash & retention record",
     librarySubtitle: "Browse local work through protected thumbnails, stable identifiers, and contract filters—never arbitrary file paths.",
-    trashSubtitle: "Soft-deleted work is browsed separately. The default retention policy is 30 days; restore and permanent deletion remain guarded later workflows.",
     filterTitle: "Archive search sleeve",
     query: "Prompt query",
     queryPlaceholder: "Search prompt text",
@@ -151,7 +154,6 @@ const copy = {
     next: "Next",
     total: "Total",
     openDetail: "Open detail",
-    deletedAt: "Deleted",
     createdAt: "Created",
     close: "Close detail",
     detailLoading: "Loading archive detail",
@@ -166,8 +168,6 @@ const copy = {
     comparisonControl: "Adjust the source and result comparison divider",
     source: "Source",
     output: "Result",
-    edit: "Continue editing",
-    retryRequest: "Retry these parameters",
     download: "Download protected image",
     downloading: "Preparing download…",
     handoffFailure: "A safe workbench handoff could not be created.",
@@ -176,8 +176,6 @@ const copy = {
     partial: "Partial result",
     error: "Structured error",
     foldersEmpty: "No folder membership",
-    retention: "30-day retention policy",
-    mutationLater: "Use Library multi-selection and the guarded mutation desk for folder, Trash, and ZIP actions.",
     selectItem: "Select Library item",
     selectPage: "Select current page",
     clearPage: "Clear current-page selection",
@@ -187,7 +185,7 @@ const copy = {
 
 type Labels = { readonly [Key in keyof (typeof copy)["zh"]]: string };
 
-const kindOptions = ["generate", "edit"] as const;
+const kindOptions = ["generate"] as const;
 const sizeOptions = ["auto", "1024x1024", "1536x1024", "1024x1536"] as const;
 const statusOptions = ["queued", "running", "succeeded", "partial", "failed"] as const;
 
@@ -209,18 +207,12 @@ function relationLabel(role: string, language: "zh" | "en"): string {
   const labels = language === "zh"
     ? {
         source: "源图",
-        target: "编辑目标",
         reference: "参考图",
-        supporting: "辅助图",
-        mask: "遮罩",
         output: "结果"
       }
     : {
         source: "Source",
-        target: "Target",
         reference: "Reference",
-        supporting: "Supporting",
-        mask: "Mask",
         output: "Output"
       };
   return labels[role as keyof typeof labels] ?? role;
@@ -228,7 +220,6 @@ function relationLabel(role: string, language: "zh" | "en"): string {
 
 function FilterPanel({
   filters,
-  view,
   labels,
   errors,
   onChange,
@@ -236,7 +227,6 @@ function FilterPanel({
   onReset
 }: {
   readonly filters: LibraryFilters;
-  readonly view: LibraryView;
   readonly labels: Labels;
   readonly errors: Readonly<Record<string, string>>;
   readonly onChange: (filters: LibraryFilters) => void;
@@ -340,23 +330,21 @@ function FilterPanel({
           </label>
         ))}
       </fieldset>
-      {view === "library" ? (
-        <fieldset>
-          <legend>{labels.statuses}</legend>
-          {statusOptions.map((value) => (
-            <label key={value}>
-              <input
-                type="checkbox"
-                checked={filters.statuses.includes(value)}
-                onChange={() =>
-                  onChange({ ...filters, statuses: toggleValue(filters.statuses, value) })
-                }
-              />
-              {value}
-            </label>
-          ))}
-        </fieldset>
-      ) : null}
+      <fieldset>
+        <legend>{labels.statuses}</legend>
+        {statusOptions.map((value) => (
+          <label key={value}>
+            <input
+              type="checkbox"
+              checked={filters.statuses.includes(value)}
+              onChange={() =>
+                onChange({ ...filters, statuses: toggleValue(filters.statuses, value) })
+              }
+            />
+            {value}
+          </label>
+        ))}
+      </fieldset>
       <div className="library-filters__actions">
         <button type="submit">{labels.apply}</button>
         <button type="button" onClick={onReset}>{labels.reset}</button>
@@ -417,9 +405,6 @@ function GalleryCard({
           <dl>
             <div><dt>{labels.createdAt}</dt><dd>{formatTimestamp(item.createdAt, language)}</dd></div>
             <div><dt>FRAME</dt><dd>{item.width} × {item.height}</dd></div>
-            {item.deletedAt === undefined ? null : (
-              <div><dt>{labels.deletedAt}</dt><dd>{formatTimestamp(item.deletedAt, language)}</dd></div>
-            )}
           </dl>
         </div>
       </button>
@@ -456,7 +441,6 @@ function ParameterLedger({
         <div><dt>PARTIAL</dt><dd>{parameters.partialImages}</dd></div>
         <div><dt>TRANSPARENCY</dt><dd>{parameters.transparentMode}</dd></div>
         <div><dt>MODERATION</dt><dd>{parameters.moderation}</dd></div>
-        <div><dt>ACTION</dt><dd>{parameters.action}</dd></div>
       </dl>
     </section>
   );
@@ -471,7 +455,9 @@ function DetailDrawer({
   actionMessage,
   actionBusy,
   onClose,
-  onHandoff,
+  currentMarkRecordId,
+  onCopyGenerationInfo,
+  onMarkImage,
   onDownload
 }: {
   readonly gateway: StudioGateway;
@@ -482,7 +468,9 @@ function DetailDrawer({
   readonly actionMessage?: string | undefined;
   readonly actionBusy: boolean;
   readonly onClose: () => void;
-  readonly onHandoff: (action: "retry" | "edit", asset: LibraryAssetDetail) => void;
+  readonly currentMarkRecordId?: string | undefined;
+  readonly onCopyGenerationInfo: (asset: LibraryAssetDetail) => void;
+  readonly onMarkImage: (asset: LibraryAssetDetail) => void;
   readonly onDownload: (asset: LibraryAssetDetail) => void;
 }) {
   if (state.status === "idle") return null;
@@ -516,11 +504,17 @@ function DetailDrawer({
                 <p>{formatTimestamp(asset.createdAt, language)}</p>
               </div>
               <div className="library-detail__actions">
-                {asset.allowedActions.includes("retry") ? (
-                  <button type="button" onClick={() => onHandoff("retry", asset)}>{labels.retryRequest}</button>
+                {asset.allowedActions.includes("copy-generation-info") ? (
+                  <button type="button" disabled={actionBusy} onClick={() => onCopyGenerationInfo(asset)}>
+                    {language === "zh" ? "复制生成信息" : "Copy generation info"}
+                  </button>
                 ) : null}
-                {asset.allowedActions.includes("edit") ? (
-                  <button type="button" onClick={() => onHandoff("edit", asset)}>{labels.edit}</button>
+                {asset.allowedActions.includes("mark") ? (
+                  <button type="button" disabled={actionBusy} onClick={() => onMarkImage(asset)}>
+                    {currentMarkRecordId === asset.id
+                      ? language === "zh" ? "取消标记" : "Clear mark"
+                      : language === "zh" ? "标记图片" : "Mark image"}
+                  </button>
                 ) : null}
                 {asset.allowedActions.includes("download") ? (
                   <button type="button" disabled={actionBusy} onClick={() => onDownload(asset)}>
@@ -569,7 +563,9 @@ function DetailDrawer({
             <section className="library-detail__section">
               <h3>{labels.relationships}</h3>
               <div className="relationship-strip">
-                {orderedLibraryRelationships(asset).map((relationship) => {
+                {orderedLibraryRelationships(asset)
+                  .filter((relationship) => ["source", "reference", "output"].includes(relationship.role))
+                  .map((relationship) => {
                   const resource = resources.find((state) => state.relationship.id === relationship.id);
                   return (
                     <article key={relationship.id}>
@@ -590,7 +586,7 @@ function DetailDrawer({
                       <strong>{relationship.label ?? relationship.relatedAssetId}</strong>
                     </article>
                   );
-                })}
+                  })}
               </div>
             </section>
 
@@ -612,9 +608,10 @@ function DetailDrawer({
             <section className="library-detail__section">
               <h3>{labels.allowedActions}</h3>
               <div className="library-action-ledger">
-                {asset.allowedActions.map((action) => <span key={action}>{action}</span>)}
+                {asset.allowedActions
+                  .filter((action) => ["copy-generation-info", "mark", "download"].includes(action))
+                  .map((action) => <span key={action}>{action}</span>)}
               </div>
-              <p>{labels.mutationLater}</p>
             </section>
           </div>
         ) : null}
@@ -625,16 +622,17 @@ function DetailDrawer({
 
 export function LibraryWorkspace({
   gateway,
-  view,
-  onCreationHandoff
+  view
 }: {
   readonly gateway: StudioGateway;
   readonly view: LibraryView;
-  readonly onCreationHandoff: (handoff: LibraryCreationHandoff) => void;
+  readonly onCreationHandoff?: (handoff: LibraryCreationHandoff) => void;
 }) {
+  void view;
+  const libraryView: LibraryView = "library";
   const { language } = useI18n();
   const labels = copy[language];
-  const initialFilters = useMemo(() => createLibraryFilters(view), [view]);
+  const initialFilters = useMemo(() => createLibraryFilters(libraryView), []);
   const [filters, setFilters] = useState<LibraryFilters>(initialFilters);
   const [appliedFilters, setAppliedFilters] = useState<LibraryFilters>(initialFilters);
   const [page, setPage] = useState(initialLibraryPage);
@@ -652,6 +650,10 @@ export function LibraryWorkspace({
   >([]);
   const [actionBusy, setActionBusy] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | undefined>();
+  const [markState, setMarkState] = useState<{
+    readonly known: boolean;
+    readonly currentMarkRecordId?: string | undefined;
+  }>({ known: false });
   const searchRequestRef = useRef(0);
   const cursor = currentLibraryCursor(page);
 
@@ -659,7 +661,7 @@ export function LibraryWorkspace({
     let active = true;
     setFolderState({ status: "loading" });
     void gateway
-      .invoke("listFolders", { includeDeleted: view === "trash" })
+      .invoke("listFolders", { includeDeleted: false })
       .then((result) => {
         if (active) setFolderState({ status: "ready", folders: result.folders });
       })
@@ -674,14 +676,14 @@ export function LibraryWorkspace({
     return () => {
       active = false;
     };
-  }, [folderRevision, gateway, labels.folderFailure, view]);
+  }, [folderRevision, gateway, labels.folderFailure]);
 
   useEffect(() => {
     const requestId = searchRequestRef.current + 1;
     searchRequestRef.current = requestId;
     let input;
     try {
-      input = buildLibrarySearchInput(appliedFilters, view, cursor);
+      input = buildLibrarySearchInput(appliedFilters, libraryView, cursor);
     } catch (error) {
       if (error instanceof LibraryQueryError) {
         setFilterErrors(error.fields);
@@ -715,7 +717,7 @@ export function LibraryWorkspace({
           });
         }
       });
-  }, [appliedFilters, cursor, gateway, labels.searchFailure, searchRevision, view]);
+  }, [appliedFilters, cursor, gateway, labels.searchFailure, searchRevision]);
 
   useEffect(() => {
     if (selectedAssetId === undefined) {
@@ -786,7 +788,7 @@ export function LibraryWorkspace({
 
   const applyFilters = useCallback(() => {
     try {
-      buildLibrarySearchInput(filters, view);
+      buildLibrarySearchInput(filters, libraryView);
       setFilterErrors({});
       setAppliedFilters(filters);
       setPage(initialLibraryPage());
@@ -796,15 +798,15 @@ export function LibraryWorkspace({
         setSearchState({ status: "failure", safeMessage: error.message });
       }
     }
-  }, [filters, view]);
+  }, [filters]);
 
   const resetFilters = useCallback(() => {
-    const next = createLibraryFilters(view);
+    const next = createLibraryFilters(libraryView);
     setFilters(next);
     setAppliedFilters(next);
     setFilterErrors({});
     setPage(initialLibraryPage());
-  }, [view]);
+  }, []);
 
   const selectFolder = useCallback(
     (folderId: string | undefined) => {
@@ -816,17 +818,53 @@ export function LibraryWorkspace({
     [filters]
   );
 
-  const handoff = useCallback(
-    (action: "retry" | "edit", asset: LibraryAssetDetail) => {
+  const copyGenerationInfo = useCallback(
+    async (asset: LibraryAssetDetail) => {
+      setActionBusy(true);
+      setActionMessage(undefined);
       try {
-        const next = action === "retry" ? createLibraryRetryHandoff(asset) : createLibraryEditHandoff(asset);
-        if (!isIdentifierOnlyLibraryHandoff(next)) throw new Error(labels.handoffFailure);
-        onCreationHandoff(next);
+        const result = await invokeBrowserSafeLibraryAction<CopyGenerationInfoResult>(
+          gateway,
+          "/api/v1/library/copy-generation-info",
+          createCopyGenerationInfoRequest(asset.id)
+        );
+        const clipboardText = copiedGenerationInformation(result);
+        if (navigator.clipboard === undefined) throw new Error("Clipboard is unavailable.");
+        await navigator.clipboard.writeText(clipboardText);
+        setActionMessage(language === "zh" ? "生成信息已复制。" : "Generation information copied.");
       } catch (error) {
         setActionMessage(error instanceof Error ? error.message : labels.handoffFailure);
+      } finally {
+        setActionBusy(false);
       }
     },
-    [labels.handoffFailure, onCreationHandoff]
+    [gateway, labels.handoffFailure, language]
+  );
+
+  const markImage = useCallback(
+    async (asset: LibraryAssetDetail) => {
+      setActionBusy(true);
+      setActionMessage(undefined);
+      try {
+        const result = await invokeBrowserSafeLibraryAction<MarkImageResult>(
+          gateway,
+          "/api/v1/library/mark",
+          createMarkImageRequest(asset.id)
+        );
+        const nextMarkId = nextCurrentMarkRecordId(result);
+        setMarkState({ known: true, currentMarkRecordId: nextMarkId });
+        setActionMessage(
+          nextMarkId === undefined
+            ? language === "zh" ? "图片标记已取消。" : "Image mark cleared."
+            : language === "zh" ? "图片已标记。" : "Image marked."
+        );
+      } catch (error) {
+        setActionMessage(error instanceof Error ? error.message : labels.handoffFailure);
+      } finally {
+        setActionBusy(false);
+      }
+    },
+    [gateway, labels.handoffFailure, language]
   );
 
   const download = useCallback(
@@ -855,26 +893,16 @@ export function LibraryWorkspace({
   const handleMutationResult = useCallback(
     (result: ExecuteLibraryMutationResult) => {
       setSelectedAssetIds((current) => remainingSelectedAssetIds(current, result));
-      const leavesCurrentView =
-        result.action === "permanent-delete" ||
-        (view === "library" && result.action === "soft-delete") ||
-        (view === "trash" && result.action === "restore");
-      if (
-        leavesCurrentView &&
-        selectedAssetId !== undefined &&
-        result.items.some(
-          (item) =>
-            item.status === "succeeded" &&
-            (item.targetId === selectedAssetId || item.affectedAssetId === selectedAssetId)
-        )
-      ) {
-        setSelectedAssetId(undefined);
-      }
+      void selectedAssetId;
     },
-    [selectedAssetId, view]
+    [selectedAssetId]
   );
 
   const items = searchState.status === "ready" ? searchState.items : [];
+  const listedCurrentMarkRecordId = items.find((item) => item.currentMark)?.assetId;
+  const currentMarkRecordId = markState.known
+    ? markState.currentMarkRecordId
+    : listedCurrentMarkRecordId;
   const currentPageIds = items.map((item) => item.assetId);
   const allCurrentPageSelected =
     currentPageIds.length > 0 && currentPageIds.every((assetId) => selectedAssetIds.includes(assetId));
@@ -882,12 +910,11 @@ export function LibraryWorkspace({
     ? searchState.total
     : undefined;
   return (
-    <section className={`library-workspace library-workspace--${view}`}>
+    <section className="library-workspace library-workspace--library">
       <header className="library-workspace__header">
-        <p>{view === "library" ? labels.libraryEyebrow : labels.trashEyebrow}</p>
-        <h1 tabIndex={-1}>{view === "library" ? labels.libraryTitle : labels.trashTitle}</h1>
-        <span>{view === "library" ? labels.librarySubtitle : labels.trashSubtitle}</span>
-        {view === "trash" ? <strong>{labels.retention}</strong> : null}
+        <p>{labels.libraryEyebrow}</p>
+        <h1 tabIndex={-1}>{labels.libraryTitle}</h1>
+        <span>{labels.librarySubtitle}</span>
       </header>
 
       <div className="library-workspace__tools">
@@ -923,7 +950,6 @@ export function LibraryWorkspace({
         </nav>
         <FilterPanel
           filters={filters}
-          view={view}
           labels={labels}
           errors={filterErrors}
           onChange={setFilters}
@@ -995,7 +1021,7 @@ export function LibraryWorkspace({
 
       <LibraryMutationPanel
         gateway={gateway}
-        view={view}
+        view="library"
         folders={folderState.status === "ready" ? folderState.folders : []}
         selectedAssetIds={selectedAssetIds}
         onFoldersChange={(folders) => setFolderState({ status: "ready", folders })}
@@ -1037,7 +1063,9 @@ export function LibraryWorkspace({
         actionMessage={actionMessage}
         actionBusy={actionBusy}
         onClose={() => setSelectedAssetId(undefined)}
-        onHandoff={handoff}
+        currentMarkRecordId={currentMarkRecordId}
+        onCopyGenerationInfo={(asset) => void copyGenerationInfo(asset)}
+        onMarkImage={(asset) => void markImage(asset)}
         onDownload={(asset) => void download(asset)}
       />
     </section>

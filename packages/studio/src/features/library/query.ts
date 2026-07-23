@@ -15,14 +15,15 @@ export class LibraryQueryError extends Error {
 const knownSizes = ["auto", "1024x1024", "1536x1024", "1024x1536"] as const;
 
 export function createLibraryFilters(view: LibraryView): LibraryFilters {
+  void view;
   return {
     query: "",
     models: "",
     from: "",
     to: "",
-    kinds: [],
+    kinds: ["generate"],
     sizes: [],
-    statuses: view === "trash" ? ["deleted"] : [],
+    statuses: [],
     sort: "created-desc",
     limit: 12
   };
@@ -55,6 +56,7 @@ export function buildLibrarySearchInput(
   view: LibraryView,
   cursor?: string
 ): StudioLibrarySearchInput {
+  void view;
   const from = dateBoundary(filters.from, false);
   const to = dateBoundary(filters.to, true);
   if (from !== undefined && to !== undefined && Date.parse(from) > Date.parse(to)) {
@@ -72,9 +74,9 @@ export function buildLibrarySearchInput(
     ...(to === undefined ? {} : { to }),
     kinds: [...filters.kinds],
     sizes,
-    statuses: view === "trash" ? ["deleted"] : filters.statuses.filter((status) => status !== "deleted"),
+    statuses: filters.statuses.filter((status) => status !== "deleted"),
     ...(filters.folderId === undefined ? {} : { folderIds: [filters.folderId] }),
-    includeDeleted: view === "trash",
+    includeDeleted: false,
     sort: filters.sort,
     limit: Math.min(200, Math.max(1, Math.round(filters.limit))),
     ...(cursor === undefined ? {} : { cursor })

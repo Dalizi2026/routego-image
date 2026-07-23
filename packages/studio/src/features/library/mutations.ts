@@ -5,7 +5,10 @@ import type {
 } from "@routego-image/contracts";
 
 export type LibraryMutationAction = LibraryMutationRequest["action"];
-export type AssetLibraryMutationAction = Exclude<LibraryMutationAction, "import-zip">;
+export type AssetLibraryMutationAction = Extract<
+  LibraryMutationAction,
+  "assign-folders" | "remove-folders" | "export-zip"
+>;
 export type FolderAssetMutationAction = Extract<
   AssetLibraryMutationAction,
   "assign-folders" | "remove-folders"
@@ -31,6 +34,9 @@ export function buildAssetLibraryMutation(
   assetIds: readonly string[],
   folderIds: readonly string[] = []
 ): LibraryMutationRequest {
+  if (!(["assign-folders", "remove-folders", "export-zip"] as const).includes(action)) {
+    throw new LibraryMutationWorkflowError("当前 Studio 仅支持文件夹与 ZIP 操作。");
+  }
   const assets = uniqueIds(assetIds, "请至少选择一个图库项目。");
   if (action === "assign-folders" || action === "remove-folders") {
     return {
@@ -75,31 +81,22 @@ export function moveFolderIds(
   return next;
 }
 
-export function confirmationForAction(
-  action: LibraryMutationAction
-): "permanent-delete" | "zip-export" | "zip-import" | undefined {
-  return action === "permanent-delete"
-    ? "permanent-delete"
-    : action === "export-zip"
-      ? "zip-export"
-      : action === "import-zip"
-        ? "zip-import"
-        : undefined;
-}
-
 export function executionConfirmations(
   preflight: PreflightLibraryMutationResult,
   exactConfirmation: string,
   now?: number
-): ("permanent-delete" | "zip-export" | "zip-import")[] {
+): ("zip-export" | "zip-import")[] {
   if (now !== undefined && Date.parse(preflight.expiresAt) <= now) {
     throw new LibraryMutationWorkflowError("预检已经过期，请重新预检后再执行。");
   }
   if (preflight.status === "blocked" || !preflight.items.some((item) => item.eligible)) {
     throw new LibraryMutationWorkflowError("当前预检没有可执行项目。");
   }
-  const required = confirmationForAction(preflight.action);
+  const required = preflight.requiredConfirmations[0];
   if (required === undefined) return [];
+  if (required !== "zip-export" && required !== "zip-import") {
+    throw new LibraryMutationWorkflowError("当前 Studio 不支持此变更确认。");
+  }
   if (
     preflight.requiredConfirmations.length !== 1 ||
     preflight.requiredConfirmations[0] !== required ||

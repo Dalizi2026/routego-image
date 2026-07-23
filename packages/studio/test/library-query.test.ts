@@ -48,10 +48,11 @@ describe("Studio Library path-free query and cursor state", () => {
     );
   });
 
-  it("forces Trash to the deleted-only contract view and validates date ranges", () => {
+  it("keeps deleted records out of every Studio Library query and validates date ranges", () => {
     expect(buildLibrarySearchInput(createLibraryFilters("trash"), "trash")).toMatchObject({
-      statuses: ["deleted"],
-      includeDeleted: true
+      statuses: [],
+      includeDeleted: false,
+      kinds: ["generate"]
     });
 
     expect(() =>
