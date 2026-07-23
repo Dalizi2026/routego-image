@@ -280,26 +280,12 @@ export async function preflightPublicOutputDestination(
 }
 
 function studioLocator(
-  request: StudioImageOperationRequest,
-  key: StudioPhysicalInputKey
+  _request: StudioImageOperationRequest,
+  _key: StudioPhysicalInputKey
 ): StudioImageInputRef {
-  if (key === "target" && request.kind === "edit") return request.target;
-  if (key === "mask" && request.kind === "edit" && request.mask !== undefined) {
-    return request.mask.image;
-  }
-  if (key.startsWith("reference:")) {
-    const index = Number.parseInt(key.slice("reference:".length), 10);
-    const reference = request.references[index];
-    if (reference !== undefined) return reference.image;
-  }
-  if (key.startsWith("supporting:") && request.kind === "edit") {
-    const index = Number.parseInt(key.slice("supporting:".length), 10);
-    const supporting = request.supportingImages[index];
-    if (supporting !== undefined) return supporting.image;
-  }
   throw new ResultCompositionError(
     "invalid-input",
-    "The prepared Studio input graph does not match its request."
+    "Studio generation does not accept physical image inputs."
   );
 }
 
@@ -448,29 +434,7 @@ function replaceCreationPaths(
     ...reference,
     path: reference.id === undefined ? reference.path : pathByArtifact.get(reference.id) ?? reference.path
   }));
-  if (request.kind === "generate") {
-    return imageOperationRequestSchema.parse({ ...request, references });
-  }
-  const mask = graph.inputs.find((item) => item.key === "mask");
-  return imageOperationRequestSchema.parse({
-    ...request,
-    references,
-    targetImage: {
-      ...request.targetImage!,
-      path:
-        request.targetImage?.id === undefined
-          ? request.targetImage!.path
-          : pathByArtifact.get(request.targetImage.id) ?? request.targetImage.path
-    },
-    supportingImages: request.supportingImages.map((supporting) => ({
-      ...supporting,
-      path:
-        supporting.id === undefined
-          ? supporting.path
-          : pathByArtifact.get(supporting.id) ?? supporting.path
-    })),
-    ...(request.maskPath === undefined ? {} : { maskPath: mask?.path ?? request.maskPath })
-  });
+  return imageOperationRequestSchema.parse({ ...request, references });
 }
 
 function stagedSourceName(item: DurableInputGraphItem): string {
@@ -742,32 +706,10 @@ function operationParameters(
       role: item.referenceRole ?? "reference",
       ...(item.label === undefined ? {} : { label: item.label })
     }));
-  const supportingImages = ordered
-    .filter((item) => item.role === "supporting")
-    .map((item) => ({
-      assetId: item.relatedAssetId,
-      role: item.referenceRole ?? "supporting",
-      ...(item.label === undefined ? {} : { label: item.label })
-    }));
-  const target = ordered.find((item) => item.role === "target");
-  const mask = ordered.find((item) => item.role === "mask");
   return libraryOperationParametersSchema.parse({
     kind: request.kind,
     prompt: request.prompt,
     references,
-    ...(target === undefined
-      ? {}
-      : {
-          target: {
-            assetId: target.relatedAssetId,
-            ...(request.targetImage?.label === undefined
-              ? {}
-              : { label: request.targetImage.label })
-          }
-        }),
-    supportingImages,
-    ...(mask === undefined ? {} : { maskAssetId: mask.relatedAssetId }),
-    ...(request.invariants === undefined ? {} : { invariants: request.invariants }),
     size: request.size,
     aspectRatio: request.aspectRatio,
     quality: request.quality,
@@ -777,12 +719,6 @@ function operationParameters(
     partialImages: request.partialImages,
     transparentMode: request.transparentMode,
     moderation: request.moderation,
-    action: request.action,
-    ...(request.previousResponseId === undefined
-      ? {}
-      : { previousResponseId: request.previousResponseId }),
-    imageIds: request.imageIds,
-    fileIds: request.fileIds,
     outputDirectoryMode: request.outputDir === undefined ? "default" : "custom",
     saveToLibrary: request.saveToLibrary
   });
@@ -888,11 +824,7 @@ function validateGraphRequest(
       "The prepared source rendition graph is incomplete or inconsistent."
     );
   }
-  const expectedCount =
-    request.references.length +
-    request.supportingImages.length +
-    (request.targetImage === undefined ? 0 : 1) +
-    (request.maskPath === undefined ? 0 : 1);
+  const expectedCount = request.references.length;
   if (graph.inputs.length !== expectedCount) {
     throw new ResultCompositionError(
       "relationship-invalid",
@@ -902,24 +834,12 @@ function validateGraphRequest(
   for (const item of graph.inputs) {
     let id: string | undefined;
     let inputPath: string | undefined;
-    if (item.key === "target" && request.kind === "edit") {
-      id = request.targetImage?.id;
-      inputPath = request.targetImage?.path;
-    } else if (item.key === "mask" && request.kind === "edit") {
-      id = item.artifactId;
-      inputPath = request.maskPath;
-    } else if (item.key.startsWith("reference:")) {
+    if (item.key.startsWith("reference:")) {
       const reference = request.references[
         Number.parseInt(item.key.slice("reference:".length), 10)
       ];
       id = reference?.id;
       inputPath = reference?.path;
-    } else if (item.key.startsWith("supporting:") && request.kind === "edit") {
-      const supporting = request.supportingImages[
-        Number.parseInt(item.key.slice("supporting:".length), 10)
-      ];
-      id = supporting?.id;
-      inputPath = supporting?.path;
     }
     if (
       id !== item.artifactId ||

@@ -37,6 +37,22 @@ afterEach(async () => {
   vi.restoreAllMocks();
 });
 
+describe("Task 4.2 generation-only batch boundary", () => {
+  it("returns ordered generation results with fixed concurrency two", async () => {
+    const created = await harness();
+    const ids = ["batch-1", "batch-2", "batch-3"];
+    const result = await created.service.batch({
+      tasks: ids.map((id) => ({
+        id,
+        operation: publicGenerate({ prompt: id, saveToLibrary: false, outputDir: created.outputRoot })
+      }))
+    });
+    expect(result.status).toBe("succeeded");
+    expect(result.concurrency).toBe(2);
+    expect(result.items.map((item) => item.id)).toEqual(ids);
+  });
+});
+
 async function harness(
   options: Parameters<typeof createOfflineHarness>[0] = {}
 ): Promise<OfflineHarness> {

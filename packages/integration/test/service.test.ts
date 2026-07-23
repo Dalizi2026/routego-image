@@ -46,6 +46,61 @@ afterEach(async () => {
   vi.restoreAllMocks();
 });
 
+describe("Task 4.2 batch snapshots", () => {
+  it("uses fixed concurrency two and preserves public batch order", async () => {
+    let active = 0;
+    let maximum = 0;
+    const execute: CreationExecution = async (request, context) => {
+      active += 1;
+      maximum = Math.max(maximum, active);
+      await new Promise((resolve) => setTimeout(resolve, request.prompt.endsWith("2") ? 5 : 15));
+      active -= 1;
+      return succeededResult(request, context.requestId);
+    };
+    const { service, output } = await createHarness({ executeCreation: execute });
+    const ids = ["task-1", "task-2", "task-3", "task-4"];
+    const result = await service.batch({
+      tasks: ids.map((id) => ({
+        id,
+        operation: publicRequest({ prompt: id, saveToLibrary: false, outputDir: output })
+      }))
+    });
+    expect(result.concurrency).toBe(2);
+    expect(maximum).toBe(2);
+    expect(result.items.map((item) => item.id)).toEqual(ids);
+  });
+
+  it("keeps Studio global controls from the submission snapshot", async () => {
+    const observed: ImageOperationRequest[] = [];
+    let release: (() => void) | undefined;
+    const hold = new Promise<void>((resolve) => { release = resolve; });
+    const execute: CreationExecution = async (request, context) => {
+      observed.push(request);
+      await hold;
+      return succeededResult(request, context.requestId);
+    };
+    const { service } = await createHarness({ executeCreation: execute });
+    const submitted = {
+      tasks: ["studio-1", "studio-2"].map((id) => ({
+        id,
+        operation: studioGenerateInputSchema.parse({
+          kind: "generate", prompt: id, format: "png", transparentMode: "native"
+        })
+      }))
+    };
+    const pending = service.studioBatch(submitted);
+    submitted.tasks[0]!.operation.format = "jpeg";
+    submitted.tasks[0]!.operation.transparentMode = "off";
+    release?.();
+    const result = await pending;
+    expect(result.concurrency).toBe(2);
+    expect(observed.map((request) => [request.format, request.transparentMode])).toEqual([
+      ["png", "native"],
+      ["png", "native"]
+    ]);
+  });
+});
+
 const LOCAL_METHODS = [
   "status",
   "generate",

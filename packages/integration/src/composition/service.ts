@@ -127,16 +127,14 @@ import {
   type UpdateSettingsInput,
   type UpdateSettingsResult,
   type UpsertProviderProfileInput,
-  type UpsertProviderProfileResult,
-  type UploadResourcePurpose
+  type UpsertProviderProfileResult
 } from "@routego-image/contracts";
 import {
   createResolvedImageExecutor,
   prepareImageInputs,
   type ImageExecutionDependencies,
   type ProviderRuntimeContext,
-  type PreparedImageInput,
-  type PreparedMaskInput
+  type PreparedImageInput
 } from "@routego-image/creation";
 import {
   LibraryError,
@@ -163,7 +161,6 @@ import {
   type InputGraphIdFactory,
   type ResolvedStudioPhysicalInput,
   type StudioPhysicalInputKey,
-  type StudioPhysicalInputRole,
   type VerifiedStudioImageResource
 } from "./graph";
 import { resolveStudioOperationInput } from "./inputs";
@@ -260,11 +257,11 @@ interface PreparedPublicOperation {
 }
 
 interface PublicInputDescriptor {
-  readonly key: StudioPhysicalInputKey;
-  readonly role: StudioPhysicalInputRole;
+  readonly key: `reference:${number}`;
+  readonly role: "reference";
   readonly order: number;
   readonly path: string;
-  readonly prepared: PreparedImageInput | PreparedMaskInput;
+  readonly prepared: PreparedImageInput;
   readonly id?: string;
   readonly label?: string;
   readonly referenceRole?: ImageOperationRequest["references"][number]["role"];
@@ -273,6 +270,36 @@ interface PublicInputDescriptor {
 
 type ParsedRoutegoBatchInput = ReturnType<typeof routegoBatchInputSchema.parse>;
 type ParsedStudioBatchInput = ReturnType<typeof studioBatchInputSchema.parse>;
+
+const FIXED_BATCH_CONCURRENCY = 2 as const;
+
+interface ProviderSnapshot {
+  readonly context?: ProviderRuntimeContext;
+  readonly model: string;
+}
+
+function freezeSnapshot<T>(value: T): T {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
+    for (const child of Object.values(value as Record<string, unknown>)) freezeSnapshot(child);
+    Object.freeze(value);
+  }
+  return value;
+}
+
+function freezeProviderSnapshot(provider: ProviderSnapshot): ProviderSnapshot {
+  if (provider.context === undefined) return Object.freeze({ model: provider.model });
+  const context = provider.context;
+  return Object.freeze({
+    model: provider.model,
+    context: Object.freeze({
+      ...context,
+      endpoints: Object.freeze({ ...context.endpoints }),
+      capabilities: Object.freeze([...context.capabilities]),
+      deadlines: Object.freeze({ ...context.deadlines }),
+      retry: Object.freeze({ ...context.retry })
+    })
+  });
+}
 
 class StudioEventQueue implements AsyncIterable<StudioImageOperationEvent> {
   readonly #events: StudioImageOperationEvent[] = [];
@@ -489,7 +516,7 @@ function normalizedPath(value: string): string {
 
 function resourceMatchesPrepared(
   resource: ResolvedStableImageResource,
-  prepared: PreparedImageInput | PreparedMaskInput,
+  prepared: PreparedImageInput,
   requestedPath: string
 ): resource is VerifiedStudioImageResource {
   return (
@@ -500,15 +527,6 @@ function resourceMatchesPrepared(
     resource.width === prepared.width &&
     resource.height === prepared.height
   );
-}
-
-function publicPurpose(role: StudioPhysicalInputRole): UploadResourcePurpose {
-  switch (role) {
-    case "target": return "target";
-    case "reference": return "reference";
-    case "supporting": return "supporting";
-    case "mask": return "mask";
-  }
 }
 
 function descriptorResource(
@@ -527,7 +545,7 @@ function descriptorResource(
   return {
     source: "upload",
     uploadResourceId,
-    purpose: publicPurpose(descriptor.role),
+    purpose: "reference",
     path: descriptor.path,
     mimeType: descriptor.prepared.mimeType,
     byteLength: descriptor.prepared.byteLength,
@@ -548,19 +566,7 @@ function publicRequestWithIds(
     ...reference,
     id: byKey.get(`reference:${index}`)?.artifactId
   }));
-  const supportingImages = request.supportingImages.map((supporting, index) => ({
-    ...supporting,
-    id: byKey.get(`supporting:${index}`)?.artifactId
-  }));
-  const target = request.targetImage === undefined
-    ? undefined
-    : { ...request.targetImage, id: byKey.get("target")?.artifactId };
-  return imageOperationRequestSchema.parse({
-    ...request,
-    references,
-    supportingImages,
-    ...(target === undefined ? {} : { targetImage: target })
-  });
+  return imageOperationRequestSchema.parse({ ...request, references });
 }
 
 function outputArtifactWithBytes(
@@ -832,28 +838,11 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     const prepared = await prepareImageInputs(request);
     const descriptors: PublicInputDescriptor[] = [];
     let order = 0;
-    if (request.kind === "edit" && request.targetImage !== undefined) {
-      const target = prepared.images.find((item) => item.kind === "target");
-      if (target === undefined) throw new Error("The prepared target image is missing.");
-      descriptors.push({ key: "target", role: "target", order: order++, path: target.path, prepared: target, ...(request.targetImage.id === undefined ? {} : { id: request.targetImage.id }), ...(request.targetImage.label === undefined ? {} : { label: request.targetImage.label }) });
-    }
     request.references.forEach((reference, index) => {
-      const item = prepared.images.filter((candidate) => candidate.kind === "reference")[index];
+      const item = prepared.images[index];
       if (item === undefined) throw new Error("The prepared reference image is missing.");
       descriptors.push({ key: `reference:${index}`, role: "reference", order: order++, path: item.path, prepared: item, ...(reference.id === undefined ? {} : { id: reference.id }), referenceRole: reference.role, ...(reference.label === undefined ? {} : { label: reference.label }) });
     });
-    if (request.kind === "edit") {
-      request.supportingImages.forEach((supporting, index) => {
-        const item = prepared.images.filter((candidate) => candidate.kind === "supporting")[index];
-        if (item === undefined) throw new Error("The prepared supporting image is missing.");
-        descriptors.push({ key: `supporting:${index}`, role: "supporting", order: order++, path: item.path, prepared: item, ...(supporting.id === undefined ? {} : { id: supporting.id }), referenceRole: supporting.role, ...(supporting.label === undefined ? {} : { label: supporting.label }) });
-      });
-      if (request.maskPath !== undefined) {
-        const mask = prepared.mask;
-        if (mask === undefined) throw new Error("The prepared mask image is missing.");
-        descriptors.push({ key: "mask", role: "mask", order, path: mask.path, prepared: mask, targetSlot: 0 });
-      }
-    }
     const now = this.#now();
     const resolved: ResolvedStudioPhysicalInput[] = [];
     for (const descriptor of descriptors) {
@@ -879,9 +868,9 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
   async #provider(
     requestId: string,
     signal: AbortSignal
-  ): Promise<{ readonly context?: ProviderRuntimeContext; readonly model: string }> {
+  ): Promise<ProviderSnapshot> {
     if (this.#options.executeCreation !== undefined) {
-      return { model: this.#options.defaultModel ?? "synthetic-model" };
+      return freezeProviderSnapshot({ model: this.#options.defaultModel ?? "synthetic-model" });
     }
     const providerOptions = {
       ...(this.#options.providerContextOptions ?? {}),
@@ -890,7 +879,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     void requestId;
     void signal;
     const context = await loadProviderContext(this.#options.library.settingsStore, {}, providerOptions);
-    return { context, model: context.model };
+    return freezeProviderSnapshot({ context, model: context.model });
   }
 
   async #executeCreation(
@@ -991,13 +980,17 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     };
   }
 
-  async #executePublic(input: ImageOperationRequest, signal?: AbortSignal): Promise<ImageOperationResult> {
+  async #executePublic(
+    input: ImageOperationRequest,
+    signal?: AbortSignal,
+    providerSnapshot?: ProviderSnapshot
+  ): Promise<ImageOperationResult> {
     const requestId = this.#id("request");
     const controller = new AbortController();
     const forwardAbort = () => controller.abort(signal?.reason ?? "operation-cancelled");
     if (signal?.aborted) forwardAbort();
     else signal?.addEventListener("abort", forwardAbort, { once: true });
-    const promise = this.#executePublicInner(requestId, input, controller.signal);
+    const promise = this.#executePublicInner(requestId, input, controller.signal, providerSnapshot);
     this.#active.set(requestId, { controller, promise });
     this.#activePromises.add(promise);
     try {
@@ -1009,7 +1002,12 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     }
   }
 
-  async #executePublicInner(requestId: string, input: ImageOperationRequest, signal: AbortSignal): Promise<ImageOperationResult> {
+  async #executePublicInner(
+    requestId: string,
+    input: ImageOperationRequest,
+    signal: AbortSignal,
+    providerSnapshot?: ProviderSnapshot
+  ): Promise<ImageOperationResult> {
     let transaction: OutputMaterializationTransaction | undefined;
     let creationInvoked = false;
     try {
@@ -1024,7 +1022,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         ...(this.#options.maximumImageBytes === undefined ? {} : { maximumImageBytes: this.#options.maximumImageBytes })
       });
       const staged = await stagePreparedPublicOperationSources(prepared, { transaction });
-      const provider = await this.#provider(requestId, signal);
+      const provider = providerSnapshot ?? await this.#provider(requestId, signal);
       creationInvoked = true;
       const raw = await this.#executeCreation(staged.request, {
         requestId,
@@ -1072,33 +1070,52 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
   }
 
   async edit(input: RoutegoEditInput): Promise<ImageOperationResult> {
-    const parsed = routegoEditInputSchema.parse(input);
-    if (this.#status !== "ready") return failureResult(parsed, this.#id("request"), this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt"));
-    return await this.#executePublic(parsed);
+    routegoEditInputSchema.parse(input);
+    throw new Error("routego_edit is removed; use routego_generate for a new generation.");
   }
 
   async #runPublicBatch(parsed: ParsedRoutegoBatchInput, signal?: AbortSignal): Promise<RoutegoBatchResult> {
     const requestId = this.#id("batch");
-    const items: Array<{ id: string; result: ImageOperationResult }> = new Array(parsed.tasks.length);
+    const tasks = parsed.tasks.map((task) => Object.freeze({
+      id: task.id,
+      operation: freezeSnapshot(imageOperationRequestSchema.parse(task.operation))
+    }));
+    let provider: ProviderSnapshot;
+    try {
+      provider = await this.#provider(requestId, signal ?? new AbortController().signal);
+    } catch (error) {
+      const serviceError = errorFromUnknown(error, "config_missing");
+      return routegoBatchResultSchema.parse({
+        schemaVersion: 1,
+        requestId,
+        status: "failed",
+        concurrency: FIXED_BATCH_CONCURRENCY,
+        items: tasks.map((task) => ({
+          id: task.id,
+          result: failureResult(task.operation, this.#id("batch-item"), serviceError)
+        }))
+      });
+    }
+    const items: Array<{ id: string; result: ImageOperationResult }> = new Array(tasks.length);
     let next = 0;
     const worker = async (): Promise<void> => {
       while (true) {
         const index = next++;
-        const task = parsed.tasks[index];
+        const task = tasks[index];
         if (task === undefined) return;
         if (signal?.aborted) {
           items[index] = { id: task.id, result: failureResult(task.operation, this.#id("batch-item"), errorFromUnknown({ code: "cancelled" }, "cancelled")) };
           continue;
         }
         try {
-          items[index] = { id: task.id, result: await this.#executePublic(task.operation, signal) };
+          items[index] = { id: task.id, result: await this.#executePublic(task.operation, signal, provider) };
         } catch (error) {
           items[index] = { id: task.id, result: failureResult(task.operation, this.#id("batch-item"), errorFromUnknown(error)) };
         }
       }
     };
-    await Promise.all(Array.from({ length: Math.min(parsed.concurrency, parsed.tasks.length) }, () => worker()));
-    const ordered = parsed.tasks.map((task, index) => items[index] ?? {
+    await Promise.all(Array.from({ length: Math.min(FIXED_BATCH_CONCURRENCY, tasks.length) }, () => worker()));
+    const ordered = tasks.map((task, index) => items[index] ?? {
       id: task.id,
       result: failureResult(task.operation, this.#id("batch-item"), errorFromUnknown({ code: "cancelled" }, "cancelled"))
     });
@@ -1114,7 +1131,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       schemaVersion: 1,
       requestId,
       status,
-      concurrency: parsed.concurrency,
+      concurrency: FIXED_BATCH_CONCURRENCY,
       items: ordered,
       ...(status === "cancelled" ? { error: errorFromUnknown({ code: "cancelled" }, "cancelled") } : {})
     });
@@ -1124,18 +1141,22 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     const parsed = routegoBatchInputSchema.parse(input);
     if (this.#status !== "ready") {
       const error = this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt");
-      return routegoBatchResultSchema.parse({ schemaVersion: 1, requestId: this.#id("batch"), status: "failed", concurrency: parsed.concurrency, items: parsed.tasks.map((task) => ({ id: task.id, result: failureResult(task.operation, this.#id("batch-item"), error) })), error });
+      return routegoBatchResultSchema.parse({ schemaVersion: 1, requestId: this.#id("batch"), status: "failed", concurrency: FIXED_BATCH_CONCURRENCY, items: parsed.tasks.map((task) => ({ id: task.id, result: failureResult(task.operation, this.#id("batch-item"), error) })), error });
     }
     return await this.#runPublicBatch(parsed);
   }
 
-  async #executeStudio(input: StudioImageOperationRequest, options: StudioExecutionOptions = {}): Promise<StudioImageOperationResult> {
+  async #executeStudio(
+    input: StudioImageOperationRequest,
+    options: StudioExecutionOptions = {},
+    providerSnapshot?: ProviderSnapshot
+  ): Promise<StudioImageOperationResult> {
     const requestId = this.#id("studio-request");
     const controller = new AbortController();
     const forwardAbort = () => controller.abort(options.signal?.reason ?? "operation-cancelled");
     if (options.signal?.aborted) forwardAbort();
     else options.signal?.addEventListener("abort", forwardAbort, { once: true });
-    const promise = this.#executeStudioInner(requestId, input, controller.signal, options.onEvent);
+    const promise = this.#executeStudioInner(requestId, input, controller.signal, options.onEvent, providerSnapshot);
     this.#active.set(requestId, { controller, promise });
     this.#activePromises.add(promise);
     try {
@@ -1151,7 +1172,8 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     requestId: string,
     input: StudioImageOperationRequest,
     signal: AbortSignal,
-    onEvent?: (event: StudioImageOperationEvent) => void | Promise<void>
+    onEvent?: (event: StudioImageOperationEvent) => void | Promise<void>,
+    providerSnapshot?: ProviderSnapshot
   ): Promise<StudioImageOperationResult> {
     const emit = async (event: StudioImageOperationEvent): Promise<void> => {
       if (onEvent === undefined) return;
@@ -1197,7 +1219,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         transaction,
         now: () => this.#now()
       });
-      const provider = await this.#provider(requestId, signal);
+      const provider = providerSnapshot ?? await this.#provider(requestId, signal);
       creationInvoked = true;
       const raw = await this.#executeCreation(staged.creationRequest, {
         requestId,
@@ -1275,19 +1297,40 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
   }
 
   async studioEdit(input: StudioEditInput): Promise<StudioImageOperationResult> {
-    const parsed = studioEditInputSchema.parse(input);
-    if (this.#status !== "ready") return studioFailureResult(parsed, this.#id("studio-request"), this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt"));
-    return await this.#executeStudio(parsed);
+    studioEditInputSchema.parse(input);
+    throw new Error("Studio editing is removed; submit a text-generation request instead.");
   }
 
   async #runStudioBatch(parsed: ParsedStudioBatchInput, signal?: AbortSignal): Promise<StudioBatchResult> {
     const requestId = this.#id("studio-batch");
-    const items: Array<{ id: string; result: StudioImageOperationResult }> = new Array(parsed.tasks.length);
+    const tasks = parsed.tasks.map((task) => Object.freeze({
+      id: task.id,
+      operation: freezeSnapshot(studioImageOperationRequestSchema.parse(task.operation))
+    }));
+    let provider: ProviderSnapshot;
+    try {
+      provider = await this.#provider(requestId, signal ?? new AbortController().signal);
+    } catch (error) {
+      const serviceError = errorFromUnknown(error, "config_missing");
+      const failedItems = tasks.map((task) => ({
+        id: task.id,
+        result: studioFailureResult(task.operation, this.#id("studio-item"), serviceError)
+      }));
+      return studioBatchResultSchema.parse({
+        schemaVersion: 1,
+        requestId,
+        status: "failed",
+        concurrency: FIXED_BATCH_CONCURRENCY,
+        taskIds: tasks.map((task) => task.id),
+        items: failedItems
+      });
+    }
+    const items: Array<{ id: string; result: StudioImageOperationResult }> = new Array(tasks.length);
     let next = 0;
     const worker = async (): Promise<void> => {
       while (true) {
         const index = next++;
-        const task = parsed.tasks[index];
+        const task = tasks[index];
         if (task === undefined) return;
         if (signal?.aborted) {
           items[index] = { id: task.id, result: studioFailureResult(task.operation, this.#id("studio-item"), errorFromUnknown({ code: "cancelled" }, "cancelled")) };
@@ -1297,16 +1340,17 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
           id: task.id,
           result: await this.#executeStudio(
             task.operation,
-            signal === undefined ? {} : { signal }
+            signal === undefined ? {} : { signal },
+            provider
           )
         };
       }
     };
-    await Promise.all(Array.from({ length: Math.min(parsed.concurrency, parsed.tasks.length) }, () => worker()));
-    const ordered = parsed.tasks.map((task, index) => items[index] ?? { id: task.id, result: studioFailureResult(task.operation, this.#id("studio-item"), errorFromUnknown({ code: "cancelled" }, "cancelled")) });
+    await Promise.all(Array.from({ length: Math.min(FIXED_BATCH_CONCURRENCY, tasks.length) }, () => worker()));
+    const ordered = tasks.map((task, index) => items[index] ?? { id: task.id, result: studioFailureResult(task.operation, this.#id("studio-item"), errorFromUnknown({ code: "cancelled" }, "cancelled")) });
     const allSucceeded = ordered.every((item) => item.result.status === "succeeded");
     const allFailed = ordered.every((item) => item.result.status === "failed");
-    return studioBatchResultSchema.parse({ schemaVersion: 1, requestId, status: allSucceeded ? "succeeded" : allFailed ? "failed" : "partial", concurrency: parsed.concurrency, taskIds: parsed.tasks.map((task) => task.id), items: ordered });
+    return studioBatchResultSchema.parse({ schemaVersion: 1, requestId, status: allSucceeded ? "succeeded" : allFailed ? "failed" : "partial", concurrency: FIXED_BATCH_CONCURRENCY, taskIds: tasks.map((task) => task.id), items: ordered });
   }
 
   async studioBatch(input: StudioBatchInput): Promise<StudioBatchResult> {
@@ -1314,7 +1358,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     if (this.#status !== "ready") {
       const error = this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt");
       const items = parsed.tasks.map((task) => ({ id: task.id, result: studioFailureResult(task.operation, this.#id("studio-item"), error) }));
-      return studioBatchResultSchema.parse({ schemaVersion: 1, requestId: this.#id("studio-batch"), status: "failed", concurrency: parsed.concurrency, taskIds: parsed.tasks.map((task) => task.id), items });
+      return studioBatchResultSchema.parse({ schemaVersion: 1, requestId: this.#id("studio-batch"), status: "failed", concurrency: FIXED_BATCH_CONCURRENCY, taskIds: parsed.tasks.map((task) => task.id), items });
     }
     return await this.#runStudioBatch(parsed);
   }

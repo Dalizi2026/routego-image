@@ -910,3 +910,32 @@ describe("Studio input resolution and durable graph planning", () => {
     expect(Reflect.set(prepared.creationRequest.references, "0", {})).toBe(false);
   });
 });
+
+describe("Task 4.2 generation-only inputs", () => {
+  it("creates an empty frozen Studio graph without resolving Library inputs", async () => {
+    const resolveImageResource = vi.fn();
+    const prepared = await resolveStudioOperationInput(
+      { kind: "generate", prompt: "A text-only batch item", format: "png", transparentMode: "native" },
+      options({ resolveImageResource })
+    );
+    expect(resolveImageResource).not.toHaveBeenCalled();
+    expect(prepared.graph.inputs).toEqual([]);
+    expect(prepared.creationRequest).toMatchObject({
+      kind: "generate",
+      prompt: "A text-only batch item",
+      references: [],
+      format: "png",
+      transparentMode: "native"
+    });
+    expect(Object.isFrozen(prepared.creationRequest)).toBe(true);
+  });
+
+  it("rejects stale image and concurrency fields before any resolution", async () => {
+    const resolveImageResource = vi.fn();
+    await expect(resolveStudioOperationInput(
+      { kind: "generate", prompt: "stale", references: [], concurrency: 1 },
+      options({ resolveImageResource })
+    )).rejects.toMatchObject({ code: "invalid-request" });
+    expect(resolveImageResource).not.toHaveBeenCalled();
+  });
+});
