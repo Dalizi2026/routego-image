@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "40f398e316bb1b9903e605ee950bdf9fb153a4d1a06b1410ca35443d49e2bf7f",
+  "capsuleSha256": "5e4dd8fa6080852d8bd41c7b97a64a3604eaa8d14b8ed395e7646b5bc0b39a2d",
   "lane": "studio",
   "stateRouting": {
     "programLaneKey": "studio",
     "laneStatePath": ".codex/routego-program/threads/studio.json"
   },
-  "role": "openspec-apply-owner-task-5.1-candidate-existing-controller-worktree",
+  "role": "task-5.1-sole-apply-owner-activated",
   "change": "streamline-routego-image-generation",
   "generation": { "source": 3, "successor": 4 },
   "source": {
@@ -23,9 +23,9 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
     "startingCommit": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
-    "registrationStatus": "registered-task-5.1-locked-pending-zero-compaction-acceptance",
+    "registrationStatus": "activated-task-5.1-sole-apply-owner",
     "registrationAttempt": 1,
-    "verifiedHeadBeforeContainingCommit": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
+    "verifiedHeadBeforeContainingCommit": "e0c02d8b504b92c7324b65c144ae74c0337713ce",
     "incorporationCommit": null
   },
   "currentState": {
@@ -35,13 +35,13 @@
     "nextTaskId": "5.1",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/studio-5.1.json",
-      "sha256": "79542763097ccaab8f47914e1e6d97d1860b2215a66301297bbd28f073b80a7e"
+      "sha256": "a172d1b207f6ae4f80d6303d3ebf8da958e3e1973f66e6e9251a0be1786fbf12"
     },
-    "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
+    "taskLocked": false,
+    "sourceIsSoleApplyOwner": false,
     "sourceArchived": false,
     "correctionSourceRetired": false,
-    "successorApplyAuthorized": false
+    "successorApplyAuthorized": true
   },
   "completedEvidence": [
     {
@@ -61,7 +61,7 @@
     "approvalRequiredTasks": ["6.1", "7.2", "8.2", "9.1"],
     "externalStateAuthorized": false,
     "networkAuthorized": false,
-    "task5_1Locked": true,
+    "task5_1Locked": false,
     "workspaceConsolidation": {
       "existingExecutionWorktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "newDirectoryOrWorktreeAuthorized": false
@@ -102,7 +102,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 93212,
+    "expectedNormalizedUtf8Bytes": 92852,
     "fallbackSourceCommit": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
     "escalationTriggers": ["capsule/Git/OpenSpec/state mismatch", "public-contract or ownership boundary", "acceptance failure", "PLAN_DEVIATION", "health-audit uncertainty"],
     "fullAuditTriggers": ["final Integration conformance", "main-spec sync/archive", "release/rollback gate", "user request"]

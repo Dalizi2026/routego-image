@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-12-task-5.1-locked-pending-studio-capsule",
+  "status": "controller-generation-12-task-5.1-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "productPlan": "routego-image-1.0-plan.md",
@@ -59,7 +59,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "ac20892014fb7beb3bf053a903670d4d634d956a",
-    "status": "authoritative-controller-generation-12-task-5.1-locked-pending-studio-capsule",
+    "status": "authoritative-controller-generation-12-task-5.1-activated",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -80,26 +80,26 @@
   },
   "activeApplyOwners": {
     "studio": {
-      "status": "task-5.1-registered-locked-pending-zero-compaction-acceptance",
+      "status": "task-5.1-sole-apply-owner-activated",
       "taskRef": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
       "threadId": "019f8ef0-1342-78b1-be4f-83f308a5ff99",
       "generation": 4,
       "taskId": "5.1",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
+      "currentHead": "e0c02d8b504b92c7324b65c144ae74c0337713ce",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/studio-5.1.json",
-        "sha256": "79542763097ccaab8f47914e1e6d97d1860b2215a66301297bbd28f073b80a7e"
+        "sha256": "a172d1b207f6ae4f80d6303d3ebf8da958e3e1973f66e6e9251a0be1786fbf12"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/studio-generation-4-streamline.capsule.json",
-        "sha256": "40f398e316bb1b9903e605ee950bdf9fb153a4d1a06b1410ca35443d49e2bf7f",
-        "rawFileSha256": "4ff85c4468fe1e083e579f53621c4d9dd229023342dfb2ecd6867b2e8f68e7d8"
+        "sha256": "5e4dd8fa6080852d8bd41c7b97a64a3604eaa8d14b8ed395e7646b5bc0b39a2d",
+        "rawFileSha256": "b4a9df7f7ff66e556a6aab6c4324e93a2df56da801f6c8df131964f7d6a564d1"
       },
-      "authorizedScope": "Task 5.1 is registered and locked. The Studio candidate may perform no audit or implementation until its current capsule validates, the direct-return handshake is independently confirmed, the workspace is clean, and zero-observable-compression acceptance succeeds.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 5.1 is activated for the registered Studio sole apply owner only. It may modify only the capsule's exact files, must directly report every blocker, deviation, checkpoint, and delivery, and must not access external state.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "4.5"
     },
     "creation": {
@@ -173,13 +173,13 @@
       "generation": 4,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "991742fc5da3164c03d2537f8e7bd77bd8465a1b",
+      "currentHead": "e0c02d8b504b92c7324b65c144ae74c0337713ce",
       "observableCompactions": 0,
       "lastCompletedTask": "4.5",
-      "status": "task-5.1-registered-locked-pending-zero-compaction-acceptance",
+      "status": "task-5.1-sole-apply-owner-activated",
       "handoffCapsuleIntegrity": {
-        "canonicalSha256": "40f398e316bb1b9903e605ee950bdf9fb153a4d1a06b1410ca35443d49e2bf7f",
-        "rawFileSha256": "4ff85c4468fe1e083e579f53621c4d9dd229023342dfb2ecd6867b2e8f68e7d8"
+        "canonicalSha256": "5e4dd8fa6080852d8bd41c7b97a64a3604eaa8d14b8ed395e7646b5bc0b39a2d",
+        "rawFileSha256": "b4a9df7f7ff66e556a6aab6c4324e93a2df56da801f6c8df131964f7d6a564d1"
       }
     },
     "creation": {
@@ -250,10 +250,10 @@
     },
     "currentTask": {
       "id": "5.1",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.1 is locked. It may be activated only after a Studio task capsule validates, the direct-return handshake is confirmed, the workspace is clean, and zero-observable-compression acceptance succeeds."
+      "authorizedScope": "Task 5.1 is activated for the registered Studio sole apply owner only; all edits remain constrained by the current task capsule and direct-return contract."
     }
   },
   "latestDirectCheckpoint": {
