@@ -262,6 +262,7 @@ async function createHarness(options: {
       },
       preflightLibraryMutation: (input) => library.preflightLibraryMutation(input),
       executeLibraryMutation: (input) => library.executeLibraryMutation(input),
+      getAssetDetail: (input) => library.getAssetDetail(input),
       galleryService: {
         copyGenerationInfo: (input) => library.galleryService.copyGenerationInfo(input)
       }
@@ -644,6 +645,7 @@ describe("task 4.2 protected upload and resource routes", () => {
         resolveBrowserResource: () => { throw new Error("Unexpected durable call"); },
         preflightLibraryMutation: async () => { throw new Error("Unexpected Library preflight"); },
         executeLibraryMutation: async () => { throw new Error("Unexpected Library execution"); },
+        getAssetDetail: async () => { throw new Error("Unexpected Library detail read"); },
         galleryService: {
           copyGenerationInfo: async () => { throw new Error("Unexpected Library copy"); }
         }
@@ -762,6 +764,9 @@ describe("Task 4.3 browser-safe Library routes", () => {
       }],
       warnings: []
     } as never);
+    const detail = vi.spyOn(created.library, "getAssetDetail")
+      .mockResolvedValueOnce({ asset: { currentMark: true } } as never)
+      .mockResolvedValueOnce({ asset: { currentMark: false } } as never);
     const copy = vi.spyOn(created.library.galleryService, "copyGenerationInfo").mockResolvedValue({
       schemaVersion: 1,
       status: "succeeded",
@@ -795,9 +800,13 @@ describe("Task 4.3 browser-safe Library routes", () => {
     expect(marked.status).toBe(200);
     expect(json(marked)).toMatchObject({
       recordId: "asset-output",
+      status: "succeeded",
+      currentMarkRecordId: "asset-output",
+      markCleared: false,
       providerRequestCount: 0,
-      execution: { status: "succeeded", action: "mark" }
     });
+    expect(json(marked)).not.toHaveProperty("preflight");
+    expect(json(marked)).not.toHaveProperty("execution");
     expect(preflight).toHaveBeenCalledWith({
       schemaVersion: 1,
       mutation: { action: "mark", assetIds: ["asset-output"] }
@@ -807,6 +816,17 @@ describe("Task 4.3 browser-safe Library routes", () => {
       preflightId: "mark-preflight",
       action: "mark",
       confirmations: []
+    });
+    expect(detail).toHaveBeenCalledWith({ schemaVersion: 1, assetId: "asset-output" });
+
+    const cleared = await runtime.dispatch(jsonRequest("/api/v1/library/mark", { recordId: "asset-output" }));
+    expect(cleared.status).toBe(200);
+    expect(json(cleared)).toEqual({
+      schemaVersion: 1,
+      status: "succeeded",
+      recordId: "asset-output",
+      markCleared: true,
+      providerRequestCount: 0
     });
 
     const copied = await runtime.dispatch(jsonRequest("/api/v1/library/copy-generation-info", { recordId: "asset-output" }));
@@ -832,6 +852,12 @@ describe("Task 4.3 browser-safe Library routes", () => {
       unexpected: true
     }));
     expect(invalid.status).toBe(400);
+    const evasive = await runtime.dispatch(request("/api/v1/library/mark", {
+      method: "POST",
+      headers: { "content-type": "application/json-evasive" },
+      body: chunks('{"recordId":"asset-output"}')
+    }));
+    expect(evasive.status).toBe(415);
     const oversized = await runtime.dispatch(request("/api/v1/library/copy-generation-info", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -895,7 +921,23 @@ describe("Task 4.3 browser-safe Library routes", () => {
       jsonRequest("/api/v1/library/mark", { recordId: "missing-record" })
     );
     expect(response.status).toBe(409);
-    expect(json(response)).toMatchObject({ recordId: "missing-record", preflight: { status: "blocked" } });
+    expect(json(response)).toEqual({
+      schemaVersion: 1,
+      status: "failed",
+      recordId: "missing-record",
+      markCleared: false,
+      providerRequestCount: 0,
+      error: {
+        code: "not_found",
+        category: "persistence",
+        stage: "persist",
+        safeMessage: "The selected Library asset does not exist.",
+        retryDisposition: "never",
+        partialArtifacts: [],
+        receivedAnyOutput: false,
+        mayHaveBilled: false
+      }
+    });
     expect(preflight).toHaveBeenCalledTimes(1);
     expect(execute).not.toHaveBeenCalled();
   });

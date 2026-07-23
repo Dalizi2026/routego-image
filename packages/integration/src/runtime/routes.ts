@@ -6,6 +6,8 @@ import {
   copyGenerationInfoInputSchema,
   identifierSchema,
   markLibraryAssetInputSchema,
+  markLibraryAssetResultSchema,
+  routegoServiceErrorSchema,
   type LocalRoutegoService,
   type StudioImageOperationRequest
 } from "@routego-image/contracts";
@@ -87,6 +89,7 @@ export interface IntegrationRuntimeRouteOptions {
     | "stageUpload"
     | "preflightLibraryMutation"
     | "executeLibraryMutation"
+    | "getAssetDetail"
   > & {
     readonly galleryService: Pick<RoutegoLibraryService["galleryService"], "copyGenerationInfo">;
   };
@@ -296,8 +299,8 @@ async function boundedJsonBody(request: RoutegoHttpRequest): Promise<unknown> {
   if (request.body === undefined) {
     throw new RuntimeRouteError(400, "invalid_request", "A JSON request body is required.");
   }
-  const contentType = header(request, "content-type")?.trim().toLowerCase();
-  if (contentType === undefined || !contentType.startsWith("application/json")) {
+  const mediaType = header(request, "content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+  if (mediaType !== "application/json") {
     throw new RuntimeRouteError(415, "invalid_request", "The Library request must be JSON.");
   }
   const iterator = request.body[Symbol.asyncIterator]();
@@ -351,6 +354,27 @@ function parseCopyInput(value: unknown) {
   } catch {
     throw new RuntimeRouteError(400, "invalid_request", "The Library copy request is invalid.");
   }
+}
+
+function markFailure(recordId: string, value: unknown) {
+  const error = routegoServiceErrorSchema.safeParse(value);
+  return markLibraryAssetResultSchema.parse({
+    schemaVersion: 1,
+    status: "failed",
+    recordId,
+    markCleared: false,
+    providerRequestCount: 0,
+    error: error.success ? error.data : {
+      code: "internal_contract",
+      category: "internal",
+      stage: "persist",
+      safeMessage: "The Library mark could not be confirmed.",
+      retryDisposition: "never",
+      partialArtifacts: [],
+      receivedAnyOutput: false,
+      mayHaveBilled: false
+    }
+  });
 }
 
 function validIdentifier(value: string | undefined): string {
@@ -583,7 +607,7 @@ export function createIntegrationRuntimeRoutes(
           mutation: { action: "mark", assetIds: [input.recordId] }
         });
         if (preflight.status !== "ready") {
-          return jsonResponse(409, { schemaVersion: 1, recordId: input.recordId, preflight });
+          return jsonResponse(409, markFailure(input.recordId, preflight.error ?? preflight.items[0]?.error));
         }
         const execution = await options.library.executeLibraryMutation({
           schemaVersion: 1,
@@ -591,13 +615,26 @@ export function createIntegrationRuntimeRoutes(
           action: "mark",
           confirmations: []
         });
-        return jsonResponse(execution.status === "succeeded" ? 200 : 409, {
+        if (execution.status !== "succeeded") {
+          return jsonResponse(409, markFailure(
+            input.recordId,
+            execution.error ?? execution.items[0]?.error
+          ));
+        }
+        const detail = await options.library.getAssetDetail({ schemaVersion: 1, assetId: input.recordId });
+        if (detail.asset === undefined) {
+          return jsonResponse(500, markFailure(input.recordId, undefined));
+        }
+        return jsonResponse(200, markLibraryAssetResultSchema.parse({
           schemaVersion: 1,
+          status: "succeeded",
           recordId: input.recordId,
-          preflight,
-          execution,
+          ...(detail.asset.currentMark
+            ? { currentMarkRecordId: input.recordId }
+            : {}),
+          markCleared: !detail.asset.currentMark,
           providerRequestCount: 0
-        });
+        }));
       }
       if (isLibraryCopy) {
         if (request.method.toUpperCase() !== "POST") {
