@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "6af060358e41b6dc20d45ec14c73f16d7ca6648d22b2a871b6d828eae9e8ad31",
+  "capsuleSha256": "1d5640af52057b132145e2558f3924686604b60404035de73c398cb46bb1a9b3",
   "lane": "integration",
   "stateRouting": {
     "programLaneKey": "streamlineIntegration",
@@ -18,17 +18,17 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "acceptedProductCommit": "9299c42f7ead88521abb8a885843868148f3e08b",
-    "handoffCommit": "3240bec320dba3e5314b7d9b41a660c624e0b2fa",
-    "handoffParent": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992"
+    "handoffCommit": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
+    "handoffParent": "3240bec320dba3e5314b7d9b41a660c624e0b2fa"
   },
   "successor": {
-    "threadId": "pending",
+    "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
-    "startingCommit": "3240bec320dba3e5314b7d9b41a660c624e0b2fa",
-    "registrationStatus": "preflight-platform-recovery-pending-thread-creation",
+    "startingCommit": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
+    "registrationStatus": "registered-platform-recovery-awaiting-handoff-acceptance",
     "registrationAttempt": 1,
-    "verifiedHeadBeforeContainingCommit": "3240bec320dba3e5314b7d9b41a660c624e0b2fa",
+    "verifiedHeadBeforeContainingCommit": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
     "incorporationCommit": null
   },
   "currentState": {
@@ -61,20 +61,20 @@
     "nextTaskId": "4.6",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
-      "sha256": "8aa1c862d10b278da78ee42ac6ddefdfa6f3b156f4e692ccc81ba90e37d8c10d",
-      "rawFileSha256": "22fdba78b1910e6be34684d3e7e09d068b26a91ae5c3ef72fbde1322ccd4f2aa"
+      "sha256": "2965871b85bf41c137f6c06d3ea07acbf2da6de918c2d298b5e123b87ef2a278",
+      "rawFileSha256": "1d95399f08cf414c279f94f776e8cb6398a7ee330603197b0f0f070590ab118c"
     },
     "taskLocked": true,
-    "sourceIsSoleApplyOwner": true,
+    "sourceIsSoleApplyOwner": false,
     "sourceApplyAuthorized": false,
     "successorApplyAuthorized": false,
-    "correctionSourceRetired": false,
+    "correctionSourceRetired": true,
     "continuation": "Platform recovery only. No task implementation may start before thread handshake, Controller registration, acceptance, and a fresh activation."
   },
   "completedEvidence": [
     {
       "path": ".codex/routego-program/evidence/streamline-4.5.json",
-      "sha256": "2ce45fb2d6350ea876222f08bf8440621a8a52a2aa02348bdf33c9ef0fa9fa95",
+      "sha256": "6ab0e75c989a81d658421da8c96068da6a7980c6509b4b494a8999426ab0f1ed",
       "taskIds": [
         "4.5"
       ]
@@ -116,10 +116,10 @@
     "maxStartupFiles": 8,
     "maxStartupBytes": 65536,
     "actualStartupFiles": 6,
-    "actualStartupBytes": 35538,
+    "actualStartupBytes": 35983,
     "budgetRole": "lane",
     "budgetValidatedBeforeSuccessorCreation": true,
-    "budgetValidatedAt": "2026-07-24T14:44:57.176Z",
+    "budgetValidatedAt": "2026-07-24T14:52:35.337Z",
     "successorCreationMethod": "create-thread-local-no-fork"
   },
   "git": {
@@ -145,7 +145,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 0,
+    "expectedNormalizedUtf8Bytes": 47449,
     "fallbackSourceCommit": "1682ce1056bd62a453f63d11cfc09bf8c7b31dce",
     "escalationTriggers": [
       "capsule, Git, OpenSpec or current-state inconsistency",

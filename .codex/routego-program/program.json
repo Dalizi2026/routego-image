@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-task-4.6-scope-amended-activated",
+  "status": "controller-generation-13-task-4.6-platform-recovery-awaiting-handoff-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -192,24 +192,24 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.6-scope-amended-sole-apply-owner",
-      "taskRef": "019f93ed-45f3-7680-a2fa-eba318806e30",
-      "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
-      "generation": 4,
+      "status": "task-4.6-platform-recovery-registered-awaiting-handoff-acceptance",
+      "taskRef": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
+      "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
+      "generation": 5,
       "taskId": "4.6",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992",
+      "currentHead": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
-        "sha256": "8aa1c862d10b278da78ee42ac6ddefdfa6f3b156f4e692ccc81ba90e37d8c10d"
+        "sha256": "2965871b85bf41c137f6c06d3ea07acbf2da6de918c2d298b5e123b87ef2a278"
       },
       "handoffCapsule": {
-        "path": null
+        "path": ".codex/routego-program/handoffs/streamline-integration-4.6-platform-recovery.capsule.json"
       },
-      "authorizedScope": "Only the activated Integration owner may modify packages/mock-relay/src/service/mock-service.ts and packages/mock-relay/test/service.test.ts for the amended Task 4.6. Studio G8 remains paused at its Task 5.5 safe checkpoint.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
+      "authorizedScope": "Platform recovery candidate may only complete handoff acceptance. Task 4.6's two Mock Relay files remain locked until Controller dispatch and activation. Studio G8 remains paused at its Task 5.5 safe checkpoint.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
       "lastCompletedTask": "4.5"
     }
   },
@@ -251,14 +251,14 @@
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
-      "generation": 4,
+      "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
+      "generation": 5,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992",
+      "currentHead": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
       "observableCompactions": 0,
       "lastCompletedTask": "4.5",
-      "status": "task-4.6-scope-amended-sole-apply-owner"
+      "status": "task-4.6-platform-recovery-registered-awaiting-handoff-acceptance"
     }
   },
   "currentChange": {
@@ -296,10 +296,10 @@
     },
     "currentTask": {
       "id": "4.6",
-      "locked": false,
-      "activationAuthorized": true,
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 4.6 amended scope is activated for its Integration owner only. Task 5.5 remains paused at its committed safe checkpoint until 4.6 verifies."
+      "authorizedScope": "Task 4.6 is locked while its registered Integration recovery candidate completes zero-compaction handoff acceptance. Task 5.5 remains paused at its committed safe checkpoint until 4.6 verifies."
     }
   },
   "latestDirectCheckpoint": {
@@ -317,7 +317,7 @@
   "currentBlockers": [
     {
       "id": "task-5.5-mock-relay-generation-relationship-defect",
-      "status": "planned-correction-4.6-amended-active",
+      "status": "planned-correction-4.6-platform-recovery-awaiting-handoff-acceptance",
       "rootCause": "Mock Relay #studioRelationships reads request.references although strict Studio generate requests no longer carry that field.",
       "impact": "Studio mock-bridge generation streams return HTTP 503; Task 5.5 completion verification is paused.",
       "resolutionTaskId": "4.6",

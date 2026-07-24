@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-13-task-4.6-scope-amended-activated",
+  "status": "authoritative-controller-generation-13-task-4.6-platform-recovery-awaiting-handoff-acceptance",
   "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -23,7 +23,7 @@
   },
   "currentOperation": {
     "id": "task-4.6-planned-mock-relay-generation-relationship-correction",
-    "allowedNext": "Only the registered Integration owner may modify Task 4.6's exact Mock Relay source file after direct-return acceptance and activation. Studio G8's safe Task 5.5 checkpoint remains preserved and paused.",
+    "allowedNext": "Only the registered Integration recovery candidate may perform read-only handoff acceptance for Task 4.6. No product code may change until a fresh dispatch is accepted and activated. Studio G8's safe Task 5.5 checkpoint remains preserved and paused.",
     "forbidden": [
       "Product code outside each task's exact owner scope",
       "package.json or pnpm-lock.yaml changes",

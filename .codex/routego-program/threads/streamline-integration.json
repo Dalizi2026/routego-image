@@ -2,36 +2,36 @@
   "schemaVersion": 2,
   "lane": "integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-4.6-integration-test-infrastructure-candidate-registration",
-  "status": "task-4.6-scope-amended-sole-apply-owner",
+  "role": "task-4.6-platform-recovery-candidate-registration",
+  "status": "task-4.6-platform-recovery-registered-awaiting-handoff-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
-  "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
+  "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "generation": 4,
-  "currentHead": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992",
+  "generation": 5,
+  "currentHead": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
     "id": "4.6",
-    "status": "active-amended-mock-relay-contract-cleanup",
-    "locked": false
+    "status": "platform-recovery-awaiting-handoff-acceptance",
+    "locked": true
   },
   "sourceOwner": {
-    "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
+    "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
-    "role": "task-4.4-completed-controller-accepted-archived",
+    "role": "task-4.6-platform-permission-prompt-unrecoverable",
     "soleApplyOwner": false,
     "archived": true,
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "status": "task-4.5-completed-controller-accepted",
-    "path": ".codex/routego-program/handoffs/integration-generation-4-streamline.capsule.json"
+    "status": "platform-recovery-preflight-passed",
+    "path": ".codex/routego-program/handoffs/streamline-integration-4.6-platform-recovery.capsule.json"
   },
   "reportingContract": {
     "currentControllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
@@ -56,13 +56,13 @@
   },
   "taskCapsule": {
     "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
-    "contentSha256": "8aa1c862d10b278da78ee42ac6ddefdfa6f3b156f4e692ccc81ba90e37d8c10d"
+    "contentSha256": "2965871b85bf41c137f6c06d3ea07acbf2da6de918c2d298b5e123b87ef2a278"
   },
   "registration": {
-    "reason": "Task 5.5's direct Studio mock-bridge verification exposed Mock Relay's stale read of the removed references field.",
-    "permittedScope": ["packages/mock-relay/src/service/mock-service.ts"],
+    "reason": "The previous Task 4.6 owner is irrecoverably waiting on a desktop permission prompt. The committed 9299c42 generation relationship repair is retained and no active writer lease exists.",
+    "permittedScope": ["packages/mock-relay/src/service/mock-service.ts", "packages/mock-relay/test/service.test.ts"],
     "externalStateAuthorized": false,
-    "writerLease": "not-acquired",
+    "writerLease": "not-acquired; task locked pending handoff acceptance",
     "directReportingRequired": true
   }
 }
