@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-task-4.6-planned-registration-pending",
+  "status": "controller-generation-13-task-4.6-registration-awaiting-handshake",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -192,14 +192,14 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.6-candidate-registration-pending",
-      "taskRef": "pending",
-      "threadId": "pending",
+      "status": "task-4.6-candidate-registration-awaiting-handshake",
+      "taskRef": "019f93ed-45f3-7680-a2fa-eba318806e30",
+      "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
       "generation": 4,
       "taskId": "4.6",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "34636ea2175df610bccf6c923a4a4a88cfc852df",
+      "currentHead": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
         "sha256": "163d3c7d6d39c9d3cf99718231fffffc8316f3ec1ae5a2fc035263f4a7d86778"
@@ -251,14 +251,14 @@
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "threadId": "pending",
+      "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
       "generation": 4,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "34636ea2175df610bccf6c923a4a4a88cfc852df",
+      "currentHead": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992",
       "observableCompactions": 0,
       "lastCompletedTask": "4.5",
-      "status": "task-4.6-candidate-registration-pending"
+      "status": "task-4.6-candidate-registration-awaiting-handshake"
     }
   },
   "currentChange": {
@@ -317,7 +317,7 @@
   "currentBlockers": [
     {
       "id": "task-5.5-mock-relay-generation-relationship-defect",
-      "status": "planned-correction-4.6-registration-pending",
+      "status": "planned-correction-4.6-registration-awaiting-handshake",
       "rootCause": "Mock Relay #studioRelationships reads request.references although strict Studio generate requests no longer carry that field.",
       "impact": "Studio mock-bridge generation streams return HTTP 503; Task 5.5 completion verification is paused.",
       "resolutionTaskId": "4.6",
