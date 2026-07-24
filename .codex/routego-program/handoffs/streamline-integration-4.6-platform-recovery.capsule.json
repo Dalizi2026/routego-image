@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "22fd3ff4a719dccd7be5b24d12da1e7da988dc703129d21c023659d274685c88",
+  "capsuleSha256": "e294170465079d7c3355c9b1c43ef30ba0e536e02b77fccc055bc5a32995e3a9",
   "lane": "integration",
   "stateRouting": {
     "programLaneKey": "streamlineIntegration",
@@ -26,7 +26,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
     "startingCommit": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
-    "registrationStatus": "accepted-platform-recovery-awaiting-task-dispatch",
+    "registrationStatus": "activated-platform-recovery-task-4.6-sole-owner",
     "registrationAttempt": 1,
     "verifiedHeadBeforeContainingCommit": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
     "incorporationCommit": null
@@ -64,10 +64,10 @@
       "sha256": "2965871b85bf41c137f6c06d3ea07acbf2da6de918c2d298b5e123b87ef2a278",
       "rawFileSha256": "1d95399f08cf414c279f94f776e8cb6398a7ee330603197b0f0f070590ab118c"
     },
-    "taskLocked": true,
+    "taskLocked": false,
     "sourceIsSoleApplyOwner": false,
     "sourceApplyAuthorized": false,
-    "successorApplyAuthorized": false,
+    "successorApplyAuthorized": true,
     "correctionSourceRetired": true,
     "continuation": "Platform recovery only. No task implementation may start before thread handshake, Controller registration, acceptance, and a fresh activation."
   },
@@ -99,7 +99,7 @@
     ],
     "externalStateAuthorized": false,
     "networkAuthorized": false,
-    "task4_6Locked": true
+    "task4_6Locked": false
   },
   "context": {
     "sourceObservableCompactions": 0,
@@ -145,7 +145,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 47476,
+    "expectedNormalizedUtf8Bytes": 47733,
     "fallbackSourceCommit": "1682ce1056bd62a453f63d11cfc09bf8c7b31dce",
     "escalationTriggers": [
       "capsule, Git, OpenSpec or current-state inconsistency",

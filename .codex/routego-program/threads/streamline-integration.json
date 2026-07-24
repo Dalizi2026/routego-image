@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "task-4.6-platform-recovery-candidate-registration",
-  "status": "task-4.6-platform-recovery-handoff-accepted-awaiting-task-dispatch",
+  "status": "task-4.6-platform-recovery-activated-sole-apply-owner",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
@@ -13,12 +13,12 @@
   "currentHead": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "4.6",
-    "status": "platform-recovery-handoff-accepted-awaiting-task-dispatch",
-    "locked": true
+    "status": "active-amended-mock-relay-contract-cleanup",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",

@@ -192,7 +192,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.6-platform-recovery-handoff-accepted-awaiting-task-dispatch",
+      "status": "task-4.6-platform-recovery-activated-sole-apply-owner",
       "taskRef": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
       "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
       "generation": 5,
@@ -207,9 +207,9 @@
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/streamline-integration-4.6-platform-recovery.capsule.json"
       },
-      "authorizedScope": "Handoff-accepted recovery candidate may only complete Task 4.6 dispatch acceptance. Its two Mock Relay files remain locked until Controller activation. Studio G8 remains paused at its Task 5.5 safe checkpoint.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Only the activated Integration recovery owner may modify packages/mock-relay/src/service/mock-service.ts and packages/mock-relay/test/service.test.ts for Task 4.6. Studio G8 remains paused at its Task 5.5 safe checkpoint.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "4.5"
     }
   },
@@ -258,7 +258,7 @@
       "currentHead": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
       "observableCompactions": 0,
       "lastCompletedTask": "4.5",
-      "status": "task-4.6-platform-recovery-handoff-accepted-awaiting-task-dispatch"
+      "status": "task-4.6-platform-recovery-activated-sole-apply-owner"
     }
   },
   "currentChange": {
@@ -296,8 +296,8 @@
     },
     "currentTask": {
       "id": "4.6",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
       "authorizedScope": "Task 4.6 is locked while its handoff-accepted Integration recovery candidate completes fresh dispatch acceptance. Task 5.5 remains paused at its committed safe checkpoint until 4.6 verifies."
     }
