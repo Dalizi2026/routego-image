@@ -3,22 +3,22 @@
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "role": "task-5.5-studio-g8-sole-apply-owner",
-  "status": "task-5.5-resume-pending-after-4.6",
+  "status": "task-5.5-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 8,
-  "currentHead": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
+  "currentHead": "b0a5a343e11bc7e9fcbb96c988caf1ff00edf43e",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "5.5",
-    "status": "resume-pending-after-4.6",
-    "locked": true
+    "status": "active-dead-surface-removal",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
