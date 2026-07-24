@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "task-4.6-integration-test-infrastructure-candidate-registration",
-  "status": "task-4.6-activated-sole-apply-owner",
+  "status": "task-4.6-scope-amendment-pending",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -14,11 +14,11 @@
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "applyAuthorized": false,
   "currentTask": {
     "id": "4.6",
-    "status": "active-mock-relay-generation-relationship-correction",
-    "locked": false
+    "status": "scope-amendment-pending-mock-relay-contract-cleanup",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
@@ -56,7 +56,7 @@
   },
   "taskCapsule": {
     "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
-    "contentSha256": "163d3c7d6d39c9d3cf99718231fffffc8316f3ec1ae5a2fc035263f4a7d86778"
+    "contentSha256": "8aa1c862d10b278da78ee42ac6ddefdfa6f3b156f4e692ccc81ba90e37d8c10d"
   },
   "registration": {
     "reason": "Task 5.5's direct Studio mock-bridge verification exposed Mock Relay's stale read of the removed references field.",

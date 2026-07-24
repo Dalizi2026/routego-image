@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-task-4.6-activated",
+  "status": "controller-generation-13-task-4.6-scope-amendment-pending",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -192,7 +192,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.6-sole-apply-owner-activated",
+      "status": "task-4.6-scope-amendment-pending",
       "taskRef": "019f93ed-45f3-7680-a2fa-eba318806e30",
       "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
       "generation": 4,
@@ -202,14 +202,14 @@
       "currentHead": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
-        "sha256": "163d3c7d6d39c9d3cf99718231fffffc8316f3ec1ae5a2fc035263f4a7d86778"
+        "sha256": "8aa1c862d10b278da78ee42ac6ddefdfa6f3b156f4e692ccc81ba90e37d8c10d"
       },
       "handoffCapsule": {
         "path": null
       },
-      "authorizedScope": "Only the activated Integration owner may modify packages/mock-relay/src/service/mock-service.ts for Task 4.6. Studio G8 remains paused at its Task 5.5 safe checkpoint.",
+      "authorizedScope": "Task 4.6 is paused while its exact Mock Relay test scope is amended to clear pre-existing stale contract drift required by the task's package typecheck. Studio G8 remains paused at its Task 5.5 safe checkpoint.",
       "soleApplyOwner": true,
-      "applyAuthorized": true,
+      "applyAuthorized": false,
       "lastCompletedTask": "4.5"
     }
   },
@@ -258,7 +258,7 @@
       "currentHead": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992",
       "observableCompactions": 0,
       "lastCompletedTask": "4.5",
-      "status": "task-4.6-sole-apply-owner-activated"
+      "status": "task-4.6-scope-amendment-pending"
     }
   },
   "currentChange": {
@@ -296,10 +296,10 @@
     },
     "currentTask": {
       "id": "4.6",
-      "locked": false,
-      "activationAuthorized": true,
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 4.6 is activated for the Integration owner only. Task 5.5 remains paused at its committed safe checkpoint until 4.6 verifies."
+      "authorizedScope": "Task 4.6 scope amendment is pending. Task 5.5 remains paused at its committed safe checkpoint until 4.6 verifies."
     }
   },
   "latestDirectCheckpoint": {
@@ -317,7 +317,7 @@
   "currentBlockers": [
     {
       "id": "task-5.5-mock-relay-generation-relationship-defect",
-      "status": "planned-correction-4.6-active",
+      "status": "planned-correction-4.6-scope-amendment-pending",
       "rootCause": "Mock Relay #studioRelationships reads request.references although strict Studio generate requests no longer carry that field.",
       "impact": "Studio mock-bridge generation streams return HTTP 503; Task 5.5 completion verification is paused.",
       "resolutionTaskId": "4.6",

@@ -1,24 +1,27 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "163d3c7d6d39c9d3cf99718231fffffc8316f3ec1ae5a2fc035263f4a7d86778",
+  "contentSha256": "8aa1c862d10b278da78ee42ac6ddefdfa6f3b156f4e692ccc81ba90e37d8c10d",
   "taskId": "4.6",
   "stageId": "4",
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "planned": true,
   "status": "ready",
-  "sourceCommit": "34636ea2175df610bccf6c923a4a4a88cfc852df",
+  "sourceCommit": "1682ce1056bd62a453f63d11cfc09bf8c7b31dce",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
-    "fileSha256": "daec1216996541aa0d1a0f24e91bb6c96538098c835a0d18b0842751e15381aa",
-    "lineSha256": "e85bc5788f4ba46f2b6b59f776783046e322c9a17073c2e13f454bafc0f61d75"
+    "fileSha256": "9fd371315dc2a3ba9006329d121b7dffbacc96bd559be6416cbea7b4dedf658c",
+    "lineSha256": "d3fa1629defad9cd44390f36784d0e1d1f3c3f2bc085e7148d80f9aeb991f9a5"
   },
   "dependsOn": ["4.5", "5.1"],
   "dependenciesSatisfied": true,
   "completedDependencies": ["4.5", "5.1"],
   "requiresExclusive": false,
   "ownership": {
-    "owned": ["packages/mock-relay/src/service/mock-service.ts"],
+    "owned": [
+      "packages/mock-relay/src/service/mock-service.ts",
+      "packages/mock-relay/test/service.test.ts"
+    ],
     "readOnly": [
       "packages/studio/test/mock-bridge.test.ts",
       "packages/studio/src/dev/mock-handler.ts",
@@ -38,7 +41,10 @@
       ".codex/routego-program/**"
     ]
   },
-  "allowedFiles": ["packages/mock-relay/src/service/mock-service.ts"],
+  "allowedFiles": [
+    "packages/mock-relay/src/service/mock-service.ts",
+    "packages/mock-relay/test/service.test.ts"
+  ],
   "forbiddenFileGlobs": [
     "packages/contracts/**",
     "packages/creation/**",
@@ -55,11 +61,13 @@
   "requiredBehavior": [
     "A strict text-only Studio generate request that omits references must complete the deterministic Mock Relay stream without a TypeError or HTTP 503.",
     "Mock Relay relationship construction for the current Studio generation contract must use only the generated output relationship and must not read, default, synthesize, or restore references, edit targets, masks, supporting images, or upload compatibility fields.",
+    "Remove only stale Mock Relay edit and legacy Library fixture code/tests required to make its package typecheck conform to the already accepted generation-only, narrowed Library, and Studio provider-switch contracts; do not change those contracts or recreate removed behavior.",
     "Keep the seven public operations and generation-only schemas unchanged. No external provider, credential, real image/data, installation, migration, deployment, release, or network access is authorized."
   ],
   "verificationCommands": [
     "openspec instructions apply --change streamline-routego-image-generation --json",
     "pnpm --filter @routego-image/mock-relay typecheck",
+    "pnpm --filter @routego-image/mock-relay exec vitest run test/service.test.ts",
     "pnpm --filter @routego-image/studio exec vitest run test/mock-bridge.test.ts",
     "git diff --check"
   ],
