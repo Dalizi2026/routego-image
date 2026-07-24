@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "1d5640af52057b132145e2558f3924686604b60404035de73c398cb46bb1a9b3",
+  "capsuleSha256": "22fd3ff4a719dccd7be5b24d12da1e7da988dc703129d21c023659d274685c88",
   "lane": "integration",
   "stateRouting": {
     "programLaneKey": "streamlineIntegration",
@@ -26,7 +26,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
     "startingCommit": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
-    "registrationStatus": "registered-platform-recovery-awaiting-handoff-acceptance",
+    "registrationStatus": "accepted-platform-recovery-awaiting-task-dispatch",
     "registrationAttempt": 1,
     "verifiedHeadBeforeContainingCommit": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
     "incorporationCommit": null
@@ -145,7 +145,7 @@
     "maxFiles": 12,
     "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "expectedNormalizedUtf8Bytes": 47449,
+    "expectedNormalizedUtf8Bytes": 47476,
     "fallbackSourceCommit": "1682ce1056bd62a453f63d11cfc09bf8c7b31dce",
     "escalationTriggers": [
       "capsule, Git, OpenSpec or current-state inconsistency",
