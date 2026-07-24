@@ -835,16 +835,14 @@ export class MockRoutegoService implements LocalRoutegoService {
         outputArtifactId,
         order: order++
       });
-    }
-    for (const reference of request.references) {
-      relationships.push({
-        role: "reference",
-        input: reference.image,
-        outputArtifactId,
-        order: order++
-      });
-    }
-    if (request.kind === "edit") {
+      for (const reference of request.references) {
+        relationships.push({
+          role: "reference",
+          input: reference.image,
+          outputArtifactId,
+          order: order++
+        });
+      }
       for (const supporting of request.supportingImages) {
         relationships.push({
           role: "supporting",
