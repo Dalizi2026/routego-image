@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-task-5.5-registered-pending-acceptance",
+  "status": "controller-generation-13-task-5.5-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -129,24 +129,24 @@
   },
   "activeApplyOwners": {
     "studio": {
-      "status": "task-5.5-registered-locked-pending-task-acceptance",
+      "status": "task-5.5-sole-apply-owner-activated",
       "taskRef": "019f925c-004c-72a1-9a53-f63debdcac84",
       "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
       "generation": 8,
       "taskId": "5.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "681d57e53d1b5142116ba8045c92f52f668603f3",
+      "currentHead": "912205e05cdd47bf0c2a08c33c2ab97c21132ab8",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/studio-5.5.json",
-        "sha256": "8da5f4329656143b235c114400b7e47ed6a666a5ce8d187f9cb082bd5f2875a4"
+        "sha256": "36692abd793097ae95885c1dc08873f02fd774252bf657cc7d7abff6957a0b0a"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"
       },
-      "authorizedScope": "Task 5.5 is registered and locked until the reused Studio lane explicitly accepts this dispatch.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Only Studio G8 may modify Task 5.5's exact dead-surface-removal scope until it checkpoints directly to this Controller.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "5.4"
     },
     "creation": {
@@ -220,10 +220,10 @@
       "generation": 8,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "681d57e53d1b5142116ba8045c92f52f668603f3",
+      "currentHead": "912205e05cdd47bf0c2a08c33c2ab97c21132ab8",
       "observableCompactions": 0,
       "lastCompletedTask": "5.4",
-      "status": "task-5.5-registered-locked-pending-task-acceptance"
+      "status": "task-5.5-sole-apply-owner-activated"
     },
     "creation": {
       "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
@@ -297,10 +297,10 @@
     },
     "currentTask": {
       "id": "5.5",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.5 is registered for the reused Studio lane and remains locked pending its explicit direct-return acceptance."
+      "authorizedScope": "Task 5.5 is activated for Studio G8 only; all checkpoints and delivery return directly to this Controller."
     }
   },
   "latestDirectCheckpoint": {
