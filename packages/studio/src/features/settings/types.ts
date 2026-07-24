@@ -1,11 +1,4 @@
-import type {
-  CapabilityProbeResult,
-  EndpointInputMode,
-  ProviderCapability,
-  ProviderProfileDescriptor,
-  ProviderTransport,
-  ReadSettingsResult
-} from "@routego-image/contracts";
+import type { EndpointInputMode, ReadSettingsResult } from "@routego-image/contracts";
 
 export type SettingsAsyncState =
   | { readonly status: "idle" }
@@ -29,7 +22,6 @@ export interface ProviderProfileDraft {
   readonly name: string;
   readonly generation: ProviderEndpointDraft;
   readonly models: OptionalProviderEndpointDraft;
-  readonly edits: OptionalProviderEndpointDraft;
   readonly responses: OptionalProviderEndpointDraft;
   readonly defaultModel: string;
   readonly apiKeyOperation: "unchanged" | "replace" | "clear";
@@ -41,15 +33,6 @@ export interface OutputDirectoryDraft {
   readonly operation: "unchanged" | "default" | "clear" | "replace";
   readonly path: string;
   readonly confirmLocalPath: boolean;
-}
-
-export interface CapabilityProbeDraft {
-  readonly providerId: string;
-  readonly model: string;
-  readonly capability: ProviderCapability;
-  readonly transport: ProviderTransport;
-  readonly requestShape: string;
-  readonly confirmBillableProbe: boolean;
 }
 
 export interface SettingsWorkspaceProps {
@@ -64,9 +47,4 @@ export interface ProviderSwitchFeedback {
   readonly providerId: string;
   readonly model?: string | undefined;
   readonly retainedModel: boolean;
-}
-
-export interface CapabilityProbePresentation {
-  readonly result: CapabilityProbeResult;
-  readonly provider?: ProviderProfileDescriptor | undefined;
 }

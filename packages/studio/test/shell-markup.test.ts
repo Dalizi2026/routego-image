@@ -18,9 +18,10 @@ describe("accessible Studio shell markup", () => {
     expect(markup).toContain("<nav");
     expect(markup).toContain('aria-label="Studio 主导航"');
     expect(markup).toContain('aria-current="page"');
-    expect(markup.match(/<button/g)).toHaveLength(4);
+    expect(markup.match(/<button/g)).toHaveLength(3);
     expect(markup).toContain("工作台");
-    expect(markup).toContain("回收站");
+    expect(markup).toContain("图库");
+    expect(markup).not.toContain("回收站");
   });
 
   it("uses assertive failure semantics and polite loading semantics", () => {

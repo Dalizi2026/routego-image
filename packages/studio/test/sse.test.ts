@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  studioEditInputSchema,
   studioGenerateInputSchema,
   studioImageOperationResultSchema,
   studioServiceErrorSchema,
@@ -18,19 +17,6 @@ const TIMESTAMP = "2026-07-18T12:00:00.000Z";
 
 function request(prompt = "浏览器安全的合成测试") {
   return studioGenerateInputSchema.parse({ kind: "generate", prompt });
-}
-
-function editRequest() {
-  return studioEditInputSchema.parse({
-    kind: "edit",
-    prompt: "只替换天空",
-    target: { source: "artifact", artifactId: "artifact-target" },
-    invariants: {
-      allowedChanges: ["sky"],
-      preserve: ["subject"],
-      forbiddenChanges: ["text"]
-    }
-  });
 }
 
 function artifact(id: string, phase: "partial" | "final") {
@@ -211,7 +197,7 @@ describe("strict browser-safe Studio SSE parser", () => {
   });
 
   it("parses CRLF and multiline data with zero or more partial events", async () => {
-    const input = editRequest();
+    const input = request("浏览器安全的多行生成测试");
     const text =
       record(started(input), { lineEnding: "\r\n", multiline: true }) +
       record(partial("request-1", 4, "partial-a"), { lineEnding: "\r\n", multiline: true }) +

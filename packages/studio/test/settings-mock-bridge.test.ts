@@ -31,7 +31,7 @@ async function startSettingsBridge(): Promise<string> {
 }
 
 describe("Settings lifecycle through the deterministic Studio bridge", () => {
-  it("keeps profile secrets and output paths write-only while separating refresh and probes", async () => {
+  it("keeps profile secrets and output paths write-only while refreshing models without probes", async () => {
     const baseUrl = await startSettingsBridge();
     const gateway = new HttpStudioGateway({
       baseUrl,
@@ -88,20 +88,6 @@ describe("Settings lifecycle through the deterministic Studio bridge", () => {
     });
     expect(refreshed).toMatchObject({ status: "succeeded", billable: false });
     expect(refreshed.models.length).toBeGreaterThan(0);
-
-    const probed = await gateway.invoke("probeCapabilities", {
-      providerId: created.profile.id,
-      model: refreshed.models[0]!,
-      capability: "target-edit",
-      transport: "openai-images",
-      requestShape: "openai-images:edit-target",
-      confirmBillableProbe: true
-    });
-    expect(probed).toMatchObject({
-      status: "completed",
-      mayHaveBilled: true,
-      record: { state: "supported", capability: "target-edit" }
-    });
 
     const localCandidate = "/synthetic/private-parent/routego-settings-output";
     const updated = await gateway.invoke("updateSettings", {
@@ -165,7 +151,6 @@ describe("Settings lifecycle through the deterministic Studio bridge", () => {
       activated,
       cleared,
       refreshed,
-      probed,
       updated,
       unchangedOutput,
       clearedOutput,

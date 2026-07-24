@@ -4,15 +4,8 @@ import type { ReadSettingsResult, RoutegoStatusResult } from "@routego-image/con
 
 import { StudioGatewayError, type StudioGateway } from "../api";
 import { AppNavigation, AsyncStatePanel, NoticeStack } from "../components";
-import { CapabilityProvider } from "../features/capabilities";
-import {
-  CreationWorkbench,
-  type CreationExternalHandoff
-} from "../features/creation";
-import {
-  LibraryWorkspace,
-  type LibraryCreationHandoff
-} from "../features/library";
+import { CreationWorkbench } from "../features/creation";
+import { LibraryWorkspace } from "../features/library";
 import { SettingsWorkspace } from "../features/settings";
 import {
   activeSettingsModel,
@@ -64,14 +57,8 @@ const routeCopy: Record<
     title: "route.library.title",
     body: "route.library.body"
   },
-  trash: {
-    index: "03",
-    eyebrow: "route.trash.eyebrow",
-    title: "route.trash.title",
-    body: "route.trash.body"
-  },
   settings: {
-    index: "04",
+    index: "03",
     eyebrow: "route.settings.eyebrow",
     title: "route.settings.title",
     body: "route.settings.body"
@@ -353,27 +340,6 @@ export function HeaderProviderSelector({
   );
 }
 
-export interface StudioLibraryHandoffTransition {
-  readonly route: "workbench";
-  readonly handoff: CreationExternalHandoff;
-}
-
-export function createStudioLibraryHandoffTransition(
-  handoff: LibraryCreationHandoff,
-  sequence: number
-): StudioLibraryHandoffTransition {
-  if (!Number.isSafeInteger(sequence) || sequence < 1) {
-    throw new Error("Library handoff sequence must be a positive integer.");
-  }
-  return {
-    route: "workbench",
-    handoff: {
-      id: `library:${sequence}:${handoff.action}`,
-      draft: handoff.draft
-    }
-  };
-}
-
 function StudioWorkspace({
   gateway,
   service,
@@ -395,23 +361,8 @@ function StudioWorkspace({
     notices: firstRunSession ? [] : noticesFor(service, settings)
   });
   const firstRunSetupVisible = firstRunSession && state.route === "settings";
-  const [creationHandoff, setCreationHandoff] = useState<CreationExternalHandoff>();
-  const handoffSequenceRef = useRef(0);
-  const handleCreationHandoff = useCallback((handoff: LibraryCreationHandoff) => {
-    handoffSequenceRef.current += 1;
-    const transition = createStudioLibraryHandoffTransition(
-      handoff,
-      handoffSequenceRef.current
-    );
-    setCreationHandoff(transition.handoff);
-    dispatch({ type: "navigate", route: transition.route });
-  }, []);
   const workbenchContent = routeContent?.workbench ?? (
-      <CreationWorkbench
-        gateway={gateway}
-        defaults={settings.defaults}
-        externalHandoff={creationHandoff}
-      />
+      <CreationWorkbench gateway={gateway} defaults={settings.defaults} />
     );
   const content = {
     library:
@@ -419,15 +370,6 @@ function StudioWorkspace({
         <LibraryWorkspace
           gateway={gateway}
           view="library"
-          onCreationHandoff={handleCreationHandoff}
-        />
-      ),
-    trash:
-      routeContent?.trash ?? (
-        <LibraryWorkspace
-          gateway={gateway}
-          view="trash"
-          onCreationHandoff={handleCreationHandoff}
         />
       ),
     settings:
@@ -569,35 +511,16 @@ export function StudioApp({
     };
   }, [attempt, gateway]);
 
-  const activeProfile =
-    boot.status === "ready"
-      ? boot.settings.profiles.find(
-          (profile) =>
-            profile.id === boot.settings.activeProviderId && profile.isActive
-        )
-      : undefined;
-
   return (
     <I18nProvider>
       {boot.status === "ready" ? (
-        <CapabilityProvider
-          providerId={boot.settings.activeProviderId ?? boot.service.providerId}
-          model={
-            boot.settings.defaults.model ??
-            activeProfile?.defaultModel ??
-            activeProfile?.models[0] ??
-            boot.service.models[0]
-          }
-          snapshots={boot.service.capabilities}
-        >
-          <StudioWorkspace
-            gateway={gateway}
-            service={boot.service}
-            settings={boot.settings}
-            onSettingsChange={updateSettings}
-            {...(routeContent === undefined ? {} : { routeContent })}
-          />
-        </CapabilityProvider>
+        <StudioWorkspace
+          gateway={gateway}
+          service={boot.service}
+          settings={boot.settings}
+          onSettingsChange={updateSettings}
+          {...(routeContent === undefined ? {} : { routeContent })}
+        />
       ) : (
         <BootScreen state={boot} onRetry={() => setAttempt((value) => value + 1)} />
       )}

@@ -1,9 +1,7 @@
 import {
-  capabilityProbeInputSchema,
   routegoDefaultsSchema,
   updateSettingsInputSchema,
   upsertProviderProfileInputSchema,
-  type CapabilityProbeInput,
   type ProviderProfileDescriptor,
   type ReadSettingsResult,
   type RefreshModelsResult,
@@ -15,7 +13,6 @@ import {
 } from "@routego-image/contracts";
 
 import type {
-  CapabilityProbeDraft,
   OptionalProviderEndpointDraft,
   OutputDirectoryDraft,
   ProviderEndpointDraft,
@@ -57,7 +54,6 @@ function generationEndpoint(
 function optionalEndpoint(
   descriptor:
     | ProviderProfileDescriptor["endpoints"]["models"]
-    | ProviderProfileDescriptor["endpoints"]["edits"]
     | ProviderProfileDescriptor["endpoints"]["responses"]
 ): OptionalProviderEndpointDraft {
   return {
@@ -77,7 +73,6 @@ export function createProviderProfileDraft(
     name: profile?.name ?? "",
     generation: generationEndpoint(profile?.endpoints.generation),
     models: optionalEndpoint(profile?.endpoints.models),
-    edits: optionalEndpoint(profile?.endpoints.edits),
     responses: optionalEndpoint(profile?.endpoints.responses),
     defaultModel: profile?.defaultModel ?? "",
     apiKeyOperation: profile === undefined || !profile.hasApiKey ? "replace" : "unchanged",
@@ -142,7 +137,6 @@ function requireEndpointReentry(draft: ProviderProfileDraft): void {
   for (const [name, endpoint] of [
     ["generation", draft.generation],
     ["models", draft.models],
-    ["edits", draft.edits],
     ["responses", draft.responses]
   ] as const) {
     if (endpoint.requiresReentry && endpoint.value.trim() === "") {
@@ -172,7 +166,6 @@ export function buildUpsertProviderProfileInput(
         value: draft.generation.value.trim()
       },
       ...(draft.models.value.trim() === "" ? {} : { models: draft.models.value.trim() }),
-      ...(draft.edits.value.trim() === "" ? {} : { edits: draft.edits.value.trim() }),
       ...(draft.responses.value.trim() === ""
         ? {}
         : { responses: draft.responses.value.trim() })
@@ -359,25 +352,6 @@ export function buildOutputDirectorySettingsInput(
   return parsed.data;
 }
 
-export function buildCapabilityProbeInput(
-  draft: CapabilityProbeDraft
-): CapabilityProbeInput {
-  const parsed = capabilityProbeInputSchema.safeParse({
-    providerId: draft.providerId,
-    model: draft.model.trim(),
-    capability: draft.capability,
-    transport: draft.transport,
-    requestShape: draft.requestShape.trim(),
-    ...(draft.confirmBillableProbe ? { confirmBillableProbe: true } : {})
-  });
-  if (!parsed.success) {
-    throw new SettingsFormError(
-      "能力探测需要完整范围和明确的潜在计费确认。",
-      fieldsFromIssues(parsed.error.issues)
-    );
-  }
-  return parsed.data;
-}
 
 export function activeSettingsProfile(
   settings: ReadSettingsResult

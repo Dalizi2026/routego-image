@@ -344,11 +344,7 @@ async function handleStudioCreationStream(
   const fixture = mockStreamFixture(input);
   let result: StudioImageOperationResult;
   try {
-    result = studioImageOperationResultSchema.parse(
-      input.kind === "generate"
-        ? await options.service.studioGenerate(input)
-        : await options.service.studioEdit(input)
-    );
+    result = studioImageOperationResultSchema.parse(await options.service.studioGenerate(input));
   } catch (error) {
     return serviceFailure(error);
   }

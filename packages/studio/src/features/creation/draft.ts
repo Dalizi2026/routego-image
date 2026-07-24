@@ -1,8 +1,7 @@
 import {
   studioGenerateInputSchema,
   type ReadSettingsResult,
-  type StudioImageOperationRequest,
-  type StudioImageOperationResult
+  type StudioImageOperationRequest
 } from "@routego-image/contracts";
 
 import type { CreationDraft, CreationVisibleControls } from "./types";
@@ -36,16 +35,7 @@ export function createInitialCreationDraft(
     mode: "generate",
     prompt: "",
     references: [],
-    supportingImages: [],
-    invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
-    controls: {
-      ...visibleControlsFromDefaults(defaults),
-      quality: defaults.quality,
-      partialImages: defaults.partialImages,
-      moderation: defaults.moderation,
-      action: "auto",
-      saveToLibrary: defaults.saveToLibrary
-    }
+    controls: visibleControlsFromDefaults(defaults)
   };
 }
 
@@ -118,31 +108,4 @@ export function buildStudioCreationRequest(draft: CreationDraft): StudioImageOpe
     }
     throw new CreationDraftError("工作台输入不符合本地契约。");
   }
-}
-
-export function createEditHandoff(
-  result: StudioImageOperationResult,
-  _artifactId: string
-): CreationDraft {
-  return {
-    mode: "generate",
-    prompt: result.effectiveParams.prompt,
-    references: [],
-    supportingImages: [],
-    invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
-    controls: {
-      ...normalizeVisibleControls({
-        size: result.effectiveParams.size,
-        aspectRatio: result.effectiveParams.aspectRatio,
-        format: result.effectiveParams.format,
-        count: result.effectiveParams.count,
-        transparentMode: result.effectiveParams.transparentMode
-      }),
-      quality: "auto",
-      partialImages: 0,
-      moderation: "auto",
-      action: "auto",
-      saveToLibrary: true
-    }
-  };
 }

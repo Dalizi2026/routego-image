@@ -16,13 +16,7 @@ import {
 } from "./draft";
 import { describeCreationResult, describeCreationStreamFailure } from "./result";
 import { consumeCreationStream } from "./stream";
-import type {
-  BatchDraftItem,
-  CreationDraft,
-  DraftImageInput,
-  SubmissionState,
-  UploadLifecycleItem
-} from "./types";
+import type { BatchDraftItem, CreationDraft, SubmissionState } from "./types";
 import "./creation.css";
 
 export function creationDefaultsFingerprint(
@@ -43,16 +37,10 @@ export function synchronizeCreationDraftDefaults(
   _resolve?: unknown
 ): CreationDraft {
   return {
-    ...draft,
     mode: "generate",
+    prompt: draft.prompt,
     references: [],
-    target: undefined,
-    supportingImages: [],
-    mask: undefined,
-    maskUpload: undefined,
-    invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
     controls: {
-      ...draft.controls,
       ...normalizeVisibleControls({
         ...draft.controls,
         size: defaults.size,
@@ -67,10 +55,13 @@ export function synchronizeCreationDraftDefaults(
 
 export function synchronizeBatchDraftDefaults(
   items: readonly BatchDraftItem[],
-  _defaults: ReadSettingsResult["defaults"],
+  defaults: ReadSettingsResult["defaults"],
   _resolve?: unknown
 ): readonly BatchDraftItem[] {
-  return items;
+  return items.map((item) => ({
+    ...item,
+    draft: synchronizeCreationDraftDefaults(item.draft, defaults)
+  }));
 }
 
 const copy = {
@@ -125,98 +116,6 @@ const copy = {
 } as const;
 
 type CreationLabels = { readonly [Key in keyof (typeof copy)["zh"]]: string };
-
-export interface CreationExternalHandoff {
-  readonly id: string;
-  readonly draft: CreationDraft;
-}
-
-function isStableIdentifier(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    /^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$/u.test(value)
-  );
-}
-
-function hasExactKeys(value: object, expected: readonly string[]): boolean {
-  const keys = Object.keys(value).sort();
-  return keys.length === expected.length && keys.every((key, index) => key === expected[index]);
-}
-
-function isStableLibraryLocator(value: unknown): boolean {
-  if (typeof value !== "object" || value === null || !("source" in value)) return false;
-  if (value.source === "asset") {
-    return (
-      "assetId" in value &&
-      isStableIdentifier(value.assetId) &&
-      hasExactKeys(value, ["assetId", "source"])
-    );
-  }
-  if (value.source === "artifact") {
-    return (
-      "artifactId" in value &&
-      isStableIdentifier(value.artifactId) &&
-      hasExactKeys(value, ["artifactId", "source"])
-    );
-  }
-  return false;
-}
-
-function isIdentifierOnlyDraftImage(value: DraftImageInput): boolean {
-  return (
-    isStableIdentifier(value.id) &&
-    value.upload === undefined &&
-    value.resource === undefined &&
-    isStableLibraryLocator(value.locator)
-  );
-}
-
-export function isIdentifierOnlyCreationExternalHandoff(
-  handoff: CreationExternalHandoff | undefined
-): handoff is CreationExternalHandoff {
-  if (handoff === undefined || !isStableIdentifier(handoff.id)) return false;
-  const draft = handoff.draft;
-  const images = [
-    ...draft.references,
-    ...(draft.target === undefined ? [] : [draft.target]),
-    ...draft.supportingImages
-  ];
-  return (
-    images.every(isIdentifierOnlyDraftImage) &&
-    draft.maskUpload === undefined &&
-    (draft.mask === undefined ||
-      (draft.mask.targetSlot === 0 && isStableLibraryLocator(draft.mask.image)))
-  );
-}
-
-export function shouldConsumeCreationExternalHandoff(
-  handoff: CreationExternalHandoff | undefined,
-  consumedId: string | undefined
-): boolean {
-  return (
-    handoff !== undefined &&
-    handoff.id !== consumedId &&
-    isIdentifierOnlyCreationExternalHandoff(handoff)
-  );
-}
-
-export function collectCreationDraftUploads(
-  drafts: readonly CreationDraft[]
-): readonly UploadLifecycleItem[] {
-  const uploads = new Map<string, UploadLifecycleItem>();
-  for (const draft of drafts) {
-    const images = [
-      ...draft.references,
-      ...(draft.target === undefined ? [] : [draft.target]),
-      ...draft.supportingImages
-    ];
-    for (const image of images) {
-      if (image.upload !== undefined) uploads.set(image.upload.id, image.upload);
-    }
-    if (draft.maskUpload !== undefined) uploads.set(draft.maskUpload.id, draft.maskUpload);
-  }
-  return [...uploads.values()];
-}
 
 function ResultPanel({
   gateway,
@@ -329,12 +228,10 @@ function StreamResultPanel({
 
 export function CreationWorkbench({
   gateway,
-  defaults,
-  externalHandoff
+  defaults
 }: {
   readonly gateway: StudioGateway;
   readonly defaults: ReadSettingsResult["defaults"];
-  readonly externalHandoff?: CreationExternalHandoff | undefined;
 }) {
   const { language } = useI18n();
   const labels = copy[language];
@@ -345,7 +242,6 @@ export function CreationWorkbench({
   const [fieldErrors, setFieldErrors] = useState<Readonly<Record<string, string>>>({});
   const activeStreamRef = useRef<AbortController | undefined>(undefined);
   const mountedRef = useRef(true);
-  const consumedExternalHandoffRef = useRef<string | undefined>(undefined);
 
   const sizeOptions = useMemo(
     () => ["auto", "1024x1024", "1536x1024", "1024x1536"] as const,
@@ -384,17 +280,6 @@ export function CreationWorkbench({
     appliedDefaultsFingerprintRef.current = defaultsFingerprint;
     setDraft((current) => synchronizeCreationDraftDefaults(current, defaults));
   }, [defaults, defaultsFingerprint]);
-
-  useEffect(() => {
-    if (externalHandoff === undefined || externalHandoff.id === consumedExternalHandoffRef.current) {
-      return;
-    }
-    consumedExternalHandoffRef.current = externalHandoff.id;
-    setDraft((current) => ({
-      ...current,
-      prompt: externalHandoff.draft.prompt
-    }));
-  }, [externalHandoff]);
 
   const patchControls = useCallback((controls: Partial<CreationDraft["controls"]>) => {
     setDraft((current) => ({

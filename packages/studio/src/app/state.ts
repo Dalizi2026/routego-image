@@ -2,7 +2,7 @@ import type { ReadSettingsResult } from "@routego-image/contracts";
 
 import type { MessageKey } from "../i18n";
 
-export const studioRoutes = ["workbench", "library", "trash", "settings"] as const;
+export const studioRoutes = ["workbench", "library", "settings"] as const;
 export type StudioRoute = (typeof studioRoutes)[number];
 
 export type NoticeTone = "success" | "degraded" | "empty" | "failure";

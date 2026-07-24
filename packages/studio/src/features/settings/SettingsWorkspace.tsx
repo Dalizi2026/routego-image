@@ -1,24 +1,19 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import {
   imageFormatSchema,
   imageQualitySchema,
   moderationSchema,
-  providerCapabilitySchema,
   transparentModeSchema,
-  type CapabilityProbeResult,
-  type ProviderCapability,
   type ProviderProfileDescriptor,
   type ReadSettingsResult
 } from "@routego-image/contracts";
 
-import { useCapabilityRegistry, resolveCapability } from "../capabilities";
 import { useI18n } from "../../i18n";
 import {
   SettingsFormError,
   activeSettingsProfile,
   applySimpleConnectionEndpoint,
-  buildCapabilityProbeInput,
   buildDefaultsSettingsInput,
   buildOutputDirectorySettingsInput,
   buildUpsertProviderProfileInput,
@@ -32,7 +27,6 @@ import {
   mergeUpsertProviderProfile
 } from "./state";
 import type {
-  CapabilityProbeDraft,
   OutputDirectoryDraft,
   ProviderProfileDraft,
   SettingsAsyncState,
@@ -317,21 +311,8 @@ function endpointList(profile: ProviderProfileDescriptor): readonly string[] {
   return [
     profile.endpoints.generation.display,
     profile.endpoints.models?.display,
-    profile.endpoints.edits?.display,
     profile.endpoints.responses?.display
   ].filter((value): value is string => value !== undefined);
-}
-
-function initialProbeDraft(settings: ReadSettingsResult): CapabilityProbeDraft {
-  const active = activeSettingsProfile(settings) ?? settings.profiles[0];
-  return {
-    providerId: active?.id ?? "",
-    model: settings.defaults.model ?? active?.defaultModel ?? active?.models[0] ?? "",
-    capability: "text-generation",
-    transport: "single-endpoint-json",
-    requestShape: "single-endpoint-json:image-generation",
-    confirmBillableProbe: false
-  };
 }
 
 export function SettingsWorkspace({
@@ -343,7 +324,6 @@ export function SettingsWorkspace({
 }: SettingsWorkspaceProps) {
   const { language } = useI18n();
   const labels = copy[language];
-  const registry = useCapabilityRegistry();
   const initialProfile = activeSettingsProfile(settings) ?? settings.profiles[0];
   const [selectedProfileId, setSelectedProfileId] = useState(initialProfile?.id ?? "new");
   const [profileDraft, setProfileDraft] = useState<ProviderProfileDraft>(() =>
@@ -355,12 +335,6 @@ export function SettingsWorkspace({
   const [modelState, setModelState] = useState<SettingsAsyncState>({ status: "idle" });
   const [availableModels, setAvailableModels] = useState<readonly string[]>([]);
   const [manualModelFallback, setManualModelFallback] = useState(false);
-  const [probeDraft, setProbeDraft] = useState<CapabilityProbeDraft>(() =>
-    initialProbeDraft(settings)
-  );
-  const [probeResult, setProbeResult] = useState<CapabilityProbeResult>();
-  const [probeErrors, setProbeErrors] = useState<Readonly<Record<string, string>>>({});
-  const [probeState, setProbeState] = useState<SettingsAsyncState>({ status: "idle" });
   const [defaultsDraft, setDefaultsDraft] = useState(settings.defaults);
   const [defaultsErrors, setDefaultsErrors] = useState<Readonly<Record<string, string>>>({});
   const [defaultsState, setDefaultsState] = useState<SettingsAsyncState>({ status: "idle" });
@@ -388,19 +362,6 @@ export function SettingsWorkspace({
   }, [selectedProfileId, settings]);
 
   const selectedProfile = settings.profiles.find((profile) => profile.id === selectedProfileId);
-  const probeProvider = settings.profiles.find((profile) => profile.id === probeDraft.providerId);
-  const probeModels = probeProvider?.models ?? [];
-  const capabilityDecisions = useMemo(
-    () =>
-      providerCapabilitySchema.options.map((capability) =>
-        resolveCapability(registry.state, {
-          providerId: probeDraft.providerId || undefined,
-          model: probeDraft.model || undefined,
-          capability
-        })
-      ),
-    [probeDraft.model, probeDraft.providerId, registry.state]
-  );
 
   const selectProfile = (profile: ProviderProfileDescriptor | undefined) => {
     setSelectedProfileId(profile?.id ?? "new");
@@ -408,14 +369,6 @@ export function SettingsWorkspace({
     setProfileErrors({});
     setProfileState({ status: "idle" });
     setRemoveConfirmed(false);
-    if (profile !== undefined) {
-      setProbeDraft((current) => ({
-        ...current,
-        providerId: profile.id,
-        model: profile.defaultModel ?? profile.models[0] ?? current.model,
-        confirmBillableProbe: false
-      }));
-    }
   };
 
   const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
@@ -567,12 +520,6 @@ export function SettingsWorkspace({
       const next = mergeActiveProviderProfile(settings, result);
       onSettingsChange(next);
       setProfileDraft(createProviderProfileDraft(result.profile));
-      setProbeDraft((current) => ({
-        ...current,
-        providerId: result.profile.id,
-        model: result.profile.defaultModel ?? result.profile.models[0] ?? current.model,
-        confirmBillableProbe: false
-      }));
       setProfileState({ status: "success", message: labels.activated });
     } catch (error) {
       setProfileState({ status: "failure", safeMessage: safeMessage(error) });
@@ -595,45 +542,12 @@ export function SettingsWorkspace({
       }
       const next = mergeRefreshedModels(settings, result);
       onSettingsChange(next);
-      setProbeDraft((current) => ({
-        ...current,
-        model: result.models.includes(current.model) ? current.model : result.models[0] ?? ""
-      }));
       setModelState({ status: "success", message: labels.modelsUpdated });
     } catch (error) {
       setModelState({ status: "failure", safeMessage: safeMessage(error) });
     }
   };
 
-  const runProbe = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    let input;
-    try {
-      input = buildCapabilityProbeInput(probeDraft);
-      setProbeErrors({});
-    } catch (error) {
-      setProbeState({ status: "failure", safeMessage: safeMessage(error) });
-      setProbeErrors(error instanceof SettingsFormError ? error.fields : {});
-      return;
-    }
-    setProbeDraft((current) => ({ ...current, confirmBillableProbe: false }));
-    setProbeState({ status: "busy", operation: "probe-capability" });
-    try {
-      const result = await gateway.invoke("probeCapabilities", input);
-      registry.integrateProbeResult(result);
-      setProbeResult(result);
-      setProbeState(
-        result.status === "completed"
-          ? { status: "success", message: labels.probeCompleted }
-          : {
-              status: "failure",
-              safeMessage: result.error?.safeMessage ?? "The capability probe failed safely."
-            }
-      );
-    } catch (error) {
-      setProbeState({ status: "failure", safeMessage: safeMessage(error) });
-    }
-  };
 
   const saveDefaults = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -881,8 +795,8 @@ export function SettingsWorkspace({
               <label><span>{labels.defaultModel}</span><input list="settings-profile-models" value={profileDraft.defaultModel} onChange={(event) => setProfileDraft((current) => ({ ...current, defaultModel: event.target.value }))} /><FieldError value={profileErrors["defaultModel"]} /></label>
               <label><span>{labels.generationMode}</span><select value={profileDraft.generation.mode} onChange={(event) => setProfileDraft((current) => ({ ...current, generation: { ...current.generation, mode: event.target.value as ProviderProfileDraft["generation"]["mode"] } }))}><option value="exact-generation-endpoint">{labels.exactEndpoint}</option><option value="legacy-api-base">{labels.legacyBase}</option></select></label>
               <label className="settings-form-grid__wide"><span>{labels.generationEndpoint}</span><input required value={profileDraft.generation.value} onChange={(event) => setProfileDraft((current) => ({ ...current, generation: { ...current.generation, value: event.target.value, requiresReentry: false } }))} />{profileDraft.generation.requiresReentry ? <small>{labels.endpointReentry}</small> : null}<FieldError value={profileErrors["endpoints.generation"] ?? profileErrors["endpoints.generation.value"]} /></label>
-              {(["models", "edits", "responses"] as const).map((name) => {
-                const label = name === "models" ? labels.modelsEndpoint : name === "edits" ? labels.editsEndpoint : labels.responsesEndpoint;
+              {(["models", "responses"] as const).map((name) => {
+                const label = name === "models" ? labels.modelsEndpoint : labels.responsesEndpoint;
                 return <label key={name} className="settings-form-grid__wide"><span>{label}</span><input value={profileDraft[name].value} onChange={(event) => setProfileDraft((current) => ({ ...current, [name]: { ...current[name], value: event.target.value, requiresReentry: false } }))} />{profileDraft[name].requiresReentry ? <small>{labels.endpointReentry}</small> : null}<FieldError value={profileErrors[`endpoints.${name}`]} /></label>;
               })}
             </div>
@@ -896,13 +810,7 @@ export function SettingsWorkspace({
         {selectedProfile ? <div className="settings-redacted-endpoints"><strong>{labels.redacted}</strong>{endpointList(selectedProfile).map((value) => <code key={value}>{value}</code>)}</div> : null}
       </section>
 
-      <div className="settings-calibration-grid">
-        <section className="settings-models" aria-labelledby="settings-models-title"><div className="settings-section-heading"><p>CATALOG / FREE</p><h2 id="settings-models-title">{labels.modelRefresh}</h2></div><p>{labels.nonBillable}</p><button type="button" disabled={!selectedProfile} onClick={() => void refreshModels()}>{labels.refreshModels}</button><div className="settings-models__list"><strong>{labels.refreshedModels}</strong>{selectedProfile?.models.length ? selectedProfile.models.map((model) => <span key={model}>{model}</span>) : <span>—</span>}</div><StateMessage state={modelState} labels={labels} /></section>
-
-        <form className="settings-probe" onSubmit={(event) => void runProbe(event)}><div className="settings-section-heading"><p>PROBE / BILLABLE</p><h2>{labels.capabilityProbe}</h2></div><p className="settings-probe__warning">{labels.probeWarning}</p><div className="settings-form-grid"><label><span>{labels.provider}</span><select value={probeDraft.providerId} onChange={(event) => { const profile = settings.profiles.find((item) => item.id === event.target.value); setProbeDraft((current) => ({ ...current, providerId: event.target.value, model: profile?.defaultModel ?? profile?.models[0] ?? "", confirmBillableProbe: false })); }}><option value="">—</option>{settings.profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}</select><FieldError value={probeErrors["providerId"]} /></label><label><span>{labels.model}</span><input list="settings-probe-models" value={probeDraft.model} onChange={(event) => setProbeDraft((current) => ({ ...current, model: event.target.value, confirmBillableProbe: false }))} /><datalist id="settings-probe-models">{probeModels.map((model) => <option key={model} value={model} />)}</datalist><FieldError value={probeErrors["model"]} /></label><label><span>{labels.capability}</span><select value={probeDraft.capability} onChange={(event) => setProbeDraft((current) => ({ ...current, capability: event.target.value as ProviderCapability, confirmBillableProbe: false }))}>{providerCapabilitySchema.options.map((capability) => <option key={capability} value={capability}>{capability}</option>)}</select></label><label><span>{labels.transport}</span><select value={probeDraft.transport} onChange={(event) => setProbeDraft((current) => ({ ...current, transport: event.target.value as CapabilityProbeDraft["transport"], confirmBillableProbe: false }))}>{transportOptions.map((transport) => <option key={transport} value={transport}>{transport}</option>)}</select></label><label className="settings-form-grid__wide"><span>{labels.requestShape}</span><input required maxLength={160} value={probeDraft.requestShape} onChange={(event) => setProbeDraft((current) => ({ ...current, requestShape: event.target.value, confirmBillableProbe: false }))} /><FieldError value={probeErrors["requestShape"]} /></label></div><label className="settings-check settings-check--warning"><input type="checkbox" checked={probeDraft.confirmBillableProbe} onChange={(event) => setProbeDraft((current) => ({ ...current, confirmBillableProbe: event.target.checked }))} />{labels.confirmProbe}</label><button type="submit" disabled={!probeDraft.confirmBillableProbe}>{labels.runProbe}</button><StateMessage state={probeState} labels={labels} />{probeResult ? <section className="settings-probe-result" data-state={probeResult.record.state}><h3>{labels.probeResult}</h3><dl><div><dt>{labels.capability}</dt><dd>{probeResult.record.capability}</dd></div><div><dt>STATE</dt><dd>{probeResult.record.state}</dd></div><div><dt>{labels.mayHaveBilled}</dt><dd>{String(probeResult.mayHaveBilled)}</dd></div></dl>{probeResult.record.evidence.map((evidence) => <p key={`${evidence.observedAt}:${evidence.summary}`}><strong>{labels.evidence}</strong> {evidence.summary}</p>)}{probeResult.record.degradedReason ? <p><strong>{labels.degradedReason}</strong> {probeResult.record.degradedReason}</p> : null}{probeResult.error ? <p role="alert">{probeResult.error.safeMessage}</p> : null}</section> : null}</form>
-      </div>
-
-      <section className="settings-capability-ledger" aria-labelledby="settings-capability-title"><div className="settings-section-heading"><p>EVIDENCE / FOUR STATE</p><h2 id="settings-capability-title">{labels.capabilityLedger}</h2></div><div>{capabilityDecisions.map((decision) => <article key={decision.capability} data-state={decision.state}><span>{decision.capability}</span><strong>{decision.state}</strong>{decision.detail ? <small>{decision.detail}</small> : null}{decision.transientFailure ? <small>{labels.transient}: {decision.transientFailure}</small> : null}</article>)}</div></section>
+      <section className="settings-models" aria-labelledby="settings-models-title"><div className="settings-section-heading"><p>CATALOG / FREE</p><h2 id="settings-models-title">{labels.modelRefresh}</h2></div><p>{labels.nonBillable}</p><button type="button" disabled={!selectedProfile} onClick={() => void refreshModels()}>{labels.refreshModels}</button><div className="settings-models__list"><strong>{labels.refreshedModels}</strong>{selectedProfile?.models.length ? selectedProfile.models.map((model) => <span key={model}>{model}</span>) : <span>—</span>}</div><StateMessage state={modelState} labels={labels} /></section>
 
       <div className="settings-output-grid">
         <form className="settings-defaults" onSubmit={(event) => void saveDefaults(event)}><div className="settings-section-heading"><p>DEFAULTS / COMPLETE</p><h2>{labels.defaults}</h2></div><p>{labels.defaultsLead}</p><div className="settings-form-grid"><label className="settings-form-grid__wide"><span>{labels.model}</span><input list="settings-profile-models" value={defaultsDraft.model ?? ""} onChange={(event) => setDefaultsDraft((current) => ({ ...current, model: event.target.value || undefined }))} /><datalist id="settings-profile-models">{settings.profiles.flatMap((profile) => profile.models).filter((model, index, models) => models.indexOf(model) === index).map((model) => <option key={model} value={model} />)}</datalist><FieldError value={defaultsErrors["model"]} /></label><label><span>{labels.size}</span><input list="settings-size-options" value={defaultsDraft.size} onChange={(event) => setDefaultsDraft((current) => ({ ...current, size: event.target.value as typeof current.size }))} /><datalist id="settings-size-options">{["auto", "1024x1024", "1536x1024", "1024x1536"].map((value) => <option key={value} value={value} />)}</datalist><FieldError value={defaultsErrors["size"]} /></label><label><span>{labels.aspect}</span><input list="settings-aspect-options" value={defaultsDraft.aspectRatio} onChange={(event) => setDefaultsDraft((current) => ({ ...current, aspectRatio: event.target.value as typeof current.aspectRatio }))} /><datalist id="settings-aspect-options">{["auto", "square", "portrait", "landscape", "1:1", "3:2", "2:3"].map((value) => <option key={value} value={value} />)}</datalist><FieldError value={defaultsErrors["aspectRatio"]} /></label><label><span>{labels.quality}</span><select value={defaultsDraft.quality} onChange={(event) => setDefaultsDraft((current) => ({ ...current, quality: event.target.value as typeof current.quality }))}>{imageQualitySchema.options.map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label><span>{labels.format}</span><select value={defaultsDraft.format} onChange={(event) => setDefaultsDraft((current) => ({ ...current, format: event.target.value as typeof current.format }))}>{imageFormatSchema.options.map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label><span>{labels.count}</span><input type="number" min={1} max={4} value={defaultsDraft.count} onChange={(event) => setDefaultsDraft((current) => ({ ...current, count: Number(event.target.value) }))} /></label><label><span>{labels.partialImages}</span><input type="number" min={0} max={3} value={defaultsDraft.partialImages} onChange={(event) => setDefaultsDraft((current) => ({ ...current, partialImages: Number(event.target.value) }))} /></label><label><span>{labels.transparency}</span><select value={defaultsDraft.transparentMode} onChange={(event) => setDefaultsDraft((current) => ({ ...current, transparentMode: event.target.value as typeof current.transparentMode }))}>{transparentModeSchema.options.map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label><span>{labels.moderation}</span><select value={defaultsDraft.moderation} onChange={(event) => setDefaultsDraft((current) => ({ ...current, moderation: event.target.value as typeof current.moderation }))}>{moderationSchema.options.map((value) => <option key={value} value={value}>{value}</option>)}</select></label></div><label className="settings-check"><input type="checkbox" checked={defaultsDraft.saveToLibrary} onChange={(event) => setDefaultsDraft((current) => ({ ...current, saveToLibrary: event.target.checked }))} />{labels.saveToLibrary}</label><button type="submit">{labels.saveDefaults}</button><StateMessage state={defaultsState} labels={labels} /></form>

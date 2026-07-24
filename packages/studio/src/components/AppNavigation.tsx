@@ -8,8 +8,7 @@ const routes: ReadonlyArray<{
 }> = [
   { id: "workbench", label: "nav.workbench", index: "01" },
   { id: "library", label: "nav.library", index: "02" },
-  { id: "trash", label: "nav.trash", index: "03" },
-  { id: "settings", label: "nav.settings", index: "04" }
+  { id: "settings", label: "nav.settings", index: "03" }
 ];
 
 export function AppNavigation({

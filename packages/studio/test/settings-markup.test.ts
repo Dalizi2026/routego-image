@@ -7,7 +7,6 @@ import { describe, expect, it } from "vitest";
 import type { ReadSettingsResult } from "@routego-image/contracts";
 
 import type { StudioGateway } from "../src/api";
-import { CapabilityProvider } from "../src/features/capabilities";
 import { SettingsWorkspace } from "../src/features/settings";
 import { I18nProvider } from "../src/i18n";
 
@@ -93,15 +92,11 @@ describe("secret-safe Settings workspace markup", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
         initialLanguage: "en",
-        children: createElement(CapabilityProvider, {
-          providerId: incompleteSettings.activeProviderId,
-          snapshots: [],
-          children: createElement(SettingsWorkspace, {
-            gateway: {} as StudioGateway,
-            settings: incompleteSettings,
-            onSettingsChange: () => undefined,
-            firstRunSession: true
-          })
+        children: createElement(SettingsWorkspace, {
+          gateway: {} as StudioGateway,
+          settings: incompleteSettings,
+          onSettingsChange: () => undefined,
+          firstRunSession: true
         })
       })
     );
@@ -122,15 +117,10 @@ describe("secret-safe Settings workspace markup", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
         initialLanguage: "en",
-        children: createElement(CapabilityProvider, {
-          providerId: settings.activeProviderId,
-          model: settings.defaults.model,
-          snapshots: [],
-          children: createElement(SettingsWorkspace, {
-            gateway: {} as StudioGateway,
-            settings,
-            onSettingsChange: () => undefined
-          })
+        children: createElement(SettingsWorkspace, {
+          gateway: {} as StudioGateway,
+          settings,
+          onSettingsChange: () => undefined
         })
       })
     );
@@ -143,8 +133,8 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).toContain("Advanced settings");
     expect(markup).not.toContain('<details class="settings-advanced" open=""');
     expect(markup).toContain("Refresh models (non-billable)");
-    expect(markup).toContain("Potentially billable");
-    expect(markup).toContain("Four-state capability evidence");
+    expect(markup).not.toContain("Potentially billable");
+    expect(markup).not.toContain("Four-state capability evidence");
     expect(markup).toContain("Replace");
     expect(markup).toContain("hidden query data");
     expect(markup).toContain("Pictures/routego-image");

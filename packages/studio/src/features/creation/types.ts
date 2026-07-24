@@ -1,61 +1,6 @@
-import type {
-  BrowserResourceDescriptor,
-  ReadSettingsResult,
-  StudioBatchResult,
-  StudioImageArtifact,
-  StudioImageInputRef,
-  StudioImageOperationResult,
-  UploadResourceDescriptor,
-  UploadResourcePurpose
-} from "@routego-image/contracts";
+import type { ReadSettingsResult, StudioBatchResult, StudioImageArtifact, StudioImageOperationResult } from "@routego-image/contracts";
 
-export type CreationMode = "generate" | "edit";
-
-export type UploadLifecycleStatus =
-  | "queued"
-  | "reserving"
-  | "uploading"
-  | "finalizing"
-  | "ready"
-  | "failed"
-  | "expired"
-  | "discarding"
-  | "discarded";
-
-export interface UploadSource {
-  readonly name: string;
-  readonly blob: Blob;
-}
-
-export interface UploadLifecycleItem {
-  readonly id: string;
-  readonly purpose: UploadResourcePurpose;
-  readonly source: UploadSource;
-  readonly status: UploadLifecycleStatus;
-  readonly uploadResourceId?: string | undefined;
-  readonly descriptor?: UploadResourceDescriptor | undefined;
-  readonly safeMessage?: string | undefined;
-}
-
-export interface DraftImageInput {
-  readonly id: string;
-  readonly role:
-    | "reference"
-    | "style"
-    | "composition"
-    | "subject"
-    | "character"
-    | "product"
-    | "background"
-    | "layout"
-    | "color-palette"
-    | "supporting"
-    | "previous-output";
-  readonly label?: string | undefined;
-  readonly locator?: StudioImageInputRef | undefined;
-  readonly resource?: BrowserResourceDescriptor | undefined;
-  readonly upload?: UploadLifecycleItem | undefined;
-}
+export type CreationMode = "generate";
 
 export interface CreationVisibleControls {
   readonly size: ReadSettingsResult["defaults"]["size"];
@@ -65,34 +10,12 @@ export interface CreationVisibleControls {
   readonly transparentMode: ReadSettingsResult["defaults"]["transparentMode"];
 }
 
-export interface CreationControls extends CreationVisibleControls {
-  readonly quality: ReadSettingsResult["defaults"]["quality"];
-  readonly compression?: number | undefined;
-  readonly partialImages: ReadSettingsResult["defaults"]["partialImages"];
-  readonly moderation: ReadSettingsResult["defaults"]["moderation"];
-  readonly action: "auto" | "generate" | "edit";
-  readonly previousResponseId?: string | undefined;
-  readonly saveToLibrary: boolean;
-}
-
-export interface EditInvariantsDraft {
-  readonly allowedChanges: readonly string[];
-  readonly preserve: readonly string[];
-  readonly forbiddenChanges: readonly string[];
-}
+export type CreationControls = CreationVisibleControls;
 
 export interface CreationDraft {
   readonly mode: CreationMode;
   readonly prompt: string;
-  readonly references: readonly DraftImageInput[];
-  readonly target?: DraftImageInput | undefined;
-  readonly supportingImages: readonly DraftImageInput[];
-  readonly mask?: {
-    readonly image: StudioImageInputRef;
-    readonly targetSlot: 0;
-  } | undefined;
-  readonly maskUpload?: UploadLifecycleItem | undefined;
-  readonly invariants: EditInvariantsDraft;
+  readonly references: readonly never[];
   readonly controls: CreationControls;
 }
 

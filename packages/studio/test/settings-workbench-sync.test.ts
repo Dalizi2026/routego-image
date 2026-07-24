@@ -11,8 +11,7 @@ import {
   synchronizeBatchDraftDefaults,
   synchronizeCreationDraftDefaults,
   type BatchDraftItem,
-  type CreationDraft,
-  type UploadLifecycleItem
+  type CreationDraft
 } from "../src/features/creation";
 
 const originalDefaults: ReadSettingsResult["defaults"] = {
@@ -41,61 +40,27 @@ const nextDefaults: ReadSettingsResult["defaults"] = {
   saveToLibrary: false
 };
 
-function upload(id: string, purpose: UploadLifecycleItem["purpose"] = "image"): UploadLifecycleItem {
-  return {
-    id,
-    purpose,
-    source: { name: `${id}.png`, blob: new Blob([id], { type: "image/png" }) },
-    status: "ready",
-    uploadResourceId: `resource-${id}`
-  };
-}
-
 const legacyDraft: CreationDraft = {
-  mode: "edit",
+  mode: "generate",
   prompt: "Preserve this mounted prompt.",
-  references: [{ id: "reference-01", role: "style", label: "Reference", upload: upload("reference") }],
-  target: { id: "target-01", role: "previous-output", upload: upload("target") },
-  supportingImages: [{ id: "supporting-01", role: "supporting", upload: upload("supporting") }],
-  mask: {
-    image: { source: "upload", uploadResourceId: "resource-mask" },
-    targetSlot: 0
-  },
-  maskUpload: upload("mask", "mask"),
-  invariants: {
-    allowedChanges: ["lighting"],
-    preserve: ["identity"],
-    forbiddenChanges: ["composition"]
-  },
+  references: [],
   controls: {
     size: originalDefaults.size,
     aspectRatio: originalDefaults.aspectRatio,
     format: "png",
     count: originalDefaults.count,
     transparentMode: originalDefaults.transparentMode,
-    quality: "high",
-    compression: 73,
-    partialImages: 2,
-    moderation: "low",
-    action: "edit",
-    previousResponseId: "response-synthetic-01",
-    saveToLibrary: false
   }
 };
 
 describe("mounted generation workbench defaults synchronization", () => {
-  it("updates only visible generation controls and removes resource-bearing edit state", () => {
+  it("updates only visible generation controls", () => {
     const synchronized = synchronizeCreationDraftDefaults(legacyDraft, nextDefaults);
 
     expect(synchronized).toMatchObject({
       mode: "generate",
       prompt: legacyDraft.prompt,
       references: [],
-      target: undefined,
-      supportingImages: [],
-      mask: undefined,
-      maskUpload: undefined,
-      invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
       controls: {
         size: "1536x1024",
         aspectRatio: "auto",
