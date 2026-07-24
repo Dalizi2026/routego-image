@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "capsuleType": "successor-handoff",
+  "capsuleSha256": "6af060358e41b6dc20d45ec14c73f16d7ca6648d22b2a871b6d828eae9e8ad31",
+  "lane": "integration",
+  "stateRouting": {
+    "programLaneKey": "streamlineIntegration",
+    "laneStatePath": ".codex/routego-program/threads/streamline-integration.json"
+  },
+  "role": "task-4.6-platform-recovery-candidate",
+  "change": "streamline-routego-image-generation",
+  "generation": {
+    "source": 4,
+    "successor": 5
+  },
+  "source": {
+    "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "acceptedProductCommit": "9299c42f7ead88521abb8a885843868148f3e08b",
+    "handoffCommit": "3240bec320dba3e5314b7d9b41a660c624e0b2fa",
+    "handoffParent": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992"
+  },
+  "successor": {
+    "threadId": "pending",
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "plannedBranch": "codex/routego-controller-g12",
+    "startingCommit": "3240bec320dba3e5314b7d9b41a660c624e0b2fa",
+    "registrationStatus": "preflight-platform-recovery-pending-thread-creation",
+    "registrationAttempt": 1,
+    "verifiedHeadBeforeContainingCommit": "3240bec320dba3e5314b7d9b41a660c624e0b2fa",
+    "incorporationCommit": null
+  },
+  "currentState": {
+    "openspecTotal": 34,
+    "openspecCompleted": 22,
+    "completedTaskIds": [
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "2.1",
+      "2.2",
+      "2.3",
+      "2.4",
+      "3.1",
+      "3.2",
+      "3.3",
+      "3.4",
+      "3.5",
+      "4.1",
+      "4.2",
+      "4.3",
+      "4.4",
+      "4.5",
+      "5.1",
+      "5.2",
+      "5.3",
+      "5.4"
+    ],
+    "nextTaskId": "4.6",
+    "taskCapsule": {
+      "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
+      "sha256": "8aa1c862d10b278da78ee42ac6ddefdfa6f3b156f4e692ccc81ba90e37d8c10d",
+      "rawFileSha256": "22fdba78b1910e6be34684d3e7e09d068b26a91ae5c3ef72fbde1322ccd4f2aa"
+    },
+    "taskLocked": true,
+    "sourceIsSoleApplyOwner": true,
+    "sourceApplyAuthorized": false,
+    "successorApplyAuthorized": false,
+    "correctionSourceRetired": false,
+    "continuation": "Platform recovery only. No task implementation may start before thread handshake, Controller registration, acceptance, and a fresh activation."
+  },
+  "completedEvidence": [
+    {
+      "path": ".codex/routego-program/evidence/streamline-4.5.json",
+      "sha256": "2ce45fb2d6350ea876222f08bf8440621a8a52a2aa02348bdf33c9ef0fa9fa95",
+      "taskIds": [
+        "4.5"
+      ]
+    }
+  ],
+  "authority": {
+    "summaryPath": ".codex/routego-program/authority-summary.md",
+    "summarySha256": "a71ad03124c05eded3c80d75ab1caa8dc6ad42a7774f87d077956902a4842d91",
+    "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+    "ownershipFingerprint": "streamline-task-4.6-mock-relay-studio-generation-relationship-correction",
+    "historyIndex": ".codex/routego-program/history/pre-pd008-state-index.json"
+  },
+  "gates": {
+    "blockers": [
+      "Previous Integration thread is irrecoverably waiting on a desktop permission prompt; no uncommitted product work or active writer lease remains."
+    ],
+    "approvalRequiredTasks": [
+      "6.1",
+      "7.2",
+      "8.2",
+      "9.1"
+    ],
+    "externalStateAuthorized": false,
+    "networkAuthorized": false,
+    "task4_6Locked": true
+  },
+  "context": {
+    "sourceObservableCompactions": 0,
+    "sourceCompactionFingerprint": null,
+    "successorObservableCompactions": 0,
+    "handoffAcceptanceCompactionLimit": 0,
+    "requiredStartupFiles": [
+      ".codex/routego-program/authority-summary.md",
+      ".codex/routego-program/program.json",
+      ".codex/routego-program/threads/streamline-integration.json",
+      ".codex/routego-program/dispatch/current.json",
+      ".codex/routego-program/tasks/streamline-integration-4.6.json"
+    ],
+    "maxStartupFiles": 8,
+    "maxStartupBytes": 65536,
+    "actualStartupFiles": 6,
+    "actualStartupBytes": 35538,
+    "budgetRole": "lane",
+    "budgetValidatedBeforeSuccessorCreation": true,
+    "budgetValidatedAt": "2026-07-24T14:44:57.176Z",
+    "successorCreationMethod": "create-thread-local-no-fork"
+  },
+  "git": {
+    "sourceClean": true,
+    "expectedSuccessorClean": true
+  },
+  "reportingContract": {
+    "primary": "Before audit or implementation, call send_message_to_thread with [THREAD_HANDSHAKE] to Controller 019f900e-0d10-7c41-9ffd-6c2e41930ac2 and then call read_thread to confirm receipt. After acceptance, every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, and acceptance request must use the same direct chain.",
+    "fallback": "No secondary continuation path exists. Automation and final answers cannot activate or advance work.",
+    "fallbackIntervalMinutes": 30,
+    "finalAnswerAloneIsInsufficient": true
+  },
+  "startup": {
+    "mandatoryFiles": [
+      "AGENTS.md",
+      ".codex/routego-program/authority-summary.md",
+      ".codex/routego-program/program.json",
+      ".codex/routego-program/threads/streamline-integration.json",
+      ".codex/routego-program/handoffs/streamline-integration-4.6-platform-recovery.capsule.json",
+      ".codex/routego-program/dispatch/current.json",
+      ".codex/routego-program/tasks/streamline-integration-4.6.json"
+    ],
+    "maxFiles": 12,
+    "maxUtf8Bytes": 122880,
+    "byteCounting": "utf8-after-crlf-to-lf-normalization",
+    "expectedNormalizedUtf8Bytes": 0,
+    "fallbackSourceCommit": "1682ce1056bd62a453f63d11cfc09bf8c7b31dce",
+    "escalationTriggers": [
+      "capsule, Git, OpenSpec or current-state inconsistency",
+      "package boundary, dependency or ownership conflict",
+      "verification failure requiring root-cause expansion"
+    ],
+    "fullAuditTriggers": [
+      "final Integration conformance",
+      "main spec sync or archive",
+      "release or rollback gate",
+      "failed targeted recovery",
+      "explicit user request"
+    ],
+    "contextBudgetFailure": "If any observable compaction occurs before handoff acceptance, send HANDOFF_CONTEXT_BUDGET_FAILED; do not activate this successor, keep the task locked, and retain the source recovery record."
+  },
+  "safety": {
+    "noProductEditsBeforeExplicitActivation": true,
+    "externalStateAuthorized": false,
+    "noCredentialsProviderRequestsRealImagesRealDataInstallMigrationDeployPublishOrRelease": true
+  }
+}
