@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "transitionId": "controller-g13-studio-5.5-20260724-001",
   "eventFingerprint": "task-5.4-c5d4af9-direct-handoff-g13",
-  "state": "awaiting-ack",
-  "resumeState": null,
+  "state": "message-unknown",
+  "resumeState": "awaiting-ack",
   "sourceThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "targetThreadId": "019f925c-004c-72a1-9a53-f63debdcac84",
   "completedTaskId": "5.4",
   "nextTaskId": "5.5",
-  "attemptCount": 2,
-  "lastAttemptAt": "2026-07-24T04:30:09.781Z",
-  "lastError": null,
+  "attemptCount": 3,
+  "lastAttemptAt": "2026-07-24T10:42:29.001Z",
+  "lastError": "Studio G8 correctly rejected the dispatch because it compared the canonical self-excluding capsule fingerprint with the raw JSON file fingerprint; retry will supply both values explicitly.",
   "receiptPath": null,
   "lastTransitionId": null,
-  "updatedAt": "2026-07-24T04:32:41.915Z"
+  "updatedAt": "2026-07-24T10:42:29.000Z"
 }
