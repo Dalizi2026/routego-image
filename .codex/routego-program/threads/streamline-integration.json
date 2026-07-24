@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "task-4.6-integration-test-infrastructure-candidate-registration",
-  "status": "task-4.6-scope-amendment-pending",
+  "status": "task-4.6-scope-amended-sole-apply-owner",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -14,11 +14,11 @@
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": true,
-  "applyAuthorized": false,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "4.6",
-    "status": "scope-amendment-pending-mock-relay-contract-cleanup",
-    "locked": true
+    "status": "active-amended-mock-relay-contract-cleanup",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
