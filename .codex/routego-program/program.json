@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-task-5.5-activated",
+  "status": "controller-generation-13-task-4.6-planned-registration-pending",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -129,14 +129,14 @@
   },
   "activeApplyOwners": {
     "studio": {
-      "status": "task-5.5-sole-apply-owner-activated",
+      "status": "task-5.5-safe-checkpoint-paused-on-task-4.6",
       "taskRef": "019f925c-004c-72a1-9a53-f63debdcac84",
       "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
       "generation": 8,
       "taskId": "5.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "912205e05cdd47bf0c2a08c33c2ab97c21132ab8",
+      "currentHead": "eddae096b45e4bc0bc0893f02ae0b2c8ddebb698",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/studio-5.5.json",
         "sha256": "8ac41315836890be95ff9e2db75f840974f0817b7d94a0f417ee500bc76b78ef"
@@ -144,9 +144,9 @@
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"
       },
-      "authorizedScope": "Only Studio G8 may modify Task 5.5's exact dead-surface-removal scope until it checkpoints directly to this Controller.",
+      "authorizedScope": "Studio G8's Task 5.5 safe checkpoint is preserved. No Studio write may resume until planned Task 4.6 repairs the cross-lane Mock Relay generation fixture and a resumed baseline is issued.",
       "soleApplyOwner": true,
-      "applyAuthorized": true,
+      "applyAuthorized": false,
       "lastCompletedTask": "5.4"
     },
     "creation": {
@@ -192,24 +192,23 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.5-completed-controller-accepted-archived-no-active-owner",
-      "taskRef": "019f8e71-38ca-7e92-a831-d8a2803d2125",
-      "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
-      "generation": 3,
-      "taskId": "4.5",
+      "status": "task-4.6-candidate-registration-pending",
+      "taskRef": "pending",
+      "threadId": "pending",
+      "generation": 4,
+      "taskId": "4.6",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+      "currentHead": "34636ea2175df610bccf6c923a4a4a88cfc852df",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/integration-4.5.json",
-        "sha256": "7ac0dee995f01b598618597266d694589a4571d7fb30a75f3f894e72ced136d5"
+        "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
+        "sha256": "163d3c7d6d39c9d3cf99718231fffffc8316f3ec1ae5a2fc035263f4a7d86778"
       },
       "handoffCapsule": {
-        "path": ".codex/routego-program/handoffs/integration-generation-4-streamline.capsule.json",
-        "sha256": "077cf83cb661bcb9a576c2661bd40f5df3bdd358d4d40128ad4b48dfafcfd75a"
+        "path": null
       },
-      "authorizedScope": "Task 4.5 is completed and its accepted task thread is archived. Task 5.1 remains locked pending a fresh Studio capsule, direct-return handshake, and zero-compression acceptance.",
-      "soleApplyOwner": false,
+      "authorizedScope": "Task 4.6 is planned but locked. A new local Integration role must complete direct-thread handshake and task acceptance before it becomes the sole apply owner for packages/mock-relay/src/service/mock-service.ts.",
+      "soleApplyOwner": true,
       "applyAuthorized": false,
       "lastCompletedTask": "4.5"
     }
@@ -220,10 +219,10 @@
       "generation": 8,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "912205e05cdd47bf0c2a08c33c2ab97c21132ab8",
+      "currentHead": "eddae096b45e4bc0bc0893f02ae0b2c8ddebb698",
       "observableCompactions": 0,
       "lastCompletedTask": "5.4",
-      "status": "task-5.5-sole-apply-owner-activated"
+      "status": "task-5.5-safe-checkpoint-paused-on-task-4.6"
     },
     "creation": {
       "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
@@ -252,21 +251,21 @@
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
-      "generation": 3,
+      "threadId": "pending",
+      "generation": 4,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+      "currentHead": "34636ea2175df610bccf6c923a4a4a88cfc852df",
       "observableCompactions": 0,
       "lastCompletedTask": "4.5",
-      "status": "task-4.5-completed-controller-accepted-archived"
+      "status": "task-4.6-candidate-registration-pending"
     }
   },
   "currentChange": {
     "id": "streamline-routego-image-generation",
     "lane": "multi-lane",
     "openspec": {
-      "totalTasks": 33,
+      "totalTasks": 34,
       "completedTasks": 22,
       "completedTaskIds": [
         "1.1",
@@ -292,15 +291,15 @@
         "5.3",
         "5.4"
       ],
-      "readyTaskIds": ["5.5"],
-      "nextTaskId": "5.5"
+      "readyTaskIds": ["4.6"],
+      "nextTaskId": "4.6"
     },
     "currentTask": {
-      "id": "5.5",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "4.6",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.5 is activated for Studio G8 only; all checkpoints and delivery return directly to this Controller."
+      "authorizedScope": "Task 4.6 is registered for a new Integration candidate. Task 5.5 remains paused at its committed safe checkpoint until 4.6 verifies."
     }
   },
   "latestDirectCheckpoint": {
@@ -315,7 +314,16 @@
     ],
     "verification": "Task 5.4's explicit Studio Library suite passed 13 tests; git diff --check and Git clean passed. Task 5.5 is registered and locked pending direct-return acceptance."
   },
-  "currentBlockers": [],
+  "currentBlockers": [
+    {
+      "id": "task-5.5-mock-relay-generation-relationship-defect",
+      "status": "planned-correction-4.6-registration-pending",
+      "rootCause": "Mock Relay #studioRelationships reads request.references although strict Studio generate requests no longer carry that field.",
+      "impact": "Studio mock-bridge generation streams return HTTP 503; Task 5.5 completion verification is paused.",
+      "resolutionTaskId": "4.6",
+      "externalStateAuthorized": false
+    }
+  ],
   "approvedDeviations": [
     {
       "id": "PD-015-task-3.1-obsolete-trash-test-cleanup",

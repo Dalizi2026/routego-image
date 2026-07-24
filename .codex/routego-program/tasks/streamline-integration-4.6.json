@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "163d3c7d6d39c9d3cf99718231fffffc8316f3ec1ae5a2fc035263f4a7d86778",
+  "taskId": "4.6",
+  "stageId": "4",
+  "lane": "integration",
+  "change": "streamline-routego-image-generation",
+  "planned": true,
+  "status": "ready",
+  "sourceCommit": "34636ea2175df610bccf6c923a4a4a88cfc852df",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "daec1216996541aa0d1a0f24e91bb6c96538098c835a0d18b0842751e15381aa",
+    "lineSha256": "e85bc5788f4ba46f2b6b59f776783046e322c9a17073c2e13f454bafc0f61d75"
+  },
+  "dependsOn": ["4.5", "5.1"],
+  "dependenciesSatisfied": true,
+  "completedDependencies": ["4.5", "5.1"],
+  "requiresExclusive": false,
+  "ownership": {
+    "owned": ["packages/mock-relay/src/service/mock-service.ts"],
+    "readOnly": [
+      "packages/studio/test/mock-bridge.test.ts",
+      "packages/studio/src/dev/mock-handler.ts",
+      "packages/contracts/src/studio-creation.ts"
+    ],
+    "forbiddenWithoutDeviation": [
+      "packages/contracts/**",
+      "packages/creation/**",
+      "packages/foundation/**",
+      "packages/library/**",
+      "packages/studio/**",
+      "packages/integration/**",
+      "package.json",
+      "pnpm-lock.yaml",
+      "node_modules/**",
+      "openspec/**",
+      ".codex/routego-program/**"
+    ]
+  },
+  "allowedFiles": ["packages/mock-relay/src/service/mock-service.ts"],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/studio/**",
+    "packages/integration/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "openspec/**",
+    ".codex/routego-program/**"
+  ],
+  "requiredBehavior": [
+    "A strict text-only Studio generate request that omits references must complete the deterministic Mock Relay stream without a TypeError or HTTP 503.",
+    "Mock Relay relationship construction for the current Studio generation contract must use only the generated output relationship and must not read, default, synthesize, or restore references, edit targets, masks, supporting images, or upload compatibility fields.",
+    "Keep the seven public operations and generation-only schemas unchanged. No external provider, credential, real image/data, installation, migration, deployment, release, or network access is authorized."
+  ],
+  "verificationCommands": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/mock-relay typecheck",
+    "pnpm --filter @routego-image/studio exec vitest run test/mock-bridge.test.ts",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "sha256": "d38323ef71751330d4d5f1efa9f1aa576e3c83f38c87dd0ba83ff1cda6008e69",
+      "reason": "Strict generation-only Studio request contract."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-creation-workbench/spec.md",
+      "sha256": "ae1a5e1809e045c9f5b00c9ee9931e1d8e322059224038c1de930a2e0090e9dc",
+      "reason": "Studio no longer accepts generation references or edit inputs."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "reason": "Generation-only contract source of truth and no compatibility shims."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-4.6-mock-relay-studio-generation-relationship-correction",
+  "externalStateAuthorized": false,
+  "reportingContract": "Before audit or implementation, send [THREAD_HANDSHAKE] to the Controller with send_message_to_thread and read the Controller thread to confirm receipt. After activation, every checkpoint, blocker, deviation, implementation, delivery, or acceptance request uses the same direct chain. Heartbeat, polling, automation, final answers, and user follow-up cannot replace it."
+}

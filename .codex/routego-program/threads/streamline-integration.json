@@ -2,22 +2,22 @@
   "schemaVersion": 2,
   "lane": "integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-4.5-completed-controller-accepted-archived-no-active-owner",
-  "status": "task-4.5-completed",
-  "controllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-  "threadId": "019f8e71-38ca-7e92-a831-d8a2803d2125",
+  "role": "task-4.6-integration-test-infrastructure-candidate-registration",
+  "status": "task-4.6-registration-pending",
+  "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+  "threadId": "pending",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "generation": 3,
-  "currentHead": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+  "generation": 4,
+  "currentHead": "34636ea2175df610bccf6c923a4a4a88cfc852df",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
+  "soleApplyOwner": true,
   "applyAuthorized": false,
   "currentTask": {
-    "id": "4.5",
-    "status": "completed-generation-only-integration-conformance",
-    "locked": false
+    "id": "4.6",
+    "status": "registration-pending-mock-relay-generation-relationship-correction",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f8db3-48e1-7920-8525-6d0c92d8adb4",
@@ -33,7 +33,7 @@
     "path": ".codex/routego-program/handoffs/integration-generation-4-streamline.capsule.json"
   },
   "reportingContract": {
-    "currentControllerThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
+    "currentControllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
     "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
     "fallback": "No secondary continuation path exists; read-only governance audit cannot send messages, activate, or advance work.",
     "acknowledgementRequiredBeforeAcceptance": true
@@ -52,5 +52,16 @@
     "implementationCommit": "cef9c2de23705fa52e7ed5a828600ce8f19d1315",
     "taskStateCommit": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
     "handoffAcceptanceObservableCompactions": 0
+  },
+  "taskCapsule": {
+    "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
+    "contentSha256": "163d3c7d6d39c9d3cf99718231fffffc8316f3ec1ae5a2fc035263f4a7d86778"
+  },
+  "registration": {
+    "reason": "Task 5.5's direct Studio mock-bridge verification exposed Mock Relay's stale read of the removed references field.",
+    "permittedScope": ["packages/mock-relay/src/service/mock-service.ts"],
+    "externalStateAuthorized": false,
+    "writerLease": "not-acquired",
+    "directReportingRequired": true
   }
 }
