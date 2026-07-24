@@ -33,7 +33,6 @@ import {
   reorderFoldersResultSchema,
   routegoBatchInputSchema,
   routegoBatchResultSchema,
-  routegoEditInputSchema,
   routegoGenerateInputSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
@@ -46,9 +45,10 @@ import {
   routegoServiceErrorSchema,
   setActiveProviderProfileInputSchema,
   setActiveProviderProfileResultSchema,
+  studioProviderSwitchInputSchema,
+  studioProviderSwitchResultSchema,
   studioBatchInputSchema,
   studioBatchResultSchema,
-  studioEditInputSchema,
   studioGenerateInputSchema,
   studioImageOperationResultSchema,
   studioLibrarySearchInputSchema,
@@ -124,6 +124,8 @@ import {
   type StudioLibrarySearchResult,
   type StudioServiceError,
   type StudioOperation,
+  type StudioProviderSwitchInput,
+  type StudioProviderSwitchResult,
   type UploadResourceDescriptor,
   type UpsertProviderProfileInput,
   type UpsertProviderProfileResult,
@@ -340,24 +342,16 @@ export class MockRoutegoService implements LocalRoutegoService {
     };
   }
 
-  #folders(
-    ids: readonly string[] = [
-      "mock-folder-primary",
-      "mock-folder-edits",
-      "mock-folder-archive"
-    ]
-  ): LibraryFolderDescriptor[] {
+  #folders(ids: readonly string[] = ["mock-folder-primary", "mock-folder-secondary"]): LibraryFolderDescriptor[] {
     return ids.map((id, index) => ({
       id,
       name:
         id === "mock-folder-primary"
           ? "Synthetic primary"
-          : id === "mock-folder-edits"
-            ? "Synthetic edits"
-            : "Synthetic archive",
+          : "Synthetic secondary",
       order: index,
-      assetCount: id === "mock-folder-primary" ? 2 : 1,
-      state: id.includes("archive") ? "deleted" : "active",
+      assetCount: 1,
+      state: "active",
       createdAt: this.#timestamp(),
       updatedAt: this.#timestamp()
     }));
@@ -385,12 +379,11 @@ export class MockRoutegoService implements LocalRoutegoService {
   }
 
   #libraryParameters(
-    kind: "generate" | "edit",
     prompt: string,
     size: "1024x1024" | "1536x1024" | "1024x1536"
   ): LibraryOperationParameters {
-    const base = {
-      kind,
+    return {
+      kind: "generate",
       prompt,
       references: [],
       size,
@@ -398,38 +391,11 @@ export class MockRoutegoService implements LocalRoutegoService {
       quality: "high" as const,
       format: "png" as const,
       count: 1,
-      partialImages: kind === "edit" ? 1 : 0,
+      partialImages: 0,
       transparentMode: "off" as const,
       moderation: "auto" as const,
-      action: kind === "edit" ? ("edit" as const) : ("auto" as const),
-      imageIds: [],
-      fileIds: [],
       outputDirectoryMode: "default" as const,
       saveToLibrary: true
-    };
-    if (kind === "generate") {
-      return { ...base, kind: "generate", supportingImages: [] };
-    }
-    return {
-      ...base,
-      kind: "edit",
-      references: [
-        { assetId: "mock-asset-reference", role: "style", label: "Synthetic style" }
-      ],
-      target: { assetId: "mock-asset-target", label: "Synthetic target" },
-      supportingImages: [
-        {
-          assetId: "mock-asset-supporting",
-          role: "supporting",
-          label: "Synthetic supporting image"
-        }
-      ],
-      maskAssetId: "mock-asset-mask",
-      invariants: {
-        allowedChanges: ["background"],
-        preserve: ["subject and composition"],
-        forbiddenChanges: []
-      }
     };
   }
 
@@ -450,97 +416,45 @@ export class MockRoutegoService implements LocalRoutegoService {
           }
         : assetId === "mock-asset-output"
           ? {
-              kind: "edit" as const,
+              kind: "generate" as const,
               status: "partial" as const,
-              prompt: "Synthetic edit request for downstream Studio development.",
+              prompt: "Synthetic partial generation for downstream Studio development.",
               size: "1536x1024" as const,
               artifactId: "mock-artifact-output",
               createdOffset: -10,
-              folders: ["mock-folder-primary", "mock-folder-edits"]
+              folders: ["mock-folder-primary", "mock-folder-secondary"]
             }
-          : assetId === "mock-asset-generate-deleted"
-            ? {
-                kind: "generate" as const,
-                status: "deleted" as const,
-                prompt: "Synthetic deleted portrait study.",
-                size: "1024x1536" as const,
-                artifactId: "mock-artifact-generate-deleted",
-                createdOffset: -30,
-                folders: ["mock-folder-archive"]
-              }
-            : undefined;
+          : undefined;
     if (!seed) {
       return undefined;
     }
 
-    const parameters = this.#libraryParameters(seed.kind, seed.prompt, seed.size);
+    const parameters = this.#libraryParameters(seed.prompt, seed.size);
     const partial = seed.status === "partial" || fixture === "partial";
-    const deleted = seed.status === "deleted";
     const createdAt = this.#timestampWithOffset(seed.createdOffset);
     const folderMap = new Map(this.#folders().map((folder) => [folder.id, folder]));
-    const relationships =
-      seed.kind === "edit"
-        ? [
-            {
-              id: `${assetId}-rel-source`,
-              role: "source" as const,
-              relatedAssetId: "mock-asset-source",
-              order: 0
-            },
-            {
-              id: `${assetId}-rel-target`,
-              role: "target" as const,
-              relatedAssetId: "mock-asset-target",
-              order: 1
-            },
-            {
-              id: `${assetId}-rel-reference`,
-              role: "reference" as const,
-              relatedAssetId: "mock-asset-reference",
-              order: 2
-            },
-            {
-              id: `${assetId}-rel-supporting`,
-              role: "supporting" as const,
-              relatedAssetId: "mock-asset-supporting",
-              order: 3
-            },
-            {
-              id: `${assetId}-rel-mask`,
-              role: "mask" as const,
-              relatedAssetId: "mock-asset-mask",
-              order: 4
-            },
-            {
-              id: `${assetId}-rel-output`,
-              role: "output" as const,
-              relatedAssetId: assetId,
-              artifactId: seed.artifactId,
-              order: 5
-            }
-          ]
-        : [
-            {
-              id: `${assetId}-rel-output`,
-              role: "output" as const,
-              relatedAssetId: assetId,
-              artifactId: seed.artifactId,
-              order: 0
-            }
-          ];
+    const relationships = [
+      {
+        id: `${assetId}-rel-output`,
+        role: "output" as const,
+        relatedAssetId: assetId,
+        artifactId: seed.artifactId,
+        order: 0
+      }
+    ];
 
     return {
       id: assetId,
       prompt: parameters.prompt,
       model: "mock-image-model",
       kind: seed.kind,
-      status: deleted ? "deleted" : partial ? "partial" : "succeeded",
+      status: partial ? "partial" : "succeeded",
+      currentMark: assetId === "mock-asset-output",
       mimeType: "image/png",
       width: seed.size === "1536x1024" ? 1536 : 1024,
-      height: seed.size === "1024x1536" ? 1536 : 1024,
+      height: 1024,
       createdAt,
       updatedAt: this.#timestampWithOffset(seed.createdOffset + 1),
-      ...(deleted ? { deletedAt: this.#timestampWithOffset(-5) } : {}),
       requestedParams: parameters,
       effectiveParams: parameters,
       execution: {
@@ -575,7 +489,7 @@ export class MockRoutegoService implements LocalRoutegoService {
           mimeType: "image/png",
           byteLength: Buffer.from(MOCK_IMAGE_BASE64, "base64").byteLength,
           width: seed.size === "1536x1024" ? 1536 : 1024,
-          height: seed.size === "1024x1536" ? 1536 : 1024,
+          height: 1024,
           sha256: createHash("sha256").update(MOCK_IMAGE_BASE64, "base64").digest("hex"),
           createdAt
         }
@@ -590,17 +504,21 @@ export class MockRoutegoService implements LocalRoutegoService {
           order: folder.order
         };
       }),
-      allowedActions: deleted
-        ? ["restore", "permanent-delete", "export-zip", "download"]
-        : ["edit", "retry", "assign-folders", "soft-delete", "export-zip", "download"]
+      allowedActions: [
+        "assign-folders",
+        "remove-folders",
+        "export-zip",
+        "download",
+        "mark",
+        "copy-generation-info"
+      ]
     };
   }
 
   #galleryDetails(): LibraryAssetDetail[] {
     return [
       this.#assetDetail("success", "mock-asset-generate-success")!,
-      this.#assetDetail("success", "mock-asset-output")!,
-      this.#assetDetail("success", "mock-asset-generate-deleted")!
+      this.#assetDetail("success", "mock-asset-output")!
     ];
   }
 
@@ -675,14 +593,8 @@ export class MockRoutegoService implements LocalRoutegoService {
 
   #requiredConfirmation(
     action: LibraryMutationRequest["action"]
-  ): "permanent-delete" | "zip-export" | "zip-import" | undefined {
-    return action === "permanent-delete"
-      ? "permanent-delete"
-      : action === "export-zip"
-        ? "zip-export"
-        : action === "import-zip"
-          ? "zip-import"
-          : undefined;
+  ): "zip-export" | "zip-import" | undefined {
+    return action === "export-zip" ? "zip-export" : action === "import-zip" ? "zip-import" : undefined;
   }
 
   #artifact(requestId: string, phase: "partial" | "final" = "final"): ImageArtifact {
@@ -821,52 +733,8 @@ export class MockRoutegoService implements LocalRoutegoService {
     };
   }
 
-  #studioRelationships(
-    request: StudioImageOperationRequest,
-    outputArtifactId: string,
-    partial: boolean
-  ): StudioImageRelationship[] {
-    const relationships: StudioImageRelationship[] = [];
-    let order = 0;
-    if (request.kind === "edit") {
-      relationships.push({
-        role: "target",
-        input: request.target,
-        outputArtifactId,
-        order: order++
-      });
-      for (const reference of request.references) {
-        relationships.push({
-          role: "reference",
-          input: reference.image,
-          outputArtifactId,
-          order: order++
-        });
-      }
-      for (const supporting of request.supportingImages) {
-        relationships.push({
-          role: "supporting",
-          input: supporting.image,
-          outputArtifactId,
-          order: order++
-        });
-      }
-      if (request.mask) {
-        relationships.push({
-          role: "mask",
-          input: request.mask.image,
-          outputArtifactId,
-          order: order++,
-          targetSlot: 0
-        });
-      }
-    }
-    relationships.push({
-      role: partial ? "stream-partial" : "output",
-      outputArtifactId,
-      order
-    });
-    return relationships;
+  #studioRelationships(outputArtifactId: string, partial: boolean): StudioImageRelationship[] {
+    return [{ role: partial ? "stream-partial" : "output", outputArtifactId, order: 0 }];
   }
 
   #studioImageResult(
@@ -937,7 +805,7 @@ export class MockRoutegoService implements LocalRoutegoService {
         finalArtifacts: [],
         partialArtifacts: [artifact],
         failedSlots: [{ slot: 0, error }],
-        relationships: this.#studioRelationships(request, artifact.artifactId, true),
+        relationships: this.#studioRelationships(artifact.artifactId, true),
         error
       });
     }
@@ -961,7 +829,7 @@ export class MockRoutegoService implements LocalRoutegoService {
       finalArtifacts: [artifact],
       partialArtifacts: [],
       failedSlots: [],
-      relationships: this.#studioRelationships(request, artifact.artifactId, false)
+      relationships: this.#studioRelationships(artifact.artifactId, false)
     });
   }
 
@@ -1160,6 +1028,58 @@ export class MockRoutegoService implements LocalRoutegoService {
     });
   }
 
+  async studioProviderSwitch(
+    input: StudioProviderSwitchInput
+  ): Promise<StudioProviderSwitchResult> {
+    const parsed = studioProviderSwitchInputSchema.parse(input);
+    const fixture = this.#fixture("studioProviderSwitch");
+    if (fixture === "invalid-output") {
+      return invalidOutput<StudioProviderSwitchResult>();
+    }
+    const selected = this.#settings.profiles.find((profile) => profile.id === parsed.profileId);
+    if (fixture === "failure" || !selected) {
+      return studioProviderSwitchResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#error("not_found", "The synthetic provider profile does not exist.")
+      });
+    }
+
+    const selectedModel =
+      parsed.preferredModel && selected.models.includes(parsed.preferredModel)
+        ? parsed.preferredModel
+        : selected.defaultModel ?? selected.models[0];
+    if (!selectedModel) {
+      return studioProviderSwitchResultSchema.parse({
+        schemaVersion: 1,
+        status: "failed",
+        error: this.#error("conflict", "The synthetic provider profile has no usable model.")
+      });
+    }
+
+    const profiles = this.#settings.profiles.map((profile) => ({
+      ...profile,
+      isActive: profile.id === selected.id,
+      updatedAt: profile.id === selected.id ? this.#timestamp() : profile.updatedAt
+    }));
+    const profile = profiles.find((item) => item.id === selected.id)!;
+    this.#settings = readSettingsResultSchema.parse({
+      ...this.#settings,
+      activeProviderId: profile.id,
+      profiles,
+      defaults: { ...this.#settings.defaults, model: selectedModel }
+    });
+    return studioProviderSwitchResultSchema.parse({
+      schemaVersion: 1,
+      status: "succeeded",
+      activeProviderId: profile.id,
+      selectedModel,
+      modelPreserved: parsed.preferredModel === selectedModel,
+      profile,
+      appliesToFutureSubmissionsOnly: true
+    });
+  }
+
   async refreshModels(input: RefreshModelsInput): Promise<RefreshModelsResult> {
     const parsed = refreshModelsInputSchema.parse(input);
     const fixture = this.#fixture("refreshModels");
@@ -1290,13 +1210,8 @@ export class MockRoutegoService implements LocalRoutegoService {
     return this.#imageResult(fixture, request, this.#requestId("generate", request));
   }
 
-  async edit(input: RoutegoEditInput): Promise<ImageOperationResult> {
-    const request = routegoEditInputSchema.parse(input);
-    const fixture = this.#fixture("edit");
-    if (fixture === "invalid-output") {
-      return invalidOutput<ImageOperationResult>();
-    }
-    return this.#imageResult(fixture, request, this.#requestId("edit", request));
+  async edit(_input: RoutegoEditInput): Promise<ImageOperationResult> {
+    throw this.#error("conflict", "The generation-only mock service does not support edit operations.");
   }
 
   async batch(input: RoutegoBatchInput): Promise<RoutegoBatchResult> {
@@ -1388,13 +1303,8 @@ export class MockRoutegoService implements LocalRoutegoService {
     );
   }
 
-  async studioEdit(input: StudioEditInput): Promise<StudioImageOperationResult> {
-    const request = studioEditInputSchema.parse(input);
-    const fixture = this.#fixture("studioEdit");
-    if (fixture === "invalid-output") {
-      return invalidOutput<StudioImageOperationResult>();
-    }
-    return this.#studioImageResult(fixture, request, this.#requestId("studioEdit", request));
+  async studioEdit(_input: StudioEditInput): Promise<StudioImageOperationResult> {
+    throw this.#error("conflict", "The generation-only mock service does not support Studio edit operations.");
   }
 
   async studioBatch(input: StudioBatchInput): Promise<StudioBatchResult> {

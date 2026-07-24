@@ -17,6 +17,7 @@ import {
   studioBatchResultSchema,
   studioImageOperationResultSchema,
   studioLibrarySearchResultSchema,
+  studioProviderSwitchResultSchema,
   updateSettingsResultSchema
 } from "@routego-image/contracts";
 import { createMockRoutegoService } from "../src/index";
@@ -29,47 +30,10 @@ function generateInput(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function editInput(overrides: Record<string, unknown> = {}) {
-  return {
-    kind: "edit" as const,
-    prompt: "离线编辑提示 🎨",
-    targetImage: { path: "/synthetic/target image.png" },
-    invariants: { preserve: ["subject and composition"] },
-    ...overrides
-  };
-}
-
 function studioGenerateInput(overrides: Record<string, unknown> = {}) {
   return {
     kind: "generate" as const,
     prompt: "Synthetic path-free Studio generate",
-    ...overrides
-  };
-}
-
-function studioEditInput(overrides: Record<string, unknown> = {}) {
-  return {
-    kind: "edit" as const,
-    prompt: "Synthetic path-free Studio edit",
-    references: [
-      {
-        image: { source: "asset" as const, assetId: "mock-asset-generate-success" },
-        role: "style" as const
-      }
-    ],
-    target: { source: "artifact" as const, artifactId: "mock-artifact-output" },
-    supportingImages: [
-      {
-        image: { source: "upload" as const, uploadResourceId: "mock-upload-supporting" },
-        role: "supporting" as const
-      }
-    ],
-    mask: {
-      image: { source: "upload" as const, uploadResourceId: "mock-upload-mask" },
-      targetSlot: 0 as const
-    },
-    invariants: { preserve: ["subject and composition"] },
-    action: "edit" as const,
     ...overrides
   };
 }
@@ -123,8 +87,10 @@ describe("deterministic mock application service", () => {
     expect(imageOperationResultSchema.parse(result)).toEqual(result);
   });
 
-  it("marks degraded continuation explicitly while keeping a valid success result", async () => {
-    const result = await createMockRoutegoService({ fixture: "degraded" }).edit(editInput());
+  it("marks a degraded generation explicitly while keeping a valid success result", async () => {
+    const result = await createMockRoutegoService({ fixture: "degraded" }).generate(
+      generateInput()
+    );
     expect(result.status).toBe("succeeded");
     expect(result.execution.degradedContinuation).toBe(true);
     expect(imageOperationResultSchema.parse(result)).toEqual(result);
@@ -136,20 +102,13 @@ describe("deterministic mock application service", () => {
     expect(() => parseRoutegoOperationOutput("generate", output)).toThrow();
   });
 
-  it("parses generate and edit with their dedicated schemas", async () => {
-    const service = createMockRoutegoService();
-    await expect(service.generate(editInput())).rejects.toThrow(/kind=generate/u);
-    await expect(service.edit(generateInput())).rejects.toThrow(/kind=edit/u);
-  });
-
   it("preserves ordered batch identities and explicit per-item partial outcomes", async () => {
     const service = createMockRoutegoService({ fixture: "partial" });
     const result = await service.batch({
       tasks: [
         { id: "task-first", operation: generateInput({ count: 2 }) },
-        { id: "task-second", operation: editInput() }
-      ],
-      concurrency: 2
+        { id: "task-second", operation: generateInput() }
+      ]
     });
 
     expect(routegoBatchResultSchema.parse(result)).toEqual(result);
@@ -240,23 +199,14 @@ describe("deterministic mock application service", () => {
     });
   });
 
-  it("provides synthetic folders, full relationships, and relative browser resources", async () => {
+  it("provides active generation-only Library fixtures and relative browser resources", async () => {
     const service = createMockRoutegoService({ fixture: "degraded" });
     const folders = await service.listFolders({ includeDeleted: true });
     const detail = await service.getAssetDetail({ assetId: "mock-asset-output" });
     const resource = await service.getBrowserResource({ assetId: "mock-asset-output" });
 
-    expect(folders.folders.map((folder) => folder.state)).toEqual([
-      "active",
-      "active",
-      "deleted"
-    ]);
+    expect(folders.folders.map((folder) => folder.state)).toEqual(["active", "active"]);
     expect(getAssetDetailResultSchema.parse(detail).asset?.relationships.map((item) => item.role)).toEqual([
-      "source",
-      "target",
-      "reference",
-      "supporting",
-      "mask",
       "output"
     ]);
     expect(detail.asset?.execution.degradedContinuation).toBe(true);
@@ -281,29 +231,24 @@ describe("deterministic mock application service", () => {
     );
   });
 
-  it("preserves per-item partial mutation outcomes from a deterministic preflight", async () => {
-    const service = createMockRoutegoService({
-      fixtureByOperation: {
-        preflightLibraryMutation: "partial",
-        executeLibraryMutation: "partial"
-      }
-    });
+  it("preserves a deterministic generation-only mark mutation", async () => {
+    const service = createMockRoutegoService();
     const preflight = await service.preflightLibraryMutation({
-      mutation: { action: "permanent-delete", assetIds: ["mock-asset-a", "mock-asset-b"] }
+      mutation: { action: "mark", assetIds: ["mock-asset-a"] }
     });
     expect(preflightLibraryMutationResultSchema.parse(preflight)).toMatchObject({
-      status: "partial",
-      requiredConfirmations: ["permanent-delete"]
+      status: "ready",
+      requiredConfirmations: []
     });
-    expect(preflight.items.map((item) => item.eligible)).toEqual([true, false]);
+    expect(preflight.items.map((item) => item.eligible)).toEqual([true]);
 
     const result = await service.executeLibraryMutation({
       preflightId: preflight.preflightId,
-      action: "permanent-delete",
-      confirmations: ["permanent-delete"]
+      action: "mark",
+      confirmations: []
     });
-    expect(executeLibraryMutationResultSchema.parse(result)).toMatchObject({ status: "partial" });
-    expect(result.items.map((item) => item.status)).toEqual(["succeeded", "failed"]);
+    expect(executeLibraryMutationResultSchema.parse(result)).toMatchObject({ status: "succeeded" });
+    expect(result.items.map((item) => item.status)).toEqual(["succeeded"]);
   });
 
   it("returns structured local-service failures and exposes invalid-output for boundary tests", async () => {
@@ -324,7 +269,7 @@ describe("deterministic mock application service", () => {
 });
 
 describe("deterministic non-empty Studio gallery", () => {
-  it("keeps stable filtering, sorting, pagination, and deleted-state behavior", async () => {
+  it("keeps stable filtering, sorting, and pagination for generation-only Library fixtures", async () => {
     const firstService = createMockRoutegoService();
     const secondService = createMockRoutegoService();
     const firstPage = await firstService.searchStudioLibrary({ limit: 1 });
@@ -342,25 +287,19 @@ describe("deterministic non-empty Studio gallery", () => {
       "mock-asset-generate-success"
     ]);
 
-    const all = await firstService.searchStudioLibrary({ includeDeleted: true, limit: 10 });
-    expect(all.total).toBe(3);
-    expect(all.items.map((item) => item.status)).toEqual([
-      "partial",
-      "succeeded",
-      "deleted"
-    ]);
+    const all = await firstService.searchStudioLibrary({ limit: 10 });
+    expect(all.total).toBe(2);
+    expect(all.items.map((item) => item.status)).toEqual(["partial", "succeeded"]);
 
     const filters = await Promise.all([
       firstService.searchStudioLibrary({ query: "astronaut" }),
-      firstService.searchStudioLibrary({ kinds: ["edit"] }),
-      firstService.searchStudioLibrary({ statuses: ["deleted"], includeDeleted: true }),
-      firstService.searchStudioLibrary({ folderIds: ["mock-folder-edits"] }),
+      firstService.searchStudioLibrary({ kinds: ["generate"] }),
+      firstService.searchStudioLibrary({ folderIds: ["mock-folder-secondary"] }),
       firstService.searchStudioLibrary({ sizes: ["1536x1024"] })
     ]);
     expect(filters.map((result) => result.items.map((item) => item.assetId))).toEqual([
       ["mock-asset-generate-success"],
-      ["mock-asset-output"],
-      ["mock-asset-generate-deleted"],
+      ["mock-asset-output", "mock-asset-generate-success"],
       ["mock-asset-output"],
       ["mock-asset-output"]
     ]);
@@ -368,7 +307,7 @@ describe("deterministic non-empty Studio gallery", () => {
 
   it("aligns search IDs with detail, relationships, and protected resources", async () => {
     const service = createMockRoutegoService();
-    const search = await service.searchStudioLibrary({ kinds: ["edit"] });
+    const search = await service.searchStudioLibrary({ kinds: ["generate"], sizes: ["1536x1024"] });
     const item = search.items[0]!;
     const detail = await service.getAssetDetail({ assetId: item.assetId });
     const resource = await service.getBrowserResource({
@@ -379,14 +318,7 @@ describe("deterministic non-empty Studio gallery", () => {
     expect(getAssetDetailResultSchema.parse(detail).asset?.renditions[0]?.artifactId).toBe(
       item.artifactId
     );
-    expect(detail.asset?.relationships.map((relationship) => relationship.role)).toEqual([
-      "source",
-      "target",
-      "reference",
-      "supporting",
-      "mask",
-      "output"
-    ]);
+    expect(detail.asset?.relationships.map((relationship) => relationship.role)).toEqual(["output"]);
     expect(resource.resource?.relativeUrl).toMatch(/^\/api\/v1\/library\/resources\//u);
     const serialized = JSON.stringify(search);
     expect(serialized).not.toContain('"path"');
@@ -395,7 +327,7 @@ describe("deterministic non-empty Studio gallery", () => {
 });
 
 describe("stateful synthetic upload lifecycle", () => {
-  it("finalizes and reuses image uploads until explicit discard", async () => {
+  it("finalizes image uploads until explicit discard without attaching them to Studio generation", async () => {
     const service = createMockRoutegoService();
     const reserved = await service.reserveUploadResource({
       purpose: "reference",
@@ -418,16 +350,7 @@ describe("stateful synthetic upload lifecycle", () => {
       }
     });
 
-    const request = studioGenerateInput({
-      references: [
-        {
-          image: { source: "upload", uploadResourceId },
-          role: "reference"
-        }
-      ]
-    });
-    expect((await service.studioGenerate(request)).status).toBe("succeeded");
-    expect((await service.studioGenerate(request)).status).toBe("succeeded");
+    expect((await service.studioGenerate(studioGenerateInput())).status).toBe("succeeded");
     expect(
       getUploadResourceStatusResultSchema.parse(
         await service.getUploadResourceStatus({ uploadResourceId })
@@ -538,7 +461,7 @@ describe("stateful synthetic upload lifecycle", () => {
 });
 
 describe("path-free Studio creation mock outcomes", () => {
-  it("returns success, partial batch, degraded edit, and capability failure", async () => {
+  it("returns success, partial batch, degraded generation, and capability failure", async () => {
     const success = await createMockRoutegoService().studioGenerate(studioGenerateInput());
     expect(studioImageOperationResultSchema.parse(success).status).toBe("succeeded");
 
@@ -548,24 +471,23 @@ describe("path-free Studio creation mock outcomes", () => {
     const batch = await partialService.studioBatch({
       tasks: [
         { id: "studio-task-generate", operation: studioGenerateInput() },
-        { id: "studio-task-edit", operation: studioEditInput() }
-      ],
-      concurrency: 2
+        { id: "studio-task-generate-second", operation: studioGenerateInput() }
+      ]
     });
     expect(studioBatchResultSchema.parse(batch)).toMatchObject({ status: "partial" });
     expect(batch.items.map((item) => item.result.status)).toEqual(["succeeded", "failed"]);
 
     const degraded = await createMockRoutegoService({
-      fixtureByOperation: { studioEdit: "degraded" }
-    }).studioEdit(studioEditInput());
+      fixtureByOperation: { studioGenerate: "degraded" }
+    }).studioGenerate(studioGenerateInput());
     expect(degraded).toMatchObject({
       status: "succeeded",
       execution: { degradedContinuation: true }
     });
 
     const failed = await createMockRoutegoService({
-      fixtureByOperation: { studioEdit: "failure" }
-    }).studioEdit(studioEditInput());
+      fixtureByOperation: { studioGenerate: "failure" }
+    }).studioGenerate(studioGenerateInput());
     expect(failed).toMatchObject({
       status: "failed",
       error: { code: "capability_unavailable" }
@@ -578,6 +500,22 @@ describe("path-free Studio creation mock outcomes", () => {
 });
 
 describe("stateful synthetic settings mutation", () => {
+  it("switches the active provider for future Studio submissions only", async () => {
+    const service = createMockRoutegoService();
+    const switched = await service.studioProviderSwitch({
+      profileId: "mock-provider",
+      preferredModel: "mock-image-model"
+    });
+
+    expect(studioProviderSwitchResultSchema.parse(switched)).toMatchObject({
+      status: "succeeded",
+      activeProviderId: "mock-provider",
+      selectedModel: "mock-image-model",
+      modelPreserved: true,
+      appliesToFutureSubmissionsOnly: true
+    });
+  });
+
   it("reflects defaults and every output-directory operation in later reads", async () => {
     const service = createMockRoutegoService();
     const initial = await service.readSettings({});
