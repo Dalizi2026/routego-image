@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "36692abd793097ae95885c1dc08873f02fd774252bf657cc7d7abff6957a0b0a",
+  "contentSha256": "e03fb3d24ceb3ccc2b1cb22be2fb55cd3e6827eb1b61f2ad677223548a75d9d8",
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "taskId": "5.5",
@@ -26,10 +26,18 @@
     "packages/studio/test/capability-state.test.ts",
     "packages/studio/test/creation-upload.test.ts",
     "packages/studio/test/mask-editor.test.ts",
+    "packages/studio/test/mask-bitmap.test.ts",
+    "packages/studio/test/mask-history.test.ts",
     "packages/studio/test/mask-png-upload.test.ts",
+    "packages/studio/test/mask-viewport.test.ts",
     "packages/studio/test/mask-workbench-integration.test.ts",
+    "packages/studio/test/creation-capability-markup.test.ts",
     "packages/studio/test/mock-bridge.test.ts",
+    "packages/studio/test/settings-markup.test.ts",
     "packages/studio/test/settings-state.test.ts",
+    "packages/studio/test/settings-workbench-sync.test.ts",
+    "packages/studio/src/features/settings/state.ts",
+    "packages/studio/src/features/settings/types.ts",
     "openspec/changes/streamline-routego-image-generation/tasks.md"
   ],
   "forbiddenFileGlobs": [
@@ -77,6 +85,20 @@
   ],
   "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
   "ownershipFingerprint": "streamline-task-5.5-exact-studio-dead-surface-removal",
+  "scopeCorrection": {
+    "reason": "The original capsule omitted direct Studio files whose deletion or update is already required by Task 5.5 and its direct specs.",
+    "addedFiles": [
+      "packages/studio/test/mask-bitmap.test.ts",
+      "packages/studio/test/mask-history.test.ts",
+      "packages/studio/test/mask-viewport.test.ts",
+      "packages/studio/test/creation-capability-markup.test.ts",
+      "packages/studio/test/settings-markup.test.ts",
+      "packages/studio/test/settings-workbench-sync.test.ts",
+      "packages/studio/src/features/settings/state.ts",
+      "packages/studio/src/features/settings/types.ts"
+    ],
+    "productBehaviorChanged": false
+  },
   "activation": {
     "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
     "controllerGeneration": 13,
