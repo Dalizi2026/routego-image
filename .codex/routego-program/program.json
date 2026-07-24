@@ -139,7 +139,7 @@
       "currentHead": "912205e05cdd47bf0c2a08c33c2ab97c21132ab8",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/studio-5.5.json",
-        "sha256": "e03fb3d24ceb3ccc2b1cb22be2fb55cd3e6827eb1b61f2ad677223548a75d9d8"
+        "sha256": "8ac41315836890be95ff9e2db75f840974f0817b7d94a0f417ee500bc76b78ef"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"

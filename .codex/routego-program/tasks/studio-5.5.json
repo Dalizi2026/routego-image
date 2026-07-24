@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "e03fb3d24ceb3ccc2b1cb22be2fb55cd3e6827eb1b61f2ad677223548a75d9d8",
+  "contentSha256": "8ac41315836890be95ff9e2db75f840974f0817b7d94a0f417ee500bc76b78ef",
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "taskId": "5.5",
@@ -33,9 +33,12 @@
     "packages/studio/test/mask-workbench-integration.test.ts",
     "packages/studio/test/creation-capability-markup.test.ts",
     "packages/studio/test/mock-bridge.test.ts",
+    "packages/studio/test/settings-mock-bridge.test.ts",
     "packages/studio/test/settings-markup.test.ts",
     "packages/studio/test/settings-state.test.ts",
     "packages/studio/test/settings-workbench-sync.test.ts",
+    "packages/studio/test/shell-markup.test.ts",
+    "packages/studio/test/sse.test.ts",
     "packages/studio/src/features/settings/state.ts",
     "packages/studio/src/features/settings/types.ts",
     "openspec/changes/streamline-routego-image-generation/tasks.md"
@@ -95,7 +98,10 @@
       "packages/studio/test/settings-markup.test.ts",
       "packages/studio/test/settings-workbench-sync.test.ts",
       "packages/studio/src/features/settings/state.ts",
-      "packages/studio/src/features/settings/types.ts"
+      "packages/studio/src/features/settings/types.ts",
+      "packages/studio/test/sse.test.ts",
+      "packages/studio/test/shell-markup.test.ts",
+      "packages/studio/test/settings-mock-bridge.test.ts"
     ],
     "productBehaviorChanged": false
   },
