@@ -2,20 +2,20 @@
   "schemaVersion": 2,
   "lane": "studio",
   "change": "streamline-routego-image-generation",
-  "role": "task-5.5-reused-lane-candidate",
-  "status": "task-5.5-registered-locked-pending-task-acceptance",
+  "role": "task-5.5-studio-g8-candidate",
+  "status": "task-5.5-registered-locked-pending-studio-g8-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
-  "threadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
+  "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "generation": 7,
-  "currentHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+  "generation": 8,
+  "currentHead": "681d57e53d1b5142116ba8045c92f52f668603f3",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": false,
   "applyAuthorized": false,
-  "currentTask": {"id": "5.5", "status": "registered-dead-surface-removal", "locked": true},
+  "currentTask": {"id": "5.5", "status": "registered-dead-surface-removal-awaiting-studio-g8", "locked": true},
   "sourceOwner": {
     "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -25,7 +25,7 @@
     "archived": true,
     "authorityRevoked": true
   },
-  "handoffCapsuleIntegrity": {"status": "task-5.5-registered-pending-direct-return-acceptance", "path": ".codex/routego-program/handoffs/current-controller-handoff.md"},
+  "handoffCapsuleIntegrity": {"status": "task-5.5-old-studio-g7-platform-unrecoverable-studio-g8-registered", "path": ".codex/routego-program/handoffs/current-controller-handoff.md"},
   "reportingContract": {
     "currentControllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
     "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
@@ -41,5 +41,6 @@
     "acceptanceObservableCompactions": 0
   },
   "externalStateAuthorized": false,
-  "lastCompletedTask": {"id": "5.4", "implementationCommit": "2a3517986597854561d06636373e0fcb4b615fac", "taskStateCommit": "c5d4af9f9883cbd803fa42477e95dd72de38739c", "handoffAcceptanceObservableCompactions": 0}
+  "lastCompletedTask": {"id": "5.4", "implementationCommit": "2a3517986597854561d06636373e0fcb4b615fac", "taskStateCommit": "c5d4af9f9883cbd803fa42477e95dd72de38739c", "handoffAcceptanceObservableCompactions": 0},
+  "supersededTarget": {"threadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b", "generation": 7, "status": "platform-unrecoverable-archived-session-rollout-missing", "transitionId": "controller-g13-studio-5.5-20260724-001"}
 }

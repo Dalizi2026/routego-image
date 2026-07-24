@@ -130,16 +130,16 @@
   "activeApplyOwners": {
     "studio": {
       "status": "task-5.5-registered-locked-pending-task-acceptance",
-      "taskRef": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
-      "threadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
-      "generation": 7,
+      "taskRef": "019f925c-004c-72a1-9a53-f63debdcac84",
+      "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
+      "generation": 8,
       "taskId": "5.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+      "currentHead": "681d57e53d1b5142116ba8045c92f52f668603f3",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/studio-5.5.json",
-        "sha256": "308c2016014746a9d0f99d1bc64deb8b1d6072e0dd8c618b1d33ad082485b12f"
+        "sha256": "8da5f4329656143b235c114400b7e47ed6a666a5ce8d187f9cb082bd5f2875a4"
       },
       "handoffCapsule": {
         "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"
@@ -216,11 +216,11 @@
   },
   "laneSuccessors": {
     "studio": {
-      "threadId": "019f8f67-8881-7561-93ad-a45f6b8f6b6b",
-      "generation": 7,
+      "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
+      "generation": 8,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+      "currentHead": "681d57e53d1b5142116ba8045c92f52f668603f3",
       "observableCompactions": 0,
       "lastCompletedTask": "5.4",
       "status": "task-5.5-registered-locked-pending-task-acceptance"
