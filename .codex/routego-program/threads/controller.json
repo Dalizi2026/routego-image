@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-13-task-4.6-registration-awaiting-handshake",
+  "status": "authoritative-controller-generation-13-task-4.6-dispatch-awaiting-acceptance",
   "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",

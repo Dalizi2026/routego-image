@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "task-4.6-integration-test-infrastructure-candidate-registration",
-  "status": "task-4.6-registration-awaiting-thread-handshake",
+  "status": "task-4.6-handshake-confirmed-dispatch-pending",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -17,7 +17,7 @@
   "applyAuthorized": false,
   "currentTask": {
     "id": "4.6",
-    "status": "registration-pending-mock-relay-generation-relationship-correction",
+    "status": "handshake-confirmed-awaiting-task-dispatch",
     "locked": true
   },
   "sourceOwner": {

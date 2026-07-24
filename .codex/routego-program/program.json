@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-task-4.6-registration-awaiting-handshake",
+  "status": "controller-generation-13-task-4.6-dispatch-awaiting-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -192,7 +192,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.6-candidate-registration-awaiting-handshake",
+      "status": "task-4.6-handshake-confirmed-dispatch-awaiting-acceptance",
       "taskRef": "019f93ed-45f3-7680-a2fa-eba318806e30",
       "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
       "generation": 4,
@@ -207,7 +207,7 @@
       "handoffCapsule": {
         "path": null
       },
-      "authorizedScope": "Task 4.6 is planned but locked. A new local Integration role must complete direct-thread handshake and task acceptance before it becomes the sole apply owner for packages/mock-relay/src/service/mock-service.ts.",
+      "authorizedScope": "Task 4.6 is dispatched to the direct-handshake-confirmed Integration thread. It remains locked until the matching TASK_ACCEPTED receipt is independently validated.",
       "soleApplyOwner": true,
       "applyAuthorized": false,
       "lastCompletedTask": "4.5"
@@ -258,7 +258,7 @@
       "currentHead": "d11e5f9f0938a30faa4198ddbca9ab2f8c3d4992",
       "observableCompactions": 0,
       "lastCompletedTask": "4.5",
-      "status": "task-4.6-candidate-registration-awaiting-handshake"
+      "status": "task-4.6-handshake-confirmed-dispatch-awaiting-acceptance"
     }
   },
   "currentChange": {
@@ -317,7 +317,7 @@
   "currentBlockers": [
     {
       "id": "task-5.5-mock-relay-generation-relationship-defect",
-      "status": "planned-correction-4.6-registration-awaiting-handshake",
+      "status": "planned-correction-4.6-dispatch-awaiting-acceptance",
       "rootCause": "Mock Relay #studioRelationships reads request.references although strict Studio generate requests no longer carry that field.",
       "impact": "Studio mock-bridge generation streams return HTTP 503; Task 5.5 completion verification is paused.",
       "resolutionTaskId": "4.6",
