@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "transitionId": "controller-g13-integration-4.6-20260724-001",
   "eventFingerprint": "studio-5.5-safe-checkpoint-eddae096-mock-relay-generation-relationship-defect",
-  "state": "awaiting-ack",
+  "state": "next-task-acknowledged",
   "resumeState": null,
   "sourceThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
@@ -12,7 +12,7 @@
   "attemptCount": 1,
   "lastAttemptAt": "2026-07-24T15:09:15.437Z",
   "lastError": null,
-  "receiptPath": null,
+  "receiptPath": ".codex/routego-program/dispatch/receipts/controller-g13-integration-4.6-20260724-001.json",
   "lastTransitionId": null,
-  "updatedAt": "2026-07-24T15:09:15.478Z"
+  "updatedAt": "2026-07-24T15:13:23.063Z"
 }
