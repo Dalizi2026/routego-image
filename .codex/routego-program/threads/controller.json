@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-13-task-4.6-platform-recovery-handoff-accepted-awaiting-task-dispatch",
+  "status": "authoritative-controller-generation-13-task-4.6-accepted-studio-5.5-resume-pending",
   "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -18,14 +18,16 @@
     "workspaceHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
     "openspecProgress": "22/33",
     "acceptedTask": "5.4",
-    "readyTasks": ["5.5"],
+    "readyTasks": [
+      "5.5"
+    ],
     "independentVerification": "Task 5.4's controller-accepted explicit Studio Library suite passed 13 tests; git diff --check and Git clean passed. Task 5.5 is registered but locked until direct-return acceptance."
   },
   "currentOperation": {
-    "id": "task-4.6-planned-mock-relay-generation-relationship-correction",
-    "allowedNext": "Only the handoff-accepted Integration recovery candidate may receive Task 4.6's fresh dispatch. No product code may change until that dispatch is accepted and activated. Studio G8's safe Task 5.5 checkpoint remains preserved and paused.",
+    "id": "task-5.5-resume-after-task-4.6",
+    "allowedNext": "Controller must dispatch the resumed clean baseline to the existing Studio owner; Studio may only verify and finish Task 5.5 within its approved capsule scope.",
     "forbidden": [
-      "Product code outside each task's exact owner scope",
+      "Product code outside each task exact owner scope",
       "package.json or pnpm-lock.yaml changes",
       "network access, dependency installation, credentials, real images or provider requests",
       "real Library migration, plugin installation, deployment, publishing or release"

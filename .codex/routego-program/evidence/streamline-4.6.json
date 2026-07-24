@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "c891bd150642124212269d863bc7585dd1d59aca3df319e04a24168dd68961b0",
+  "event": "streamline-task-4.6-controller-accepted",
+  "lane": "integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "4.6",
+  "status": "accepted-with-generation-only-mock-relay-regressions",
+  "implementationCommit": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
+  "tests": [
+    {
+      "command": "pnpm --filter @routego-image/mock-relay typecheck",
+      "result": "pass"
+    },
+    {
+      "command": "pnpm --filter @routego-image/mock-relay exec vitest run test/service.test.ts",
+      "result": "pass",
+      "files": 1,
+      "passed": 27
+    },
+    {
+      "command": "pnpm --filter @routego-image/studio exec vitest run test/mock-bridge.test.ts",
+      "result": "pass",
+      "files": 1,
+      "passed": 11
+    },
+    {
+      "command": "git diff --check",
+      "result": "pass"
+    }
+  ],
+  "scopeExact": true,
+  "scopeFiles": [
+    "packages/mock-relay/src/service/mock-service.ts",
+    "packages/mock-relay/test/service.test.ts"
+  ],
+  "behaviorAudit": [
+    "Strict text-only Studio generation no longer reads references and completes the deterministic Mock Relay stream.",
+    "Stale Mock Relay edit, Trash, upload, and legacy Library fixture surfaces were removed without restoring compatibility fields.",
+    "The Studio provider switch affects only future mock submissions."
+  ],
+  "nextTaskIds": [
+    "5.5"
+  ],
+  "nextTaskLocked": true,
+  "externalStateAuthorized": false
+}

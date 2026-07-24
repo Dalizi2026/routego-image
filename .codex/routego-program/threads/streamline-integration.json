@@ -3,22 +3,22 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "task-4.6-platform-recovery-candidate-registration",
-  "status": "task-4.6-platform-recovery-activated-sole-apply-owner",
+  "status": "task-4.6-controller-accepted-complete",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 5,
-  "currentHead": "84d2f502fe1648422ea8c32e120435e40d55c0f6",
+  "currentHead": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
     "id": "4.6",
-    "status": "active-amended-mock-relay-contract-cleanup",
-    "locked": false
+    "status": "controller-accepted-complete",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -49,9 +49,8 @@
   },
   "externalStateAuthorized": false,
   "lastCompletedTask": {
-    "id": "4.5",
-    "implementationCommit": "cef9c2de23705fa52e7ed5a828600ce8f19d1315",
-    "taskStateCommit": "7a20f89ae2db9cfeffcfb1e812475c592aedde50",
+    "id": "4.6",
+    "implementationCommit": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
     "handoffAcceptanceObservableCompactions": 0
   },
   "taskCapsule": {
@@ -60,9 +59,12 @@
   },
   "registration": {
     "reason": "The previous Task 4.6 owner is irrecoverably waiting on a desktop permission prompt. The committed 9299c42 generation relationship repair is retained and no active writer lease exists.",
-    "permittedScope": ["packages/mock-relay/src/service/mock-service.ts", "packages/mock-relay/test/service.test.ts"],
+    "permittedScope": [
+      "packages/mock-relay/src/service/mock-service.ts",
+      "packages/mock-relay/test/service.test.ts"
+    ],
     "externalStateAuthorized": false,
-    "writerLease": "not-acquired; task locked pending handoff acceptance",
+    "writerLease": "released",
     "directReportingRequired": true
   }
 }
