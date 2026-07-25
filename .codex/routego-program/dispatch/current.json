@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "transitionId": "streamline-6.2-dispatch-20260725-001",
-  "eventFingerprint": "streamline-6.2-resource-scope-revised-64f9836f",
+  "eventFingerprint": "streamline-6.2-resource-scope-activated-64f9836f",
   "state": "next-task-acknowledged",
   "resumeState": null,
   "sourceThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
