@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "6d4936f173230e989d9e9826a477cca92af4f705d73c5330e70d2b345509b326",
+  "contentSha256": "a39c245bf98f5b540e78c4ef9cb28167c91ce59a58568f86859ea1764a4d2a8e",
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "taskId": "5.6",
-  "status": "scope-correction-ready-after-stale-browser-regression-audit",
+  "status": "scope-correction-activated-generation-only-browser-regression",
   "sourceCommit": "cbcbefec6132d2f1b63864fef27f77839aa1d1c7",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -65,6 +65,15 @@
   ],
   "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
   "ownershipFingerprint": "streamline-task-5.6-studio-quality-and-browser-verification",
+  "scopeCorrectionActivation": {
+    "transitionId": "controller-g13-studio-5.6-g10-scope-correction-002",
+    "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "workerThreadId": "019f9916-ed2e-74e0-8613-a5b033583244",
+    "implementationBase": "c127fdba4711cf4cb0f22880374859d709d31a09",
+    "scopeCorrectionAcceptance": "9bcab994dce037bdbd7a87b3592daaf3d449dbbc",
+    "soleApplyOwner": true,
+    "applyAuthorized": true
+  },
   "externalStateAuthorized": false,
   "reportingContract": "The sole Studio apply owner must send a structured checkpoint to Controller and read Controller to confirm delivery after implementation, verification, task-state commit, or a blocker."
 }
