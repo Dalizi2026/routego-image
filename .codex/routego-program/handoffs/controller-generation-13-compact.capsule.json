@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "capsuleType": "controller-successor-handoff-compact",
+  "capsuleSha256": "ce6179e6f7d090d975ba5e1a7be727dda14409b6af2c93efd4749a80869484d1",
+  "role": "program-controller",
+  "change": "streamline-routego-image-generation",
+  "generation": {
+    "source": 13,
+    "successor": 14
+  },
+  "source": {
+    "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "baseline": "7dc78b05cb10b1ad9376bf30a9be15d035ab106c",
+    "observableCompactions": 3,
+    "handoffReason": "Mandatory low-context handoff after user-observed multiple automatic compressions."
+  },
+  "context": {
+    "requiredStartupFiles": [
+      ".codex/routego-program/authority-summary.md",
+      ".codex/routego-program/program.json",
+      ".codex/routego-program/threads/controller.json",
+      ".codex/routego-program/dispatch/current.json",
+      ".codex/routego-program/tasks/streamline-approval-6.1.json"
+    ],
+    "handoffAcceptanceCompactionLimit": 0,
+    "startupRule": "Read only this capsule and the required startup files before acceptance. Read AGENTS.md only after the budget audit establishes the compact set.",
+    "maxStartupFiles": 6,
+    "maxStartupBytes": 49152,
+    "actualStartupFiles": 6,
+    "actualStartupBytes": 31965,
+    "budgetRole": "controller",
+    "budgetValidatedBeforeSuccessorCreation": true,
+    "budgetValidatedAt": "2026-07-25T13:35:19.209Z",
+    "successorCreationMethod": "create-thread-local-no-fork"
+  },
+  "currentTask": {
+    "id": "6.1",
+    "status": "incomplete-runtime-distribution-integrity-blocked",
+    "evidencePath": ".codex/routego-program/evidence/streamline-6.1-external-resource-approval.json",
+    "nextTaskLocked": "6.2",
+    "durableBlocker": "U-2-Netp release is verified. The official ONNX Runtime Web 1.20.1 registry metadata is reachable, but all observed retrievable archives fail official SRI/SHA-1 or fail to produce a complete verifiable tarball. Do not install or package that artifact."
+  },
+  "userAuthorization": {
+    "networkDownloads": true,
+    "dependencyInstallationAfterIntegrityVerification": true,
+    "ruleAmendment": true,
+    "stillForbidden": [
+      "real provider requests or billing probes",
+      "credentials, user images, or real Library data",
+      "real migration, installed-plugin replacement, deployment, publishing, or release"
+    ]
+  },
+  "continuationContract": "The successor must send [THREAD_HANDSHAKE] to Controller, verify delivery, then independently run workflow-doctor and fresh OpenSpec instructions. It must use direct task messages for every acceptance, checkpoint, blocker, deviation, activation, and delivery; heartbeat is read-only only. It must not create a worktree, clone, directory, or subagent successor."
+}
