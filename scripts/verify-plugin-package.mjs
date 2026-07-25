@@ -12,6 +12,13 @@ const MAXIMUM_FILES = 512;
 const MAXIMUM_FILE_BYTES = 24 * 1_024 * 1_024;
 const MAXIMUM_TOTAL_BYTES = 64 * 1_024 * 1_024;
 const PNGJS_LICENSE_SHA256 = "be75ef59c5cf59715588a17a82dff7dd3e83c4dba3c458676bb9311e05fbedc5";
+const U2NETP_LICENSE_SHA256 = "44ad51c5f588276b85d65f599087034c3a3c957f67cb8f7de92bb9b58cad9bb3";
+const ONNXRUNTIME_WEB_LICENSE_SHA256 = "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322";
+const BACKGROUND_REMOVAL_RESOURCES = new Map([
+  ["u2netp-model", { path: "u2netp.onnx", bytes: 4574861, sha256: "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8", version: "u2netp", license: "Apache-2.0", source: "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx" }],
+  ["onnxruntime-web-simd-threaded-jsep", { path: "ort-wasm-simd-threaded.jsep.wasm", bytes: 21663894, sha256: "185b0861a6cd6cbdfb057289338090436483cc59e10a7bc83bd167b15531a51b", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }],
+  ["onnxruntime-web-simd-threaded", { path: "ort-wasm-simd-threaded.wasm", bytes: 11246032, sha256: "207d02be4591c156b0a98f024f3d58005b5b04c92274d759fb390338c63559ea", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }]
+]);
 const MINIMUM_RAW_BASE64_PAYLOAD_CHARS = 96;
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 const ACCEPTED_PLUGIN_MANIFEST = {
@@ -51,10 +58,13 @@ const EXACT_FILES = new Set([
   "skills/routego-image/SKILL.md",
   "scripts/start-routego-image.mjs",
   "runtime/index.js",
+  "runtime/resource-manifest.json",
   "runtime/studio-assets.json",
   "THIRD_PARTY_NOTICES.md",
   "licenses/gpt_image_playground-MIT.txt",
   "licenses/pngjs-MIT.txt",
+  "licenses/u2netp-Apache-2.0.txt",
+  "licenses/onnxruntime-web-MIT.txt",
   ARTIFACT_MANIFEST
 ]);
 const FORBIDDEN_SEGMENTS = new Set([
@@ -226,8 +236,44 @@ function validateAllowlist(files) {
         file.endsWith(".tsx") || file.endsWith(".env") || file.includes("binding.gyp")) {
       fail(`a forbidden path is present: ${file}`);
     }
-    if (!EXACT_FILES.has(file) && !file.startsWith("runtime/studio/assets/")) {
+    if (!EXACT_FILES.has(file) && !file.startsWith("runtime/studio/assets/") &&
+        !file.startsWith("resources/background-removal/")) {
       fail(`a file is not allowlisted: ${file}`);
+    }
+  }
+}
+
+function validateBackgroundRemovalResources(manifest, fileSet) {
+  if (!plainObject(manifest) || manifest.schemaVersion !== 1 || manifest.offlineOnly !== true ||
+      !Array.isArray(manifest.resources) || manifest.resources.length !== BACKGROUND_REMOVAL_RESOURCES.size ||
+      !Array.isArray(manifest.licenses) ||
+      JSON.stringify(manifest.licenses) !== JSON.stringify(["licenses/u2netp-Apache-2.0.txt", "licenses/onnxruntime-web-MIT.txt"])) {
+    fail("the background-removal resource manifest has an invalid shape");
+  }
+  const expectedPaths = new Set();
+  const seenIds = new Set();
+  for (const resource of manifest.resources) {
+    if (!plainObject(resource) || typeof resource.id !== "string" || typeof resource.path !== "string" ||
+        !Number.isSafeInteger(resource.bytes) || typeof resource.sha256 !== "string") {
+      fail("the background-removal resource manifest contains an invalid resource");
+    }
+    const expected = BACKGROUND_REMOVAL_RESOURCES.get(resource.id);
+    if (expected === undefined || seenIds.has(resource.id) || resource.path !== expected.path ||
+        resource.bytes !== expected.bytes || resource.sha256 !== expected.sha256 ||
+        resource.version !== expected.version || resource.license !== expected.license || resource.source !== expected.source) {
+      fail("the background-removal resource manifest does not match the approved resources");
+    }
+    seenIds.add(resource.id);
+    const packagedPath = `resources/background-removal/${resource.path}`;
+    if (!fileSet.has(packagedPath)) fail(`a required background-removal resource is missing: ${resource.path}`);
+    expectedPaths.add(packagedPath);
+  }
+  if (seenIds.size !== BACKGROUND_REMOVAL_RESOURCES.size) {
+    fail("the background-removal resource manifest omits an approved resource");
+  }
+  for (const file of fileSet) {
+    if (file.startsWith("resources/background-removal/") && !expectedPaths.has(file)) {
+      fail(`an unapproved background-removal resource is present: ${file}`);
     }
   }
 }
@@ -317,6 +363,7 @@ export async function verifyPluginPackage(packageDirectory) {
   }
 
   validateStudioManifest(await readJson(root, "runtime/studio-assets.json"), fileSet);
+  validateBackgroundRemovalResources(await readJson(root, "runtime/resource-manifest.json"), fileSet);
   const runtimeText = (await boundedRead(path.join(root, "runtime/index.js"))).toString("utf8");
   validateRuntimeImports(runtimeText);
 
@@ -334,6 +381,10 @@ export async function verifyPluginPackage(packageDirectory) {
   }
   const pngjsLicense = await boundedRead(path.join(root, "licenses/pngjs-MIT.txt"));
   if (sha256(pngjsLicense) !== PNGJS_LICENSE_SHA256) fail("the pinned pngjs MIT license differs");
+  const u2netpLicense = await boundedRead(path.join(root, "licenses/u2netp-Apache-2.0.txt"));
+  if (sha256(u2netpLicense) !== U2NETP_LICENSE_SHA256) fail("the pinned U-2-Netp Apache-2.0 license differs");
+  const onnxruntimeLicense = await boundedRead(path.join(root, "licenses/onnxruntime-web-MIT.txt"));
+  if (sha256(onnxruntimeLicense) !== ONNXRUNTIME_WEB_LICENSE_SHA256) fail("the pinned ONNX Runtime Web MIT license differs");
 
   return {
     root,

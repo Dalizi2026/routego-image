@@ -33,7 +33,9 @@ const STATIC_SOURCE_FILES = [
   ["scripts/start-routego-image.mjs", "scripts/start-routego-image.mjs"],
   ["THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"],
   ["licenses/gpt_image_playground-MIT.txt", "licenses/gpt_image_playground-MIT.txt"],
-  ["licenses/pngjs-MIT.txt", "licenses/pngjs-MIT.txt"]
+  ["licenses/pngjs-MIT.txt", "licenses/pngjs-MIT.txt"],
+  ["licenses/u2netp-Apache-2.0.txt", "licenses/u2netp-Apache-2.0.txt"],
+  ["licenses/onnxruntime-web-MIT.txt", "licenses/onnxruntime-web-MIT.txt"]
 ];
 const ALLOWED_STUDIO_EXTENSIONS = new Set([
   ".css", ".gif", ".ico", ".jpeg", ".jpg", ".js", ".json", ".png",
@@ -122,6 +124,17 @@ async function collectRegularFiles(directory, relativeDirectory = "") {
     else throw new Error(`Generated output contains a non-regular file: ${relativeFile}`);
   }
   return output;
+}
+
+async function copyContainedDirectory(repositoryRoot, sourceRelative, targetRoot, targetRelative) {
+  const requested = path.resolve(repositoryRoot, ...sourceRelative.split("/"));
+  const sourceRoot = await realpath(requested);
+  if (!contained(repositoryRoot, sourceRoot)) throw new Error(`Source path escapes the repository: ${sourceRelative}`);
+  const sourceStats = await stat(sourceRoot);
+  if (!sourceStats.isDirectory()) throw new Error(`Source path is not a directory: ${sourceRelative}`);
+  for (const file of await collectRegularFiles(sourceRoot)) {
+    await copyContainedSource(repositoryRoot, `${sourceRelative}/${file}`, targetRoot, `${targetRelative}/${file}`);
+  }
 }
 
 async function auditRuntimeDependencies(repositoryRoot) {
@@ -284,6 +297,18 @@ export async function buildPluginPackage(options = {}) {
     if (!(await exists(runtimeSource))) throw new Error("The bundled Integration runtime was not generated.");
     await mkdir(path.join(packageRoot, "runtime"), { recursive: true });
     await copyFile(runtimeSource, path.join(packageRoot, "runtime/index.js"));
+    await copyContainedSource(
+      repositoryRoot,
+      "packages/integration/src/runtime/resource-manifest.json",
+      packageRoot,
+      "runtime/resource-manifest.json"
+    );
+    await copyContainedDirectory(
+      repositoryRoot,
+      "packages/integration/resources/background-removal",
+      packageRoot,
+      "resources/background-removal"
+    );
 
     const viteManifest = parseViteManifest(
       JSON.parse(await readFile(path.join(studioBuild, ".vite/manifest.json"), "utf8"))
