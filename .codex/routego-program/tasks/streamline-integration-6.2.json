@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3",
+  "contentSha256": "c757ccd6f12311454c3a50fe86beb5db6ab11698ad9bd750ef6af80ffa043ca6",
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "taskId": "6.2",
@@ -8,9 +8,9 @@
   "sourceCommit": "4baf17f4e4454ea5b8e07e06b54247cdd1849221",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
-    "fileSha256": "f4ab7d8f9175c2c07f378928745d104d9a6d31e4af59a678470d528eb795d0d4",
-    "lineSha256": "b162ccbc70096098668838f9ac280540a36d0eaaf5c2db965ce0c8a84d3891c0",
-    "lineBytes": 287
+    "fileSha256": "59a4aebe9ad4a545dd49ea7bdab2ea9dc1cec4762631cbb44866d71d9ac4d407",
+    "lineSha256": "aebadfef9dc10d4eb53507b2fa4142ae69da4483e8e72ab0109525bb428a95b7",
+    "lineBytes": 479
   },
   "dependencies": [
     "6.1"
@@ -29,7 +29,10 @@
     "licenses/onnxruntime-web-MIT.txt",
     "package.json",
     "pnpm-lock.yaml",
-    "openspec/changes/streamline-routego-image-generation/tasks.md"
+    "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "scripts/build-plugin-package.mjs",
+    "scripts/verify-plugin-package.mjs",
+    "packages/integration/test/install-smoke.test.ts"
   ],
   "forbiddenFileGlobs": [
     "packages/contracts/**",
@@ -57,7 +60,8 @@
     "runtime resource loader rejects missing or modified resources without network access",
     "pnpm --filter @routego-image/integration typecheck",
     "pnpm --filter @routego-image/integration test -- background-removal-resources.test.ts",
-    "git diff --check"
+    "git diff --check",
+    "existing package builder/verifier tests for the expanded resource file set"
   ],
   "directSpecifications": [
     {
@@ -67,7 +71,7 @@
     },
     {
       "path": "openspec/changes/streamline-routego-image-generation/design.md",
-      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "sha256": "50c59628ec1327a7a6ca60fa2617b14025d5cbe8ed6cfbba4bd21fa22437a0e1",
       "reason": "Defines the dependency gate, resource manifest and offline package boundary."
     }
   ],

@@ -143,6 +143,8 @@ This change is applied on `codex/routego-integration-g8` by one OpenSpec apply o
 - Studio: `packages/studio/**` and scoped Playwright tests.
 - Packaging/docs: plugin manifest/build/verify scripts and product/development documentation.
 
+Task 6.2 owns the minimum existing package-builder and package-verifier changes required to carry its pinned model, WASM, license, and integrity resources into the built offline plugin. This does not include the later full artifact smoke and release gates owned by Task 7.3.
+
 Frozen dependencies are Node.js 20.19+, pnpm 11.9+, strict TypeScript, the existing atomic JSON/lock/journal primitives, loopback session security, and browser path-free contracts. A task that needs to change these boundaries must first update this OpenSpec design.
 
 ## Error And Security Boundaries
