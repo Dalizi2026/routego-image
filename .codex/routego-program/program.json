@@ -211,7 +211,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.2-recovery-owner-registered-awaiting-acceptance",
+      "status": "task-6.2-accepted-awaiting-activation",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
@@ -223,7 +223,7 @@
         "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
         "sha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
       },
-      "authorizedScope": "Task 6.2 recovery owner read-only acceptance; no lease or product mutation until TASK_ACCEPTED and TASK_ACTIVATED.",
+      "authorizedScope": "Task 6.2 accepted; awaiting TASK_ACTIVATED before writer lease and product mutation.",
       "soleApplyOwner": false,
       "applyAuthorized": false,
       "lastCompletedTask": "6.1"
@@ -278,7 +278,7 @@
       "currentHead": "8144983fe73b9806f69f4eef15d888594434697a",
       "observableCompactions": 0,
       "lastCompletedTask": "6.1",
-      "status": "task-6.2-recovery-owner-registered-awaiting-acceptance",
+      "status": "task-6.2-accepted-awaiting-activation",
       "taskId": "6.2",
       "taskCapsuleIntegrity": {
         "canonicalSha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
