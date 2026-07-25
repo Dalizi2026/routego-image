@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "type": "TASK_ACCEPTED",
+  "transitionId": "controller-g13-studio-5.6-g10-scope-correction-002",
+  "eventFingerprint": "studio-5.6-c127fdba-browser-regression-scope-correction",
+  "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+  "sourceThreadId": "019f9916-ed2e-74e0-8613-a5b033583244",
+  "targetThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+  "taskId": "5.6",
+  "stateCommit": "f3f9b7894ee9a1048a8cbc89497d084b3e886033",
+  "acknowledgedAt": "2026-07-25T12:22:00.000Z",
+  "evidence": {
+    "baseline": "f3f9b7894ee9a1048a8cbc89497d084b3e886033",
+    "rawCapsuleSha256": "753386f2a4af757a105739ddc60b176372b61c33a1a08647e9604852708ec926",
+    "gitClean": true,
+    "workflowDoctor": "pass",
+    "openspecInstructions": "pass",
+    "externalStateAuthorized": false
+  }
+}
