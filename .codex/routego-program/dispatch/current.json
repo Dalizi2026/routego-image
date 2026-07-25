@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "transitionId": "streamline-6.2-dispatch-20260725-001",
-  "eventFingerprint": "streamline-6.2-capsule-restored-8144983",
-  "state": "next-task-acknowledged",
+  "eventFingerprint": "streamline-6.2-scope-revised-c757ccd6",
+  "state": "acceptance-in-progress",
   "resumeState": null,
   "sourceThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "targetThreadId": "019f99ae-601b-7262-9457-8006de418f17",
   "completedTaskId": null,
   "nextTaskId": "6.2",
-  "attemptCount": 3,
-  "lastAttemptAt": "2026-07-25T14:43:43.490Z",
+  "attemptCount": 0,
+  "lastAttemptAt": null,
   "lastError": null,
-  "receiptPath": ".codex/routego-program/dispatch/receipts/controller-g14-integration-6.2-20260725-001.json",
+  "receiptPath": null,
   "lastTransitionId": null,
-  "updatedAt": "2026-07-25T14:43:52.019Z"
+  "updatedAt": "2026-07-25T14:56:28.765Z"
 }
