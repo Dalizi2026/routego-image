@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "type": "CHECKPOINT_RECEIVED",
+  "transitionId": "controller-g13-studio-5.6-g10-scope-correction-002",
+  "eventFingerprint": "studio-5.6-c127fdba-browser-regression-scope-correction",
+  "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+  "sourceThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+  "targetThreadId": "019f9916-ed2e-74e0-8613-a5b033583244",
+  "taskId": "5.6",
+  "stateCommit": "977767401f15a23c4e8b959cff8f05d092ce18c4",
+  "acknowledgedAt": "2026-07-25T12:15:00.000Z",
+  "evidence": {
+    "implementationCommit": "c127fdba4711cf4cb0f22880374859d709d31a09",
+    "scopeAudit": "Studio-only implementation accepted for resumed browser-regression correction",
+    "productMutationAfterCheckpoint": false,
+    "externalStateAuthorized": false
+  }
+}
