@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-14-task-6.1-complete-task-6.2-dispatch-blocked",
+  "status": "controller-generation-14-task-6.1-complete-task-6.2-scope-resource-revision",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -116,7 +116,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-14-task-6.1-complete-task-6.2-dispatch-blocked",
+    "status": "authoritative-controller-generation-14-task-6.1-complete-task-6.2-scope-resource-revision",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -211,7 +211,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.2-revised-activated",
+      "status": "task-6.2-resource-scope-revised-awaiting-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
@@ -221,11 +221,11 @@
       "currentHead": "82e2627fe6dab99abf0852253ee6c6c3ac17410d",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
-        "sha256": "c757ccd6f12311454c3a50fe86beb5db6ab11698ad9bd750ef6af80ffa043ca6"
+        "sha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57"
       },
-      "authorizedScope": "Task 6.2 revised scope activated; only capsule allowed runtime and package-builder/verifier files may be mutated.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
+      "authorizedScope": "Task 6.2 resource scope revision is committed; awaiting revised acceptance before activation.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
       "lastCompletedTask": "6.1"
     }
   },
@@ -278,10 +278,10 @@
       "currentHead": "82e2627fe6dab99abf0852253ee6c6c3ac17410d",
       "observableCompactions": 0,
       "lastCompletedTask": "6.1",
-      "status": "task-6.2-revised-activated",
+      "status": "task-6.2-resource-scope-revised-awaiting-acceptance",
       "taskId": "6.2",
       "taskCapsuleIntegrity": {
-        "canonicalSha256": "c757ccd6f12311454c3a50fe86beb5db6ab11698ad9bd750ef6af80ffa043ca6"
+        "canonicalSha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57"
       }
     }
   },

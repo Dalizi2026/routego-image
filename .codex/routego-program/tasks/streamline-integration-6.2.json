@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "c757ccd6f12311454c3a50fe86beb5db6ab11698ad9bd750ef6af80ffa043ca6",
+  "contentSha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57",
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "taskId": "6.2",
@@ -8,9 +8,9 @@
   "sourceCommit": "4baf17f4e4454ea5b8e07e06b54247cdd1849221",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
-    "fileSha256": "59a4aebe9ad4a545dd49ea7bdab2ea9dc1cec4762631cbb44866d71d9ac4d407",
-    "lineSha256": "aebadfef9dc10d4eb53507b2fa4142ae69da4483e8e72ab0109525bb428a95b7",
-    "lineBytes": 479
+    "fileSha256": "50e90ec7d4e7411fee43677aba3bcc281f9537656e7d1eafb0e5c2f9fe0f66e2",
+    "lineSha256": "629a463f5773b2c3fee8e5ba9fda7779161db04485dffc97e1e2d2894c7d40fe",
+    "lineBytes": 539
   },
   "dependencies": [
     "6.1"
@@ -23,6 +23,7 @@
     "packages/integration/src/runtime/background-removal-worker.ts",
     "packages/integration/src/runtime/background-removal-resources.ts",
     "packages/integration/src/runtime/resource-manifest.json",
+    "packages/integration/resources/background-removal/**",
     "packages/integration/test/background-removal-resources.test.ts",
     "packages/integration/test/background-removal.test.ts",
     "licenses/u2netp-Apache-2.0.txt",
