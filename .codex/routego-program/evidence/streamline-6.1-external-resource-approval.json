@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "8871b804aaf34d0944693a45c9c070d8ebcf6cd052e6f9a42f80546461686efd",
+  "contentSha256": "c60e825d473d48be1e5bd5e9b33762907f508b9c5661983f34ac62944e7021a1",
   "event": "streamline-task-6.1-user-authorization-and-resource-integrity-audit",
   "change": "streamline-routego-image-generation",
   "taskId": "6.1",
@@ -61,6 +61,14 @@
       "shasumSha1": "71dc4495bb75cdd56a9dc981cf27723a599189f7"
     },
     "result": "Three fresh isolated npm-cache attempts read official metadata but did not produce a tarball that could complete explicit SHA-512/SHA-1 comparison, tar listing, package metadata, and size verification. The verbose attempt reached only npm registry metadata GET 200 responses before no verifiable tarball was available.",
+    "rangeAudit": {
+      "recordedAt": "2026-07-25T13:44:00.000Z",
+      "source": "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz",
+      "declaredArchiveBytes": 20439316,
+      "rangeSizeBytes": 262144,
+      "parallelRanges": 78,
+      "result": "The registry honored byte ranges but one required range returned 28672 bytes instead of 262144; the complete archive could not be reconstructed. No concatenated stream was hashed or extracted."
+    },
     "disposition": "No newly downloaded artifact is approved, no SHA-256 is recorded for an unverified artifact, and Task 6.1 remains incomplete. This does not override the earlier rejected range response."
   },
   "packageSizeImpact": {
