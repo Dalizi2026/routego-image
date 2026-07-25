@@ -3,22 +3,22 @@
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "role": "task-5.5-studio-g9-platform-recovery-candidate",
-  "status": "task-5.5-platform-recovery-registration-pending",
+  "status": "task-5.5-active-g9-sole-apply-owner",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "threadId": "019f979c-4c0e-7ac0-8437-02ac6c7b4fd1",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 9,
-  "currentHead": "44c6f7132f4ab5ca3fa7274343fd0fe52ad6f53a",
+  "currentHead": "57656007f49092baba9d99ae33d1ba319df767d4",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "5.5",
-    "status": "platform-recovery-registration-pending",
-    "locked": true
+    "status": "active-dead-surface-removal",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
@@ -30,7 +30,7 @@
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "status": "studio-g9-platform-recovery-registered-awaiting-acceptance",
+    "status": "studio-g9-platform-recovery-activated",
     "path": ".codex/routego-program/handoffs/studio-generation-9-platform-recovery.capsule.json",
     "canonicalSha256": "973649588e5cabdb53d427d3eeaf2c0ed59667e7cd04153d85f30d994d4ec911",
     "rawFileSha256": "6bab5dd801ffdd986eaea79fa37a36de7a146b09017613c35f947b4122cbca48"

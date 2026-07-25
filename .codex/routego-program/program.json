@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-studio-g9-platform-recovery-registration",
+  "status": "controller-generation-13-studio-g9-task-5.5-active",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -310,9 +310,9 @@
     "currentTask": {
       "id": "5.5",
       "locked": true,
-      "activationAuthorized": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.5 is preserved at safe checkpoint c2fa583 and awaits Studio G9 handoff acceptance and a new dispatch."
+      "authorizedScope": "Studio G9 is active sole owner for Task 5.5 and must stay within the task capsule scope."
     }
   },
   "latestDirectCheckpoint": {

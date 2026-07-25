@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-13-studio-g9-platform-recovery-registration",
+  "status": "authoritative-controller-generation-13-studio-g9-task-5.5-active",
   "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -24,8 +24,8 @@
     "independentVerification": "Task 5.4's controller-accepted explicit Studio Library suite passed 13 tests; git diff --check and Git clean passed. Task 5.5 is registered but locked until direct-return acceptance."
   },
   "currentOperation": {
-    "id": "studio-g9-platform-recovery-registration",
-    "allowedNext": "Studio G9 may perform only handoff acceptance after [REGISTRATION_READY], then awaits a renewed dispatch and activation for Task 5.5.",
+    "id": "studio-g9-task-5.5-active",
+    "allowedNext": "Studio G9 may modify only the Task 5.5 capsule scope, then return a checkpoint directly to this Controller.",
     "forbidden": [
       "Product code outside each task exact owner scope",
       "package.json or pnpm-lock.yaml changes",
