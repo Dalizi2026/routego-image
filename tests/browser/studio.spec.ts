@@ -13,7 +13,6 @@ import {
   startStudioServer,
   stopStudioServer,
   syntheticPng,
-  syntheticZip,
   type BrowserSecurityAudit,
   type StudioServer
 } from "./harness";
@@ -149,22 +148,6 @@ async function expectSecurityClean(
   }
 }
 
-function uploadInput(page: Page, heading: string) {
-  return page
-    .locator(".file-dropzone-wrap")
-    .filter({ has: page.getByRole("heading", { name: heading }) })
-    .locator('input[type="file"]');
-}
-
-async function runCapabilityProbe(page: Page, capability: string): Promise<void> {
-  const form = page.locator("form.settings-probe");
-  await form.getByLabel("能力").selectOption(capability);
-  await form.getByLabel("我确认本次探测可能产生费用").check();
-  await form.getByRole("button", { name: "执行一次能力探测" }).click();
-  await expect(form.locator(".settings-probe-result")).toHaveAttribute("data-state", "supported");
-  await expect(form.locator(".settings-probe-result")).toContainText(capability);
-}
-
 async function submitTextGeneration(page: Page, prompt: string): Promise<void> {
   await page.getByLabel("提示词").fill(prompt);
   await page.getByRole("button", { name: "开始生成" }).click();
@@ -280,48 +263,6 @@ async function readStreamUiObservation(page: Page): Promise<{
     }).__routegoStreamUiObservation;
     return value?.observation ?? { states: [], resourceIds: [] };
   });
-}
-
-async function installObjectUrlAudit(page: Page): Promise<void> {
-  await page.addInitScript(() => {
-    const created: string[] = [];
-    const revoked: string[] = [];
-    const createObjectUrl = URL.createObjectURL.bind(URL);
-    const revokeObjectUrl = URL.revokeObjectURL.bind(URL);
-    Object.defineProperty(URL, "createObjectURL", {
-      configurable: true,
-      value(blob: Blob) {
-        const value = createObjectUrl(blob);
-        created.push(value);
-        return value;
-      }
-    });
-    Object.defineProperty(URL, "revokeObjectURL", {
-      configurable: true,
-      value(value: string) {
-        revoked.push(value);
-        revokeObjectUrl(value);
-      }
-    });
-    Object.defineProperty(window, "__routegoObjectUrlAudit", {
-      configurable: true,
-      value: { created, revoked }
-    });
-  });
-}
-
-async function readObjectUrlAudit(page: Page): Promise<{
-  readonly created: readonly string[];
-  readonly revoked: readonly string[];
-}> {
-  return page.evaluate(() =>
-    (window as unknown as {
-      readonly __routegoObjectUrlAudit?: {
-        readonly created: string[];
-        readonly revoked: string[];
-      };
-    }).__routegoObjectUrlAudit ?? { created: [], revoked: [] }
-  );
 }
 
 async function installResourceBoundary(page: Page): Promise<ResourceBoundaryState> {
@@ -645,10 +586,9 @@ test("authenticated streamed success is genuinely chunked, enters streaming stat
   ]);
 });
 
-test("failure after partial preserves risk and descriptor lifetime while browser object URLs clean up independently", async ({ page }) => {
+test("failure after partial preserves risk and descriptor lifetime without automatic replay", async ({ page }) => {
   const audit = observeBrowserSecurity(page);
   const resourceBoundary = await installResourceBoundary(page);
-  await installObjectUrlAudit(page);
   await page.clock.setFixedTime(new Date(STREAM_REGISTERED_AT));
   await openStudio(page);
 
@@ -676,18 +616,7 @@ test("failure after partial preserves risk and descriptor lifetime while browser
   await expect(facts.filter({ has: page.getByText("可能计费", { exact: true }) }).locator("dd")).toHaveText("是");
   await expect(panel.getByRole("button", { name: "以当前草稿再次提交" })).toBeDisabled();
 
-  const beforeCleanup = await readObjectUrlAudit(page);
-  expect(beforeCleanup.created.length).toBeGreaterThanOrEqual(1);
-  const activeObjectUrl = beforeCleanup.created.find(
-    (value) => !beforeCleanup.revoked.includes(value)
-  );
-  expect(activeObjectUrl).toBeDefined();
   const relativeUrl = `/api/v1/resources/${encodeURIComponent(resourceId)}`;
-  await page.getByRole("button", { name: "批量队列" }).click();
-  await expect(panel).toHaveCount(0);
-  await expect.poll(async () => (await readObjectUrlAudit(page)).revoked.includes(activeObjectUrl ?? "")).toBe(true);
-  const afterCleanup = await readObjectUrlAudit(page);
-  expect(afterCleanup.revoked).toContain(activeObjectUrl);
 
   resourceBoundary.now = STREAM_FULL_EXPIRY - 1;
   expect(await fetchProtectedStatus(page, relativeUrl)).toBe(200);
@@ -770,109 +699,55 @@ test("disconnect fixture remains live until explicit abort, then closes without 
   await expectSecurityClean(page, audit);
 });
 
-test("confirmed capability probes unlock reference upload, generation, target edit, and target-slot-zero mask save", async ({ page }) => {
+test("generation-only workbench keeps accessible text generation while removed controls stay absent", async ({ page }) => {
   const audit = observeBrowserSecurity(page);
   await installDeterministicMock(page);
   await openStudio(page);
 
-  await expect(page.getByRole("button", { name: "编辑", exact: true })).toBeDisabled();
-  await expect(page.getByText("当前中转未确认支持").first()).toBeVisible();
-  await expect(uploadInput(page, "参考图")).toBeDisabled();
+  await expect(page.getByLabel("提示词")).toBeVisible();
+  await expect(page.getByRole("button", { name: "开始生成" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "编辑", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "批量队列" })).toHaveCount(0);
+  await expect(page.getByText("能力探测", { exact: true })).toHaveCount(0);
+  await expect(page.locator('.file-dropzone-wrap input[type="file"]')).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "打开遮罩编辑器" })).toHaveCount(0);
 
-  await page.getByRole("button", { name: "设置" }).click();
-  await page.getByText("高级设置", { exact: true }).click();
-  await runCapabilityProbe(page, "single-image-input");
-  await runCapabilityProbe(page, "target-edit");
-  await runCapabilityProbe(page, "mask-edit");
-  await page.getByRole("button", { name: "工作台" }).click();
-
-  await expect(uploadInput(page, "参考图")).toBeEnabled();
-  await uploadInput(page, "参考图").setInputFiles(syntheticPng);
-  await expect(page.locator(".upload-card", { hasText: syntheticPng.name })).toContainText("ready");
-  await submitTextGeneration(page, "使用一张合成参考图的安静暗房场景");
+  const prompt = "只用文本描述的安静暗房场景";
+  await submitTextGeneration(page, prompt);
   await expect(page.getByRole("heading", { name: "图像已生成" })).toBeVisible();
 
-  await page.locator(".upload-card", { hasText: syntheticPng.name }).getByRole("button", { name: "移除" }).click();
-  await page.getByRole("button", { name: "编辑", exact: true }).click();
-  const targetFile = { ...syntheticPng, name: "synthetic-target.png" };
-  await uploadInput(page, "编辑目标").setInputFiles(targetFile);
-  await expect(page.locator(".upload-card", { hasText: targetFile.name })).toContainText("ready");
-  await page.getByLabel("允许修改").fill("仅修改中央区域");
-  await page.getByRole("button", { name: "打开遮罩编辑器" }).click();
-  await expect(page.getByRole("dialog", { name: "遮罩暗房" })).toBeVisible();
-  const canvas = page.getByRole("region", { name: "目标图与可编辑遮罩覆盖层" });
-  await expect(canvas).toBeVisible();
-  const canvasBounds = await canvas.boundingBox();
-  expect(canvasBounds).not.toBeNull();
-  await canvas.click({
-    position: {
-      x: Math.max(1, Math.floor((canvasBounds?.width ?? 2) / 2)),
-      y: Math.max(1, Math.floor((canvasBounds?.height ?? 2) / 2))
-    }
-  });
-  await page.getByRole("button", { name: "保存遮罩" }).click();
-  await expect(page.getByText("遮罩已就绪")).toBeVisible();
-  await page.getByRole("button", { name: "关闭编辑器" }).click();
-  await expect(page.getByText("遮罩已绑定 TARGET[0]")).toBeVisible();
-  await page.getByRole("button", { name: "提交编辑" }).click();
-  await expect(page.getByRole("heading", { name: "图像已生成" })).toBeVisible();
-
-  const editRequest = audit.requests.find((request) => request.body?.includes('"targetSlot":0'));
-  expect(editRequest?.body).toContain('"targetSlot":0');
-  expect(editRequest?.body).not.toMatch(/path|data:image|base64/iu);
+  expectExactStreamRequest(audit, prompt);
+  const generationRequest = audit.requests.find((request) =>
+    request.body?.includes(prompt) && new URL(request.url).pathname === STUDIO_CREATION_STREAM_PATH
+  );
+  expect(generationRequest?.body).not.toMatch(/target|mask|edit|upload|data:image|base64/iu);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await expectSecurityClean(page, audit);
 });
 
-test("ordered batch keeps task identity and displays mixed outcomes in submitted order", async ({ page }) => {
+test("mobile and desktop generation surfaces remain accessible without a batch queue", async ({ page }) => {
   const audit = observeBrowserSecurity(page);
-  await installDeterministicMock(page, { studioBatch: "partial" });
+  await installDeterministicMock(page);
   await openStudio(page);
 
-  await page.getByRole("button", { name: "批量队列" }).click();
-  await page.getByLabel("提示词").fill("batch-first");
-  await page.getByRole("button", { name: /新增任务/ }).click();
-  await page.getByLabel("提示词").fill("batch-second");
-  await expect(page.locator(".batch-editor__list > li").nth(0)).toContainText("batch-first");
-  await expect(page.locator(".batch-editor__list > li").nth(1)).toContainText("batch-second");
-  await page.getByLabel("并发数").fill("2");
-  await page.getByRole("button", { name: "提交整个批次" }).click();
-  await expect(page.locator(".batch-editor__summary")).toContainText("批量任务部分完成");
-  await expect(page.locator(".batch-editor__list > li").nth(0)).toContainText("成功");
-  await expect(page.locator(".batch-editor__list > li").nth(1)).toContainText("失败");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.getByRole("heading", { name: "把想法放进显影盘" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "开始生成" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: /新增任务|提交整个批次|取消批次/ })).toHaveCount(0);
+  await expect(page.locator(".batch-editor")).toHaveCount(0);
 
-  const batchRequest = audit.requests.find(
-    (request) => request.body?.includes("batch-first") && request.body.includes("batch-second")
-  );
-  const batchBody = JSON.parse(batchRequest?.body ?? "{}") as {
-    tasks?: Array<{ operation?: { prompt?: string } }>;
-  };
-  expect(batchBody.tasks?.map((item) => item.operation?.prompt)).toEqual([
-    "batch-first",
-    "batch-second"
-  ]);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toBeVisible();
+  await expect(page.getByLabel("提示词")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await expectSecurityClean(page, audit);
 });
 
-async function executeVisiblePreflight(page: Page, expectedAction: string): Promise<void> {
-  const preflight = page.locator(".library-preflight");
-  await expect(preflight).toBeVisible();
-  await expect(preflight).toContainText(expectedAction);
-  const confirmationCode = preflight.locator("code");
-  const confirmation =
-    (await confirmationCode.count()) === 0 ? null : await confirmationCode.textContent();
-  if (confirmation !== null && confirmation !== "") {
-    await preflight.locator('input[autocomplete="off"]').fill(confirmation);
-  }
-  const execute = preflight.getByRole("button", { name: "执行已预检变更" });
-  await expect(execute).toBeEnabled();
-  await execute.click();
-  await expect(page.locator(".library-mutation-result")).toBeVisible();
-}
-
-test("Library search, detail, comparison, folders, partial mutations, Trash, and ZIP stay identifier based", async ({ page }) => {
+test("Library search, detail, folders, mark, and copy stay identifier based", async ({ page }) => {
   test.setTimeout(90_000);
   const audit = observeBrowserSecurity(page);
-  await installDeterministicMock(page, { executeLibraryMutation: "partial" });
+  await installDeterministicMock(page);
   await openStudio(page);
 
   await page.getByRole("button", { name: "图库" }).click();
@@ -882,85 +757,28 @@ test("Library search, detail, comparison, folders, partial mutations, Trash, and
   await page.getByLabel("提示词检索").fill("no-synthetic-match");
   await page.getByRole("button", { name: "应用筛选" }).click();
   await expect(page.getByRole("heading", { name: "没有符合当前筛选的作品" })).toBeVisible();
-  await page.getByLabel("提示词检索").fill("Synthetic edit request");
+  await page.getByLabel("提示词检索").fill("Synthetic astronaut cat");
   await page.getByRole("button", { name: "应用筛选" }).click();
-  const editPrompt = "Synthetic edit request for downstream Studio development.";
-  await expect(page.getByRole("button", { name: `查看详情: ${editPrompt}` })).toBeVisible();
-  await page.getByRole("button", { name: `查看详情: ${editPrompt}` }).click();
-  const detail = page.getByRole("dialog", { name: editPrompt });
+  const prompt = "Synthetic astronaut cat in a quiet darkroom.";
+  await expect(page.getByRole("button", { name: `查看详情: ${prompt}` })).toBeVisible();
+  await page.getByRole("button", { name: `查看详情: ${prompt}` }).click();
+  const detail = page.getByRole("dialog", { name: prompt });
   await expect(detail).toBeVisible();
-  const comparison = detail.getByRole("slider", { name: "调整源图与结果图的对比分隔线" });
-  await expect(comparison).toHaveValue("50");
-  await comparison.focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(comparison).toHaveValue("55");
-  await page.keyboard.press("End");
-  await expect(comparison).toHaveValue("100");
+  await expect(detail.getByRole("slider", { name: "调整源图与结果图的对比分隔线" })).toHaveCount(0);
+  await expect(detail.getByRole("heading", { name: "关系底片" })).toBeVisible();
+  await expect(detail.getByRole("button", { name: "复制生成信息" })).toBeVisible();
+  await expect(detail.getByRole("button", { name: "标记图片" })).toBeVisible();
   await detail.getByRole("button", { name: "关闭详情" }).click();
 
   await page.getByRole("button", { name: "重置" }).click();
   await expect(page.locator(".library-card")).toHaveCount(2);
-  const createFolderForm = page
-    .locator(".library-mutation-panel form")
-    .filter({ has: page.getByRole("heading", { name: "创建档案夹" }) });
-  await createFolderForm.getByLabel("档案夹名称").fill("Synthetic browser folder");
-  await createFolderForm.getByRole("button", { name: "创建" }).click();
-  await expect(page.locator(".library-mutation-panel__message")).toContainText("create-folder");
-  const renameFolderForm = page
-    .locator(".library-mutation-panel form")
-    .filter({ has: page.getByRole("heading", { name: "重命名档案夹" }) });
-  await renameFolderForm.getByLabel("选择档案夹").selectOption("mock-folder-primary");
-  await renameFolderForm.getByLabel("档案夹名称").fill("Synthetic renamed folder");
-  await renameFolderForm.getByRole("button", { name: "重命名" }).click();
-  await expect(page.locator(".library-mutation-panel__message")).toContainText("rename-folder");
-  await page.getByRole("button", { name: "保存完整顺序" }).click();
-  await expect(page.locator(".library-mutation-panel__message")).toContainText("完整排序");
-
-  await page.getByRole("button", { name: "选择当前页" }).click();
-  await page.getByLabel("Synthetic primary", { exact: true }).check();
-  await page.getByRole("button", { name: "分配到档案夹" }).click();
-  await executeVisiblePreflight(page, "assign-folders");
-  await expect(page.locator(".library-mutation-result")).toHaveAttribute("data-state", "partial");
-  await expect(page.locator(".library-mutation-result li")).toHaveCount(2);
-
-  const selectCurrentPage = page.getByRole("button", { name: /选择当前页|取消当前页选择/ });
-  if ((await selectCurrentPage.textContent())?.includes("选择当前页")) {
-    await selectCurrentPage.click();
-  }
-  await page.getByRole("button", { name: "移入回收站" }).click();
-  await executeVisiblePreflight(page, "soft-delete");
-  await expect(page.locator(".library-mutation-result")).toHaveAttribute("data-state", "partial");
-  if ((await selectCurrentPage.textContent())?.includes("选择当前页")) {
-    await selectCurrentPage.click();
-  }
-  await page.getByRole("button", { name: "导出 ZIP" }).click();
-  await executeVisiblePreflight(page, "export-zip");
-  await expect(page.locator(".library-preflight")).toContainText("export-zip");
-
-  const zipPicker = page.locator(".library-zip-import input[type=file]");
-  await zipPicker.setInputFiles(syntheticZip);
-  await expect(page.getByText("ZIP 已完成上传，可开始导入预检。")).toBeVisible();
-  await page.locator(".library-zip-import__state").getByRole("button", { name: "预检" }).click();
-  await executeVisiblePreflight(page, "import-zip");
-  await expect(page.getByText("ZIP 已单次使用；再次导入必须重新上传。")).toBeVisible();
-
-  await page.getByRole("button", { name: "回收站", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "回收站与保留记录" })).toBeVisible();
-  await expect(page.getByText("30 天保留策略").first()).toBeVisible();
-  await page.getByRole("button", { name: "选择当前页" }).click();
-  await page.getByRole("button", { name: "恢复所选项目" }).click();
-  await executeVisiblePreflight(page, "restore");
-  await expect(page.locator(".library-preflight")).toContainText("restore");
-  const remainingTrashAsset = page.locator('.library-card input[type="checkbox"]').first();
-  await expect(remainingTrashAsset).toBeVisible();
-  if (!(await remainingTrashAsset.isChecked())) {
-    await remainingTrashAsset.check();
-  }
-  const permanentDelete = page.getByRole("button", { name: "永久删除" });
-  await expect(permanentDelete).toBeEnabled();
-  await permanentDelete.click();
-  await executeVisiblePreflight(page, "permanent-delete");
-  await expect(page.locator(".library-preflight")).toContainText("permanent-delete");
+  await expect(page.getByRole("navigation", { name: "档案夹" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "回收站", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "导出 ZIP" })).toHaveCount(0);
+  await expect(page.locator(".library-mutation-panel")).toHaveCount(0);
+  await expect(page.locator('.library-zip-import input[type="file"]')).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 
   const apiText = audit.requests
     .filter((request) => request.url.includes("/api/v1/"))
