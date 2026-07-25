@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "transitionId": "controller-g13-studio-5.6-g10-scope-correction-002",
   "eventFingerprint": "studio-5.6-c127fdba-browser-regression-scope-correction",
-  "state": "awaiting-ack",
-  "resumeState": null,
+  "state": "message-unknown",
+  "resumeState": "awaiting-ack",
   "sourceThreadId": "019f9916-ed2e-74e0-8613-a5b033583244",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "targetThreadId": "019f9916-ed2e-74e0-8613-a5b033583244",
   "completedTaskId": "5.6",
   "nextTaskId": "5.6",
-  "attemptCount": 1,
-  "lastAttemptAt": "2026-07-25T12:19:12.182Z",
-  "lastError": null,
+  "attemptCount": 2,
+  "lastAttemptAt": "2026-07-25T12:20:49.002Z",
+  "lastError": "Initial TASK_DISPATCH included a nonexistent expanded baseline SHA; lane rejected before acceptance.",
   "receiptPath": ".codex/routego-program/dispatch/receipts/controller-g13-studio-5.6-g10-scope-correction-002-checkpoint.json",
   "lastTransitionId": null,
-  "updatedAt": "2026-07-25T12:19:48.257Z"
+  "updatedAt": "2026-07-25T12:20:49.001Z"
 }
