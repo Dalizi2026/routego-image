@@ -211,21 +211,21 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.2-activated",
+      "status": "task-6.2-scope-revised-awaiting-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "6.2",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "8144983fe73b9806f69f4eef15d888594434697a",
+      "currentHead": "82e2627fe6dab99abf0852253ee6c6c3ac17410d",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
-        "sha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
+        "sha256": "c757ccd6f12311454c3a50fe86beb5db6ab11698ad9bd750ef6af80ffa043ca6"
       },
-      "authorizedScope": "Task 6.2 activated for the registered Integration owner; only capsule allowed files may be mutated.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
+      "authorizedScope": "Task 6.2 scope revised to include package builder/verifier ownership; read-only re-acceptance required before reactivation.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
       "lastCompletedTask": "6.1"
     }
   },
@@ -275,13 +275,13 @@
       "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "8144983fe73b9806f69f4eef15d888594434697a",
+      "currentHead": "82e2627fe6dab99abf0852253ee6c6c3ac17410d",
       "observableCompactions": 0,
       "lastCompletedTask": "6.1",
-      "status": "task-6.2-accepted-awaiting-activation",
+      "status": "task-6.2-scope-revised-awaiting-acceptance",
       "taskId": "6.2",
       "taskCapsuleIntegrity": {
-        "canonicalSha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
+        "canonicalSha256": "c757ccd6f12311454c3a50fe86beb5db6ab11698ad9bd750ef6af80ffa043ca6"
       }
     }
   },
