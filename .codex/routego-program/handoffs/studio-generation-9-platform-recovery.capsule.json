@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "977c80aa93dee3330b461719356cea5dab550a9e876008d28426bd82578c76d7",
+  "capsuleSha256": "d31fe18fd954d3b0488444b3d9eb8c206d92f1e12fc0b21cbe328c4cd65f2e5a",
   "lane": "studio",
   "stateRouting": {
     "programLaneKey": "studio",
@@ -18,17 +18,17 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "acceptedProductCommit": "69f6c2bbf65f96741b900fd765d61fce243a6801",
-    "handoffCommit": "c2fa5831cc9c746f95a24e70d93d9c9a0438fc9f",
+    "handoffCommit": "c2fa5830a36ad81a36f6f2af4c5801b6dd981fc7",
     "handoffParent": "69f6c2bbf65f96741b900fd765d61fce243a6801"
   },
   "successor": {
     "threadId": "pending",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
-    "startingCommit": "c2fa5831cc9c746f95a24e70d93d9c9a0438fc9f",
+    "startingCommit": "c2fa5830a36ad81a36f6f2af4c5801b6dd981fc7",
     "registrationStatus": "registered-awaiting-handoff-acceptance",
     "registrationAttempt": 1,
-    "verifiedHeadBeforeContainingCommit": "c2fa5831cc9c746f95a24e70d93d9c9a0438fc9f",
+    "verifiedHeadBeforeContainingCommit": "c2fa5830a36ad81a36f6f2af4c5801b6dd981fc7",
     "incorporationCommit": null
   },
   "currentState": {
@@ -112,7 +112,7 @@
     "actualStartupBytes": 42397,
     "budgetRole": "lane",
     "budgetValidatedBeforeSuccessorCreation": true,
-    "budgetValidatedAt": "2026-07-25T04:44:21.375Z",
+    "budgetValidatedAt": "2026-07-25T04:46:11.509Z",
     "successorCreationMethod": "create-thread-local-no-fork"
   },
   "git": {
