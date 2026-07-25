@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-13-studio-5.6-accepted-task-6.1-blocked",
+  "status": "mandatory-context-handoff-after-task-6.1-integrity-safe-checkpoint",
   "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -11,8 +11,8 @@
   "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
   "generation": 13,
   "authoritative": true,
-  "observableCompactions": 0,
-  "lastCompactionFingerprint": null,
+  "observableCompactions": 3,
+  "lastCompactionFingerprint": "controller-g13-observed-multiple-automatic-compactions-2026-07-25",
   "lastHealthAudit": {
     "status": "passed",
       "workspaceHead": "057497869d777427c2c6ffaddd827b26c8d91fbd",
@@ -24,12 +24,12 @@
       "independentVerification": "Task 5.6 controller reproduction passed Studio typecheck, 19 test files/103 tests, production build, dead-surface scan, git diff check, and clean-Git workflow doctor."
   },
   "currentOperation": {
-    "id": "task-6.1-external-dependency-approval-and-capsule-reconciliation",
-    "allowedNext": "Do not activate Task 6.1 until the external dependency approval gate is executable and its task capsule matches the current OpenSpec task definition.",
+    "id": "task-6.1-user-approval-recorded-runtime-integrity-resolution",
+    "allowedNext": "Resolve a runtime artifact that matches its official integrity declaration, record its SHA-256 and measured size, then complete Task 6.1 before dispatching Task 6.2.",
     "forbidden": [
       "Product code outside each task exact owner scope",
       "package.json or pnpm-lock.yaml changes",
-      "network access, dependency installation, credentials, real images or provider requests",
+      "Installing or packaging an artifact that fails its official integrity declaration, credentials, real images or provider requests",
       "real Library migration, plugin installation, deployment, publishing or release"
     ]
   },
@@ -46,6 +46,8 @@
   },
   "reportingContractAcknowledged": true,
   "lowContextLosslessHandoffAcknowledged": true,
+  "networkAuthorized": true,
+  "packageInstallationAuthorized": true,
   "externalStateAuthorized": false,
   "history": {
     "previousStateCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "491eff277a0a2e3583714aecbccc5b156d739e006d8f9ea7a37667c34cc95598",
+  "lane": "approval-gate",
+  "change": "streamline-routego-image-generation",
+  "taskId": "6.1",
+  "status": "blocked-integrity-verification-after-user-authorization",
+  "sourceCommit": "01a35135b648c11a274ab015acf150236af3274d",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "a9c96b99f729330bcfac66c5914114d3b8947f0ba7c054b453207de274cb4651",
+    "lineSha256": "5efe39b48b8fdc3408e51da51ba7d7d7e9124d7be8f24620d422a03e78083032",
+    "lineBytes": 330
+  },
+  "dependencies": ["2.4", "4.5"],
+  "allowedFiles": [
+    ".codex/routego-program/authority-summary.md",
+    ".codex/routego-program/evidence/streamline-6.1-external-resource-approval.json",
+    ".codex/routego-program/program.json",
+    ".codex/routego-program/tasks/streamline-approval-6.1.json",
+    ".codex/routego-program/threads/controller.json",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    ".codex-plugin/**",
+    "skills/**",
+    "scripts/**",
+    "tests/**"
+  ],
+  "requiredBehavior": [
+    "Record the user's explicit authorization for network downloads, dependency installation, and scoped workflow-rule amendment before any project dependency acquisition.",
+    "Record U-2-Netp and ONNX Runtime Web/WASM versions, licenses, upstream sources, hashes, and measured sizes.",
+    "Reject any downloaded runtime artifact whose bytes do not match its official registry integrity declaration; do not add it to the project or mark Task 6.1 complete.",
+    "Keep real provider requests, credentials, user images, Library migration, installed-plugin replacement, deployment, publication, and release unauthorized."
+  ],
+  "verification": [
+    "official U-2-Netp release size and SHA-256 reconstructed from exact HTTP ranges",
+    "official U-2-Netp upstream MD5 declaration matches reconstructed file",
+    "official ONNX Runtime Web registry metadata captured",
+    "downloaded ONNX Runtime Web bytes compared against official npm SHA-512 integrity and rejected on mismatch",
+    "git diff --check",
+    "workflow-doctor --mode controller --require-clean after commit"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/local-background-removal/spec.md",
+      "sha256": "8bc15925c68fa2160a7b05a1f6a29172820e7a21a603f77092e4692f82768a51",
+      "reason": "Pinned model and WASM package resources must be verified and runtime must not download them."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "reason": "Defines U-2-Netp with ONNX Runtime Web/WASM, no native add-ons, and recorded resource integrity."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-6.1-controller-approval-record-and-supply-chain-integrity-gate",
+  "externalStateAuthorized": false,
+  "networkAuthorized": true,
+  "packageInstallationAuthorized": true,
+  "targetPluginInstallationAuthorized": false,
+  "reportingContract": "Controller records the user authorization and integrity evidence. Task 6.1 cannot be checked off or dispatch Task 6.2 until every approved package artifact is cryptographically verified."
+}

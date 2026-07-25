@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "e7add4d3670d52233ecc3f663434174d14a4e79cbf9cc24afa08d558f9c217e8",
+  "event": "streamline-task-6.1-user-authorization-and-resource-integrity-audit",
+  "change": "streamline-routego-image-generation",
+  "taskId": "6.1",
+  "status": "blocked-runtime-artifact-integrity-mismatch",
+  "recordedAt": "2026-07-25T13:18:00.000Z",
+  "userAuthorization": {
+    "source": "Current Controller conversation on 2026-07-25",
+    "authorization": "The user explicitly authorized modifying the prior external-access rule, network downloads, and installation of new dependencies.",
+    "scope": [
+      "Acquire and inspect U-2-Netp and ONNX Runtime Web/WASM resources for this OpenSpec change.",
+      "Install only dependencies that pass the recorded cryptographic verification."
+    ],
+    "stillForbidden": [
+      "Real provider requests or billing probes",
+      "Credentials, user images, or real Library data",
+      "Real Library migration",
+      "Replacing the installed plugin, deployment, publication, or release"
+    ]
+  },
+  "acquisitionOrdering": {
+    "userAuthorizationPrecededTemporaryDownloads": true,
+    "projectDependencyOrSourceMutationBeforeRecord": false,
+    "note": "Temporary files outside the project were used only to verify upstream bytes after the user authorization; no package, lockfile, model, WASM resource, or product source was added to the project."
+  },
+  "resources": [
+    {
+      "name": "U-2-Netp ONNX model",
+      "version": "rembg release v0.0.0 asset u2netp.onnx",
+      "license": "Apache-2.0 (U-2-Net upstream)",
+      "upstream": "https://github.com/xuebinqin/U-2-Net and https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx",
+      "sizeBytes": 4574861,
+      "sha256": "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8",
+      "md5": "8e83ca70e441ab06c318d82300c84806",
+      "verification": "Exact HTTP ranges reconstructed to the official 4,574,861-byte release size. The SHA-256 was calculated over ordered ranges and the MD5 matches rembg's declared upstream value.",
+      "approval": "approved-for-later-task-6.2-acquisition"
+    },
+    {
+      "name": "ONNX Runtime Web/WASM",
+      "version": "onnxruntime-web@1.20.1",
+      "license": "MIT",
+      "upstream": "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz",
+      "registryIntegrity": "sha512-TePF6XVpLL1rWVMIl5Y9ACBQcyCNFThZON/jgElNd9Txb73CIEGlklhYR3UEr1cp5r0rbGI6nDwwrs79g7WjoA==",
+      "registryShasumSha1": "71dc4495bb75cdd56a9dc981cf27723a599189f7",
+      "registryUnpackedSizeBytes": 96005696,
+      "observedRangeResponseSizeBytes": 20439316,
+      "observedSha256": "a543bb2d130b9516afbd7eda6bfb485753e128850a9e7bbe00659bc20327625f",
+      "observedSha512": "tBOUcfX+LJx5QArbZG38rSy5TauoPZ6yQs9V3gDpAuo79EowEYedCEadwMtntOaWfkkO61a0VPiZ+OZceXqSNA==",
+      "verification": "The server honored exact byte ranges, but the reconstructed response does not match the official npm SHA-512 integrity or SHA-1 shasum. The tar stream also fails to list completely. This source response is rejected and must not be installed or packaged.",
+      "approval": "rejected-pending-independent-official-artifact-resolution"
+    }
+  ],
+  "packageSizeImpact": {
+    "verifiedModelBytes": 4574861,
+    "runtimeRegistryUnpackedBytes": 96005696,
+    "verifiedCombinedPackagedImpact": null,
+    "reason": "Combined packaged impact remains intentionally unmeasured because the required runtime artifact failed integrity verification and is not approved for packaging."
+  },
+  "nextRequiredAction": "Resolve a cryptographically valid official ONNX Runtime Web/WASM distribution, record its SHA-256 and measured package impact, then complete Task 6.1 before dispatching Task 6.2.",
+  "externalStateAuthorized": false
+}

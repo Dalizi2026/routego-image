@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-studio-5.6-accepted-task-6.1-blocked",
+  "status": "controller-generation-13-mandatory-context-handoff-after-task-6.1-integrity-safe-checkpoint",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -59,7 +59,7 @@
   "productPlan": "routego-image-1.0-plan.md",
   "authoritySummary": {
     "path": ".codex/routego-program/authority-summary.md",
-    "sha256": "a71ad03124c05eded3c80d75ab1caa8dc6ad42a7774f87d077956902a4842d91"
+    "sha256": "1e730f31537bd3dffe0c09383db7aa135c82f889d01de2ff3d8c4e0091cd2fd8"
   },
   "governance": {
     "activeDecisions": [
@@ -113,8 +113,8 @@
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
     "status": "authoritative-controller-generation-13-studio-g9-platform-recovery-registration",
     "authoritative": true,
-    "observableCompactions": 0,
-    "lastCompactionFingerprint": null
+    "observableCompactions": 3,
+    "lastCompactionFingerprint": "controller-g13-observed-multiple-automatic-compactions-2026-07-25"
   },
   "lastApplyOwner": {
     "lane": "streamline",
@@ -331,7 +331,7 @@
     {
       "taskId": "6.1",
       "status": "blocked-recorded",
-      "reason": "Task 6.1 requires external U-2-Netp/ONNX Runtime download and authoritative upstream version, license, SHA-256, and measured-size evidence before acquisition. Current execution policy prohibits network and dependency installation; existing integration-6.1 capsule also does not match the current OpenSpec task definition.",
+      "reason": "The user has authorized U-2-Netp/ONNX Runtime downloads and dependency installation, and a current Task 6.1 capsule now exists. U-2-Netp verifies successfully, but the exact-range ONNX Runtime Web 1.20.1 registry response does not match npm's official SHA-512 integrity or SHA-1 shasum and its tar stream is incomplete. It must not be installed or packaged until an independently valid official artifact is resolved.",
       "externalStateAuthorized": false
     }
   ],
@@ -349,7 +349,7 @@
     }
   ],
   "currentRisks": [
-    "Only local, offline contract work is currently authorized; real providers, credentials, images, migrations, installation, deployment and release remain prohibited.",
+    "User authorization permits U-2-Netp/ONNX Runtime Web/WASM downloads, integrity inspection, and installation only after each resource matches its recorded official integrity value; real providers, credentials, images, migrations, installed-plugin replacement, deployment and release remain prohibited.",
     "The legacy integrate-routego-image-plugin change remains separately blocked at task 9.1 by missing Windows and Ubuntu CI evidence.",
     "Task 4.1 must read only .codex/routego-program/threads/streamline-integration.json through its explicit state-routing key; .codex/routego-program/threads/integration.json is legacy history and must not be used to activate or authorize streamline work.",
     "User-approved workspace consolidation prohibits new project directories, Git worktrees, clones, successor folders and persistent test directories without fresh explicit approval; future visible threads must reuse the existing controller-g12 worktree."

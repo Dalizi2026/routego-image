@@ -54,6 +54,7 @@
 ## 外部授权和安全
 
 - 不提交或暴露真实 API key、认证值、用户图片、本地配置、真实 Library/relay 数据、图片 data URL 或敏感日志。
-- 未经用户当前明确批准，不执行 billable probe/request、安装替换、marketplace、部署、发布、迁移、删除或 release。
+- 用户已于 2026-07-25 明确批准本 change 的 U-2-Netp 与 ONNX Runtime Web/WASM 联网下载、完整性检查和新依赖安装；只有通过记录的官方完整性校验的资源可以加入项目。当前 npm 下载响应与官方 ONNX Runtime Web 完整性签名不一致，仍不得安装或打包。
+- 未经用户当前明确批准，不执行 billable probe/request、marketplace、部署、发布、迁移、删除或 release。
 - Integration 7.2、8.2、9.1 需要新的用户明确批准。
 - 不使用 git reset --hard 或破坏性 checkout；保留用户未提交修改；共享历史用修复提交或 revert。
