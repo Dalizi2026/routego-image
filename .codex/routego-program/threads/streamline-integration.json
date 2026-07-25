@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "task-6.2-integration-recovery-owner",
-  "status": "task-6.2-scope-revised-awaiting-acceptance",
+  "status": "task-6.2-revised-accepted-awaiting-activation",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
@@ -17,7 +17,7 @@
   "applyAuthorized": false,
   "currentTask": {
     "id": "6.2",
-    "status": "scope-revised-awaiting-acceptance",
+    "status": "revised-accepted-awaiting-activation",
     "locked": true
   },
   "sourceOwner": {
