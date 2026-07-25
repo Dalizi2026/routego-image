@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "85939b00315ddfbe254beee8a1b57e79727bf35a5257204a4edea9c4cf88a058",
+  "lane": "studio",
+  "change": "streamline-routego-image-generation",
+  "taskId": "5.6",
+  "status": "planned-ready-for-dispatch",
+  "sourceCommit": "cbcbefec6132d2f1b63864fef27f77839aa1d1c7",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "09a3c57260a69e5ee9fe13b2e775b02f6b03a12b140c94e342b08adfd590c1f4",
+    "lineSha256": "9a1a6d504d8585733783029d1bb534c8d8b8f6b84b8d740e84431f0bfa17ac9d"
+  },
+  "dependencies": ["5.1", "5.2", "5.3", "5.4", "5.5"],
+  "allowedFiles": [
+    "packages/studio/",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/integration/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**"
+  ],
+  "requiredBehavior": [
+    "Cover the generation-only Studio loading, empty, success, failure, partial-result, and cancellation states without restoring edit, mask, upload, capability-probe, or Trash behavior.",
+    "Repair Studio typecheck, build, unit-test, and scoped browser visual failures at their source within Studio ownership.",
+    "Verify desktop and mobile layouts for overflow and overlap while preserving the Phase 1 visual design."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/studio typecheck",
+    "pnpm --filter @routego-image/studio test",
+    "pnpm --filter @routego-image/studio build",
+    "pnpm test:browser",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-application-shell/spec.md",
+      "sha256": "97b70925bf28811730ed6efe4ed4b0c38769604dbcd7ac1b9231397480391900",
+      "reason": "Accessible application navigation and visual shell states."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-creation-workbench/spec.md",
+      "sha256": "ae1a5e1809e045c9f5b00c9ee9931e1d8e322059224038c1de930a2e0090e9dc",
+      "reason": "Generation-only creation state and cancellation behavior."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/studio-library-experience/spec.md",
+      "sha256": "e9415fcbe56ace8f1934d0a336c3ba330ca3a007abf1445d15762550dce9e5d0",
+      "reason": "Browser-safe Library loading, empty, and result states."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "reason": "Studio quality and visual verification scope."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-5.6-studio-quality-and-browser-verification",
+  "externalStateAuthorized": false,
+  "reportingContract": "The sole Studio apply owner must send a structured checkpoint to Controller and read Controller to confirm delivery after implementation, verification, task-state commit, or a blocker."
+}
