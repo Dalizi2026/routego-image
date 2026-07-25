@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "transitionId": "controller-g13-studio-5.6-g10-20260725-001",
-  "eventFingerprint": null,
+  "eventFingerprint": "studio-5.5-complete-cbcbefe-studio-5.6-dispatch",
   "state": "awaiting-ack",
   "resumeState": null,
   "sourceThreadId": null,
@@ -9,10 +9,10 @@
   "targetThreadId": "019f9916-ed2e-74e0-8613-a5b033583244",
   "completedTaskId": "5.5",
   "nextTaskId": "5.6",
-  "attemptCount": 1,
-  "lastAttemptAt": "2026-07-25T11:50:42.447Z",
+  "attemptCount": 2,
+  "lastAttemptAt": "2026-07-25T11:53:02.236Z",
   "lastError": null,
   "receiptPath": null,
   "lastTransitionId": null,
-  "updatedAt": "2026-07-25T11:50:42.537Z"
+  "updatedAt": "2026-07-25T11:53:02.323Z"
 }
