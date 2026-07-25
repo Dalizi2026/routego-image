@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "a39c245bf98f5b540e78c4ef9cb28167c91ce59a58568f86859ea1764a4d2a8e",
+  "contentSha256": "19b52fdfc66d8791c82c7c374977a21afcb08c13faafadc526644c53c9f67639",
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "taskId": "5.6",
-  "status": "scope-correction-activated-generation-only-browser-regression",
+  "status": "source-correction-ready-stream-presentation-typecheck",
   "sourceCommit": "cbcbefec6132d2f1b63864fef27f77839aa1d1c7",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -31,6 +31,7 @@
     "Cover the generation-only Studio loading, empty, success, failure, partial-result, and cancellation states without restoring edit, mask, upload, capability-probe, or Trash behavior.",
     "Repair Studio typecheck, build, unit-test, and scoped browser visual failures at their source within Studio ownership.",
     "Replace only stale browser assertions in tests/browser/studio.spec.ts that require batch-queue, capability-probe, upload/edit, Trash, ZIP, or other removed behavior with generation-only state, accessibility, and responsive-layout assertions.",
+    "Repair the CreationWorkbench stream-presentation union so the non-retry streaming branch has the same optional manualRetryWarning shape read by its JSX, without adding retry behavior.",
     "Verify desktop and mobile layouts for overflow and overlap while preserving the Phase 1 visual design."
   ],
   "verification": [
@@ -73,6 +74,11 @@
     "scopeCorrectionAcceptance": "9bcab994dce037bdbd7a87b3592daaf3d449dbbc",
     "soleApplyOwner": true,
     "applyAuthorized": true
+  },
+  "sourceCorrection": {
+    "path": "packages/studio/src/features/creation/CreationWorkbench.tsx",
+    "reason": "TS2339 at the stream-presentation union read of manualRetryWarning after the accepted browser-regression checkpoint",
+    "allowedBehavior": "Unify the optional display shape only; do not restore retry, edit, upload, mask, capability-probe, Trash, ZIP, or batch behavior."
   },
   "externalStateAuthorized": false,
   "reportingContract": "The sole Studio apply owner must send a structured checkpoint to Controller and read Controller to confirm delivery after implementation, verification, task-state commit, or a blocker."
