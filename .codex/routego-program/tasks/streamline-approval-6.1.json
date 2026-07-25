@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "491eff277a0a2e3583714aecbccc5b156d739e006d8f9ea7a37667c34cc95598",
+  "contentSha256": "0c762d59437dbf2697183b89e79023e8dece6392369209a4adb9b63a54420e41",
   "lane": "approval-gate",
   "change": "streamline-routego-image-generation",
   "taskId": "6.1",
-  "status": "blocked-integrity-verification-after-user-authorization",
+  "status": "approved-resources-ready-for-checkoff",
   "sourceCommit": "01a35135b648c11a274ab015acf150236af3274d",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -12,7 +12,10 @@
     "lineSha256": "5efe39b48b8fdc3408e51da51ba7d7d7e9124d7be8f24620d422a03e78083032",
     "lineBytes": 330
   },
-  "dependencies": ["2.4", "4.5"],
+  "dependencies": [
+    "2.4",
+    "4.5"
+  ],
   "allowedFiles": [
     ".codex/routego-program/authority-summary.md",
     ".codex/routego-program/evidence/streamline-6.1-external-resource-approval.json",

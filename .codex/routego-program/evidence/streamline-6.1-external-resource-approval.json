@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "c60e825d473d48be1e5bd5e9b33762907f508b9c5661983f34ac62944e7021a1",
+  "contentSha256": "fa63ecf8b9d8b4e3048b63a7d04bd9f7180ee60633c2df4b89f20851b0c6adfd",
   "event": "streamline-task-6.1-user-authorization-and-resource-integrity-audit",
   "change": "streamline-routego-image-generation",
   "taskId": "6.1",
-  "status": "blocked-official-runtime-distribution-path-integrity-unresolved",
+  "status": "approved-resources-task-6.1-ready-for-checkoff",
   "recordedAt": "2026-07-25T13:18:00.000Z",
   "userAuthorization": {
     "source": "Current Controller conversation on 2026-07-25",
@@ -48,8 +48,15 @@
       "observedRangeResponseSizeBytes": 20439316,
       "observedSha256": "a543bb2d130b9516afbd7eda6bfb485753e128850a9e7bbe00659bc20327625f",
       "observedSha512": "tBOUcfX+LJx5QArbZG38rSy5TauoPZ6yQs9V3gDpAuo79EowEYedCEadwMtntOaWfkkO61a0VPiZ+OZceXqSNA==",
-      "verification": "The server honored exact byte ranges, but the reconstructed response does not match the official npm SHA-512 integrity or SHA-1 shasum. The tar stream also fails to list completely. This source response is rejected and must not be installed or packaged.",
-      "approval": "rejected-pending-independent-official-artifact-resolution"
+      "verification": "Official npm metadata matched an independently reconstructed 20,439,316-byte archive from ordered 65,536-byte HTTP ranges. SHA-1, SHA-512 SRI, SHA-256, tar listing, package version, and license all match.",
+      "archiveBytes": 20439316,
+      "sha256": "0a38facf0672dfaaeaf352e8a9f44533732b60b4af93b9dd507fe7c2d2be437b",
+      "verifiedSha1": "71dc4495bb75cdd56a9dc981cf27723a599189f7",
+      "verifiedSha512Base64": "TePF6XVpLL1rWVMIl5Y9ACBQcyCNFThZON/jgElNd9Txb73CIEGlklhYR3UEr1cp5r0rbGI6nDwwrs79g7WjoA==",
+      "tarFileCount": 375,
+      "packageVersion": "1.20.1",
+      "packageLicense": "MIT",
+      "approval": "approved-for-task-6.2-acquisition"
     }
   ],
   "independentNpmCacheReproduction": {
@@ -67,16 +74,17 @@
       "declaredArchiveBytes": 20439316,
       "rangeSizeBytes": 262144,
       "parallelRanges": 78,
-      "result": "The registry honored byte ranges but one required range returned 28672 bytes instead of 262144; the complete archive could not be reconstructed. No concatenated stream was hashed or extracted."
+      "result": "The earlier 256KiB attempt had one short range. A subsequent serial 64KiB retry completed all 312 ranges at exact lengths and reconstructed the official archive."
     },
-    "disposition": "No newly downloaded artifact is approved, no SHA-256 is recorded for an unverified artifact, and Task 6.1 remains incomplete. This does not override the earlier rejected range response."
+    "disposition": "The earlier truncated response is rejected. The independently reconstructed 64KiB-range archive is approved after all official integrity and package checks."
   },
   "packageSizeImpact": {
     "verifiedModelBytes": 4574861,
     "runtimeRegistryUnpackedBytes": 96005696,
-    "verifiedCombinedPackagedImpact": null,
-    "reason": "Combined packaged impact remains intentionally unmeasured because the required runtime artifact failed integrity verification and is not approved for packaging."
+    "runtimeArchiveBytes": 20439316,
+    "verifiedCombinedPackagedImpact": 25008177,
+    "reason": "Measured model plus verified runtime archive bytes; package metadata and license files add additional small overhead in Task 6.2."
   },
-  "nextRequiredAction": "A fresh Controller successor must use an independent official npm distribution path that produces a complete archive, then require official SHA-512 SRI and SHA-1 matches, a complete tar listing, package version/license inspection, SHA-256 recording, and measured package impact before completing Task 6.1. Task 6.2 remains locked until then.",
+  "nextRequiredAction": "Check off Task 6.1 after commit and activate Task 6.2 for pinned offline resource packaging. Do not install or replace the current plugin.",
   "externalStateAuthorized": false
 }
