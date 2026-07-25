@@ -94,6 +94,7 @@ const copy = {
     effective: "实际参数",
     billing: "可能计费",
     output: "已收到输出",
+    retryDraft: "以当前草稿再次提交",
     yes: "是",
     no: "否"
   },
@@ -118,6 +119,7 @@ const copy = {
     effective: "Effective parameters",
     billing: "May have billed",
     output: "Received output",
+    retryDraft: "Submit the current draft again",
     yes: "Yes",
     no: "No"
   }
@@ -143,6 +145,16 @@ function ResultPanel({
         <h2>{presentation.title}</h2>
       </div>
       {result.error ? <p className="creation-result__error">{result.error.safeMessage}</p> : null}
+      {presentation.manualRetryWarning ? (
+        <>
+          <p className="creation-result__warning" role="status">
+            {presentation.manualRetryWarning}
+          </p>
+          <button className="studio-button" type="button" disabled>
+            {labels.retryDraft}
+          </button>
+        </>
+      ) : null}
       <div className="creation-result__artifacts">
         {artifacts.map((artifact) => (
           <article className="result-card" key={artifact.artifactId}>
@@ -184,10 +196,12 @@ function ResultPanel({
 }
 
 function StreamResultPanel({
+  gateway,
   state,
   labels,
   onCancel
 }: {
+  readonly gateway: StudioGateway;
   readonly state: Extract<SubmissionState, { readonly status: "streaming" | "stream-failure" }>;
   readonly labels: CreationLabels;
   readonly onCancel: () => void;
@@ -214,6 +228,36 @@ function StreamResultPanel({
         <p className="creation-result__error" role="alert">
           {state.safeMessage}
         </p>
+      ) : null}
+      {presentation.manualRetryWarning ? (
+        <>
+          <p className="creation-result__warning" role="status">
+            {presentation.manualRetryWarning}
+          </p>
+          <button className="studio-button" type="button" disabled>
+            {labels.retryDraft}
+          </button>
+        </>
+      ) : null}
+      {state.partialArtifacts.length > 0 ? (
+        <div className="creation-result__artifacts">
+          {state.partialArtifacts.map((artifact) => (
+            <article
+              className="result-card"
+              key={artifact.artifactId}
+              data-resource-id={artifact.resource.resourceId}
+              data-browser-object-url-cleanup="true"
+              data-server-descriptor-revocation="false"
+            >
+              <ProtectedImage
+                gateway={gateway}
+                descriptor={artifact.resource}
+                alt="Streamed partial result"
+              />
+              <time dateTime={artifact.resource.expiresAt}>{artifact.resource.expiresAt}</time>
+            </article>
+          ))}
+        </div>
       ) : null}
       <dl className="creation-result__facts">
         <div>
@@ -490,6 +534,7 @@ export function CreationWorkbench({
       ) : null}
       {submission.status === "streaming" || submission.status === "stream-failure" ? (
         <StreamResultPanel
+          gateway={gateway}
           state={submission}
           labels={labels}
           onCancel={cancelActiveStream}

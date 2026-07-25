@@ -268,7 +268,7 @@ export function HeaderProviderSelector({
     try {
       const result = await gateway.invoke("setActiveProviderProfile", {
         schemaVersion: 1,
-        providerId
+        profileId: providerId
       });
       if (!isValidatedActiveProviderResult(result, providerId)) {
         throw new Error("Invalid provider activation response.");

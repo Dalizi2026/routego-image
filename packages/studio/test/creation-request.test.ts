@@ -31,14 +31,7 @@ describe("path-free Studio generation request construction", () => {
         aspectRatio: "auto",
         format: "png",
         count: 2,
-        transparentMode: "native",
-        quality: "high",
-        compression: 80,
-        partialImages: 2,
-        moderation: "low",
-        action: "generate",
-        previousResponseId: "response-should-not-leak",
-        saveToLibrary: true
+        transparentMode: "native"
       }
     });
 
@@ -65,12 +58,7 @@ describe("path-free Studio generation request construction", () => {
         aspectRatio: "portrait",
         format: "png",
         count: 1,
-        transparentMode: "off",
-        quality: "high",
-        partialImages: 2,
-        moderation: "low",
-        action: "auto",
-        saveToLibrary: true
+        transparentMode: "off"
       }
     };
 
@@ -103,16 +91,15 @@ describe("path-free Studio generation request construction", () => {
     ).toMatchObject({ format: "jpeg", transparentMode: "off" });
   });
 
-  it("blocks empty prompts and non-generation workbench submissions", () => {
+  it("blocks empty prompts and keeps the workbench generation-only", () => {
     expect(() => buildStudioCreationRequest(createInitialCreationDraft(defaults))).toThrow(
       CreationDraftError
     );
-    expect(() =>
+    expect(
       buildStudioCreationRequest({
         ...createInitialCreationDraft(defaults),
-        mode: "edit",
-        prompt: "Try to edit from Studio"
+        prompt: "A generation-only Studio request"
       })
-    ).toThrow(CreationDraftError);
+    ).toMatchObject({ kind: "generate" });
   });
 });

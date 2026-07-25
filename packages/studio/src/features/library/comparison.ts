@@ -48,7 +48,7 @@ export function selectComparisonRelationships(asset: LibraryAssetDetail): {
   return {
     source:
       ordered.find((relationship) => relationship.role === "source") ??
-      ordered.find((relationship) => relationship.role === "target"),
+      ordered.find((relationship) => relationship.role === "reference"),
     output: ordered.find((relationship) => relationship.role === "output")
   };
 }

@@ -176,6 +176,8 @@ export async function consumeCreationStream(
     )) {
       state = transitionCreationStreamState(state, event);
       options.onState?.(state);
+      // Let React commit each validated stream state so users can see progress.
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
     }
     if (state.status !== "result" && state.status !== "stream-failure") {
       throw new CreationStreamStateError();

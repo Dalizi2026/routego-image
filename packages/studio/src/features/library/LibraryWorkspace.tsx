@@ -17,7 +17,6 @@ import type { StudioGateway } from "../../api";
 import { AsyncStatePanel, ProtectedImage } from "../../components";
 import { useI18n } from "../../i18n";
 import { ImageComparison } from "./ImageComparison";
-import { LibraryMutationPanel } from "./LibraryMutationPanel";
 import {
   orderedLibraryRelationships,
   relationshipResourceInput,
@@ -1018,16 +1017,6 @@ export function LibraryWorkspace({
           ))}
         </div>
       )}
-
-      <LibraryMutationPanel
-        gateway={gateway}
-        view="library"
-        folders={folderState.status === "ready" ? folderState.folders : []}
-        selectedAssetIds={selectedAssetIds}
-        onFoldersChange={(folders) => setFolderState({ status: "ready", folders })}
-        onMutationResult={handleMutationResult}
-        onRefresh={refreshLibraryState}
-      />
 
       <nav className="library-pagination" aria-label={`${labels.page} ${page.index + 1}`}>
         <button

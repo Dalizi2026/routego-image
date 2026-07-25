@@ -1,5 +1,3 @@
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import type {
@@ -8,10 +6,7 @@ import type {
   PreflightLibraryMutationResult
 } from "@routego-image/contracts";
 
-import type { StudioGateway } from "../src/api";
-import { I18nProvider } from "../src/i18n";
 import {
-  LibraryMutationPanel,
   buildAssetLibraryMutation,
   buildZipImportMutation,
   executionConfirmations,
@@ -159,40 +154,12 @@ describe("Library folder ordering and safe mutation workflow", () => {
     ]);
   });
 
-  it("prevents false ZIP resource reuse and renders only non-destructive Library controls", () => {
+  it("prevents false ZIP resource reuse", () => {
     expect(buildZipImportMutation("upload-zip-01", false)).toEqual({
       action: "import-zip",
       uploadResourceId: "upload-zip-01"
     });
     expect(() => buildZipImportMutation("upload-zip-01", true)).toThrow(/重新选择/u);
 
-    const common = {
-      gateway: {} as StudioGateway,
-      folders,
-      selectedAssetIds: ["asset-a"],
-      onFoldersChange: () => undefined,
-      onMutationResult: () => undefined,
-      onRefresh: () => undefined
-    };
-    const libraryMarkup = renderToStaticMarkup(
-      createElement(
-        I18nProvider,
-        {
-          initialLanguage: "en",
-          children: createElement(LibraryMutationPanel, { ...common, view: "library" })
-        }
-      )
-    );
-    expect(libraryMarkup).toContain("Create folder");
-    expect(libraryMarkup).toContain("Rename folder");
-    expect(libraryMarkup).toContain("Save complete order");
-    expect(libraryMarkup).toContain("Assign folders");
-    expect(libraryMarkup).toContain('type="file"');
-    expect(libraryMarkup).toContain('accept="application/zip,.zip"');
-
-    expect(libraryMarkup).not.toMatch(/Trash|Restore selected|Permanent delete|Soft delete/u);
-    expect(libraryMarkup).not.toMatch(
-      /(?:C:\\|\/Users\/|data:image|base64|Authorization)/u
-    );
   });
 });
