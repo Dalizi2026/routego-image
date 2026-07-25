@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "transitionId": null,
+  "transitionId": "controller-g13-studio-5.6-g10-20260725-001",
   "eventFingerprint": null,
-  "state": "idle",
+  "state": "awaiting-ack",
   "resumeState": null,
   "sourceThreadId": null,
-  "controllerThreadId": null,
-  "targetThreadId": null,
-  "completedTaskId": null,
-  "nextTaskId": null,
-  "attemptCount": 0,
-  "lastAttemptAt": null,
+  "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+  "targetThreadId": "019f9916-ed2e-74e0-8613-a5b033583244",
+  "completedTaskId": "5.5",
+  "nextTaskId": "5.6",
+  "attemptCount": 1,
+  "lastAttemptAt": "2026-07-25T11:50:42.447Z",
   "lastError": null,
   "receiptPath": null,
-  "lastTransitionId": "controller-g13-studio-5.5-g9-platform-recovery-20260725-001",
-  "updatedAt": "2026-07-25T11:01:12.287Z"
+  "lastTransitionId": null,
+  "updatedAt": "2026-07-25T11:50:42.537Z"
 }
