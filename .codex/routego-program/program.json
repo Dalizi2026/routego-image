@@ -211,7 +211,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.2-revised-accepted-awaiting-activation",
+      "status": "task-6.2-revised-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
@@ -223,9 +223,9 @@
         "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
         "sha256": "c757ccd6f12311454c3a50fe86beb5db6ab11698ad9bd750ef6af80ffa043ca6"
       },
-      "authorizedScope": "Task 6.2 revised scope accepted; awaiting revised TASK_ACTIVATED before writer lease and product mutation.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 6.2 revised scope activated; only capsule allowed runtime and package-builder/verifier files may be mutated.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "6.1"
     }
   },
@@ -278,7 +278,7 @@
       "currentHead": "82e2627fe6dab99abf0852253ee6c6c3ac17410d",
       "observableCompactions": 0,
       "lastCompletedTask": "6.1",
-      "status": "task-6.2-revised-accepted-awaiting-activation",
+      "status": "task-6.2-revised-activated",
       "taskId": "6.2",
       "taskCapsuleIntegrity": {
         "canonicalSha256": "c757ccd6f12311454c3a50fe86beb5db6ab11698ad9bd750ef6af80ffa043ca6"
