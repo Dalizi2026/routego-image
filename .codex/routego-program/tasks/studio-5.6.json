@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "85939b00315ddfbe254beee8a1b57e79727bf35a5257204a4edea9c4cf88a058",
+  "contentSha256": "6d4936f173230e989d9e9826a477cca92af4f705d73c5330e70d2b345509b326",
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "taskId": "5.6",
-  "status": "planned-ready-for-dispatch",
+  "status": "scope-correction-ready-after-stale-browser-regression-audit",
   "sourceCommit": "cbcbefec6132d2f1b63864fef27f77839aa1d1c7",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -14,6 +14,7 @@
   "dependencies": ["5.1", "5.2", "5.3", "5.4", "5.5"],
   "allowedFiles": [
     "packages/studio/",
+    "tests/browser/studio.spec.ts",
     "openspec/changes/streamline-routego-image-generation/tasks.md"
   ],
   "forbiddenFileGlobs": [
@@ -29,6 +30,7 @@
   "requiredBehavior": [
     "Cover the generation-only Studio loading, empty, success, failure, partial-result, and cancellation states without restoring edit, mask, upload, capability-probe, or Trash behavior.",
     "Repair Studio typecheck, build, unit-test, and scoped browser visual failures at their source within Studio ownership.",
+    "Replace only stale browser assertions in tests/browser/studio.spec.ts that require batch-queue, capability-probe, upload/edit, Trash, ZIP, or other removed behavior with generation-only state, accessibility, and responsive-layout assertions.",
     "Verify desktop and mobile layouts for overflow and overlap while preserving the Phase 1 visual design."
   ],
   "verification": [
