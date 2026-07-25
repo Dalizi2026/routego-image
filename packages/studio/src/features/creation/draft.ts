@@ -34,7 +34,6 @@ export function createInitialCreationDraft(
   return {
     mode: "generate",
     prompt: "",
-    references: [],
     controls: visibleControlsFromDefaults(defaults)
   };
 }

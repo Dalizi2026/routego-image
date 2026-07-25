@@ -39,7 +39,6 @@ export function synchronizeCreationDraftDefaults(
   return {
     mode: "generate",
     prompt: draft.prompt,
-    references: [],
     controls: {
       ...normalizeVisibleControls({
         ...draft.controls,

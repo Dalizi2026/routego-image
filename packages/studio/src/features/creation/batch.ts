@@ -55,12 +55,6 @@ export function buildStudioBatchRequest(
           ...submissionDraft,
           mode: "generate",
           prompt: item.prompt,
-          references: [],
-          target: undefined,
-          supportingImages: [],
-          mask: undefined,
-          maskUpload: undefined,
-          invariants: { allowedChanges: [], preserve: [], forbiddenChanges: [] },
           controls: normalizeVisibleControls({
             ...submissionDraft.controls,
             size: item.size,

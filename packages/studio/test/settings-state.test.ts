@@ -11,7 +11,6 @@ import {
   applySimpleConnectionEndpoint,
   activeSettingsModel,
   activeSettingsProfile,
-  buildCapabilityProbeInput,
   buildDefaultsSettingsInput,
   buildOutputDirectorySettingsInput,
   buildUpsertProviderProfileInput,
@@ -265,22 +264,7 @@ describe("secret-safe Settings state and request construction", () => {
     expect(JSON.stringify(cleared)).not.toContain(candidatePath);
   });
 
-  it("separates non-billable refresh from explicitly confirmed probe input", () => {
-    const base = {
-      providerId: profile.id,
-      model: "synthetic-image-model",
-      capability: "target-edit" as const,
-      transport: "openai-images" as const,
-      requestShape: "images:edit-target",
-      confirmBillableProbe: false
-    };
-    expect(() => buildCapabilityProbeInput(base)).toThrow(/确认/u);
-    expect(buildCapabilityProbeInput({ ...base, confirmBillableProbe: true })).toMatchObject({
-      providerId: profile.id,
-      capability: "target-edit",
-      confirmBillableProbe: true
-    });
-
+  it("preserves settings when a non-billable model refresh fails", () => {
     const failedRefresh: RefreshModelsResult = {
       schemaVersion: 1,
       providerId: profile.id,

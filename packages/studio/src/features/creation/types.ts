@@ -15,7 +15,6 @@ export type CreationControls = CreationVisibleControls;
 export interface CreationDraft {
   readonly mode: CreationMode;
   readonly prompt: string;
-  readonly references: readonly never[];
   readonly controls: CreationControls;
 }
 
@@ -59,5 +58,3 @@ export type SubmissionState =
       readonly automaticReplayAllowed: false;
     }
   | { readonly status: "failure"; readonly safeMessage: string };
-
-export type CreationInputSlot = "reference" | "target" | "supporting";
