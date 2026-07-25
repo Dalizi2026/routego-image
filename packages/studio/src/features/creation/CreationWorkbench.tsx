@@ -213,7 +213,8 @@ function StreamResultPanel({
           tone: "partial" as const,
           title: labels.streaming,
           receivedAnyOutput: state.receivedAnyOutput,
-          mayHaveBilled: state.mayHaveBilled
+          mayHaveBilled: state.mayHaveBilled,
+          manualRetryWarning: undefined
         };
   return (
     <section
