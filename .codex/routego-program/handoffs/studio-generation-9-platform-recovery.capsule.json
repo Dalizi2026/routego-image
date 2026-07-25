@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capsuleType": "successor-handoff",
-  "capsuleSha256": "d31fe18fd954d3b0488444b3d9eb8c206d92f1e12fc0b21cbe328c4cd65f2e5a",
+  "capsuleSha256": "973649588e5cabdb53d427d3eeaf2c0ed59667e7cd04153d85f30d994d4ec911",
   "lane": "studio",
   "stateRouting": {
     "programLaneKey": "studio",
@@ -22,17 +22,17 @@
     "handoffParent": "69f6c2bbf65f96741b900fd765d61fce243a6801"
   },
   "successor": {
-    "threadId": "pending",
+    "threadId": "019f979c-4c0e-7ac0-8437-02ac6c7b4fd1",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "plannedBranch": "codex/routego-controller-g12",
     "startingCommit": "c2fa5830a36ad81a36f6f2af4c5801b6dd981fc7",
     "registrationStatus": "registered-awaiting-handoff-acceptance",
     "registrationAttempt": 1,
-    "verifiedHeadBeforeContainingCommit": "c2fa5830a36ad81a36f6f2af4c5801b6dd981fc7",
+    "verifiedHeadBeforeContainingCommit": "44c6f7132f4ab5ca3fa7274343fd0fe52ad6f53a",
     "incorporationCommit": null
   },
   "currentState": {
-    "openspecTotal": 33,
+    "openspecTotal": 34,
     "openspecCompleted": 23,
     "completedTaskIds": [
       "1.1",
@@ -62,13 +62,16 @@
     "nextTaskId": "5.5",
     "taskCapsule": {
       "path": ".codex/routego-program/tasks/studio-5.5.json",
-      "sha256": "8ac41315836890be95ff9e2db75f840974f0817b7d94a0f417ee500bc76b78ef"
+      "sha256": "9041218c1564b9a72102a5274486379dfe89e91b3a797fc5f720b8b4b46c8b95",
+      "rawFileSha256": "3fd14d42289e26a3a074a071f61f9864af3a3e53f55b966b37e7a9c71b9edfd4"
     },
     "taskLocked": true,
     "sourceIsSoleApplyOwner": false,
-    "sourceArchived": false,
+    "sourceApplyAuthorized": false,
+    "successorApplyAuthorized": false,
+    "sourceArchived": true,
     "correctionSourceRetired": true,
-    "successorApplyAuthorized": false
+    "continuation": "Platform recovery only. No task implementation may start before [REGISTRATION_READY], handoff acceptance, and a fresh [TASK_DISPATCH]/[TASK_ACTIVATED]."
   },
   "completedEvidence": [],
   "authority": {
@@ -80,7 +83,7 @@
   },
   "gates": {
     "blockers": [
-      "Studio G8 platform approval loop; safe checkpoint c2fa583 preserves partial in-scope work."
+      "Studio G8 entered a platform approval loop after acquiring the Task 5.5 lease; safe checkpoint c2fa583 and additional authorized in-scope SettingsWorkspace recovery work preserve partial Task 5.5 progress without marking the task complete."
     ],
     "approvalRequiredTasks": [
       "6.1",
@@ -98,9 +101,7 @@
       ".codex/routego-program/program.json",
       ".codex/routego-program/threads/studio.json",
       ".codex/routego-program/dispatch/current.json",
-      ".codex/routego-program/tasks/studio-5.5.json",
-      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
-      ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md"
+      ".codex/routego-program/tasks/studio-5.5.json"
     ],
     "sourceObservableCompactions": 0,
     "sourceCompactionFingerprint": "platform-approval-loop-after-safe-checkpoint-c2fa583",
@@ -108,11 +109,11 @@
     "handoffAcceptanceCompactionLimit": 0,
     "maxStartupFiles": 8,
     "maxStartupBytes": 65536,
-    "actualStartupFiles": 8,
-    "actualStartupBytes": 42397,
+    "actualStartupFiles": 6,
+    "actualStartupBytes": 35992,
     "budgetRole": "lane",
     "budgetValidatedBeforeSuccessorCreation": true,
-    "budgetValidatedAt": "2026-07-25T04:46:11.509Z",
+    "budgetValidatedAt": "2026-07-25T09:52:45.186Z",
     "successorCreationMethod": "create-thread-local-no-fork"
   },
   "git": {
@@ -120,25 +121,43 @@
     "expectedSuccessorClean": true
   },
   "reportingContract": {
-    "primary": "Before audit or implementation, send [THREAD_HANDSHAKE] and then [HANDOFF_ACCEPTED] to Controller 019f900e-0d10-7c41-9ffd-6c2e41930ac2 using send_message_to_thread, then read Controller thread to confirm delivery.",
-    "fallback": "No secondary continuation path exists; automation and final answers cannot accept, activate, or advance product work.",
+    "primary": "Before audit or implementation, call send_message_to_thread with [THREAD_HANDSHAKE] to Controller 019f900e-0d10-7c41-9ffd-6c2e41930ac2 and then call read_thread to confirm receipt. After acceptance, every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, and acceptance request must use the same direct chain.",
+    "fallback": "No secondary continuation path exists. Automation and final answers cannot activate or advance work.",
     "fallbackIntervalMinutes": 30,
     "finalAnswerAloneIsInsufficient": true
   },
   "startup": {
     "mandatoryFiles": [
-      ".codex/routego-program/handoffs/studio-generation-9-platform-recovery.capsule.json",
+      "AGENTS.md",
       ".codex/routego-program/authority-summary.md",
       ".codex/routego-program/program.json",
       ".codex/routego-program/threads/studio.json",
+      ".codex/routego-program/handoffs/studio-generation-9-platform-recovery.capsule.json",
       ".codex/routego-program/dispatch/current.json",
-      ".codex/routego-program/tasks/studio-5.5.json",
-      ".codex/routego-program/deviations/PD-008-low-context-lossless-handoff.md",
-      ".codex/routego-program/deviations/PD-014-third-compaction-hard-handoff.md"
+      ".codex/routego-program/tasks/studio-5.5.json"
     ],
-    "maxFiles": 8,
-    "maxUtf8Bytes": 65536,
+    "maxFiles": 12,
+    "maxUtf8Bytes": 122880,
     "byteCounting": "utf8-after-crlf-to-lf-normalization",
-    "contextBudgetFailure": "HANDOFF_CONTEXT_BUDGET_FAILED"
+    "expectedNormalizedUtf8Bytes": 48145,
+    "fallbackSourceCommit": "34cb815ad33439402249f6cc077fc829e3f001f9",
+    "escalationTriggers": [
+      "capsule, Git, OpenSpec or current-state inconsistency",
+      "package boundary, dependency or ownership conflict",
+      "verification failure requiring root-cause expansion"
+    ],
+    "fullAuditTriggers": [
+      "final Integration conformance",
+      "main spec sync or archive",
+      "release or rollback gate",
+      "failed targeted recovery",
+      "explicit user request"
+    ],
+    "contextBudgetFailure": "If any observable compaction occurs before handoff acceptance, send HANDOFF_CONTEXT_BUDGET_FAILED; do not activate this successor, keep the task locked, and retain the source recovery record."
+  },
+  "safety": {
+    "noProductEditsBeforeExplicitActivation": true,
+    "externalStateAuthorized": false,
+    "noCredentialsProviderRequestsRealImagesRealDataInstallMigrationDeployPublishOrRelease": true
   }
 }

@@ -1,17 +1,20 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "8ac41315836890be95ff9e2db75f840974f0817b7d94a0f417ee500bc76b78ef",
+  "contentSha256": "9041218c1564b9a72102a5274486379dfe89e91b3a797fc5f720b8b4b46c8b95",
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "taskId": "5.5",
-  "status": "activated-task-5.5-studio-g8-sole-apply-owner",
-  "sourceCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
+  "status": "platform-recovery-registered-awaiting-handoff-acceptance",
+  "sourceCommit": "34cb815ad33439402249f6cc077fc829e3f001f9",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
-    "fileSha256": "17d5f801e2e329a99823e6c99188c83f0ae9207182c240ecab5f0cc295485738",
-    "lineSha256": "b8200616ed1ecfb714d6a802e6eb8695e90b7a368717072f500d08fe8652808f"
+    "fileSha256": "5debbe72be9fbcf60829132d8da34dfe51dacb016046269c9ac9f9fcc445af7c",
+    "lineSha256": "3ab57044ceb20ab0d868753493cb1e4bb9c17b607b7e88bb9e61ac71b8097a58"
   },
-  "dependencies": ["5.1", "5.4"],
+  "dependencies": [
+    "5.1",
+    "5.4"
+  ],
   "allowedFiles": [
     "packages/studio/src/app/StudioApp.tsx",
     "packages/studio/src/app/state.ts",
@@ -108,10 +111,10 @@
   "activation": {
     "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
     "controllerGeneration": 13,
-    "workerThreadId": "019f925c-004c-72a1-9a53-f63debdcac84",
-    "workerGeneration": 8,
-    "soleApplyOwner": true,
-    "applyAuthorized": true
+    "workerThreadId": "019f979c-4c0e-7ac0-8437-02ac6c7b4fd1",
+    "workerGeneration": 9,
+    "soleApplyOwner": false,
+    "applyAuthorized": false
   },
   "externalStateAuthorized": false,
   "reportingContract": "Before audit or implementation, send [TASK_ACCEPTED] to the Controller with send_message_to_thread and then call read_thread to confirm receipt. The Controller independently reads the receipt before activation. After activation, every checkpoint, blocker, deviation, handoff, implementation, delivery, or acceptance request uses the same direct chain; heartbeat, polling, automation, final answers, and user follow-up cannot replace it."

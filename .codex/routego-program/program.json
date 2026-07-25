@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-task-4.6-accepted-studio-5.5-resume-pending",
+  "status": "controller-generation-13-studio-g9-platform-recovery-registration",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -111,7 +111,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-13-task-5.5-registered-pending-acceptance",
+    "status": "authoritative-controller-generation-13-studio-g9-platform-recovery-registration",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -132,22 +132,25 @@
   },
   "activeApplyOwners": {
     "studio": {
-      "status": "task-5.5-resume-pending-after-4.6",
-      "taskRef": "019f925c-004c-72a1-9a53-f63debdcac84",
-      "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
-      "generation": 8,
+      "status": "platform-recovery-registered-awaiting-handoff-acceptance",
+      "taskRef": "019f979c-4c0e-7ac0-8437-02ac6c7b4fd1",
+      "threadId": "019f979c-4c0e-7ac0-8437-02ac6c7b4fd1",
+      "generation": 9,
       "taskId": "5.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
+      "currentHead": "44c6f7132f4ab5ca3fa7274343fd0fe52ad6f53a",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/studio-5.5.json",
-        "sha256": "8ac41315836890be95ff9e2db75f840974f0817b7d94a0f417ee500bc76b78ef"
+        "sha256": "9041218c1564b9a72102a5274486379dfe89e91b3a797fc5f720b8b4b46c8b95",
+        "rawFileSha256": "3fd14d42289e26a3a074a071f61f9864af3a3e53f55b966b37e7a9c71b9edfd4"
       },
       "handoffCapsule": {
-        "path": ".codex/routego-program/handoffs/studio-generation-6-streamline.capsule.json"
+        "path": ".codex/routego-program/handoffs/studio-generation-9-platform-recovery.capsule.json",
+        "sha256": "973649588e5cabdb53d427d3eeaf2c0ed59667e7cd04153d85f30d994d4ec911",
+        "rawFileSha256": "6bab5dd801ffdd986eaea79fa37a36de7a146b09017613c35f947b4122cbca48"
       },
-      "authorizedScope": "Task 5.5 safe checkpoint is preserved; the existing Studio owner may resume only after the Controller sends a fresh baseline.",
+      "authorizedScope": "Read-only handoff acceptance only; no lease or product mutation until Controller re-dispatches and activates Task 5.5.",
       "soleApplyOwner": false,
       "applyAuthorized": false,
       "lastCompletedTask": "5.4"
@@ -218,14 +221,18 @@
   },
   "laneSuccessors": {
     "studio": {
-      "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
-      "generation": 8,
+      "threadId": "019f979c-4c0e-7ac0-8437-02ac6c7b4fd1",
+      "generation": 9,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
+      "currentHead": "44c6f7132f4ab5ca3fa7274343fd0fe52ad6f53a",
       "observableCompactions": 0,
       "lastCompletedTask": "5.4",
-      "status": "task-5.5-resume-pending-after-4.6"
+      "status": "platform-recovery-registered-awaiting-handoff-acceptance",
+      "handoffCapsuleIntegrity": {
+        "canonicalSha256": "973649588e5cabdb53d427d3eeaf2c0ed59667e7cd04153d85f30d994d4ec911",
+        "rawFileSha256": "6bab5dd801ffdd986eaea79fa37a36de7a146b09017613c35f947b4122cbca48"
+      }
     },
     "creation": {
       "threadId": "019f8a35-481e-7150-9c45-70fae241ac87",
@@ -305,7 +312,7 @@
       "locked": true,
       "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 5.5 is ready after accepted Task 4.6 and awaits a resumed-baseline dispatch to the existing Studio owner."
+      "authorizedScope": "Task 5.5 is preserved at safe checkpoint c2fa583 and awaits Studio G9 handoff acceptance and a new dispatch."
     }
   },
   "latestDirectCheckpoint": {

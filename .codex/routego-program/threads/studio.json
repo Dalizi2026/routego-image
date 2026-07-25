@@ -2,36 +2,38 @@
   "schemaVersion": 2,
   "lane": "studio",
   "change": "streamline-routego-image-generation",
-  "role": "task-5.5-studio-g8-sole-apply-owner",
-  "status": "task-5.5-activated",
+  "role": "task-5.5-studio-g9-platform-recovery-candidate",
+  "status": "task-5.5-platform-recovery-registration-pending",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
-  "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
+  "threadId": "019f979c-4c0e-7ac0-8437-02ac6c7b4fd1",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "generation": 8,
-  "currentHead": "b0a5a343e11bc7e9fcbb96c988caf1ff00edf43e",
+  "generation": 9,
+  "currentHead": "44c6f7132f4ab5ca3fa7274343fd0fe52ad6f53a",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
     "id": "5.5",
-    "status": "active-dead-surface-removal",
-    "locked": false
+    "status": "platform-recovery-registration-pending",
+    "locked": true
   },
   "sourceOwner": {
-    "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
-    "role": "program-controller-g13-task-5.5-registration-source",
+    "role": "task-5.5-studio-g8-platform-approval-loop",
     "soleApplyOwner": false,
     "archived": true,
     "authorityRevoked": true
   },
   "handoffCapsuleIntegrity": {
-    "status": "task-5.5-studio-g8-accepted-and-activated",
-    "path": ".codex/routego-program/handoffs/current-controller-handoff.md"
+    "status": "studio-g9-platform-recovery-registered-awaiting-acceptance",
+    "path": ".codex/routego-program/handoffs/studio-generation-9-platform-recovery.capsule.json",
+    "canonicalSha256": "973649588e5cabdb53d427d3eeaf2c0ed59667e7cd04153d85f30d994d4ec911",
+    "rawFileSha256": "6bab5dd801ffdd986eaea79fa37a36de7a146b09017613c35f947b4122cbca48"
   },
   "reportingContract": {
     "currentControllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
