@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-13-studio-g9-task-5.5-active",
+  "status": "authoritative-controller-generation-13-studio-5.6-accepted-task-6.1-blocked",
   "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -15,17 +15,17 @@
   "lastCompactionFingerprint": null,
   "lastHealthAudit": {
     "status": "passed",
-    "workspaceHead": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "openspecProgress": "22/33",
-    "acceptedTask": "5.4",
+      "workspaceHead": "057497869d777427c2c6ffaddd827b26c8d91fbd",
+      "openspecProgress": "25/34",
+      "acceptedTask": "5.6",
     "readyTasks": [
-      "5.5"
+        "6.1"
     ],
-    "independentVerification": "Task 5.4's controller-accepted explicit Studio Library suite passed 13 tests; git diff --check and Git clean passed. Task 5.5 is registered but locked until direct-return acceptance."
+      "independentVerification": "Task 5.6 controller reproduction passed Studio typecheck, 19 test files/103 tests, production build, dead-surface scan, git diff check, and clean-Git workflow doctor."
   },
   "currentOperation": {
-    "id": "studio-g9-task-5.5-active",
-    "allowedNext": "Studio G9 may modify only the Task 5.5 capsule scope, then return a checkpoint directly to this Controller.",
+    "id": "task-6.1-external-dependency-approval-and-capsule-reconciliation",
+    "allowedNext": "Do not activate Task 6.1 until the external dependency approval gate is executable and its task capsule matches the current OpenSpec task definition.",
     "forbidden": [
       "Product code outside each task exact owner scope",
       "package.json or pnpm-lock.yaml changes",

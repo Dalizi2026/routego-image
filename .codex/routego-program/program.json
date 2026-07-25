@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-studio-g9-task-5.5-active",
+  "status": "controller-generation-13-studio-5.6-accepted-task-6.1-blocked",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -276,7 +276,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 34,
-      "completedTasks": 23,
+      "completedTasks": 25,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -300,32 +300,41 @@
         "5.2",
         "5.3",
         "5.4",
-        "4.6"
+        "4.6",
+        "5.5",
+        "5.6"
       ],
       "readyTaskIds": [
-        "5.5"
+        "6.1"
       ],
-      "nextTaskId": "5.5"
+      "nextTaskId": "6.1"
     },
     "currentTask": {
-      "id": "5.5",
+      "id": "6.1",
       "locked": true,
-      "activationAuthorized": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Studio G9 is active sole owner for Task 5.5 and must stay within the task capsule scope."
+      "authorizedScope": "Task 6.1 cannot be activated until the external dependency approval gate is executable and a current task capsule matches its OpenSpec definition."
     }
   },
   "latestDirectCheckpoint": {
-    "lane": "integration",
-    "event": "TASK_4_6_ACCEPTED",
-    "implementationCommit": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
-    "openspecProgress": "23/34",
+    "lane": "studio",
+    "event": "TASK_5_6_CONTROLLER_ACCEPTED",
+    "implementationCommit": "40d9f85a6d63034bf426daab196f6beed17de256",
+    "openspecProgress": "25/34",
     "nextTaskIds": [
-      "5.5"
+      "6.1"
     ],
-    "verification": "Mock Relay typecheck passed; service test passed 27 tests; Studio mock-bridge passed 11 tests; exact two-file scope and git diff check passed."
+    "verification": "Studio typecheck, unit suite (19 files/103 tests), production build, browser suite (12/12), dead-surface scan, git diff check, and clean-Git workflow doctor passed."
   },
-  "currentBlockers": [],
+  "currentBlockers": [
+    {
+      "taskId": "6.1",
+      "status": "blocked-recorded",
+      "reason": "Task 6.1 requires external U-2-Netp/ONNX Runtime download and authoritative upstream version, license, SHA-256, and measured-size evidence before acquisition. Current execution policy prohibits network and dependency installation; existing integration-6.1 capsule also does not match the current OpenSpec task definition.",
+      "externalStateAuthorized": false
+    }
+  ],
   "approvedDeviations": [
     {
       "id": "PD-015-task-3.1-obsolete-trash-test-cleanup",
