@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "task-6.2-integration-recovery-owner",
-  "status": "task-6.2-resource-scope-activated",
+  "status": "task-6.2-implementation-committed-typecheck-blocked",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
@@ -13,12 +13,12 @@
   "currentHead": "6daea607267d0884f9d9f93a58fe0eab840ffd83",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
     "id": "6.2",
-    "status": "activated",
-    "locked": false
+    "status": "implementation-committed-typecheck-blocked",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",

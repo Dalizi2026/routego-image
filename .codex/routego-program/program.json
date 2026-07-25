@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-14-task-6.2-resource-scope-activated",
+  "status": "controller-generation-14-task-6.2-implementation-blocked-by-typecheck-baseline",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -116,7 +116,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-14-task-6.2-resource-scope-activated",
+    "status": "authoritative-controller-generation-14-task-6.2-implementation-blocked-by-typecheck-baseline",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -211,7 +211,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.2-resource-scope-activated",
+      "status": "task-6.2-implementation-committed-typecheck-blocked",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
@@ -223,9 +223,9 @@
         "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
         "sha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57"
       },
-      "authorizedScope": "Task 6.2 resource scope activated; capsule runtime, resources, licenses, package builder/verifier and install-smoke files only.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
+      "authorizedScope": "Task 6.2 implementation committed at e3a2524; task state locked until required Integration typecheck baseline is restored.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
       "lastCompletedTask": "6.1"
     }
   },
@@ -278,7 +278,7 @@
       "currentHead": "6daea607267d0884f9d9f93a58fe0eab840ffd83",
       "observableCompactions": 0,
       "lastCompletedTask": "6.1",
-      "status": "task-6.2-resource-scope-activated",
+      "status": "task-6.2-implementation-committed-typecheck-blocked",
       "taskId": "6.2",
       "taskCapsuleIntegrity": {
         "canonicalSha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57"
@@ -342,6 +342,14 @@
     "verification": "Studio typecheck, unit suite (19 files/103 tests), production build, browser suite (12/12), dead-surface scan, git diff check, and clean-Git workflow doctor passed."
   },
   "currentBlockers": [
+    {
+      "taskId": "6.2",
+      "status": "blocked-recorded",
+      "implementationCommit": "e3a2524ec5968032bc9311136d284430985e348c",
+      "reason": "Required `pnpm --filter @routego-image/integration typecheck` fails in pre-existing out-of-capsule Creation, Library, and Integration files. Focused Task 6.2 resource/package tests pass 35/35 and no diagnostic references Task 6.2 files. Task state must remain unchecked until the owning lanes restore the typecheck baseline or an approved scoped exception is recorded.",
+      "verification": "focused-resource-package-tests=35/35; git-diff-check=pass; integration-typecheck=blocked-out-of-scope",
+      "externalStateAuthorized": false
+    },
     {
       "taskId": "6.1",
       "status": "blocked-recorded",

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-14-task-6.1-complete-task-6.2-dispatch-blocked",
+  "status": "authoritative-controller-generation-14-task-6.2-implementation-blocked-by-typecheck-baseline",
   "threadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "predecessorThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -22,10 +22,10 @@
     "handoffCommit": "ced376cede0705350afb5184335a572c645c83d6"
   },
   "lastHealthAudit": {
-    "status": "task-6.1-complete-task-6.2-capsule-owner-mismatch",
+    "status": "task-6.2-implementation-committed-typecheck-blocked",
       "workspaceHead": "057497869d777427c2c6ffaddd827b26c8d91fbd",
       "openspecProgress": "25/34",
-      "acceptedTask": "5.6",
+    "acceptedTask": "6.1",
     "readyTasks": [],
       "independentVerification": "Task 5.6 controller reproduction passed Studio typecheck, 19 test files/103 tests, production build, dead-surface scan, git diff check, and clean-Git workflow doctor. Task 6.1 then reproduced an official npm metadata versus retrievable-runtime-artifact integrity blocker in isolated npm caches."
   },
