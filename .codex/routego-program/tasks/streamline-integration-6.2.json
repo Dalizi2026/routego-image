@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3",
+  "lane": "integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "6.2",
+  "status": "ready-after-task-6.1",
+  "sourceCommit": "4baf17f4e4454ea5b8e07e06b54247cdd1849221",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "f4ab7d8f9175c2c07f378928745d104d9a6d31e4af59a678470d528eb795d0d4",
+    "lineSha256": "b162ccbc70096098668838f9ac280540a36d0eaaf5c2db965ce0c8a84d3891c0",
+    "lineBytes": 287
+  },
+  "dependencies": [
+    "6.1"
+  ],
+  "dependencyCommits": {
+    "task6_1": "4baf17f4e4454ea5b8e07e06b54247cdd1849221"
+  },
+  "allowedFiles": [
+    "packages/integration/src/runtime/background-removal.ts",
+    "packages/integration/src/runtime/background-removal-worker.ts",
+    "packages/integration/src/runtime/background-removal-resources.ts",
+    "packages/integration/src/runtime/resource-manifest.json",
+    "packages/integration/test/background-removal-resources.test.ts",
+    "packages/integration/test/background-removal.test.ts",
+    "licenses/u2netp-Apache-2.0.txt",
+    "licenses/onnxruntime-web-MIT.txt",
+    "package.json",
+    "pnpm-lock.yaml",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/library/**",
+    "packages/mock-relay/**",
+    "packages/studio/**",
+    ".codex-plugin/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "real-data/**",
+    "**/.env*"
+  ],
+  "requiredBehavior": [
+    "Add pinned U-2-Netp and ONNX Runtime Web/WASM resources using only the Task 6.1 verified artifacts.",
+    "Record licenses and an integrity manifest; resource loading must be offline and fail closed on missing or modified assets.",
+    "Use no native addons and do not perform provider requests, credential access, real-data migration, deployment, release, or installed-plugin replacement.",
+    "Keep the implementation ready for the subsequent worker lifecycle and quality-gate tasks without implementing those later task behaviors early."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "resource manifest integrity and license tests",
+    "runtime resource loader rejects missing or modified resources without network access",
+    "pnpm --filter @routego-image/integration typecheck",
+    "pnpm --filter @routego-image/integration test -- background-removal-resources.test.ts",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/local-background-removal/spec.md",
+      "sha256": "8bc15925c68fa2160a7b05a1f6a29172820e7a21a603f77092e4692f82768a51",
+      "reason": "Pinned U-2-Netp/WASM resources, offline loading, integrity failure behavior and no native addon."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "0dc422b1f84e51831309b49d351f5cc3c78010f9921680d78ed5bc94e3dbc0ca",
+      "reason": "Defines the dependency gate, resource manifest and offline package boundary."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-6.2-offline-background-removal-resources",
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": true,
+  "targetPluginInstallationAuthorized": false,
+  "reportingContract": "Before activation send THREAD_HANDSHAKE and verify delivery. After activation use direct messages for every checkpoint, blocker, deviation, handoff and delivery; heartbeat and final answers never advance this task."
+}
