@@ -57,9 +57,18 @@ export function synchronizeBatchDraftDefaults(
   defaults: ReadSettingsResult["defaults"],
   _resolve?: unknown
 ): readonly BatchDraftItem[] {
+  const controls = normalizeVisibleControls({
+    size: defaults.size,
+    aspectRatio: defaults.aspectRatio,
+    format: defaults.format,
+    count: defaults.count,
+    transparentMode: defaults.transparentMode
+  });
   return items.map((item) => ({
     ...item,
-    draft: synchronizeCreationDraftDefaults(item.draft, defaults)
+    size: controls.size,
+    aspectRatio: controls.aspectRatio,
+    count: controls.count
   }));
 }
 

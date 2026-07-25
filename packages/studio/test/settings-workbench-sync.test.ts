@@ -43,7 +43,6 @@ const nextDefaults: ReadSettingsResult["defaults"] = {
 const legacyDraft: CreationDraft = {
   mode: "generate",
   prompt: "Preserve this mounted prompt.",
-  references: [],
   controls: {
     size: originalDefaults.size,
     aspectRatio: originalDefaults.aspectRatio,
@@ -60,7 +59,6 @@ describe("mounted generation workbench defaults synchronization", () => {
     expect(synchronized).toMatchObject({
       mode: "generate",
       prompt: legacyDraft.prompt,
-      references: [],
       controls: {
         size: "1536x1024",
         aspectRatio: "auto",
@@ -88,19 +86,19 @@ describe("mounted generation workbench defaults synchronization", () => {
 
   it("updates preserved single and ordered batch prompts without changing task identity", () => {
     const items: readonly BatchDraftItem[] = [
-      { id: "batch-a", draft: legacyDraft },
-      { id: "batch-b", draft: { ...legacyDraft, prompt: "Second task" } }
+      { id: "batch-a", prompt: legacyDraft.prompt, size: legacyDraft.controls.size, aspectRatio: legacyDraft.controls.aspectRatio, count: legacyDraft.controls.count },
+      { id: "batch-b", prompt: "Second task", size: legacyDraft.controls.size, aspectRatio: legacyDraft.controls.aspectRatio, count: legacyDraft.controls.count }
     ];
     const synchronizedSingle = synchronizeCreationDraftDefaults(legacyDraft, nextDefaults);
     const synchronizedBatch = synchronizeBatchDraftDefaults(items, nextDefaults);
 
     expect(synchronizedSingle.prompt).toBe(legacyDraft.prompt);
     expect(synchronizedBatch.map((item) => item.id)).toEqual(["batch-a", "batch-b"]);
-    expect(synchronizedBatch.map((item) => item.draft.prompt)).toEqual([
+    expect(synchronizedBatch.map((item) => item.prompt)).toEqual([
       legacyDraft.prompt,
       "Second task"
     ]);
-    expect(synchronizedBatch.every((item) => item.draft.mode === "generate")).toBe(true);
+    expect(synchronizedBatch.every((item) => item.count === 3)).toBe(true);
   });
 
   it("keeps hidden Settings defaults out of the browser request after synchronization", () => {
