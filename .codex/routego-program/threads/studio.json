@@ -3,7 +3,7 @@
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "role": "task-5.6-studio-g10-platform-recovery-successor",
-  "status": "task-5.6-registration-ready",
+  "status": "task-5.6-active-g10-sole-apply-owner",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "threadId": "019f9916-ed2e-74e0-8613-a5b033583244",
@@ -13,12 +13,12 @@
   "currentHead": "5c4068f0a24318bd5937f80aa2fdeeca2fd570a8",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "5.6",
-    "status": "registered-quality-verification",
-    "locked": true
+    "status": "active-quality-verification",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f925c-004c-72a1-9a53-f63debdcac84",
