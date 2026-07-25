@@ -3,7 +3,7 @@
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "role": "task-6.2-integration-recovery-owner",
-  "status": "task-6.2-accepted-awaiting-activation",
+  "status": "task-6.2-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
@@ -13,12 +13,12 @@
   "currentHead": "8144983fe73b9806f69f4eef15d888594434697a",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "6.2",
-    "status": "accepted-awaiting-activation",
-    "locked": true
+    "status": "activated",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -58,7 +58,7 @@
     "contentSha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
   },
   "registration": {
-    "reason": "Task 6.1 is complete and this fresh thread is the registered Integration recovery owner for Task 6.2; acceptance remains read-only until the Controller confirms the same transition.",
+    "reason": "Task 6.1 is complete and the Controller has activated this registered Integration owner for Task 6.2 under the same dispatch transition.",
     "permittedScope": [
       "packages/integration/src/runtime/background-removal.ts",
       "packages/integration/src/runtime/background-removal-worker.ts",
@@ -73,7 +73,7 @@
       "openspec/changes/streamline-routego-image-generation/tasks.md"
     ],
     "externalStateAuthorized": false,
-    "writerLease": "released",
+    "writerLease": "required-after-activation",
     "directReportingRequired": true
   }
 }

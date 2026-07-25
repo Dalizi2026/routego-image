@@ -211,7 +211,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.2-accepted-awaiting-activation",
+      "status": "task-6.2-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
@@ -223,9 +223,9 @@
         "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
         "sha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
       },
-      "authorizedScope": "Task 6.2 accepted; awaiting TASK_ACTIVATED before writer lease and product mutation.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 6.2 activated for the registered Integration owner; only capsule allowed files may be mutated.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "6.1"
     }
   },
