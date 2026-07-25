@@ -6,13 +6,13 @@
   "resumeState": "acceptance-in-progress",
   "sourceThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
-  "targetThreadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
+  "targetThreadId": "019f99ae-601b-7262-9457-8006de418f17",
   "completedTaskId": null,
   "nextTaskId": "6.2",
-  "attemptCount": 1,
-  "lastAttemptAt": "2026-07-25T14:17:18.559Z",
-  "lastError": "Existing streamline Integration thread 019f9498-8fb7-7f60-aae0-ec970bbf5663 is archived and its rollout file is missing; platform cannot deliver TASK_DISPATCH. New worktree/directory creation is forbidden.",
+  "attemptCount": 2,
+  "lastAttemptAt": "2026-07-25T14:30:31.436Z",
+  "lastError": "Replacing archived target with fresh recovery thread 019f99ae-601b-7262-9457-8006de418f17 after handshake delivery.",
   "receiptPath": null,
   "lastTransitionId": null,
-  "updatedAt": "2026-07-25T14:17:18.557Z"
+  "updatedAt": "2026-07-25T14:30:31.435Z"
 }

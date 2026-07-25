@@ -211,25 +211,22 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-4.6-controller-accepted-no-active-product-owner",
-      "taskRef": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
-      "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
-      "generation": 5,
-      "taskId": "4.6",
+      "status": "task-6.2-recovery-owner-registered-awaiting-acceptance",
+      "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
+      "threadId": "019f99ae-601b-7262-9457-8006de418f17",
+      "generation": 6,
+      "taskId": "6.2",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
+      "currentHead": "8144983fe73b9806f69f4eef15d888594434697a",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
-        "sha256": "2965871b85bf41c137f6c06d3ea07acbf2da6de918c2d298b5e123b87ef2a278"
+        "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
+        "sha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
       },
-      "handoffCapsule": {
-        "path": ".codex/routego-program/handoffs/streamline-integration-4.6-platform-recovery.capsule.json"
-      },
-      "authorizedScope": "Task 4.6 is accepted. No Integration product owner is active.",
+      "authorizedScope": "Task 6.2 recovery owner read-only acceptance; no lease or product mutation until TASK_ACCEPTED and TASK_ACTIVATED.",
       "soleApplyOwner": false,
       "applyAuthorized": false,
-      "lastCompletedTask": "4.6"
+      "lastCompletedTask": "6.1"
     }
   },
   "laneSuccessors": {
@@ -274,14 +271,18 @@
       "historicalWorktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
-      "generation": 5,
+      "threadId": "019f99ae-601b-7262-9457-8006de418f17",
+      "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
+      "currentHead": "8144983fe73b9806f69f4eef15d888594434697a",
       "observableCompactions": 0,
-      "lastCompletedTask": "4.6",
-      "status": "task-4.6-controller-accepted-no-active-product-owner"
+      "lastCompletedTask": "6.1",
+      "status": "task-6.2-recovery-owner-registered-awaiting-acceptance",
+      "taskId": "6.2",
+      "taskCapsuleIntegrity": {
+        "canonicalSha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
+      }
     }
   },
   "currentChange": {

@@ -2,22 +2,22 @@
   "schemaVersion": 2,
   "lane": "integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-4.6-platform-recovery-candidate-registration",
-  "status": "task-4.6-controller-accepted-complete",
+  "role": "task-6.2-integration-recovery-owner",
+  "status": "task-6.2-recovery-owner-registered-awaiting-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-  "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
-  "threadId": "019f9498-8fb7-7f60-aae0-ec970bbf5663",
+  "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
+  "threadId": "019f99ae-601b-7262-9457-8006de418f17",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
-  "generation": 5,
-  "currentHead": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
+  "generation": 6,
+  "currentHead": "8144983fe73b9806f69f4eef15d888594434697a",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": false,
   "applyAuthorized": false,
   "currentTask": {
-    "id": "4.6",
-    "status": "controller-accepted-complete",
+    "id": "6.2",
+    "status": "locked-awaiting-acceptance",
     "locked": true
   },
   "sourceOwner": {
@@ -34,7 +34,7 @@
     "path": ".codex/routego-program/handoffs/streamline-integration-4.6-platform-recovery.capsule.json"
   },
   "reportingContract": {
-    "currentControllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "currentControllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
     "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
     "fallback": "No secondary continuation path exists; read-only governance audit cannot send messages, activate, or advance work.",
     "acknowledgementRequiredBeforeAcceptance": true
@@ -49,19 +49,28 @@
   },
   "externalStateAuthorized": false,
   "lastCompletedTask": {
-    "id": "4.6",
-    "implementationCommit": "d047d0cdaf5f9e331a52d25da6c4b9c93c82b078",
+    "id": "6.1",
+    "implementationCommit": "4baf17f4e4454ea5b8e07e06b54247cdd1849221",
     "handoffAcceptanceObservableCompactions": 0
   },
   "taskCapsule": {
-    "path": ".codex/routego-program/tasks/streamline-integration-4.6.json",
-    "contentSha256": "2965871b85bf41c137f6c06d3ea07acbf2da6de918c2d298b5e123b87ef2a278"
+    "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
+    "contentSha256": "cbd67fac92463baf5b1225dba580d86ff636f18369ad7c2f2f8fc29a682fcca3"
   },
   "registration": {
-    "reason": "The previous Task 4.6 owner is irrecoverably waiting on a desktop permission prompt. The committed 9299c42 generation relationship repair is retained and no active writer lease exists.",
+    "reason": "Task 6.1 is complete and this fresh thread is the registered Integration recovery owner for Task 6.2; acceptance remains read-only until the Controller confirms the same transition.",
     "permittedScope": [
-      "packages/mock-relay/src/service/mock-service.ts",
-      "packages/mock-relay/test/service.test.ts"
+      "packages/integration/src/runtime/background-removal.ts",
+      "packages/integration/src/runtime/background-removal-worker.ts",
+      "packages/integration/src/runtime/background-removal-resources.ts",
+      "packages/integration/src/runtime/resource-manifest.json",
+      "packages/integration/test/background-removal-resources.test.ts",
+      "packages/integration/test/background-removal.test.ts",
+      "licenses/u2netp-Apache-2.0.txt",
+      "licenses/onnxruntime-web-MIT.txt",
+      "package.json",
+      "pnpm-lock.yaml",
+      "openspec/changes/streamline-routego-image-generation/tasks.md"
     ],
     "externalStateAuthorized": false,
     "writerLease": "released",
