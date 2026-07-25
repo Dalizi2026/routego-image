@@ -109,17 +109,25 @@
     }
   },
   "controller": {
-    "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
-    "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
-    "generation": 13,
+    "threadId": "019f997e-225a-7623-a52a-2a9590b55d07",
+    "predecessorThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "generation": 14,
     "role": "program-controller",
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-pre-handoff-task-6.1-runtime-distribution-blocked",
+    "status": "authoritative-controller-generation-14-task-6.1-runtime-distribution-blocked",
     "authoritative": true,
-    "observableCompactions": 3,
-    "lastCompactionFingerprint": "controller-g13-observed-multiple-automatic-compactions-2026-07-25"
+    "observableCompactions": 0,
+    "lastCompactionFingerprint": null
+  },
+  "controllerPredecessor": {
+    "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "generation": 13,
+    "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+    "branch": "codex/routego-controller-g12",
+    "authorityRevoked": true,
+    "handoffCommit": "ced376cede0705350afb5184335a572c645c83d6"
   },
   "lastApplyOwner": {
     "lane": "streamline",
