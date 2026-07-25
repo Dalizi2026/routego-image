@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "19b52fdfc66d8791c82c7c374977a21afcb08c13faafadc526644c53c9f67639",
+  "contentSha256": "1a5a25ab4bc126007e697d5cbd31d6bafb66f9c38d027eeb22e4b0075db4b5aa",
   "lane": "studio",
   "change": "streamline-routego-image-generation",
   "taskId": "5.6",
-  "status": "source-correction-ready-stream-presentation-typecheck",
+  "status": "source-correction-activated-stream-presentation-typecheck",
   "sourceCommit": "cbcbefec6132d2f1b63864fef27f77839aa1d1c7",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
@@ -79,6 +79,14 @@
     "path": "packages/studio/src/features/creation/CreationWorkbench.tsx",
     "reason": "TS2339 at the stream-presentation union read of manualRetryWarning after the accepted browser-regression checkpoint",
     "allowedBehavior": "Unify the optional display shape only; do not restore retry, edit, upload, mask, capability-probe, Trash, ZIP, or batch behavior."
+  },
+  "sourceCorrectionActivation": {
+    "transitionId": "controller-g13-studio-5.6-g10-source-correction-003",
+    "controllerThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
+    "workerThreadId": "019f9916-ed2e-74e0-8613-a5b033583244",
+    "sourceCorrectionAcceptance": "177408e4a680422897662d7ce7c441502bb43ed1",
+    "soleApplyOwner": true,
+    "applyAuthorized": true
   },
   "externalStateAuthorized": false,
   "reportingContract": "The sole Studio apply owner must send a structured checkpoint to Controller and read Controller to confirm delivery after implementation, verification, task-state commit, or a blocker."
