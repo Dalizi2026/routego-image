@@ -40,7 +40,7 @@
 
 ## 6. Local Transparent Background Processing
 
-- [ ] 6.1 [Lane: Approval Gate] [Depends: 2.4,4.5] Obtain explicit user authorization before downloading or installing U-2-Netp/ONNX Runtime dependencies; record approved versions, licenses, upstream sources, SHA-256 values, and measured package-size impact. [Verify: approval is recorded and no dependency was acquired before it]
+- [x] 6.1 [Lane: Approval Gate] [Depends: 2.4,4.5] Obtain explicit user authorization before downloading or installing U-2-Netp/ONNX Runtime dependencies; record approved versions, licenses, upstream sources, SHA-256 values, and measured package-size impact. [Verify: approval is recorded and no dependency was acquired before it]
 - [ ] 6.2 [Lane: Integration/Packaging] [Depends: 6.1] Add pinned U-2-Netp model, required ONNX Runtime Web/WASM resources, license notices, integrity manifest, and offline package loading with no native addons or runtime download. [Verify: package resource integrity and license tests]
 - [ ] 6.3 [Lane: Integration] [Depends: 6.2] Implement the concurrency-one Node worker lifecycle, bounded preprocessing/inference/compositing, timeout/cancel/crash termination, and original-preserving cleanup. [Verify: `pnpm --filter @routego-image/integration test -- background-removal.test.ts`]
 - [ ] 6.4 [Lane: Integration] [Depends: 6.3] Implement alpha inspection and mask coverage/edge/dimension/output quality gates with deterministic synthetic PNG fixtures. [Verify: `pnpm --filter @routego-image/integration test -- background-removal.test.ts image.test.ts`]

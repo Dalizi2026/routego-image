@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "fa63ecf8b9d8b4e3048b63a7d04bd9f7180ee60633c2df4b89f20851b0c6adfd",
+  "contentSha256": "8f7129c11d6a5f063ee98677ca1f2583ec685ae36a21676bfbc1cd63d1e3761d",
   "event": "streamline-task-6.1-user-authorization-and-resource-integrity-audit",
   "change": "streamline-routego-image-generation",
   "taskId": "6.1",
@@ -85,6 +85,12 @@
     "verifiedCombinedPackagedImpact": 25008177,
     "reason": "Measured model plus verified runtime archive bytes; package metadata and license files add additional small overhead in Task 6.2."
   },
-  "nextRequiredAction": "Check off Task 6.1 after commit and activate Task 6.2 for pinned offline resource packaging. Do not install or replace the current plugin.",
+  "nextRequiredAction": "The verified resources are ready for Task 6.1 check-off, but activation of streamline Task 6.2 is blocked by missing task capsule and Integration owner. The existing integration-6.2.json belongs to integrate-routego-image-plugin and must not be reused. Create a matching streamline task capsule through the Controller before product mutation.",
+  "dispatchBlocker": {
+    "status": "plan-capsule-owner-mismatch",
+    "existingWrongChangeCapsule": ".codex/routego-program/tasks/integration-6.2.json",
+    "expectedChange": "streamline-routego-image-generation",
+    "requiredAction": "Create or restore the committed streamline 6.2 task capsule and activate an Integration apply owner using the existing thread/workspace policy before dispatch."
+  },
   "externalStateAuthorized": false
 }
