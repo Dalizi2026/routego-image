@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "mandatory-context-handoff-after-task-6.1-integrity-safe-checkpoint",
+  "status": "authoritative-pre-handoff-task-6.1-runtime-distribution-blocked",
   "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "predecessorThreadId": "019f8ab7-8af6-7181-a59d-2f662c037b1a",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -14,18 +14,18 @@
   "observableCompactions": 3,
   "lastCompactionFingerprint": "controller-g13-observed-multiple-automatic-compactions-2026-07-25",
   "lastHealthAudit": {
-    "status": "passed",
+    "status": "blocked-external-runtime-distribution-path",
       "workspaceHead": "057497869d777427c2c6ffaddd827b26c8d91fbd",
       "openspecProgress": "25/34",
       "acceptedTask": "5.6",
     "readyTasks": [
         "6.1"
     ],
-      "independentVerification": "Task 5.6 controller reproduction passed Studio typecheck, 19 test files/103 tests, production build, dead-surface scan, git diff check, and clean-Git workflow doctor."
+      "independentVerification": "Task 5.6 controller reproduction passed Studio typecheck, 19 test files/103 tests, production build, dead-surface scan, git diff check, and clean-Git workflow doctor. Task 6.1 then reproduced an official npm metadata versus retrievable-runtime-artifact integrity blocker in isolated npm caches."
   },
   "currentOperation": {
-    "id": "task-6.1-user-approval-recorded-runtime-integrity-resolution",
-    "allowedNext": "Resolve a runtime artifact that matches its official integrity declaration, record its SHA-256 and measured size, then complete Task 6.1 before dispatching Task 6.2.",
+    "id": "task-6.1-pre-handoff-official-runtime-distribution-path-blocker",
+    "allowedNext": "A fresh Controller successor must resume external audit through an independent official npm distribution path. It must obtain a complete archive matching official SHA-512 SRI and SHA-1, then verify tar contents, package metadata, SHA-256, and measured size before completing Task 6.1. Task 6.2 remains locked.",
     "forbidden": [
       "Product code outside each task exact owner scope",
       "package.json or pnpm-lock.yaml changes",

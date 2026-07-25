@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "e7add4d3670d52233ecc3f663434174d14a4e79cbf9cc24afa08d558f9c217e8",
+  "contentSha256": "8871b804aaf34d0944693a45c9c070d8ebcf6cd052e6f9a42f80546461686efd",
   "event": "streamline-task-6.1-user-authorization-and-resource-integrity-audit",
   "change": "streamline-routego-image-generation",
   "taskId": "6.1",
-  "status": "blocked-runtime-artifact-integrity-mismatch",
+  "status": "blocked-official-runtime-distribution-path-integrity-unresolved",
   "recordedAt": "2026-07-25T13:18:00.000Z",
   "userAuthorization": {
     "source": "Current Controller conversation on 2026-07-25",
@@ -52,12 +52,23 @@
       "approval": "rejected-pending-independent-official-artifact-resolution"
     }
   ],
+  "independentNpmCacheReproduction": {
+    "recordedAt": "2026-07-25T13:27:33.924Z",
+    "method": "In each fresh temporary npm cache, read official npm dist metadata and run npm pack onnxruntime-web@1.20.1 with --ignore-scripts and --json. No project directory, dependency, lockfile, model, WASM resource, or product source was modified.",
+    "officialRegistryMetadata": {
+      "registry": "https://registry.npmjs.org",
+      "integrity": "sha512-TePF6XVpLL1rWVMIl5Y9ACBQcyCNFThZON/jgElNd9Txb73CIEGlklhYR3UEr1cp5r0rbGI6nDwwrs79g7WjoA==",
+      "shasumSha1": "71dc4495bb75cdd56a9dc981cf27723a599189f7"
+    },
+    "result": "Three fresh isolated npm-cache attempts read official metadata but did not produce a tarball that could complete explicit SHA-512/SHA-1 comparison, tar listing, package metadata, and size verification. The verbose attempt reached only npm registry metadata GET 200 responses before no verifiable tarball was available.",
+    "disposition": "No newly downloaded artifact is approved, no SHA-256 is recorded for an unverified artifact, and Task 6.1 remains incomplete. This does not override the earlier rejected range response."
+  },
   "packageSizeImpact": {
     "verifiedModelBytes": 4574861,
     "runtimeRegistryUnpackedBytes": 96005696,
     "verifiedCombinedPackagedImpact": null,
     "reason": "Combined packaged impact remains intentionally unmeasured because the required runtime artifact failed integrity verification and is not approved for packaging."
   },
-  "nextRequiredAction": "Resolve a cryptographically valid official ONNX Runtime Web/WASM distribution, record its SHA-256 and measured package impact, then complete Task 6.1 before dispatching Task 6.2.",
+  "nextRequiredAction": "A fresh Controller successor must use an independent official npm distribution path that produces a complete archive, then require official SHA-512 SRI and SHA-1 matches, a complete tar listing, package version/license inspection, SHA-256 recording, and measured package impact before completing Task 6.1. Task 6.2 remains locked until then.",
   "externalStateAuthorized": false
 }

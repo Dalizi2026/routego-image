@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-13-mandatory-context-handoff-after-task-6.1-integrity-safe-checkpoint",
+  "status": "controller-generation-13-mandatory-context-handoff-task-6.1-runtime-distribution-blocked",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -101,7 +101,12 @@
       ],
       "fingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01"
     },
-    "externalStateAuthorized": false
+    "externalStateAuthorized": false,
+    "task6_1RuntimeDistributionBlocker": {
+      "status": "blocked-official-runtime-distribution-path-integrity-unresolved",
+      "evidencePath": ".codex/routego-program/evidence/streamline-6.1-external-resource-approval.json",
+      "continuation": "A fresh Controller successor must resume the external audit. Task 6.1 remains incomplete and Task 6.2 is locked until an independently retrievable official archive passes SRI, SHA-1, archive, metadata, and size checks."
+    }
   },
   "controller": {
     "threadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
@@ -111,7 +116,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-13-studio-g9-platform-recovery-registration",
+    "status": "authoritative-pre-handoff-task-6.1-runtime-distribution-blocked",
     "authoritative": true,
     "observableCompactions": 3,
     "lastCompactionFingerprint": "controller-g13-observed-multiple-automatic-compactions-2026-07-25"
