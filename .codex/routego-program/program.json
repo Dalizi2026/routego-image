@@ -211,21 +211,21 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.1c-completed-awaiting-6.2-acceptance",
+      "status": "task-6.2-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "6.1c",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "ded3aed3620fd9eaeeef37a304a8e0333f86c687",
+      "currentHead": "445c2ccf936deafb55f96b3ead7ee3fdf08d13ab",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
         "sha256": "a06cf5b12323b2334ea602dc8bbcd5d6da7057e5a3516368f73690f17b1de1d4"
       },
-      "authorizedScope": "Task 6.1c only; remove stale Integration contract references. Task 6.2 remains locked pending 6.1a, 6.1b, and 6.1c.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 6.2 offline resources and package inclusion are activated for the registered Integration owner; Task 6.3+ and 7.3 remain locked.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "6.1c",
       "implementationCommit": "9a8c5909172151875aaefcd236186051788d95c7",
       "taskStateCommit": "ded3aed3620fd9eaeeef37a304a8e0333f86c687"
@@ -310,13 +310,13 @@
       "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "9ef34b8ddd30133c5bfedcf40db57f528f7e2159",
+      "currentHead": "445c2ccf936deafb55f96b3ead7ee3fdf08d13ab",
       "observableCompactions": 0,
-      "lastCompletedTask": "6.1",
-      "status": "task-6.1c-verification-scope-revised-activated",
-      "taskId": "6.1c",
+      "lastCompletedTask": "6.1c",
+      "status": "task-6.2-activated",
+      "taskId": "6.2",
       "taskCapsuleIntegrity": {
-        "canonicalSha256": "573cc6afac383ba3e3e7be28afa9a9ae7993293af6ceebfae59f75619bac76d1"
+        "canonicalSha256": "a06cf5b12323b2334ea602dc8bbcd5d6da7057e5a3516368f73690f17b1de1d4"
       }
     },
     "streamlineCreation": {
@@ -386,10 +386,10 @@
     },
     "currentTask": {
       "id": "6.2",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 6.2 is ready for the registered Integration owner after fresh acceptance; Task 6.3+ and 7.3 remain locked."
+      "authorizedScope": "Task 6.2 is activated for the registered Integration owner; only capsule-declared offline resource/package files are allowed. Task 6.3+ and 7.3 remain locked."
     }
   },
   "latestDirectCheckpoint": {
