@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "transitionId": "streamline-6.1c-dispatch-20260726-001",
   "eventFingerprint": "streamline-6.1c-verification-scope-revised-20260726-001",
-  "state": "task-message-sent",
+  "state": "next-task-acknowledged",
   "resumeState": null,
   "sourceThreadId": "019f99ae-601b-7262-9457-8006de418f17",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
@@ -12,7 +12,7 @@
   "attemptCount": 1,
   "lastAttemptAt": "2026-07-26T05:12:25.638Z",
   "lastError": null,
-  "receiptPath": null,
+  "receiptPath": ".codex/routego-program/dispatch/receipts/streamline-6.1c-verification-scope-revised-20260726-001.json",
   "lastTransitionId": null,
-  "updatedAt": "2026-07-26T05:12:25.638Z"
+  "updatedAt": "2026-07-26T05:16:42.929Z"
 }
