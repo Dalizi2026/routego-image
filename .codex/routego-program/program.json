@@ -221,7 +221,7 @@
       "currentHead": "9a8c5909172151875aaefcd236186051788d95c7",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
-        "sha256": "54ddf2470bb167666ceb5ab0bc3aa135642cbe97e573daf270c6180614deab3f"
+        "sha256": "573cc6afac383ba3e3e7be28afa9a9ae7993293af6ceebfae59f75619bac76d1"
       },
       "authorizedScope": "Task 6.1c only; remove stale Integration contract references. Task 6.2 remains locked pending 6.1a, 6.1b, and 6.1c.",
       "soleApplyOwner": false,
@@ -314,7 +314,7 @@
       "status": "task-6.1c-verification-scope-revised-awaiting-acceptance",
       "taskId": "6.1c",
       "taskCapsuleIntegrity": {
-        "canonicalSha256": "54ddf2470bb167666ceb5ab0bc3aa135642cbe97e573daf270c6180614deab3f"
+        "canonicalSha256": "573cc6afac383ba3e3e7be28afa9a9ae7993293af6ceebfae59f75619bac76d1"
       }
     },
     "streamlineCreation": {

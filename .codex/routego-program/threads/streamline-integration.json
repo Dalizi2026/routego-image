@@ -55,7 +55,7 @@
   },
   "taskCapsule": {
     "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
-    "contentSha256": "54ddf2470bb167666ceb5ab0bc3aa135642cbe97e573daf270c6180614deab3f"
+    "contentSha256": "573cc6afac383ba3e3e7be28afa9a9ae7993293af6ceebfae59f75619bac76d1"
   },
   "registration": {
     "reason": "Task 6.2 implementation is committed but locked until the three independent typecheck-baseline repairs complete. This owner is registered for 6.1c only.",
