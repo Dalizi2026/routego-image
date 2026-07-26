@@ -145,6 +145,8 @@ This change is applied on `codex/routego-integration-g8` by one OpenSpec apply o
 
 Task 6.2 owns the minimum existing package-builder and package-verifier changes required to carry its pinned model, WASM, license, and integrity resources into the built offline plugin. This does not include the later full artifact smoke and release gates owned by Task 7.3.
 
+Before Task 6.2 can be accepted, the Controller may run the narrowly scoped 6.1a, 6.1b, and 6.1c typecheck-baseline repairs when pre-existing Generation-only contract debt in Creation, Library, or Integration prevents the required Integration typecheck. Those repairs remove only stale type-level and fixture references within their owning lane; they neither change public contracts nor implement later background-removal behavior.
+
 Frozen dependencies are Node.js 20.19+, pnpm 11.9+, strict TypeScript, the existing atomic JSON/lock/journal primitives, loopback session security, and browser path-free contracts. A task that needs to change these boundaries must first update this OpenSpec design.
 
 ## Error And Security Boundaries
