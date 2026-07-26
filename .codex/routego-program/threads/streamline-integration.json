@@ -2,23 +2,23 @@
   "schemaVersion": 2,
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-6.2-offline-background-removal-resources-owner",
-  "status": "task-6.2-activated",
+  "role": "task-6.3-local-background-removal-worker-owner",
+  "status": "task-6.2-completed-awaiting-task-6.3-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "445c2ccf936deafb55f96b3ead7ee3fdf08d13ab",
+  "currentHead": "a319e5bb1880225d2b12b717e55021b587bae0b6",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
-    "id": "6.2",
-    "status": "activated",
-    "locked": false
+    "id": "6.3",
+    "status": "awaiting-acceptance",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -55,21 +55,15 @@
     "handoffAcceptanceObservableCompactions": 0
   },
   "taskCapsule": {
-    "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
-    "contentSha256": "a06cf5b12323b2334ea602dc8bbcd5d6da7057e5a3516368f73690f17b1de1d4"
+    "path": ".codex/routego-program/tasks/streamline-integration-6.3.json",
+    "contentSha256": "890ffd7b7fc1b5603085394423313efc59c87a718b1ad0f4bee93ebba08ab21d"
   },
   "registration": {
-    "reason": "Task 6.1c is complete; this owner is registered for the next Task 6.2 offline resource/package scope.",
+    "reason": "Task 6.2 is complete; this owner is registered for the next Task 6.3 local worker scope.",
       "permittedScope": [
-        "packages/integration/src/composition/inputs.ts",
-        "packages/integration/src/composition/results.ts",
-        "packages/integration/src/provider/probes.ts",
-        "packages/integration/test/fixtures.ts",
-        "packages/integration/test/http-host.test.ts",
-        "packages/integration/test/provider.test.ts",
-        "packages/integration/test/results.test.ts",
-        "packages/integration/test/routes.test.ts",
-        "packages/integration/test/service.test.ts",
+        "packages/integration/src/runtime/background-removal.ts",
+        "packages/integration/src/runtime/background-removal-worker.ts",
+        "packages/integration/test/background-removal.test.ts",
         "openspec/changes/streamline-routego-image-generation/tasks.md"
     ],
     "externalStateAuthorized": false,

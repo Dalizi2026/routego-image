@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-14-dispatching-task-6.2",
+  "status": "controller-generation-14-dispatching-task-6.3",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -116,7 +116,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-14-dispatching-task-6.2",
+    "status": "authoritative-controller-generation-14-dispatching-task-6.3",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -211,24 +211,24 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.2-activated",
+      "status": "task-6.2-completed-awaiting-task-6.3-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
-      "taskId": "6.1c",
+      "taskId": "6.3",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "445c2ccf936deafb55f96b3ead7ee3fdf08d13ab",
+      "currentHead": "a319e5bb1880225d2b12b717e55021b587bae0b6",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
-        "sha256": "a06cf5b12323b2334ea602dc8bbcd5d6da7057e5a3516368f73690f17b1de1d4"
+        "path": ".codex/routego-program/tasks/streamline-integration-6.3.json",
+        "sha256": "890ffd7b7fc1b5603085394423313efc59c87a718b1ad0f4bee93ebba08ab21d"
       },
-      "authorizedScope": "Task 6.2 offline resources and package inclusion are activated for the registered Integration owner; Task 6.3+ and 7.3 remain locked.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "6.1c",
-      "implementationCommit": "9a8c5909172151875aaefcd236186051788d95c7",
-      "taskStateCommit": "ded3aed3620fd9eaeeef37a304a8e0333f86c687"
+      "authorizedScope": "Task 6.3 acceptance is pending for the registered Integration owner; Task 6.4+ and 7.3 remain locked.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "6.2",
+      "implementationCommit": "e3a2524ec5968032bc9311136d284430985e348c",
+      "taskStateCommit": "a319e5bb1880225d2b12b717e55021b587bae0b6"
     },
     "streamlineCreation": {
       "status": "task-6.1a-completed-awaiting-controller-archive",
@@ -310,13 +310,13 @@
       "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "445c2ccf936deafb55f96b3ead7ee3fdf08d13ab",
+      "currentHead": "a319e5bb1880225d2b12b717e55021b587bae0b6",
       "observableCompactions": 0,
-      "lastCompletedTask": "6.1c",
-      "status": "task-6.2-activated",
-      "taskId": "6.2",
+      "lastCompletedTask": "6.2",
+      "status": "task-6.2-completed-awaiting-task-6.3-acceptance",
+      "taskId": "6.3",
       "taskCapsuleIntegrity": {
-        "canonicalSha256": "a06cf5b12323b2334ea602dc8bbcd5d6da7057e5a3516368f73690f17b1de1d4"
+        "canonicalSha256": "890ffd7b7fc1b5603085394423313efc59c87a718b1ad0f4bee93ebba08ab21d"
       }
     },
     "streamlineCreation": {
