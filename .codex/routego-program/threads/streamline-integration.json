@@ -3,7 +3,7 @@
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
   "role": "task-7.4-governance-owner",
-  "status": "task-7.4-activated",
+  "status": "task-7.4-completed",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
@@ -13,12 +13,12 @@
   "currentHead": "1313dc7227515a647021615e9d02ca688f40254e",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
     "id": "7.4",
-    "status": "activated",
-    "locked": false
+    "status": "completed",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -49,9 +49,9 @@
   },
   "externalStateAuthorized": false,
   "lastCompletedTask": {
-    "id": "6.5",
-    "implementationCommit": "6047d9a6c5da4a4cc1ca539411695c46cb14c2fb",
-    "taskStateCommit": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3",
+    "id": "7.4",
+    "implementationCommit": "3b8b84ca095d9192f254f8719c1815676778f53e",
+    "taskStateCommit": "61c0b505931147806248670132de76eed079c12d",
     "handoffAcceptanceObservableCompactions": 0
   },
   "taskCapsule": {

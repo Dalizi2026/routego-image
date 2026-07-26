@@ -211,24 +211,24 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-7.4-activated",
+      "status": "task-7.4-completed",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "7.4",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "1313dc7227515a647021615e9d02ca688f40254e",
+      "currentHead": "61c0b505931147806248670132de76eed079c12d",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-7.4.json",
         "sha256": "6aa17caa7c28c46120bb7502e433ddf172568707f66cc80439fc5c39b6f0e740"
       },
-      "authorizedScope": "Task 7.4 final governance audit is activated for the registered owner; only final audit evidence and the 7.4 task-state line are allowed. No real migration or installed-plugin replacement.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "7.2",
-      "implementationCommit": "6047d9a6c5da4a4cc1ca539411695c46cb14c2fb",
-      "taskStateCommit": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3"
+      "authorizedScope": "Task 7.4 final governance audit completed; no further product or external-state work is authorized in this change.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "7.4",
+      "implementationCommit": "3b8b84ca095d9192f254f8719c1815676778f53e",
+      "taskStateCommit": "61c0b505931147806248670132de76eed079c12d"
     },
     "streamlineCreation": {
       "status": "task-6.1a-completed-awaiting-controller-archive",
@@ -386,10 +386,10 @@
     },
     "currentTask": {
       "id": "7.4",
-      "locked": false,
-      "activationAuthorized": true,
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 7.4 final governance audit is activated; no product or external-state work is authorized."
+      "authorizedScope": "Task 7.4 final governance audit completed; no further task is pending in this change."
     }
   },
   "latestDirectCheckpoint": {
