@@ -708,7 +708,8 @@ export class LibrarySettingsStore {
       if (!selected) throw new LibraryError("not_found", "The provider profile does not exist.");
 
       const preferredModel = parsed.preferredModel ?? state.config.defaults.model;
-      const modelPreserved = selected.models.includes(preferredModel);
+      const modelPreserved =
+        preferredModel !== undefined && selected.models.includes(preferredModel);
       const selectedModel = modelPreserved ? preferredModel : selected.defaultModel;
       if (selectedModel === undefined || !selected.models.includes(selectedModel)) {
         throw new LibraryError("invalid_input", "The target provider has no valid default model.");

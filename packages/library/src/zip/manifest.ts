@@ -99,32 +99,7 @@ function portableParameters(parameters: LibraryOperationParameters): LibraryOper
       ...(reference.label === undefined
         ? {}
         : { label: redactPortableText(reference.label) })
-    })),
-    supportingImages: parameters.supportingImages.map((reference) => ({
-      ...reference,
-      ...(reference.label === undefined
-        ? {}
-        : { label: redactPortableText(reference.label) })
-    })),
-    ...(parameters.target === undefined
-      ? {}
-      : {
-          target: {
-            ...parameters.target,
-            ...(parameters.target.label === undefined
-              ? {}
-              : { label: redactPortableText(parameters.target.label) })
-          }
-        }),
-    ...(parameters.invariants === undefined
-      ? {}
-      : {
-          invariants: {
-            allowedChanges: parameters.invariants.allowedChanges.map(redactPortableText),
-            preserve: parameters.invariants.preserve.map(redactPortableText),
-            forbiddenChanges: parameters.invariants.forbiddenChanges.map(redactPortableText)
-          }
-        })
+    }))
   };
 }
 
@@ -218,12 +193,7 @@ function parsePortableBlob(value: unknown): PortableImageBlob {
 }
 
 function parameterAssetIds(parameters: LibraryOperationParameters): readonly string[] {
-  return [
-    ...parameters.references.map((item) => item.assetId),
-    ...parameters.supportingImages.map((item) => item.assetId),
-    ...(parameters.target === undefined ? [] : [parameters.target.assetId]),
-    ...(parameters.maskAssetId === undefined ? [] : [parameters.maskAssetId])
-  ];
+  return parameters.references.map((item) => item.assetId);
 }
 
 export function portableAssetDependencyIds(asset: StoredLibraryAsset): ReadonlySet<string> {
