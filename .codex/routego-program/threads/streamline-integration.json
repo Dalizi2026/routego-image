@@ -2,23 +2,23 @@
   "schemaVersion": 2,
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-6.1c-integration-typecheck-baseline-repair-owner",
-  "status": "task-6.1c-verification-scope-revised-activated",
+  "role": "task-6.2-offline-background-removal-resources-owner",
+  "status": "task-6.1c-completed-awaiting-6.2-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "9ef34b8ddd30133c5bfedcf40db57f528f7e2159",
+  "currentHead": "ded3aed3620fd9eaeeef37a304a8e0333f86c687",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
-    "id": "6.1c",
-    "status": "activated",
-    "locked": false
+    "id": "6.2",
+    "status": "awaiting-acceptance",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -49,16 +49,17 @@
   },
   "externalStateAuthorized": false,
   "lastCompletedTask": {
-    "id": "6.1",
-    "implementationCommit": "4baf17f4e4454ea5b8e07e06b54247cdd1849221",
+    "id": "6.1c",
+    "implementationCommit": "9a8c5909172151875aaefcd236186051788d95c7",
+    "taskStateCommit": "ded3aed3620fd9eaeeef37a304a8e0333f86c687",
     "handoffAcceptanceObservableCompactions": 0
   },
   "taskCapsule": {
-    "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
-    "contentSha256": "573cc6afac383ba3e3e7be28afa9a9ae7993293af6ceebfae59f75619bac76d1"
+    "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
+    "contentSha256": "a06cf5b12323b2334ea602dc8bbcd5d6da7057e5a3516368f73690f17b1de1d4"
   },
   "registration": {
-    "reason": "Task 6.2 implementation is committed but locked until the three independent typecheck-baseline repairs complete. This owner is registered for 6.1c only.",
+    "reason": "Task 6.1c is complete; this owner is registered for the next Task 6.2 offline resource/package scope.",
       "permittedScope": [
         "packages/integration/src/composition/inputs.ts",
         "packages/integration/src/composition/results.ts",

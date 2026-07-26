@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-14-typecheck-baseline-repair-dispatch",
+  "status": "controller-generation-14-dispatching-task-6.2",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -116,7 +116,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-14-dispatching-task-6.1c",
+    "status": "authoritative-controller-generation-14-dispatching-task-6.2",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -211,22 +211,24 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.1c-verification-scope-revised-activated",
+      "status": "task-6.1c-completed-awaiting-6.2-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "6.1c",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "9ef34b8ddd30133c5bfedcf40db57f528f7e2159",
+      "currentHead": "ded3aed3620fd9eaeeef37a304a8e0333f86c687",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
-        "sha256": "573cc6afac383ba3e3e7be28afa9a9ae7993293af6ceebfae59f75619bac76d1"
+        "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
+        "sha256": "a06cf5b12323b2334ea602dc8bbcd5d6da7057e5a3516368f73690f17b1de1d4"
       },
       "authorizedScope": "Task 6.1c only; remove stale Integration contract references. Task 6.2 remains locked pending 6.1a, 6.1b, and 6.1c.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "6.1"
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "6.1c",
+      "implementationCommit": "9a8c5909172151875aaefcd236186051788d95c7",
+      "taskStateCommit": "ded3aed3620fd9eaeeef37a304a8e0333f86c687"
     },
     "streamlineCreation": {
       "status": "task-6.1a-completed-awaiting-controller-archive",
@@ -374,19 +376,20 @@
         "5.6",
         "6.1",
         "6.1a",
-        "6.1b"
-      ],
-      "readyTaskIds": [
+        "6.1b",
         "6.1c"
       ],
-      "nextTaskId": "6.1c"
+      "readyTaskIds": [
+        "6.2"
+      ],
+      "nextTaskId": "6.2"
     },
     "currentTask": {
-      "id": "6.1c",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "6.2",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 6.1c is activated for the registered Integration owner; only the capsule-declared verification and task-state update are allowed. Task 6.2 remains locked until 6.1c completes."
+      "authorizedScope": "Task 6.2 is ready for the registered Integration owner after fresh acceptance; Task 6.3+ and 7.3 remain locked."
     }
   },
   "latestDirectCheckpoint": {
