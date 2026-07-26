@@ -211,7 +211,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-7.1-accepted-awaiting-activation",
+      "status": "task-7.1-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
@@ -386,10 +386,10 @@
     },
     "currentTask": {
       "id": "7.1",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 7.1 is dispatched to the registered Integration owner and remains locked until explicit activation; Task 7.2+ remain locked."
+      "authorizedScope": "Task 7.1 is activated for the registered Integration owner; only capsule-declared dead-surface and safety files are allowed. Task 7.2+ remain locked."
     }
   },
   "latestDirectCheckpoint": {
