@@ -1,23 +1,23 @@
 {
   "schemaVersion": 2,
-  "lane": "integration",
+  "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-6.2-integration-recovery-owner",
-  "status": "task-6.2-implementation-committed-typecheck-blocked",
+  "role": "task-6.1c-integration-typecheck-baseline-repair-owner",
+  "status": "task-6.1c-registered-awaiting-dispatch",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "6daea607267d0884f9d9f93a58fe0eab840ffd83",
+  "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": false,
   "applyAuthorized": false,
   "currentTask": {
-    "id": "6.2",
-    "status": "implementation-committed-typecheck-blocked",
+    "id": "6.1c",
+    "status": "registered-awaiting-dispatch",
     "locked": true
   },
   "sourceOwner": {
@@ -54,27 +54,22 @@
     "handoffAcceptanceObservableCompactions": 0
   },
   "taskCapsule": {
-    "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
-    "contentSha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57"
+    "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
+    "contentSha256": "ad91b715781a10b43a65bc1dfc5d174859009553d7da522863669a5fd94b0d12"
   },
   "registration": {
-    "reason": "Task 6.2 revised scope is accepted and activated for this registered Integration owner; package builder/verifier ownership is limited to the declared offline resources.",
-    "permittedScope": [
-      "packages/integration/src/runtime/background-removal.ts",
-      "packages/integration/src/runtime/background-removal-worker.ts",
-      "packages/integration/src/runtime/background-removal-resources.ts",
-      "packages/integration/src/runtime/resource-manifest.json",
-      "packages/integration/resources/background-removal/**",
-      "scripts/build-plugin-package.mjs",
-      "scripts/verify-plugin-package.mjs",
-      "packages/integration/test/install-smoke.test.ts",
-      "packages/integration/test/background-removal-resources.test.ts",
-      "packages/integration/test/background-removal.test.ts",
-      "licenses/u2netp-Apache-2.0.txt",
-      "licenses/onnxruntime-web-MIT.txt",
-      "package.json",
-      "pnpm-lock.yaml",
-      "openspec/changes/streamline-routego-image-generation/tasks.md"
+    "reason": "Task 6.2 implementation is committed but locked until the three independent typecheck-baseline repairs complete. This owner is registered for 6.1c only.",
+      "permittedScope": [
+        "packages/integration/src/composition/inputs.ts",
+        "packages/integration/src/composition/results.ts",
+        "packages/integration/src/provider/probes.ts",
+        "packages/integration/test/fixtures.ts",
+        "packages/integration/test/http-host.test.ts",
+        "packages/integration/test/provider.test.ts",
+        "packages/integration/test/results.test.ts",
+        "packages/integration/test/routes.test.ts",
+        "packages/integration/test/service.test.ts",
+        "openspec/changes/streamline-routego-image-generation/tasks.md"
     ],
     "externalStateAuthorized": false,
     "writerLease": "required-after-activation",

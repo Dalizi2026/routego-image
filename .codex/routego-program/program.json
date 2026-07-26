@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-14-task-6.2-implementation-blocked-by-typecheck-baseline",
+  "status": "controller-generation-14-typecheck-baseline-repair-dispatch",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -211,22 +211,50 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.2-implementation-committed-typecheck-blocked",
+      "status": "task-6.1c-registered-awaiting-dispatch",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
-      "taskId": "6.2",
+      "taskId": "6.1c",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "6daea607267d0884f9d9f93a58fe0eab840ffd83",
+      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/streamline-integration-6.2.json",
-        "sha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57"
+        "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
+        "sha256": "ad91b715781a10b43a65bc1dfc5d174859009553d7da522863669a5fd94b0d12"
       },
-      "authorizedScope": "Task 6.2 implementation committed at e3a2524; task state locked until required Integration typecheck baseline is restored.",
+      "authorizedScope": "Task 6.1c only; remove stale Integration contract references. Task 6.2 remains locked pending 6.1a, 6.1b, and 6.1c.",
       "soleApplyOwner": false,
       "applyAuthorized": false,
       "lastCompletedTask": "6.1"
+    },
+    "streamlineCreation": {
+      "status": "task-6.1a-registered-awaiting-dispatch",
+      "taskRef": "019f9bd6-1aef-73f0-8459-2b416a72ea86",
+      "threadId": "019f9bd6-1aef-73f0-8459-2b416a72ea86",
+      "generation": 1,
+      "taskId": "6.1a",
+      "branch": "codex/routego-controller-g12",
+      "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+      "taskCapsule": {"path": ".codex/routego-program/tasks/streamline-creation-6.1a.json", "sha256": "211f9a76a6d52bbecabadee3682c62b38e36fcc6082c9ddc5485f8e6faf19c31"},
+      "authorizedScope": "Task 6.1a only; remove stale Creation generation-only contract references.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false
+    },
+    "streamlineLibrary": {
+      "status": "task-6.1b-registered-awaiting-dispatch",
+      "taskRef": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
+      "threadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
+      "generation": 1,
+      "taskId": "6.1b",
+      "branch": "codex/routego-controller-g12",
+      "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+      "taskCapsule": {"path": ".codex/routego-program/tasks/streamline-library-6.1b.json", "sha256": "3be612300fa5221e8961b441788e4db7d465e3701df71f9d7ede477d994fb28b"},
+      "authorizedScope": "Task 6.1b only; remove stale Library generation-only contract references.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false
     }
   },
   "laneSuccessors": {
@@ -275,22 +303,44 @@
       "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "6daea607267d0884f9d9f93a58fe0eab840ffd83",
+      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
       "observableCompactions": 0,
       "lastCompletedTask": "6.1",
-      "status": "task-6.2-implementation-committed-typecheck-blocked",
-      "taskId": "6.2",
+      "status": "task-6.1c-registered-awaiting-dispatch",
+      "taskId": "6.1c",
       "taskCapsuleIntegrity": {
-        "canonicalSha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57"
+        "canonicalSha256": "ad91b715781a10b43a65bc1dfc5d174859009553d7da522863669a5fd94b0d12"
       }
+    },
+    "streamlineCreation": {
+      "threadId": "019f9bd6-1aef-73f0-8459-2b416a72ea86",
+      "generation": 1,
+      "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+      "plannedBranch": "codex/routego-controller-g12",
+      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+      "observableCompactions": 0,
+      "status": "task-6.1a-registered-awaiting-dispatch",
+      "taskId": "6.1a",
+      "taskCapsuleIntegrity": {"canonicalSha256": "211f9a76a6d52bbecabadee3682c62b38e36fcc6082c9ddc5485f8e6faf19c31"}
+    },
+    "streamlineLibrary": {
+      "threadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
+      "generation": 1,
+      "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+      "plannedBranch": "codex/routego-controller-g12",
+      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+      "observableCompactions": 0,
+      "status": "task-6.1b-registered-awaiting-dispatch",
+      "taskId": "6.1b",
+      "taskCapsuleIntegrity": {"canonicalSha256": "3be612300fa5221e8961b441788e4db7d465e3701df71f9d7ede477d994fb28b"}
     }
   },
   "currentChange": {
     "id": "streamline-routego-image-generation",
     "lane": "multi-lane",
     "openspec": {
-      "totalTasks": 34,
-      "completedTasks": 25,
+      "totalTasks": 37,
+      "completedTasks": 26,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -316,19 +366,20 @@
         "5.4",
         "4.6",
         "5.5",
-        "5.6"
-      ],
-      "readyTaskIds": [
+        "5.6",
         "6.1"
       ],
-      "nextTaskId": "6.1"
+      "readyTaskIds": [
+        "6.1a"
+      ],
+      "nextTaskId": "6.1a"
     },
     "currentTask": {
-      "id": "6.1",
-      "locked": true,
-      "activationAuthorized": false,
+      "id": "6.1a",
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 6.1 cannot be activated until the external dependency approval gate is executable and a current task capsule matches its OpenSpec definition."
+      "authorizedScope": "Task 6.1a only. Tasks 6.1b and 6.1c are queued serially; Task 6.2 remains locked until all three repairs complete."
     }
   },
   "latestDirectCheckpoint": {

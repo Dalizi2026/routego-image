@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 2,
+  "lane": "streamline-creation",
+  "change": "streamline-routego-image-generation",
+  "role": "task-6.1a-creation-typecheck-baseline-repair-owner",
+  "status": "task-6.1a-registered-awaiting-dispatch",
+  "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+  "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
+  "threadId": "019f9bd6-1aef-73f0-8459-2b416a72ea86",
+  "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+  "branch": "codex/routego-controller-g12",
+  "generation": 1,
+  "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+  "observableCompactions": 0,
+  "lastCompactionFingerprint": null,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
+  "currentTask": {
+    "id": "6.1a",
+    "status": "registered-awaiting-dispatch",
+    "locked": true
+  },
+  "taskCapsule": {
+    "path": ".codex/routego-program/tasks/streamline-creation-6.1a.json",
+    "contentSha256": "211f9a76a6d52bbecabadee3682c62b38e36fcc6082c9ddc5485f8e6faf19c31"
+  },
+  "reportingContract": {
+    "currentControllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
+    "primary": "send_message_to_thread plus read_thread after every checkpoint, blocker, deviation, handoff, activation, implementation, delivery, or acceptance request",
+    "fallback": "No secondary continuation path exists; heartbeat cannot advance work.",
+    "acknowledgementRequiredBeforeAcceptance": true
+  },
+  "lowContextPolicy": {
+    "startupMaxFiles": 12,
+    "startupMaxUtf8Bytes": 122880,
+    "acceptanceObservableCompactions": 0
+  },
+  "externalStateAuthorized": false
+}
