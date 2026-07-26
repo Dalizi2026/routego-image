@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "857f00a01123f69f8fe7986302ef10c0fd86edc83dcba095fb48b74a7cff9c7c",
+  "lane": "streamline-integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "7.1",
+  "status": "ready-after-task-6.5",
+  "sourceCommit": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "af68d924b27cc7c34824eda8997fbef5f68521315b4a86de1134ebabd3e7ebb9",
+    "lineSha256": "5df11c8ba1e96d712fbdd91b965c5a705a8baa42db00672562db684d740dac8d",
+    "lineBytes": 358
+  },
+  "dependencies": ["2.4", "3.5", "4.5", "5.6", "6.5"],
+  "dependencyCommits": {
+    "task6_5": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3"
+  },
+  "allowedFiles": [
+    "packages/contracts/src/service.ts",
+    "packages/contracts/src/studio-creation.ts",
+    "packages/contracts/test/settings-service.test.ts",
+    "packages/contracts/test/studio-creation.test.ts",
+    "packages/contracts/test/tools-service.test.ts",
+    "packages/integration/src/composition/service.ts",
+    "packages/integration/test/mcp-process.test.ts",
+    "packages/integration/test/service.test.ts",
+    "packages/mock-relay/src/service/mock-service.ts",
+    "packages/studio/test/settings-workbench-sync.test.ts",
+    "scripts/ci-plugin-smoke.mjs",
+    "scripts/smoke-plugin-install.mjs",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/library/**",
+    "packages/creation/**",
+    "packages/foundation/**",
+    "packages/studio/src/**",
+    "packages/integration/resources/**",
+    "packages/integration/src/runtime/**",
+    "packages/integration/test/install-smoke.test.ts",
+    "scripts/build-plugin-package.mjs",
+    "scripts/verify-plugin-package.mjs",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".codex-plugin/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "real-data/**",
+    "**/.env*"
+  ],
+  "requiredBehavior": [
+    "Run the repository safety scanner and classify every remaining edit, mask, or Trash reference.",
+    "Remove stale shipped edit/mask/Trash runtime, smoke, and non-migration test surfaces from the declared files.",
+    "Retain explicit migration-history documentation and negative tests that prove removed clients are rejected.",
+    "Keep the seven public operations and generation-only contracts unchanged while making package smoke expectations current."
+  ],
+  "verification": [
+    "pnpm safety",
+    "rg -n 'routego_edit|studioEdit|MaskEditor' packages scripts plugin",
+    "pnpm --filter @routego-image/contracts typecheck",
+    "pnpm --filter @routego-image/integration typecheck",
+    "pnpm --filter @routego-image/integration exec vitest run --config vitest.config.ts test/mcp-process.test.ts test/service.test.ts",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/proposal.md",
+      "sha256": "1212725c03d16c97957bf2cf792908439bb3dc3e91367c5014d7a5e7ad728d2f",
+      "reason": "Removes shipped edit/Trash surfaces while retaining a separately approved legacy cleanup migration."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "bfa8c541a9d5c7ade99f9dcfd76c9e06c0b01344a0d08cfa5ce39a76810cd12d",
+      "reason": "Defines dead-surface scanning, migration-history retention, and final safety gates."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-7.1-dead-surface-safety-scan",
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "reportingContract": "Before acceptance send THREAD_HANDSHAKE and verify delivery. After activation use direct messages for every acceptance, activation, checkpoint, blocker, deviation, and delivery; heartbeat and final answers never advance this task."
+}
