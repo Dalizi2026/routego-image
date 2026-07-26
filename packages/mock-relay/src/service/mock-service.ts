@@ -98,7 +98,6 @@ import {
   type ReorderFoldersResult,
   type RoutegoBatchInput,
   type RoutegoBatchResult,
-  type RoutegoEditInput,
   type RoutegoGenerateInput,
   type RoutegoManageLibraryInput,
   type RoutegoManageLibraryResult,
@@ -114,7 +113,6 @@ import {
   type SetActiveProviderProfileResult,
   type StudioBatchInput,
   type StudioBatchResult,
-  type StudioEditInput,
   type StudioGenerateInput,
   type StudioImageArtifact,
   type StudioImageRelationship,
@@ -1210,10 +1208,6 @@ export class MockRoutegoService implements LocalRoutegoService {
     return this.#imageResult(fixture, request, this.#requestId("generate", request));
   }
 
-  async edit(_input: RoutegoEditInput): Promise<ImageOperationResult> {
-    throw this.#error("conflict", "The generation-only mock service does not support edit operations.");
-  }
-
   async batch(input: RoutegoBatchInput): Promise<RoutegoBatchResult> {
     const parsed = routegoBatchInputSchema.parse(input);
     const fixture = this.#fixture("batch");
@@ -1301,10 +1295,6 @@ export class MockRoutegoService implements LocalRoutegoService {
       request,
       this.#requestId("studioGenerate", request)
     );
-  }
-
-  async studioEdit(_input: StudioEditInput): Promise<StudioImageOperationResult> {
-    throw this.#error("conflict", "The generation-only mock service does not support Studio edit operations.");
   }
 
   async studioBatch(input: StudioBatchInput): Promise<StudioBatchResult> {

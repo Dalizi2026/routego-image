@@ -25,7 +25,7 @@ const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
 const OWNER_MARKER = ".routego-install-smoke-owner.json";
-const OWNER_PURPOSE = "routego-image-task-5.3-install-smoke";
+const OWNER_PURPOSE = "routego-image-plugin-install-smoke";
 const REQUEST_TIMEOUT_MS = 15_000;
 export const INSTALLED_PACKAGE_ARGUMENT_PREFIX = "routego-installed-package:";
 const DEFAULT_CODEX_ARGUMENTS = [
@@ -38,7 +38,6 @@ const DEFAULT_CODEX_ARGUMENTS = [
 ];
 const EXPECTED_TOOLS = [
   "routego_batch",
-  "routego_edit",
   "routego_generate",
   "routego_manage_library",
   "routego_open_studio",
@@ -688,7 +687,7 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
       fail("the portable installed process did not expose the exact seven frozen MCP tools");
     }
     const creationSchemas = listedTools
-      .filter((tool) => ["routego_generate", "routego_edit", "routego_batch"].includes(tool?.name))
+      .filter((tool) => ["routego_generate", "routego_batch"].includes(tool?.name))
       .map((tool) => tool?.outputSchema)
       .filter((schema) => schema !== undefined);
     if (creationSchemas.length > 0 &&
@@ -839,7 +838,7 @@ async function runInsideOwnedRoot(options, root, verification) {
     if (JSON.stringify(tools) !== JSON.stringify(EXPECTED_TOOLS)) {
       fail("fresh Codex did not discover the exact seven frozen MCP tools");
     }
-    const creationSchemas = ["routego_generate", "routego_edit", "routego_batch"]
+    const creationSchemas = ["routego_generate", "routego_batch"]
       .map((name) => server.tools[name]?.outputSchema)
       .filter((schema) => schema !== undefined);
     if (creationSchemas.length > 0 &&

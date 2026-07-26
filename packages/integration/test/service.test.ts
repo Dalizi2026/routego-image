@@ -104,7 +104,6 @@ describe("Task 4.2 batch snapshots", () => {
 const LOCAL_METHODS = [
   "status",
   "generate",
-  "edit",
   "batch",
   "searchLibrary",
   "manageLibrary",
@@ -129,7 +128,6 @@ const LOCAL_METHODS = [
   "getUploadResourceStatus",
   "discardUploadResource",
   "studioGenerate",
-  "studioEdit",
   "studioBatch"
 ] as const satisfies readonly (keyof LocalRoutegoService)[];
 
@@ -360,7 +358,7 @@ async function collectEvents(source: AsyncIterable<StudioImageOperationEvent>) {
 describe("task 3.5 contract surface and recovery", () => {
   it("implements the exact local method matrix while preserving seven public tools and phases", async () => {
     const { service } = await createHarness();
-    expect(LOCAL_METHODS).toHaveLength(29);
+    expect(LOCAL_METHODS).toHaveLength(27);
     for (const method of LOCAL_METHODS) expect(typeof service[method]).toBe("function");
     expect(routegoOperationNames).toEqual([
       "status", "generate", "prepareRegeneration", "batch", "searchLibrary", "manageLibrary", "openStudio"
@@ -374,7 +372,7 @@ describe("task 3.5 contract surface and recovery", () => {
       "routego_manage_library",
       "routego_open_studio"
     ]);
-    expect(studioOperationNames).toHaveLength(22);
+    expect(studioOperationNames).toHaveLength(21);
     expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
     expect(imageArtifactPhaseSchema.safeParse("source").success).toBe(false);
   });

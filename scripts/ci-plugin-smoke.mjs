@@ -22,12 +22,11 @@ import {
 import { comparePluginPackages, verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 const REPOSITORY_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ROOT_PREFIX = "routego-task-6-2-ci-smoke-";
-const OWNER_MARKER = ".routego-task-6-2-owner.json";
-const OWNER_PURPOSE = "routego-image-task-6.2-ci-plugin-smoke";
+const ROOT_PREFIX = "routego-plugin-ci-smoke-";
+const OWNER_MARKER = ".routego-plugin-ci-smoke-owner.json";
+const OWNER_PURPOSE = "routego-image-plugin-ci-smoke";
 const EXPECTED_TOOLS = [
   "routego_batch",
-  "routego_edit",
   "routego_generate",
   "routego_manage_library",
   "routego_open_studio",
@@ -82,28 +81,28 @@ async function cleanupOwnedRoot(root) {
   const metadata = await lstat(requested);
   if (metadata.isSymbolicLink() || !metadata.isDirectory() ||
       !path.basename(requested).startsWith(ROOT_PREFIX)) {
-    fail("cleanup refused a path that is not an owned Task 6.2 temporary root");
+    fail("cleanup refused a path that is not an owned plugin smoke temporary root");
   }
   let marker;
   try {
     const markerPath = path.join(requested, OWNER_MARKER);
     const markerMetadata = await lstat(markerPath);
     if (markerMetadata.isSymbolicLink() || !markerMetadata.isFile()) {
-      fail("cleanup refused an invalid Task 6.2 owner marker");
+      fail("cleanup refused an invalid plugin smoke owner marker");
     }
     marker = JSON.parse(await readFile(markerPath, "utf8"));
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("Routego CI plugin smoke failed:")) {
       throw error;
     }
-    fail("cleanup refused a root without a valid Task 6.2 owner marker");
+    fail("cleanup refused a root without a valid plugin smoke owner marker");
   }
   if (!exactKeys(marker, ["schemaVersion", "purpose", "rootName", "nonce"]) ||
       marker.schemaVersion !== 1 || marker.purpose !== OWNER_PURPOSE ||
       marker.rootName !== path.basename(requested) ||
       typeof marker.nonce !== "string" ||
       !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/iu.test(marker.nonce)) {
-    fail("cleanup refused an invalid Task 6.2 owner marker");
+    fail("cleanup refused an invalid plugin smoke owner marker");
   }
   await rm(requested, { recursive: true, force: false });
 }

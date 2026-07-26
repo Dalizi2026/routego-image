@@ -23,49 +23,6 @@ import {
 import { browserResourceDescriptorSchema } from "./library";
 import { providerCapabilitySchema } from "./provider";
 
-/**
- * @deprecated Studio is text-generation-only and no longer accepts image locators.
- * Retained only so temporary in-package consumers can typecheck until later cutover.
- * Validation always fails when used as a Studio generation input.
- */
-export const studioImageInputRefSchema = z.discriminatedUnion("source", [
-  z.object({ source: z.literal("asset"), assetId: identifierSchema }).strict(),
-  z.object({ source: z.literal("artifact"), artifactId: identifierSchema }).strict(),
-  z.object({ source: z.literal("upload"), uploadResourceId: identifierSchema }).strict()
-]);
-
-/**
- * @deprecated Removed with Studio image inputs. Validation is unused by generation contracts.
- */
-export const studioReferenceInputSchema = z
-  .object({
-    image: studioImageInputRefSchema,
-    role: z.string().trim().min(1).max(64),
-    label: z.string().trim().min(1).max(200).optional()
-  })
-  .strict();
-
-/**
- * @deprecated Removed with Studio image inputs.
- */
-export const studioSupportingInputSchema = z
-  .object({
-    image: studioImageInputRefSchema,
-    role: z.string().trim().min(1).max(64).default("supporting"),
-    label: z.string().trim().min(1).max(200).optional()
-  })
-  .strict();
-
-/**
- * @deprecated Removed with Studio mask editing.
- */
-export const studioMaskInputSchema = z
-  .object({
-    image: studioImageInputRefSchema,
-    targetSlot: z.literal(0)
-  })
-  .strict();
-
 function addStudioOutputControlIssues(
   value: {
     format: "png" | "jpeg" | "webp";
@@ -104,24 +61,6 @@ export const studioGenerateInputSchema = z
   .strict()
   .superRefine((value, context) => {
     addStudioOutputControlIssues(value, context);
-  });
-
-/**
- * @deprecated Removed from the Studio surface. Retained only so temporary in-package
- * consumers can still typecheck until later cutover tasks. Validation always fails.
- */
-export const studioEditInputSchema = z
-  .object({
-    kind: z.literal("edit")
-  })
-  .strict()
-  .superRefine((_value, context) => {
-    context.addIssue({
-      code: "custom",
-      path: ["kind"],
-      message:
-        "studioEdit is removed; Studio is text-generation-only. Use Library mark/copy and routego_prepare_regeneration"
-    });
   });
 
 export const studioImageOperationRequestSchema = studioGenerateInputSchema;
@@ -455,9 +394,7 @@ export const studioBatchResultSchema = z
     }
   });
 
-export type StudioImageInputRef = z.infer<typeof studioImageInputRefSchema>;
 export type StudioGenerateInput = z.input<typeof studioGenerateInputSchema>;
-export type StudioEditInput = z.input<typeof studioEditInputSchema>;
 export type StudioImageOperationRequest = z.output<typeof studioImageOperationRequestSchema>;
 export type StudioImageArtifact = z.infer<typeof studioImageArtifactSchema>;
 export type StudioImageRelationship = z.infer<typeof studioImageRelationshipSchema>;

@@ -7,11 +7,11 @@ import {
   routegoOperationNames,
   studioBatchInputSchema,
   studioBatchResultSchema,
-  studioEditInputSchema,
   studioGenerateInputSchema,
   studioImageOperationEventSchema,
   studioImageOperationResultSchema,
   studioOperationDefinitions,
+  studioOperationNames,
   studioServiceErrorSchema,
   type StudioImageArtifact,
   type StudioImageOperationRequest,
@@ -211,15 +211,9 @@ describe("text-only Studio generation contracts", () => {
     ).toBe("native");
   });
 
-  it("rejects the removed studioEdit operation before any resource resolution", () => {
-    expect(
-      studioEditInputSchema.safeParse({
-        kind: "edit",
-        prompt: "edit me",
-        target: { source: "asset", assetId: "asset-a" }
-      }).success
-    ).toBe(false);
-    expect(studioEditInputSchema.safeParse({ kind: "edit" }).success).toBe(false);
+  it("does not register the removed studioEdit operation", () => {
+    expect(studioOperationNames).not.toContain("studioEdit");
+    expect("studioEdit" in studioOperationDefinitions).toBe(false);
   });
 });
 

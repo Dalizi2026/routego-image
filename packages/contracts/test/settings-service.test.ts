@@ -451,7 +451,6 @@ describe("separate Studio operation registry", () => {
       "getUploadResourceStatus",
       "discardUploadResource",
       "studioGenerate",
-      "studioEdit",
       "studioBatch",
       "searchStudioLibrary",
       "updateSettings"

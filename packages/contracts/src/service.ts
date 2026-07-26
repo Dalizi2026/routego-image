@@ -67,12 +67,10 @@ import {
 import {
   studioBatchInputSchema,
   studioBatchResultSchema,
-  studioEditInputSchema,
   studioGenerateInputSchema,
   studioImageOperationResultSchema,
   type StudioBatchInput,
   type StudioBatchResult,
-  type StudioEditInput,
   type StudioGenerateInput,
   type StudioImageOperationResult
 } from "./studio-creation";
@@ -80,7 +78,6 @@ import {
   imageOperationResultSchema,
   routegoBatchInputSchema,
   routegoBatchResultSchema,
-  routegoEditInputSchema,
   routegoGenerateInputSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
@@ -93,7 +90,6 @@ import {
   type ImageOperationResult,
   type RoutegoBatchInput,
   type RoutegoBatchResult,
-  type RoutegoEditInput,
   type RoutegoGenerateInput,
   type RoutegoManageLibraryInput,
   type RoutegoManageLibraryResult,
@@ -126,7 +122,6 @@ import {
 export const routegoOperationNames = [
   "status",
   "generate",
-  "edit",
   "batch",
   "searchLibrary",
   "manageLibrary",
@@ -154,7 +149,6 @@ export const studioOperationNames = [
   "getUploadResourceStatus",
   "discardUploadResource",
   "studioGenerate",
-  "studioEdit",
   "studioBatch",
   "searchStudioLibrary",
   "updateSettings"
@@ -173,12 +167,6 @@ export const routegoOperationDefinitions = {
     toolName: "routego_generate",
     http: { method: "POST", path: "/api/v1/generate" },
     inputSchema: routegoGenerateInputSchema,
-    outputSchema: imageOperationResultSchema
-  },
-  edit: {
-    toolName: "routego_edit",
-    http: { method: "POST", path: "/api/v1/edit" },
-    inputSchema: routegoEditInputSchema,
     outputSchema: imageOperationResultSchema
   },
   batch: {
@@ -306,11 +294,6 @@ export const studioOperationDefinitions = {
     inputSchema: studioGenerateInputSchema,
     outputSchema: studioImageOperationResultSchema
   },
-  studioEdit: {
-    http: { method: "POST", path: "/api/v1/studio/creation/edit" },
-    inputSchema: studioEditInputSchema,
-    outputSchema: studioImageOperationResultSchema
-  },
   studioBatch: {
     http: { method: "POST", path: "/api/v1/studio/creation/batch" },
     inputSchema: studioBatchInputSchema,
@@ -338,7 +321,6 @@ export const studioOperationDefinitions = {
 export interface RoutegoService {
   status(input: RoutegoStatusInput): Promise<RoutegoStatusResult>;
   generate(input: RoutegoGenerateInput): Promise<ImageOperationResult>;
-  edit(input: RoutegoEditInput): Promise<ImageOperationResult>;
   batch(input: RoutegoBatchInput): Promise<RoutegoBatchResult>;
   searchLibrary(input: RoutegoSearchLibraryInput): Promise<RoutegoSearchLibraryResult>;
   manageLibrary(input: RoutegoManageLibraryInput): Promise<RoutegoManageLibraryResult>;
@@ -387,7 +369,6 @@ export interface StudioUploadService {
 
 export interface StudioCreationService {
   studioGenerate(input: StudioGenerateInput): Promise<StudioImageOperationResult>;
-  studioEdit(input: StudioEditInput): Promise<StudioImageOperationResult>;
   studioBatch(input: StudioBatchInput): Promise<StudioBatchResult>;
 }
 

@@ -35,7 +35,6 @@ import {
   reserveUploadResourceResultSchema,
   routegoBatchInputSchema,
   routegoBatchResultSchema,
-  routegoEditInputSchema,
   routegoGenerateInputSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
@@ -55,7 +54,6 @@ import {
   studioProviderSwitchResultSchema,
   studioBatchInputSchema,
   studioBatchResultSchema,
-  studioEditInputSchema,
   studioGenerateInputSchema,
   studioImageOperationEventSchema,
   studioImageOperationResultSchema,
@@ -101,7 +99,6 @@ import {
   type ReserveUploadResourceResult,
   type RoutegoBatchInput,
   type RoutegoBatchResult,
-  type RoutegoEditInput,
   type RoutegoGenerateInput,
   type RoutegoManageLibraryInput,
   type RoutegoManageLibraryResult,
@@ -120,7 +117,6 @@ import {
   type StudioProviderSwitchResult,
   type StudioBatchInput,
   type StudioBatchResult,
-  type StudioEditInput,
   type StudioGenerateInput,
   type StudioImageOperationEvent,
   type StudioImageArtifact,
@@ -1166,11 +1162,6 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     return await this.#executePublic(parsed);
   }
 
-  async edit(input: RoutegoEditInput): Promise<ImageOperationResult> {
-    routegoEditInputSchema.parse(input);
-    throw new Error("routego_edit is removed; use routego_generate for a new generation.");
-  }
-
   async #runPublicBatch(parsed: ParsedRoutegoBatchInput, signal?: AbortSignal): Promise<RoutegoBatchResult> {
     const requestId = this.#id("batch");
     const tasks = parsed.tasks.map((task) => Object.freeze({
@@ -1391,11 +1382,6 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     const parsed = studioGenerateInputSchema.parse(input);
     if (this.#status !== "ready") return studioFailureResult(parsed, this.#id("studio-request"), this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt"));
     return await this.#executeStudio(parsed);
-  }
-
-  async studioEdit(input: StudioEditInput): Promise<StudioImageOperationResult> {
-    studioEditInputSchema.parse(input);
-    throw new Error("Studio editing is removed; submit a text-generation request instead.");
   }
 
   async #runStudioBatch(parsed: ParsedStudioBatchInput, signal?: AbortSignal): Promise<StudioBatchResult> {
