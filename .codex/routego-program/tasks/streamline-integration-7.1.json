@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "857f00a01123f69f8fe7986302ef10c0fd86edc83dcba095fb48b74a7cff9c7c",
+  "contentSha256": "8b1106c6035ecbb69f5c604b76c75762940ff094b266397b376e4084191dd814",
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
   "taskId": "7.1",
   "status": "ready-after-task-6.5",
-  "sourceCommit": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3",
+  "sourceCommit": "0df5070a1e5ce7e224fe156244f27310c836a159",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
     "fileSha256": "af68d924b27cc7c34824eda8997fbef5f68521315b4a86de1134ebabd3e7ebb9",

@@ -10,7 +10,7 @@
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "c26286b6a42f22b7069faa7c9d5e0b83c8d288ea",
+  "currentHead": "0df5070a1e5ce7e224fe156244f27310c836a159",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": false,
@@ -56,7 +56,7 @@
   },
   "taskCapsule": {
     "path": ".codex/routego-program/tasks/streamline-integration-7.1.json",
-    "contentSha256": "857f00a01123f69f8fe7986302ef10c0fd86edc83dcba095fb48b74a7cff9c7c"
+    "contentSha256": "8b1106c6035ecbb69f5c604b76c75762940ff094b266397b376e4084191dd814"
   },
   "registration": {
     "reason": "Task 6.5 is complete; this owner is registered for the next Task 7.1 dead-surface and safety scope.",
