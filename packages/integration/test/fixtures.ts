@@ -239,7 +239,7 @@ export async function createOfflineHarness(options: {
     assets: { protectedRoots: [], idFactory: (kind) => next(kind) },
     resources: { now: () => new Date(clock.now), idFactory: (kind) => next(`resource-${kind}`) },
     read: { folderIdFactory: () => next("folder") },
-    mutations: { protectedRoots: [], idFactory: (kind) => next(kind) },
+    mutations: { idFactory: (kind) => next(kind) },
     portability: { idFactory: (kind) => next(kind) },
     publicProtectedRoots: []
   });

@@ -260,7 +260,7 @@ async function createLibrary(root: string): Promise<RoutegoLibraryService> {
     assets: { protectedRoots: [], idFactory: (kind) => next(kind) },
     resources: { idFactory: (kind) => next(`resource-${kind}`) },
     read: { folderIdFactory: () => next("folder") },
-    mutations: { protectedRoots: [], idFactory: (kind) => next(kind) },
+    mutations: { idFactory: (kind) => next(kind) },
     portability: { idFactory: (kind) => next(kind) },
     publicProtectedRoots: []
   });

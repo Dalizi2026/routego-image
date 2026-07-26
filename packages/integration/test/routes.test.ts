@@ -201,7 +201,7 @@ async function createHarness(options: {
       idFactory: (kind) => next(`resource-${kind}`)
     },
     read: { folderIdFactory: () => next("folder") },
-    mutations: { protectedRoots: [], idFactory: (kind) => next(kind) },
+    mutations: { idFactory: (kind) => next(kind) },
     portability: { idFactory: (kind) => next(kind) },
     publicProtectedRoots: []
   });

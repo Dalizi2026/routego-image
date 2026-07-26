@@ -96,7 +96,10 @@ export async function resolveStudioOperationInput(
     return Object.freeze({ studioRequest, creationRequest, graph });
   } catch (error) {
     if (error instanceof DurableInputGraphError) {
-      throw new StudioInputResolutionError(error.code, error.message);
+      throw new StudioInputResolutionError(
+        error.code === "invalid-input" ? "invalid-request" : error.code,
+        error.message
+      );
     }
     throw error;
   }

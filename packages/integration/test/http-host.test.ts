@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   routegoStatusResultSchema,
   type LocalRoutegoService,
+  type RoutegoService,
   type RoutegoOpenStudioResult
 } from "@routego-image/contracts";
 
@@ -63,7 +64,7 @@ function statusResult() {
   });
 }
 
-function service(overrides: Record<string, unknown> = {}): LocalRoutegoService {
+function service(overrides: Record<string, unknown> = {}): LocalRoutegoService & RoutegoService {
   return new Proxy(overrides, {
     get(target, property) {
       if (typeof property === "string" && property in target) return target[property];
@@ -71,7 +72,7 @@ function service(overrides: Record<string, unknown> = {}): LocalRoutegoService {
         throw new Error(`Unused service method: ${String(property)}`);
       };
     }
-  }) as unknown as LocalRoutegoService;
+  }) as unknown as LocalRoutegoService & RoutegoService;
 }
 
 async function staticFixture(): Promise<{

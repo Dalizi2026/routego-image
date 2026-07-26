@@ -107,12 +107,6 @@ const CAPABILITY_PROBE_DEFINITIONS: readonly CapabilityProbeDefinition[] = [
   {
     transport: "single-endpoint-json",
     requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
-    capability: "target-edit",
-    responseProof: "images-output"
-  },
-  {
-    transport: "single-endpoint-json",
-    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
     capability: "native-transparency",
     responseProof: "images-alpha-output"
   },
@@ -131,32 +125,13 @@ const CAPABILITY_PROBE_DEFINITIONS: readonly CapabilityProbeDefinition[] = [
   {
     transport: "single-endpoint-json",
     requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImages,
-    capability: "target-edit",
-    responseProof: "images-output"
-  },
-  {
-    transport: "single-endpoint-json",
-    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImages,
     capability: "data-url-input",
     responseProof: "images-output"
   },
   ...[
-    "single-image-input",
-    "multi-image-input",
-    "target-edit",
-    "mask-edit",
-    "multipart-input"
-  ].map((capability): CapabilityProbeDefinition => ({
-    transport: "openai-images",
-    requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart,
-    capability: capability as ProviderCapability,
-    responseProof: "images-output"
-  })),
-  ...[
     "text-generation",
     "single-image-input",
     "multi-image-input",
-    "target-edit",
     "data-url-input"
   ].map((capability): CapabilityProbeDefinition => ({
     transport: "openai-responses",
@@ -199,18 +174,6 @@ function exactEndpoint(profile: RuntimeProviderProfile, input: CapabilityProbeIn
     }
     return profile.normalizedEndpoints.responsesEndpoint;
   }
-  if (input.requestShape === PROVIDER_REQUEST_SHAPES.imagesEditsMultipart) {
-    if (!profile.normalizedEndpoints.editsEndpoint) {
-      throw new ProviderIntegrationError(
-        createProviderServiceError({
-          code: "config_missing",
-          stage: "configure",
-          safeMessage: "This provider profile has no explicitly configured Edits endpoint."
-        })
-      );
-    }
-    return profile.normalizedEndpoints.editsEndpoint;
-  }
   return profile.normalizedEndpoints.generationEndpoint;
 }
 
@@ -243,9 +206,7 @@ function jsonProbeBody(input: CapabilityProbeInput): string {
   const synthetic = createDeterministicSyntheticPngInputs();
   const common = {
     model: input.model,
-    prompt: input.capability === "target-edit"
-      ? "Routego capability probe: edit the synthetic checkerboard while preserving its layout."
-      : "Routego capability probe: generate one synthetic checkerboard image."
+    prompt: "Routego capability probe: generate one synthetic checkerboard image."
   };
   const controls = {
     ...(input.capability === "native-variants" ? { n: 2 } : {}),
@@ -268,7 +229,6 @@ function jsonProbeBody(input: CapabilityProbeInput): string {
       ? 2
       : new Set<ProviderCapability>([
           "single-image-input",
-          "target-edit",
           "data-url-input"
         ]).has(input.capability)
         ? 1
@@ -287,9 +247,7 @@ function jsonProbeBody(input: CapabilityProbeInput): string {
       input: [{ role: "user", content }],
       tools: [{
         type: "image_generation",
-        action: input.capability === "target-edit"
-          ? "edit"
-          : input.capability === "text-generation"
+        action: input.capability === "text-generation"
             ? "generate"
             : "auto"
       }]
@@ -304,45 +262,6 @@ function requestDescriptor(
 ): CapabilityProbeRequestDescriptor {
   const endpoint = exactEndpoint(profile, input);
   const authorization = `Bearer ${profile.credential}`;
-  if (input.requestShape === PROVIDER_REQUEST_SHAPES.imagesEditsMultipart) {
-    const synthetic = createDeterministicSyntheticPngInputs();
-    const body = new FormData();
-    body.set("model", input.model);
-    body.set("prompt", "Routego capability probe: preserve the synthetic input exactly.");
-    body.append(
-      "image",
-      new Blob([Uint8Array.from(synthetic.image.bytes).buffer], {
-        type: synthetic.image.mimeType
-      }),
-      "routego-probe.png"
-    );
-    if (input.capability === "multi-image-input") {
-      body.append(
-        "image[]",
-        new Blob([Uint8Array.from(synthetic.mask.bytes).buffer], {
-          type: synthetic.mask.mimeType
-        }),
-        "routego-probe-additional.png"
-      );
-    }
-    if (input.capability === "mask-edit") {
-      body.append(
-        "mask",
-        new Blob([Uint8Array.from(synthetic.mask.bytes).buffer], {
-          type: synthetic.mask.mimeType
-        }),
-        "routego-probe-mask.png"
-      );
-    }
-    return {
-      endpoint,
-      request: {
-        method: "POST",
-        headers: { accept: "application/json", authorization },
-        body
-      }
-    };
-  }
   return {
     endpoint,
     request: {

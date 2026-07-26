@@ -18,11 +18,9 @@ import {
   type LibraryOperationParameters,
   type RoutegoServiceError,
   type StudioImageArtifact,
-  type StudioImageInputRef,
   type StudioImageOperationRequest,
   type StudioImageOperationResult,
   type StudioImageRelationship,
-  type UploadResourcePurpose
 } from "@routego-image/contracts";
 import { detectImageMetadata } from "@routego-image/creation";
 import {
@@ -32,7 +30,6 @@ import {
   type IngestLibraryAssetResult,
   type LibraryAssetStore,
   type LibraryRelationship,
-  type ResolvedStableImageResource,
   type RoutegoLibraryService,
   type StoredImageBlob
 } from "@routego-image/library";
@@ -41,8 +38,7 @@ import type { PreparedStudioOperationInput } from "./inputs";
 import type {
   DurableInputGraphItem,
   DurableInputGraphPlan,
-  PlannedSourceRendition,
-  StudioPhysicalInputKey
+  PlannedSourceRendition
 } from "./graph";
 import {
   ImageMaterializationError,
@@ -279,66 +275,6 @@ export async function preflightPublicOutputDestination(
   });
 }
 
-function studioLocator(
-  _request: StudioImageOperationRequest,
-  _key: StudioPhysicalInputKey
-): StudioImageInputRef {
-  throw new ResultCompositionError(
-    "invalid-input",
-    "Studio generation does not accept physical image inputs."
-  );
-}
-
-function expectedUploadPurposes(item: DurableInputGraphItem): readonly UploadResourcePurpose[] {
-  switch (item.role) {
-    case "target":
-      return ["target", "image"];
-    case "reference":
-      return ["reference", "image"];
-    case "supporting":
-      return ["supporting", "image"];
-    case "mask":
-      return ["mask"];
-  }
-}
-
-function validateRefreshedUpload(
-  item: DurableInputGraphItem,
-  locator: StudioImageInputRef,
-  resource: ResolvedStableImageResource,
-  nowMs: number
-): asserts resource is Extract<ResolvedStableImageResource, { readonly source: "upload" }> {
-  if (
-    locator.source !== "upload" ||
-    resource.source !== "upload" ||
-    resource.uploadResourceId !== locator.uploadResourceId ||
-    !expectedUploadPurposes(item).includes(resource.purpose) ||
-    resource.reusePolicy !== "reusable-until-expiry" ||
-    typeof resource.path !== "string" ||
-    resource.path.includes("\0") ||
-    !path.isAbsolute(resource.path) ||
-    normalizePathForComparison(resource.path) !== normalizePathForComparison(item.path) ||
-    !SUPPORTED_IMAGE_MIME_TYPES.has(resource.mimeType) ||
-    resource.mimeType !== item.mimeType ||
-    resource.byteLength !== item.byteLength ||
-    resource.sha256 !== item.sha256 ||
-    resource.width !== item.width ||
-    resource.height !== item.height
-  ) {
-    throw new ResultCompositionError(
-      "source-changed",
-      "An uploaded source changed after Studio input preparation."
-    );
-  }
-  const expiry = Date.parse(resource.expiresAt);
-  if (!Number.isFinite(expiry) || expiry <= nowMs) {
-    throw new ResultCompositionError(
-      "source-unavailable",
-      "An uploaded source expired before stable request staging completed."
-    );
-  }
-}
-
 async function readVerifiedSource(
   filePath: string,
   item: Pick<
@@ -495,81 +431,20 @@ export async function stagePreparedStudioOperationSources(
   prepared: PreparedStudioOperationInput,
   options: StagePreparedStudioSourcesOptions
 ): Promise<PreparedStudioOperationInput> {
-  if (
-    options === null ||
-    typeof options !== "object" ||
-    options.library === null ||
-    typeof options.library !== "object" ||
-    typeof options.library.resolveImageResource !== "function" ||
-    !(options.transaction instanceof Object)
-  ) {
+  if (options === null || typeof options !== "object" || !(options.transaction instanceof Object)) {
     throw new ResultCompositionError(
       "invalid-input",
-      "Stable Studio source staging requires Library ownership and a request transaction."
+      "Stable Studio source staging requires a request transaction."
     );
   }
   validateGraphRequest(prepared.creationRequest, prepared.graph);
-  const now = options.now ?? (() => new Date());
-  const updatedInputs: DurableInputGraphItem[] = [];
-  const updatedSources: PlannedSourceRendition[] = [];
-  try {
-    for (const item of prepared.graph.inputs) {
-      if (item.origin !== "upload") {
-        updatedInputs.push(item);
-        continue;
-      }
-      const locator = studioLocator(prepared.studioRequest, item.key);
-      let refreshed: ResolvedStableImageResource;
-      try {
-        refreshed = await options.library.resolveImageResource(
-          locator,
-          expectedUploadPurposes(item)
-        );
-      } catch {
-        throw new ResultCompositionError(
-          "source-unavailable",
-          "An uploaded source is no longer available for stable request staging."
-        );
-      }
-      const startMs = currentTime(now).getTime();
-      validateRefreshedUpload(item, locator, refreshed, startMs);
-      const bytes = await readVerifiedSource(refreshed.path, item);
-      const stagedName = stagedSourceName(item);
-      const stagedPath = path.join(options.transaction.directory, stagedName);
-      await writeExclusive(stagedPath, bytes);
-      if (Date.parse(refreshed.expiresAt) <= currentTime(now).getTime()) {
-        await unlink(stagedPath).catch(() => undefined);
-        throw new ResultCompositionError(
-          "source-unavailable",
-          "An uploaded source expired before stable request staging completed."
-        );
-      }
-      const sourceRendition = Object.freeze({
-        ...item.sourceRendition!,
-        sourceRoot: options.transaction.directory,
-        sourceRelativePath: stagedName
-      });
-      updatedSources.push(sourceRendition);
-      updatedInputs.push(Object.freeze({
-        ...item,
-        path: stagedPath,
-        sourceRendition
-      }));
-    }
-  } catch (error) {
-    await options.transaction.cleanup().catch(() => undefined);
-    throw error;
+  if (prepared.graph.inputs.length !== 0 || prepared.graph.sourceRenditions.length !== 0) {
+    throw new ResultCompositionError(
+      "relationship-invalid",
+      "Studio generation cannot stage image inputs."
+    );
   }
-  const graph = Object.freeze({
-    ...prepared.graph,
-    inputs: Object.freeze(updatedInputs),
-    sourceRenditions: Object.freeze(updatedSources)
-  });
-  return Object.freeze({
-    studioRequest: prepared.studioRequest,
-    creationRequest: deepFreeze(replaceCreationPaths(prepared.creationRequest, graph)),
-    graph
-  });
+  return prepared;
 }
 
 function outputIssue(safeMessage: string): ResultIssue {
@@ -775,8 +650,8 @@ function validateGraphRequest(
   graph: DurableInputGraphPlan
 ): void {
   const orderedInputs = [...graph.inputs].sort((left, right) => left.order - right.order);
-  const physicalImageCount = orderedInputs.filter((item) => item.role !== "mask").length;
-  const maskCount = orderedInputs.length - physicalImageCount;
+  const physicalImageCount = orderedInputs.length;
+  const maskCount = 0;
   if (
     graph.relationships.length !== orderedInputs.length ||
     graph.physicalImageCount !== physicalImageCount ||
@@ -792,7 +667,8 @@ function validateGraphRequest(
         relationship.artifactId !== item.artifactId ||
         relationship.order !== item.order ||
         (item.origin === "upload") !== (item.sourceRendition !== undefined) ||
-        (item.role === "mask") !== (item.targetSlot === 0)
+        item.role !== "reference" ||
+        item.targetSlot !== undefined
       );
     })
   ) {
@@ -1005,22 +881,12 @@ function studioRequestWithEffectiveControls(
   });
 }
 
-function studioInputForGraphItem(
-  prepared: PreparedStudioOperationInput,
-  item: DurableInputGraphItem
-): StudioImageInputRef {
-  return studioLocator(prepared.studioRequest, item.key);
-}
-
 function studioRelationships(
   prepared: PreparedStudioOperationInput,
   result: ImageOperationResult,
   artifactIds: ReadonlySet<string>,
   issues: ResultIssue[]
 ): readonly StudioImageRelationship[] {
-  const inputByArtifact = new Map(
-    prepared.graph.inputs.map((item) => [item.artifactId, item])
-  );
   const relationships: StudioImageRelationship[] = [];
   for (const relationship of result.relationships) {
     if (!artifactIds.has(relationship.outputArtifactId)) continue;
@@ -1036,20 +902,7 @@ function studioRelationships(
       });
       continue;
     }
-    const item = relationship.inputId === undefined
-      ? undefined
-      : inputByArtifact.get(relationship.inputId);
-    if (item === undefined || item.role !== relationship.inputRole) {
-      issues.push(outputIssue("An inconsistent output relationship was rejected."));
-      continue;
-    }
-    relationships.push({
-      role: item.role,
-      input: studioInputForGraphItem(prepared, item),
-      outputArtifactId: relationship.outputArtifactId,
-      order: relationship.order,
-      ...(item.role === "mask" ? { targetSlot: 0 as const } : {})
-    });
+    issues.push(outputIssue("A forbidden Studio input relationship was rejected."));
   }
   return relationships;
 }

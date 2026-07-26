@@ -281,18 +281,6 @@ async function assertProbeRequestSemantics(
 ): Promise<void> {
   expect(init?.method).toBe("POST");
   expect(new Headers(init?.headers).get("authorization")).toBe(`Bearer ${credential}`);
-  if (pair.requestShape === PROVIDER_REQUEST_SHAPES.imagesEditsMultipart) {
-    expect(init?.body).toBeInstanceOf(FormData);
-    const form = init?.body as FormData;
-    expect(form.get("image")).toBeInstanceOf(File);
-    expect(form.getAll("image[]")).toHaveLength(pair.capability === "multi-image-input" ? 1 : 0);
-    if (pair.capability === "mask-edit") {
-      expect(form.get("mask")).toBeInstanceOf(File);
-    } else {
-      expect(form.get("mask")).toBeNull();
-    }
-    return;
-  }
   const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
   if (pair.requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointImage) {
     expect(body["image"]).toMatch(/^data:image\/png;base64,/u);
@@ -307,14 +295,12 @@ async function assertProbeRequestSemantics(
     const input = body["input"] as Array<{ content: Array<Record<string, unknown>> }>;
     const images = input[0]?.content.filter((item) => item["type"] === "input_image") ?? [];
     expect(images).toHaveLength(pair.capability === "multi-image-input" ? 2 :
-      ["single-image-input", "target-edit", "data-url-input"].includes(pair.capability) ? 1 : 0);
+      ["single-image-input", "data-url-input"].includes(pair.capability) ? 1 : 0);
     for (const image of images) {
       expect(image["image_url"]).toMatch(/^data:image\/png;base64,/u);
     }
     const tools = body["tools"] as Array<Record<string, unknown>>;
-    expect(tools[0]?.["action"]).toBe(pair.capability === "target-edit"
-      ? "edit"
-      : pair.capability === "text-generation"
+    expect(tools[0]?.["action"]).toBe(pair.capability === "text-generation"
         ? "generate"
         : "auto");
   }
@@ -777,7 +763,7 @@ describe("exact confirmed capability probes", () => {
     },
     {
       label: "Responses success without completed image_generation_call output",
-      capability: "target-edit" as const,
+      capability: "single-image-input" as const,
       transport: "openai-responses" as const,
       requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration,
       body: { status: "completed", output: [{ type: "message", status: "completed" }] }
@@ -956,7 +942,7 @@ describe("exact confirmed capability probes", () => {
       providerId: "provider-synthetic",
       capability: "multi-image-input",
       transport: "openai-images",
-      requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
+      requestShape: "openai-images:edits-multipart"
     }), { fetch: fetchImpl, now: () => now })).rejects.toMatchObject({
       serviceError: { code: "invalid_request" }
     });
@@ -1039,7 +1025,7 @@ describe("exact confirmed capability probes", () => {
         headers: { "content-type": "application/json" }
       }))
       .mockResolvedValueOnce(successfulProbeResponse({
-        capability: "target-edit",
+        capability: "single-image-input",
         transport: "openai-responses"
       }, {
           "x-routego-capability-state": "degraded",
@@ -1059,7 +1045,7 @@ describe("exact confirmed capability probes", () => {
     }), { fetch: fetchImpl, now: () => now });
     const degraded = await probeProviderCapability(store, probeInput({
       providerId: profileId!,
-      capability: "target-edit",
+      capability: "single-image-input",
       transport: "openai-responses",
       requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration
     }), { fetch: fetchImpl, now: () => now });
@@ -1097,9 +1083,9 @@ describe("exact confirmed capability probes", () => {
     const fetchImpl = vi.fn<typeof fetch>();
     await expect(probeProviderCapability(store, probeInput({
       providerId: profileId!,
-      capability: "mask-edit",
+      capability: "single-image-input",
       transport: "openai-images",
-      requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
+      requestShape: "openai-images:edits-multipart"
     }), { fetch: fetchImpl, now: () => now })).rejects.toMatchObject({
       serviceError: { code: "invalid_request" }
     });
@@ -1135,15 +1121,15 @@ describe("exact confirmed capability probes", () => {
     const fetchImpl = vi.fn<typeof fetch>();
     await expect(probeProviderCapability(store, probeInput({
       providerId: profileId!,
-      capability: "mask-edit",
+      capability: "single-image-input",
       transport: "openai-images",
-      requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
+      requestShape: "openai-images:edits-multipart"
     }), { fetch: fetchImpl })).rejects.toMatchObject({
       serviceError: { code: "invalid_request" }
     });
     await expect(probeProviderCapability(store, probeInput({
       providerId: profileId!,
-      capability: "mask-edit",
+      capability: "single-image-input",
       transport: "single-endpoint-json",
       requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText
     }), { fetch: fetchImpl })).rejects.toBeInstanceOf(ProviderIntegrationError);
