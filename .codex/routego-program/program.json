@@ -412,6 +412,15 @@
       "externalStateAuthorized": false
     },
     {
+      "taskId": "7.1",
+      "status": "blocked-recorded",
+      "implementationCommit": "f027b05ec905609e050c83be711dbe0878df8f2f",
+      "reason": "The Task 7.1 implementation and all in-scope regressions pass. Generic pnpm safety rejects only the two approved ONNX Runtime Web WASM resources required by completed Task 6.2 because they exceed the generic 5 MiB tracked-file limit. PD-016 records an exact-path verification exception; no 7.1 file may alter those resources.",
+      "verification": "contracts=31/31; integration=27/27; mock-relay-typecheck=pass; smoke-syntax=pass; diff-check=pass; lane-doctor=pass; pnpm-safety=blocked-by-approved-6.2-wasm-size-exception",
+      "externalStateAuthorized": false,
+      "deviation": ".codex/routego-program/deviations/PD-016-task-7.1-approved-wasm-size-exception.md"
+    },
+    {
       "taskId": "6.1",
       "status": "blocked-recorded",
       "reason": "The user has authorized U-2-Netp/ONNX Runtime downloads and dependency installation, and a current Task 6.1 capsule now exists. U-2-Netp verifies successfully, but the exact-range ONNX Runtime Web 1.20.1 registry response does not match npm's official SHA-512 integrity or SHA-1 shasum and its tar stream is incomplete. It must not be installed or packaged until an independently valid official artifact is resolved.",
@@ -429,6 +438,18 @@
         "migration execution",
         "public contract changes"
       ]
+    },
+    {
+      "id": "PD-016-task-7.1-approved-wasm-size-exception",
+      "status": "approved-scoped-verification-exception",
+      "scope": "Only the two pinned ONNX Runtime Web 1.20.1 WASM files under packages/integration/resources/background-removal/** listed in PD-016",
+      "nonGoals": [
+        "changing or removing the WASM bytes",
+        "weakening other safety rules",
+        "changing the safety scanner",
+        "package installation, deployment, release, or plugin replacement"
+      ],
+      "evidence": ".codex/routego-program/deviations/PD-016-task-7.1-approved-wasm-size-exception.md"
     }
   ],
   "currentRisks": [
