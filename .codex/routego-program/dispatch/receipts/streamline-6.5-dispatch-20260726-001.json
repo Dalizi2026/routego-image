@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "type": "TASK_ACCEPTED",
+  "transitionId": "streamline-6.5-dispatch-20260726-001",
+  "eventFingerprint": "streamline-6.5-dispatch-20260726-001",
+  "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
+  "sourceThreadId": "019f99ae-601b-7262-9457-8006de418f17",
+  "targetThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
+  "taskId": "6.5",
+  "stateCommit": "fd2940338d39330be8b2b4e790a320c7e5883c06",
+  "acknowledgedAt": "2026-07-26T06:35:45.000Z",
+  "evidence": {
+    "baseline": "fff6ec78d90ed6417c0abafc263ca17a94c59309",
+    "observedHead": "fd2940338d39330be8b2b4e790a320c7e5883c06",
+    "internalContentSha256": "38074f6751883d06c8bb5feaad3d67137f83acd502ff5e017e83653d84934598",
+    "gitClean": true,
+    "workflowDoctor": "pass",
+    "openspec": "fresh-instructions-pass",
+    "acceptanceObservableCompactions": 0,
+    "externalStateAuthorized": false
+  }
+}
