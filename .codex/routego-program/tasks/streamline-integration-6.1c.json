@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "6c5c3bbbe986d88e3add97c04f13062a0ee61ece4bcdeb4521af9d34686b82a1",
+  "contentSha256": "54ddf2470bb167666ceb5ab0bc3aa135642cbe97e573daf270c6180614deab3f",
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
   "taskId": "6.1c",
   "status": "ready-after-task-6.1",
-  "sourceCommit": "83d5f2bc216c944df00487548895a07d106a390c",
-  "taskSource": {"path": "openspec/changes/streamline-routego-image-generation/tasks.md", "fileSha256": "bfccb13a8ae83d3c6b49ce5e75d18ab55ff82b6543baa784f8e2ae9151b04e66", "lineSha256": "adce57c3dfb557646a8afd7e2e1935b8cf1077ec9d614810c567cc1c83d478a5", "lineBytes": 517},
+  "sourceCommit": "9a8c5909172151875aaefcd236186051788d95c7",
+  "taskSource": {"path": "openspec/changes/streamline-routego-image-generation/tasks.md", "fileSha256": "0c27a25cec7124e6a79dd180d8bdd313a1686ba82b9e6db2b433e65b3c3f23ae", "lineSha256": "e03caadf9f71ce60f8bc081f5ac567c04831f1ed554520887a9f52710f3ef4ea", "lineBytes": 582},
   "dependencies": ["6.1"],
   "allowedFiles": [
     "packages/integration/src/composition/inputs.ts",
@@ -22,7 +22,7 @@
   ],
   "forbiddenFileGlobs": ["packages/contracts/**", "packages/foundation/**", "packages/creation/**", "packages/library/**", "packages/mock-relay/**", "packages/studio/**", "package.json", "pnpm-lock.yaml", "node_modules/**", "**/.env*"],
   "requiredBehavior": ["Remove only stale Integration edit, mask, Trash and provider-probe references that conflict with the accepted generation-only contracts.", "Do not implement Task 6.3 worker behavior, modify Creation or Library, call providers, use credentials, operate on real data, deploy, release, or replace the installed plugin."],
-  "verification": ["openspec instructions apply --change streamline-routego-image-generation --json", "pnpm --filter @routego-image/integration typecheck", "pnpm --filter @routego-image/integration test -- inputs.test.ts provider.test.ts results.test.ts routes.test.ts service.test.ts http-host.test.ts", "git diff --check"],
+  "verification": ["openspec instructions apply --change streamline-routego-image-generation --json", "pnpm --filter @routego-image/integration typecheck", "pnpm --filter @routego-image/integration exec vitest run --config vitest.config.ts test/inputs.test.ts test/provider.test.ts test/results.test.ts test/routes.test.ts test/service.test.ts test/http-host.test.ts", "git diff --check"],
   "directSpecifications": [
     {"path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md", "sha256": "d38323ef71751330d4d5f1efa9f1aa576e3c83f38c87dd0ba83ff1cda6008e69", "reason": "Strict generation-only contracts."},
     {"path": "openspec/changes/streamline-routego-image-generation/specs/provider-capability-model/spec.md", "sha256": "ae672e4f589549563e46246c34798049527bb3b4a2cf922a7b3e70974367e3e2", "reason": "Removed legacy provider edit probes."},
