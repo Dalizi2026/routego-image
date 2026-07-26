@@ -112,7 +112,7 @@ Alternative considered: Sharp or another native codec. Rejected by the self-cont
 
 Integration will use Creation's validated JSON dispatcher and event serializer, but own the Node HTTP host so it can distinguish bootstrap/static routes from protected API routes. It binds only `127.0.0.1` or `::1`.
 
-- `GET /?token=...` validates one short-lived launch token and returns no-store HTML; the browser removes the token immediately.
+- `GET /?token=...` validates one short-lived launch token and returns no-store HTML; the browser removes the token immediately. If Codex++ drops the query while opening a local page, an exact clean-root HTML navigation may recover only the newest still-launchable session; non-HTML requests, extra queries, and every protected route remain credential-protected.
 - Hashed Studio JS/CSS assets are read-only public loopback assets with strict MIME, size, containment, ETag, and no directory listing.
 - JSON, upload, browser-resource, ZIP-resource, and the exact `POST /api/v1/studio/creation/stream` route require an active session header and exact loopback origin; cookies and wildcard CORS are rejected.
 - Multiple bounded active sessions may share one listener. `routego_open_studio` reuses the listener when requested, issues a fresh token without invalidating other unexpired sessions, and returns the exact expiry.

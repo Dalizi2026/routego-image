@@ -169,6 +169,19 @@ export class StudioSessionManager {
     return { ...descriptor(record), sessionToken: record.sessionToken };
   }
 
+  /**
+   * Recovers a launch when a trusted local browser opener drops the URL query.
+   * The fallback is limited to the newest session and its original launch window.
+   */
+  authorizeLatestLaunchFallback(): ActivatedStudioSession | undefined {
+    if (this.#closed) return undefined;
+    const now = this.#now();
+    this.#pruneExpired(now);
+    const record = this.#records.at(-1);
+    if (record === undefined || record.launchExpiresAtMs <= now) return undefined;
+    return { ...descriptor(record), sessionToken: record.sessionToken };
+  }
+
   /** Validates an API token by scanning every bounded record. */
   authorizeSessionToken(candidate: string): StudioSessionDescriptor | undefined {
     if (this.#closed) return undefined;

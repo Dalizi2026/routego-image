@@ -154,6 +154,12 @@ function header(request: RoutegoHttpRequest, name: string): string | undefined {
   return request.headers[name.toLowerCase()];
 }
 
+function acceptsHtmlDocument(request: RoutegoHttpRequest): boolean {
+  return (header(request, "accept") ?? "")
+    .split(",")
+    .some((value) => value.trim().toLowerCase().startsWith("text/html"));
+}
+
 function withBrowserSameOrigin(
   request: RoutegoHttpRequest,
   expectedOrigin: string
@@ -438,10 +444,15 @@ export class IntegrationLoopbackHttpHost {
       return jsonError(403, "origin_rejected", "Cookie authentication is not accepted by the local service.");
     }
     const tokens = request.url.searchParams.getAll("token");
-    if (tokens.length !== 1 || [...request.url.searchParams.keys()].length !== 1) {
+    const queryKeys = [...request.url.searchParams.keys()];
+    if (queryKeys.length > 0 && (tokens.length !== 1 || queryKeys.length !== 1)) {
       return jsonError(403, "session_invalid", "The Studio launch token is missing or no longer valid.");
     }
-    const activated = this.#sessions.authorizeLaunchToken(tokens[0] ?? "");
+    const activated = tokens.length === 1
+      ? this.#sessions.authorizeLaunchToken(tokens[0] ?? "")
+      : acceptsHtmlDocument(request)
+        ? this.#sessions.authorizeLatestLaunchFallback()
+        : undefined;
     if (activated === undefined) {
       return jsonError(403, "session_invalid", "The Studio launch token is missing or no longer valid.");
     }

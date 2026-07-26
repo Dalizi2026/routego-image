@@ -20,7 +20,7 @@ import { pathToFileURL } from "node:url";
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 export const ACCEPTED_ARTIFACT_MANIFEST_SHA256 =
-  "3f93a7aec9cb0f43958ae590e1c36780f5c54b0697f017d92b36cdda917cf1d9";
+  "e1154e518e429b1a7dbf223d27218744527f25278e958c3b8aa73417aca92ead";
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";

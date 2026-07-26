@@ -42,11 +42,15 @@ The Skill SHALL map user intent to the seven MCP tools, distinguish variants fro
 - **THEN** the Skill SHALL present those exact results and SHALL not reuse an older file or flood ordinary context with intermediate images
 
 ### Requirement: Studio bootstrap and static assets are loopback contained
-The runtime SHALL bind only `127.0.0.1` or `::1`, SHALL require a valid short-lived launch token for bootstrap HTML, SHALL serve only contained allowlisted Studio static assets with correct MIME/size/ETag, and SHALL provide no directory listing, arbitrary file read, LAN bind, wildcard CORS, or cookie authentication.
+The runtime SHALL bind only `127.0.0.1` or `::1`, SHALL require a valid short-lived launch token for bootstrap HTML, and SHALL support a bounded browser-opener recovery when a local HTML navigation loses the launch query: an exact clean-root document request MAY use only the newest still-launchable session, while non-browser requests and all protected routes remain token/session protected. It SHALL serve only contained allowlisted Studio static assets with correct MIME/size/ETag, and SHALL provide no directory listing, arbitrary file read, LAN bind, wildcard CORS, or cookie authentication.
 
 #### Scenario: Studio opens with a valid launch token
 - **WHEN** `routego_open_studio` returns a fresh URL and the browser requests it before expiry
 - **THEN** the runtime SHALL serve no-store HTML, Studio SHALL remove the token from the visible URL, and later API requests SHALL use only the in-memory session header
+
+#### Scenario: Local browser opener drops the launch query
+- **WHEN** a local browser makes an HTML document request to the exact clean Studio root during the newest session's launch window
+- **THEN** the runtime SHALL bootstrap that newest session with no-store HTML; a non-HTML request, an extra query, an expired launch window, or any protected API/resource request SHALL remain rejected without a session credential
 
 #### Scenario: Static path traversal is attempted
 - **WHEN** a request uses traversal, encoded separators, a symlink escape, or an unallowlisted asset

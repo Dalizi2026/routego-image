@@ -139,9 +139,14 @@ describe("StudioSessionManager", () => {
       id: issued.id,
       sessionToken: issued.sessionToken
     });
+    expect(manager.authorizeLatestLaunchFallback()).toMatchObject({
+      id: issued.id,
+      sessionToken: issued.sessionToken
+    });
 
     now += 20 * 60 * 1_000;
     expect(manager.authorizeLaunchToken(issued.launchToken)).toBeUndefined();
+    expect(manager.authorizeLatestLaunchFallback()).toBeUndefined();
     now += 3 * 60 * 60 * 1_000;
     expect(manager.authorizeSessionToken(issued.sessionToken)).toMatchObject({ id: issued.id });
   });
@@ -280,6 +285,14 @@ describe("IntegrationLoopbackHttpHost", () => {
         expect(openedAfterPreview.status).toBe(200);
         expect(openedAfterPreview.headers.get("cache-control")).toContain("no-store");
         expect(sessionTokenFromBootstrap(await openedAfterPreview.text())).toBe(first.session.sessionToken);
+
+        const querylessBrowserOpen = await fetch(host.address!.origin, {
+          headers: { accept: "text/html,application/xhtml+xml" }
+        });
+        expect(querylessBrowserOpen.status).toBe(200);
+        expect(sessionTokenFromBootstrap(await querylessBrowserOpen.text())).toBe(first.session.sessionToken);
+        const querylessApiClient = await fetch(host.address!.origin);
+        expect(querylessApiClient.status).toBe(403);
 
         const staticResponse = await fetch(`${host.address!.origin}/assets/app.ab12cd.js`);
         expect(staticResponse.status).toBe(200);
