@@ -3,22 +3,22 @@
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
   "role": "task-6.1c-integration-typecheck-baseline-repair-owner",
-  "status": "task-6.1c-verification-scope-revised-awaiting-acceptance",
+  "status": "task-6.1c-verification-scope-revised-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "9a8c5909172151875aaefcd236186051788d95c7",
+  "currentHead": "9ef34b8ddd30133c5bfedcf40db57f528f7e2159",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "6.1c",
-    "status": "scope-revised-awaiting-acceptance",
-    "locked": true
+    "status": "activated",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
