@@ -211,22 +211,22 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-7.1-scoped-exception-activated",
+      "status": "task-7.2-dispatched-awaiting-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
-      "taskId": "7.1",
+      "taskId": "7.2",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "dab6fc8b0b693489a3cb9dbe1bea9cd9490864ee",
+      "currentHead": "245ce15c4b0d6f99767024da0e92f26476ccce31",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/streamline-integration-7.1.json",
-        "sha256": "8b1106c6035ecbb69f5c604b76c75762940ff094b266397b376e4084191dd814"
+        "path": ".codex/routego-program/tasks/streamline-integration-7.2.json",
+        "sha256": "4c83989ffd5bbb5b7d28e3d554b21fc6a08c8a4d7fc44eb1142c48bdde1ab640"
       },
-      "authorizedScope": "PD-016 scoped activation permits only the 7.1 verification recheck and tasks.md checkoff. Task 7.2+ remain locked.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "6.5",
+      "authorizedScope": "Task 7.2 final conformance is dispatched to the registered Integration owner; acceptance and activation are required before mutation. Task 7.3+ remain locked.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "7.1",
       "implementationCommit": "6047d9a6c5da4a4cc1ca539411695c46cb14c2fb",
       "taskStateCommit": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3"
     },
@@ -380,16 +380,16 @@
         "6.1c"
       ],
       "readyTaskIds": [
-        "7.1"
+        "7.2"
       ],
-      "nextTaskId": "7.1"
+      "nextTaskId": "7.2"
     },
     "currentTask": {
-      "id": "7.1",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "7.2",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 7.1 is scoped-activated under PD-016 for verification recheck and tasks.md checkoff only. Task 7.2+ remain locked."
+      "authorizedScope": "Task 7.2 final conformance is dispatched and awaits lane acceptance/activation. Task 7.3+ remain locked."
     }
   },
   "latestDirectCheckpoint": {
