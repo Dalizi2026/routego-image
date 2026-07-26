@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "taskId": "7.4",
+  "change": "streamline-routego-image-generation",
+  "lane": "streamline-integration",
+  "activationHead": "d3fce978f6392be04d756c1c153c0138801a9bdd",
+  "capsule": {
+    "path": ".codex/routego-program/tasks/streamline-integration-7.4.json",
+    "contentSha256": "6aa17caa7c28c46120bb7502e433ddf172568707f66cc80439fc5c39b6f0e740"
+  },
+  "auditScope": {
+    "documents": [
+      "openspec/changes/streamline-routego-image-generation/proposal.md",
+      "openspec/changes/streamline-routego-image-generation/design.md",
+      "openspec/changes/streamline-routego-image-generation/tasks.md",
+      "openspec/changes/streamline-routego-image-generation/specs/durable-image-library/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/image-job-execution/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/library-simplification-migration/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/local-background-removal/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/provider-capability-model/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/regeneration-preparation/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/studio-application-shell/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/studio-creation-workbench/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/studio-library-experience/spec.md",
+      "openspec/changes/streamline-routego-image-generation/specs/studio-mask-editor/spec.md"
+    ],
+    "taskCount": 37,
+    "completedBeforeAudit": 36,
+    "requirementsReviewed": true
+  },
+  "taskStatus": {"1.1":true,"1.2":true,"1.3":true,"1.4":true,"2.1":true,"2.2":true,"2.3":true,"2.4":true,"3.1":true,"3.2":true,"3.3":true,"3.4":true,"3.5":true,"4.1":true,"4.2":true,"4.3":true,"4.4":true,"4.5":true,"4.6":true,"5.1":true,"5.2":true,"5.3":true,"5.4":true,"5.5":true,"5.6":true,"6.1":true,"6.1a":true,"6.1b":true,"6.1c":true,"6.2":true,"6.3":true,"6.4":true,"6.5":true,"7.1":true,"7.2":true,"7.3":true,"7.4":false},
+  "commits": {
+    "task6_2Implementation": "e3a2524ec5968032bc9311136d284430985e348c",
+    "task6_2TaskState": "a319e5bb1880225d2b12b717e55021b587bae0b6",
+    "task7_1Implementation": "f027b05ec905609e050c83be711dbe0878df8f2f",
+    "task7_1TaskState": "11e930f74d5e275deb08bd9b6db626dd8bd1cb1c",
+    "task7_2Implementation": "3caeb971ba6f9edf241443aeae02b21204d7abba",
+    "task7_2TaskState": "3ba99d6635ab90236f393a05e0946a9c2871133a",
+    "task7_3Implementation": "7d58174cdb3fb3f470eca0acbcdce4db0d217a7a",
+    "task7_3TaskState": "d5ca1e8a2a725d1aac0bebe2d33e7e733d256897"
+  },
+  "verification": {
+    "openspecInstructions": "PASS",
+    "openspecStrictValidation": "PASS",
+    "task7_1": "Contracts 31/31; Integration 27/27; Mock Relay typecheck; smoke syntax; diff-check; lane doctor PASS",
+    "task7_2": "full typecheck; full test; browser 12/12; exports; strict OpenSpec; diff-check; lane doctor PASS",
+    "task7_3": "build:plugin PASS; verify:plugin PASS; install-smoke 5/5; node checks; diff-check; lane doctor PASS",
+    "finalDoctorBeforeEvidence": "PASS; clean Git; no lease; observableCompactions=0"
+  },
+  "approvedException": {
+    "id": "PD-016-task-7.1-approved-wasm-size-exception",
+    "path": ".codex/routego-program/deviations/PD-016-task-7.1-approved-wasm-size-exception.md",
+    "exactPaths": [
+      "packages/integration/resources/background-removal/ort-wasm-simd-threaded.jsep.wasm",
+      "packages/integration/resources/background-removal/ort-wasm-simd-threaded.wasm"
+    ],
+    "effect": "Only generic safety size findings for these pinned Task 6.2 resources; no scanner, resource, manifest, or product changes authorized."
+  },
+  "separateBlocker": {
+    "task": "integrate-routego-image-plugin 9.1",
+    "status": "blocked",
+    "reason": "Missing Windows and Ubuntu CI run evidence",
+    "scope": "External legacy change; not part of this change and not resolved here"
+  },
+  "safety": {
+    "realData": false,
+    "realLibraryMigration": false,
+    "installedPluginReplacement": false,
+    "deployment": false,
+    "release": false,
+    "providerRequests": false,
+    "credentials": false,
+    "dependencyManifestChanges": false
+  },
+  "residualRisk": "Task 9.1 remains separately blocked. Real Library migration and installed-plugin replacement require distinct future approvals."
+}
