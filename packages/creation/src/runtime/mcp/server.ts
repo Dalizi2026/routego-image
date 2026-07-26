@@ -53,7 +53,7 @@ export interface McpServerOptions {
 const TOOL_DESCRIPTIONS: Readonly<Record<RoutegoOperation, string>> = {
   status: "Inspect Routego Image health, defaults, and redacted provider capabilities.",
   generate: "Generate image variants from a validated Routego Image request.",
-  edit: "Edit a resolved target image with validated references and invariants.",
+  prepareRegeneration: "Prepare read-only generation information for an explicit library image.",
   batch: "Execute an ordered bounded batch of independent image operations.",
   searchLibrary: "Search the Routego Image library through the composed service.",
   manageLibrary: "Run a validated Routego Image library management action.",
@@ -271,7 +271,7 @@ function nonImageSuccessProjection(value: unknown): unknown {
 
 function successToolResult(operation: RoutegoOperation, output: unknown): McpToolResult {
   const projected =
-    operation === "generate" || operation === "edit" || operation === "batch"
+    operation === "generate" || operation === "batch"
       ? imageSuccessProjection(output)
       : nonImageSuccessProjection(output);
   const images = finalImageContents(output);

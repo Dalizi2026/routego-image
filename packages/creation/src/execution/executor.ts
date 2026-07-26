@@ -327,15 +327,7 @@ class ExecutionEvents {
 }
 
 function requestBody(prepared: PreparedProviderRequest): BodyInit {
-  if (prepared.submission.bodyType === "json") {
-    return JSON.stringify(prepared.submission.body);
-  }
-  const clone = new FormData();
-  for (const [name, value] of prepared.submission.body.entries()) {
-    if (typeof value === "string") clone.append(name, value);
-    else clone.append(name, value, value.name);
-  }
-  return clone;
+  return JSON.stringify(prepared.submission.body);
 }
 
 function wrapResponseBody(

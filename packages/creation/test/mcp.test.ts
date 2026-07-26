@@ -40,22 +40,6 @@ function request(prompt = "MCP synthetic image"): ImageOperationRequest {
   return imageOperationRequestSchema.parse({ kind: "generate", prompt });
 }
 
-function editRequest(
-  prompt = "MCP synthetic edit",
-  embeddedImagePayload?: string
-): ImageOperationRequest {
-  const payloadSuffix = embeddedImagePayload === undefined ? "" : ` ${embeddedImagePayload}`;
-  return imageOperationRequestSchema.parse({
-    kind: "edit",
-    prompt,
-    targetImage: {
-      path: "/synthetic/target.png",
-      label: `Synthetic target${payloadSuffix}`
-    },
-    invariants: { preserve: [`Keep the synthetic subject identity.${payloadSuffix}`] }
-  });
-}
-
 function imageResult(
   input: unknown,
   options: {
@@ -193,7 +177,7 @@ function service(overrides: Record<string, unknown>): RoutegoService {
   return {
     status: unavailable,
     generate: unavailable,
-    edit: unavailable,
+    prepareRegeneration: unavailable,
     batch: unavailable,
     searchLibrary: unavailable,
     manageLibrary: unavailable,
@@ -370,64 +354,6 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
   });
 
-  it("removes every image payload form while preserving ordinary text and business numbers", async () => {
-    const projectedInput = imageOperationRequestSchema.parse({
-      kind: "edit",
-      prompt:
-        `gif ${GIF_DATA_URL} svg ${SVG_DATA_URL} custom ${CUSTOM_DATA_URL} ` +
-        `parameterized ${PARAMETERIZED_PNG_DATA_URL} raw ${UNKNOWN_HEADER_BASE64} ` +
-        `percent before ${PERCENT_ENCODED_SVG_DATA_URL} after-percent ` +
-        `adjacent (${PERCENT_ENCODED_SVG_DATA_URL})after-adjacent ` +
-        `ordinary ${ORDINARY_LONG_TEXT} web ${ORDINARY_WEB_URL}`,
-      targetImage: {
-        path: "/synthetic/target.png",
-        label: `percent ${PERCENT_ENCODED_SVG_DATA_URL} label-after`
-      },
-      invariants: {
-        preserve: [
-          `preserve ${CUSTOM_DATA_URL}`,
-          `percent ${PERCENT_ENCODED_SVG_DATA_URL} invariant-after`,
-          `keep ${ORDINARY_LONG_TEXT}`
-        ]
-      }
-    });
-    const server = createRoutegoMcpServer({
-      service: service({ edit: async () => imageResult(projectedInput) })
-    });
-    await initialize(server);
-
-    const toolResult = resultValue(
-      await server.handleLine(
-        JSON.stringify({
-          jsonrpc: "2.0",
-          id: "all-image-payload-forms",
-          method: "tools/call",
-          params: { name: "routego_edit", arguments: editRequest() }
-        })
-      )
-    ) as McpToolResult;
-    const text = structuredText(toolResult);
-    const rendered = JSON.stringify(text);
-    expect(rendered).not.toContain("data:image");
-    expect(rendered).not.toContain(GIF_BASE64);
-    expect(rendered).not.toContain(SVG_BASE64);
-    expect(rendered).not.toContain(UNKNOWN_HEADER_BASE64);
-    expect(rendered).not.toContain(PNG_BASE64);
-    expect(rendered).not.toContain("%3Csvg");
-    expect(rendered).toContain(ORDINARY_LONG_TEXT);
-    expect(rendered).toContain(ORDINARY_WEB_URL);
-    expect(rendered).toContain("after-percent");
-    expect(rendered).toContain(")after-adjacent");
-    expect(rendered).toContain("label-after");
-    expect(rendered).toContain("invariant-after");
-    expect(text).toMatchObject({
-      requestedParams: { count: 1 },
-      execution: { attemptCount: 1, providerRequestCount: 1 },
-      finalArtifacts: [{ slot: 0, byteLength: 68, width: 1, height: 1, sha256: "a".repeat(64) }]
-    });
-    expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
-  });
-
   it("preserves a schema-valid Studio launch URL with its fresh one-time token", async () => {
     const studioResult = routegoOpenStudioResultSchema.parse({
       schemaVersion: 1,
@@ -549,61 +475,12 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     }
   });
 
-  it("preserves a truthful image path while omitting its display payload", async () => {
-    const input = editRequest(
-      `ordinary edit prompt data:image/png;base64,${PNG_BASE64} after`,
-      PNG_BASE64
-    );
-    const edit = vi.fn(async (parsedInput: ImageOperationRequest) =>
-      imageResult(parsedInput, {
-        artifactId: "artifact-edit",
-        path: "/synthetic/output/edit.png"
-      })
-    );
-    const server = createRoutegoMcpServer({ service: service({ edit }) });
-    await initialize(server);
-
-    const response = await server.handleLine(
-      JSON.stringify({
-        jsonrpc: "2.0",
-        id: "edit-path",
-        method: "tools/call",
-        params: { name: "routego_edit", arguments: input }
-      })
-    );
-    const toolResult = resultValue(response) as McpToolResult;
-    const text = structuredText(toolResult);
-    const artifact = (text["finalArtifacts"] as Array<Record<string, unknown>>)[0]!;
-    expect(edit).toHaveBeenCalledTimes(1);
-    expect(artifact).toMatchObject({
-      id: "artifact-edit",
-      path: "/synthetic/output/edit.png",
-      phase: "final",
-      mimeType: "image/png",
-      providerImageId: "provider-artifact-edit"
-    });
-    expect(artifact).not.toHaveProperty("display");
-    expect(JSON.stringify(text)).not.toContain("data:image");
-    expect(JSON.stringify(text)).not.toContain(PNG_BASE64);
-    expect(text).toMatchObject({
-      requestedParams: {
-        prompt: "ordinary edit prompt [REDACTED_IMAGE_DATA] after",
-        targetImage: { label: "Synthetic target [REDACTED_IMAGE_DATA]" },
-        invariants: {
-          preserve: ["Keep the synthetic subject identity. [REDACTED_IMAGE_DATA]"]
-        }
-      }
-    });
-    expect(toolResult.content[1]).toEqual({ type: "image", data: PNG_BASE64, mimeType: "image/png" });
-  });
-
   it("projects path-bearing and pathless batch artifacts without fabricating a path", async () => {
     const generateInput = request(
       `Batch path-bearing image data:image/png;base64,${PNG_BASE64} after`
     );
-    const editInput = editRequest(
-      `Batch pathless edit data:image/png;base64,${PNG_BASE64} after`,
-      PNG_BASE64
+    const pathlessInput = request(
+      `Batch pathless image data:image/png;base64,${PNG_BASE64} after`
     );
     const batchResult = routegoBatchResultSchema.parse({
       schemaVersion: 1,
@@ -621,7 +498,7 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
         },
         {
           id: "task-pathless",
-          result: imageResult(editInput, {
+          result: imageResult(pathlessInput, {
             artifactId: "artifact-batch-pathless",
             requestId: "request-batch-pathless"
           })
@@ -642,9 +519,8 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
           arguments: {
             tasks: [
               { id: "task-path", operation: generateInput },
-              { id: "task-pathless", operation: editInput }
-            ],
-            concurrency: 2
+              { id: "task-pathless", operation: pathlessInput }
+            ]
           }
         }
       })
@@ -668,7 +544,7 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(JSON.stringify(text)).not.toContain("data:image");
     expect(JSON.stringify(text)).not.toContain(PNG_BASE64);
     expect(JSON.stringify(text)).toContain("Batch path-bearing image [REDACTED_IMAGE_DATA] after");
-    expect(JSON.stringify(text)).toContain("Batch pathless edit [REDACTED_IMAGE_DATA] after");
+    expect(JSON.stringify(text)).toContain("Batch pathless image [REDACTED_IMAGE_DATA] after");
     expect(toolResult.content.slice(1)).toEqual([
       { type: "image", data: PNG_BASE64, mimeType: "image/png" },
       { type: "image", data: PNG_BASE64, mimeType: "image/png" }

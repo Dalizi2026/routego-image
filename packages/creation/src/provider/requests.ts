@@ -7,7 +7,6 @@ import {
 } from "@routego-image/contracts";
 import {
   PROVIDER_REQUEST_SHAPES,
-  REDACTED_BINARY_DATA,
   redactDiagnostic,
   selectProviderRoute,
   type SelectedProviderRoute
@@ -365,26 +364,10 @@ export function redactProviderDiagnostic(value: unknown): unknown {
 }
 
 export function describePreparedProviderRequest(request: PreparedProviderRequest): unknown {
-  const body = request.submission.bodyType === "json"
-    ? request.submission.body
-    : {
-        type: "multipart",
-        entries: [...request.submission.body.entries()].map(([name, value]) => ({
-          name,
-          value: typeof value === "string"
-            ? value
-            : {
-                type: "file",
-                mimeType: value.type,
-                byteLength: value.size,
-                content: REDACTED_BINARY_DATA
-              }
-        }))
-      };
   return redactDiagnostic({
     method: request.submission.method,
     endpoint: request.submission.endpoint,
     headers: request.submission.headers,
-    body
+    body: request.submission.body
   });
 }

@@ -157,8 +157,8 @@ function createArtifact(
   });
 }
 
-function relationshipRole(input: PreparedImageInputs["images"][number]): "target" | "supporting" | "reference" {
-  return input.kind === "target" ? "target" : input.kind === "supporting" ? "supporting" : "reference";
+function relationshipRole(_input: PreparedImageInputs["images"][number]): "reference" {
+  return "reference";
 }
 
 function relationshipsFor(
@@ -174,16 +174,6 @@ function relationshipsFor(
         imageRelationshipSchema.parse({
           ...(input.id === undefined ? {} : { inputId: input.id }),
           inputRole: relationshipRole(input),
-          outputArtifactId: artifact.id,
-          order
-        })
-      );
-      order += 1;
-    }
-    if (inputs?.mask !== undefined) {
-      relationships.push(
-        imageRelationshipSchema.parse({
-          inputRole: "mask",
           outputArtifactId: artifact.id,
           order
         })

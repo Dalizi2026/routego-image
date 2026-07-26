@@ -9,6 +9,7 @@ import {
   studioServiceErrorSchema,
   type ImageOperationRequest,
   type LocalRoutegoService,
+  type RoutegoService,
   type StudioImageArtifact,
   type StudioImageOperationRequest
 } from "@routego-image/contracts";
@@ -91,7 +92,11 @@ function imageResult(input: ImageOperationRequest) {
   });
 }
 
-function service(overrides: Record<string, unknown> = {}): LocalRoutegoService {
+type CreationLocalRoutegoService = LocalRoutegoService & {
+  readonly prepareRegeneration: RoutegoService["prepareRegeneration"];
+};
+
+function service(overrides: Record<string, unknown> = {}): CreationLocalRoutegoService {
   return new Proxy(overrides, {
     get(target, property) {
       if (typeof property === "string" && property in target) return target[property];
@@ -99,7 +104,7 @@ function service(overrides: Record<string, unknown> = {}): LocalRoutegoService {
         throw new Error(`Unused service method: ${String(property)}`);
       };
     }
-  }) as unknown as LocalRoutegoService;
+  }) as unknown as CreationLocalRoutegoService;
 }
 
 async function* chunks(...values: Array<string | Uint8Array>): AsyncGenerator<string | Uint8Array> {

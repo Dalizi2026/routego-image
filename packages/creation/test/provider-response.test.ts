@@ -27,7 +27,6 @@ const ROUTE_A: SelectedProviderRoute = {
   effectiveKind: "generate",
   requiredCapabilities: ["text-generation"],
   degraded: false,
-  degradedContinuation: false,
   replayPolicy: "never-cross-transport"
 };
 const ROUTE_C: SelectedProviderRoute = {
@@ -39,7 +38,6 @@ const ROUTE_C: SelectedProviderRoute = {
   effectiveKind: "generate",
   requiredCapabilities: ["text-generation"],
   degraded: false,
-  degradedContinuation: false,
   replayPolicy: "never-cross-transport"
 };
 
@@ -513,8 +511,8 @@ describe("HTTP/provider error mapping and high-level parsing", () => {
   it.each([
     [401, { error: { code: "invalid_api_key", message: "Bad key" } }, "auth_failed", "never"],
     [400, { error: { code: "content_policy_violation", message: "Moderation blocked" } }, "moderation_blocked", "never"],
-    [429, { error: { code: "rate_limit", message: "Slow down" } }, "rate_limited", "respect-retry-after"],
-    [503, { error: { code: "unavailable", message: "Unavailable" } }, "provider_5xx", "safe-pre-generation"]
+    [429, { error: { code: "rate_limit", message: "Slow down" } }, "rate_limited", "user-confirmation"],
+    [503, { error: { code: "unavailable", message: "Unavailable" } }, "provider_5xx", "user-confirmation"]
   ] as const)(
     "maps status %s without treating it as unsupported capability",
     async (status, body, code, retryDisposition) => {

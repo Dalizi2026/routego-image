@@ -318,8 +318,7 @@ function safeExtension(mimeType: SupportedImageMimeType): string {
 
 async function readValidatedImage(
   path: string,
-  maxBytes: number,
-  tooLargeReason: "image-too-large" | "mask-too-large"
+  maxBytes: number
 ): Promise<{ readonly bytes: Uint8Array; readonly metadata: ImageFileMetadata }> {
   let fileStats;
   try {
@@ -340,7 +339,7 @@ async function readValidatedImage(
   }
   if (fileStats.size < 1 || fileStats.size > maxBytes) {
     throw new ProviderPreparationError(
-      tooLargeReason,
+      "image-too-large",
       fileStats.size < 1 ? "The image file is empty." : "The image file exceeds the byte limit.",
       { byteLength: fileStats.size, maximumBytes: maxBytes }
     );
@@ -357,7 +356,7 @@ async function readValidatedImage(
     );
   }
   if (bytes.byteLength > maxBytes) {
-    throw new ProviderPreparationError(tooLargeReason, "The image file exceeds the byte limit.", {
+    throw new ProviderPreparationError("image-too-large", "The image file exceeds the byte limit.", {
       byteLength: bytes.byteLength,
       maximumBytes: maxBytes
     });
@@ -405,8 +404,7 @@ export async function prepareImageInputs(
   for (const [slot, descriptor] of descriptors.entries()) {
     const { bytes, metadata } = await readValidatedImage(
       descriptor.value.path,
-      maxFileBytes,
-      "image-too-large"
+      maxFileBytes
     );
     totalBytes += bytes.byteLength;
     if (totalBytes > maxTotalBytes) {

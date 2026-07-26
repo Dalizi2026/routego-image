@@ -4,6 +4,7 @@ import {
   providerCapabilityRecordSchema,
   routegoOperationDefinitions,
   routegoOperationNames,
+  type RoutegoService,
   type ProviderCapability,
   type ProviderCapabilityRecord,
   type ProviderTransport
@@ -109,7 +110,7 @@ describe("Creation package integration", () => {
   it("exports the approved runtime surface and exposes exactly the seven frozen MCP tools", async () => {
     expect(ROUTEGO_CREATION_PACKAGE_VERSION).toBe(1);
     const server = createRoutegoMcpServer({
-      service: createMockRoutegoService({ requestId: "request-integration-mcp" })
+      service: createMockRoutegoService({ requestId: "request-integration-mcp" }) as unknown as RoutegoService
     });
     await server.handleRequest({ jsonrpc: "2.0", id: 1, method: "initialize" });
     const response = await server.handleRequest({ jsonrpc: "2.0", id: 2, method: "tools/list" });
@@ -148,7 +149,7 @@ describe("Creation package integration", () => {
     }
   });
 
-  it("rejects a non-generation batch before the offline relay is accessed", async () => {
+  it("rejects stale edit fields before the offline relay is accessed", async () => {
     const server = await startMockRelayTestServer({ fixture: "single-endpoint-text" });
     try {
       const service = createCreationImageService(
@@ -157,7 +158,10 @@ describe("Creation package integration", () => {
       const unsafeBatch = service.batch as (input: unknown) => Promise<unknown>;
       await expect(
         unsafeBatch({
-          tasks: [{ id: "removed-edit", operation: { kind: "edit", prompt: "Removed edit" } }]
+          tasks: [{
+            id: "stale-edit-field",
+            operation: { kind: "generate", prompt: "Generation only", targetImage: { path: "/stale" } }
+          }]
         })
       ).rejects.toThrow();
       expect(server.relay.observations).toHaveLength(0);
