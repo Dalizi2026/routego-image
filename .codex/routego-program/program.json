@@ -211,24 +211,24 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.3-activated",
+      "status": "task-6.3-completed-awaiting-task-6.4-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
-      "taskId": "6.3",
+      "taskId": "6.4",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "6284672e0d2628142b7cbe2c9af18e05012fc87f",
+      "currentHead": "ab8b79568bab84a0e15e6cfbba3ab3f7894b5579",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/streamline-integration-6.3.json",
-        "sha256": "890ffd7b7fc1b5603085394423313efc59c87a718b1ad0f4bee93ebba08ab21d"
+        "path": ".codex/routego-program/tasks/streamline-integration-6.4.json",
+        "sha256": "a43f63aac2982b9240c76b94909b2cd6f24ef51caefaf76bfd31032a545f0ad9"
       },
-      "authorizedScope": "Task 6.3 local worker lifecycle is activated for the registered Integration owner; Task 6.4+ and 7.3 remain locked.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "6.2",
-      "implementationCommit": "e3a2524ec5968032bc9311136d284430985e348c",
-      "taskStateCommit": "a319e5bb1880225d2b12b717e55021b587bae0b6"
+      "authorizedScope": "Task 6.4 acceptance is pending for the registered Integration owner; Task 6.5+ and 7.3 remain locked.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "6.3",
+      "implementationCommit": "f4fec38a629e3cb0352eb97b13a8d4009453143a",
+      "taskStateCommit": "ab8b79568bab84a0e15e6cfbba3ab3f7894b5579"
     },
     "streamlineCreation": {
       "status": "task-6.1a-completed-awaiting-controller-archive",
@@ -310,13 +310,13 @@
       "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "6284672e0d2628142b7cbe2c9af18e05012fc87f",
+      "currentHead": "ab8b79568bab84a0e15e6cfbba3ab3f7894b5579",
       "observableCompactions": 0,
-      "lastCompletedTask": "6.2",
-      "status": "task-6.3-activated",
-      "taskId": "6.3",
+      "lastCompletedTask": "6.3",
+      "status": "task-6.3-completed-awaiting-task-6.4-acceptance",
+      "taskId": "6.4",
       "taskCapsuleIntegrity": {
-        "canonicalSha256": "890ffd7b7fc1b5603085394423313efc59c87a718b1ad0f4bee93ebba08ab21d"
+        "canonicalSha256": "a43f63aac2982b9240c76b94909b2cd6f24ef51caefaf76bfd31032a545f0ad9"
       }
     },
     "streamlineCreation": {
