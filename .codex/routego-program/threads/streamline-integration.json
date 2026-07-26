@@ -2,23 +2,23 @@
   "schemaVersion": 2,
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-7.2-final-conformance-owner",
-  "status": "task-7.2-activated",
+  "role": "task-7.3-packaging-owner",
+  "status": "task-7.3-dispatched-awaiting-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "e2593f7bfc2d66ea4618d7156fe72ee00d23dca5",
+  "currentHead": "0c10fa1dcb31c7ccde4fe471f1fb27954e3d1022",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": true,
   "applyAuthorized": true,
   "currentTask": {
-    "id": "7.2",
-    "status": "activated",
-    "locked": false
+    "id": "7.3",
+    "status": "dispatched-awaiting-acceptance",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -55,8 +55,8 @@
     "handoffAcceptanceObservableCompactions": 0
   },
   "taskCapsule": {
-    "path": ".codex/routego-program/tasks/streamline-integration-7.2.json",
-    "contentSha256": "4c83989ffd5bbb5b7d28e3d554b21fc6a08c8a4d7fc44eb1142c48bdde1ab640"
+    "path": ".codex/routego-program/tasks/streamline-integration-7.3.json",
+    "contentSha256": "190f0f6379e741832118035e23226b6d3ae1508092ee5abbbf565a5e2637c319"
   },
   "registration": {
     "reason": "Task 6.5 is complete; this owner is registered for the next Task 7.1 dead-surface and safety scope.",

@@ -211,22 +211,22 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-7.2-activated",
+      "status": "task-7.3-dispatched-awaiting-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
-      "taskId": "7.2",
+      "taskId": "7.3",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "e2593f7bfc2d66ea4618d7156fe72ee00d23dca5",
+      "currentHead": "0c10fa1dcb31c7ccde4fe471f1fb27954e3d1022",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/streamline-integration-7.2.json",
-        "sha256": "4c83989ffd5bbb5b7d28e3d554b21fc6a08c8a4d7fc44eb1142c48bdde1ab640"
+        "path": ".codex/routego-program/tasks/streamline-integration-7.3.json",
+        "sha256": "190f0f6379e741832118035e23226b6d3ae1508092ee5abbbf565a5e2637c319"
       },
-      "authorizedScope": "Task 7.2 final conformance is activated for the registered Integration owner; only capsule-declared source/test/script repairs and task-state checkoff are allowed. Task 7.3+ remain locked.",
+      "authorizedScope": "Task 7.3 temporary package build and isolated offline smoke is dispatched to the registered owner; acceptance and activation are required before mutation. Task 7.4 remains locked.",
       "soleApplyOwner": true,
       "applyAuthorized": true,
-      "lastCompletedTask": "7.1",
+      "lastCompletedTask": "7.2",
       "implementationCommit": "6047d9a6c5da4a4cc1ca539411695c46cb14c2fb",
       "taskStateCommit": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3"
     },
@@ -380,16 +380,16 @@
         "6.1c"
       ],
       "readyTaskIds": [
-        "7.2"
+        "7.3"
       ],
-      "nextTaskId": "7.2"
+      "nextTaskId": "7.3"
     },
     "currentTask": {
-      "id": "7.2",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "7.3",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 7.2 final conformance is activated; Task 7.3+ remain locked."
+      "authorizedScope": "Task 7.3 temporary package build and isolated offline smoke is dispatched; activation is required. Task 7.4 remains locked."
     }
   },
   "latestDirectCheckpoint": {
