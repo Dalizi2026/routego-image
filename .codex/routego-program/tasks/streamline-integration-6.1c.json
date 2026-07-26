@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "ad91b715781a10b43a65bc1dfc5d174859009553d7da522863669a5fd94b0d12",
+  "lane": "streamline-integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "6.1c",
+  "status": "ready-after-task-6.1",
+  "sourceCommit": "83d5f2bc216c944df00487548895a07d106a390c",
+  "taskSource": {"path": "openspec/changes/streamline-routego-image-generation/tasks.md", "fileSha256": "a73bbccfb6cd84e1366c1dcd4b817ed2116b4634b6c69b092fffc6b90d2f13d4", "lineSha256": "adce57c3dfb557646a8afd7e2e1935b8cf1077ec9d614810c567cc1c83d478a5", "lineBytes": 517},
+  "dependencies": ["6.1"],
+  "allowedFiles": [
+    "packages/integration/src/composition/inputs.ts",
+    "packages/integration/src/composition/results.ts",
+    "packages/integration/src/provider/probes.ts",
+    "packages/integration/test/fixtures.ts",
+    "packages/integration/test/http-host.test.ts",
+    "packages/integration/test/provider.test.ts",
+    "packages/integration/test/results.test.ts",
+    "packages/integration/test/routes.test.ts",
+    "packages/integration/test/service.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": ["packages/contracts/**", "packages/foundation/**", "packages/creation/**", "packages/library/**", "packages/mock-relay/**", "packages/studio/**", "package.json", "pnpm-lock.yaml", "node_modules/**", "**/.env*"],
+  "requiredBehavior": ["Remove only stale Integration edit, mask, Trash and provider-probe references that conflict with the accepted generation-only contracts.", "Do not implement Task 6.3 worker behavior, modify Creation or Library, call providers, use credentials, operate on real data, deploy, release, or replace the installed plugin."],
+  "verification": ["openspec instructions apply --change streamline-routego-image-generation --json", "pnpm --filter @routego-image/integration typecheck", "pnpm --filter @routego-image/integration test -- inputs.test.ts provider.test.ts results.test.ts routes.test.ts service.test.ts http-host.test.ts", "git diff --check"],
+  "directSpecifications": [
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md", "sha256": "d38323ef71751330d4d5f1efa9f1aa576e3c83f38c87dd0ba83ff1cda6008e69", "reason": "Strict generation-only contracts."},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/provider-capability-model/spec.md", "sha256": "ae672e4f589549563e46246c34798049527bb3b4a2cf922a7b3e70974367e3e2", "reason": "Removed legacy provider edit probes."},
+    {"path": "openspec/changes/streamline-routego-image-generation/design.md", "sha256": "bfa8c541a9d5c7ade99f9dcfd76c9e06c0b01344a0d08cfa5ce39a76810cd12d", "reason": "Scoped typecheck-baseline repair boundary."}
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-6.1c-integration-typecheck-baseline-repair",
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "reportingContract": "Before activation send THREAD_HANDSHAKE and verify delivery. After activation directly report every checkpoint, blocker, deviation and delivery; final answers and heartbeat never advance this task."
+}

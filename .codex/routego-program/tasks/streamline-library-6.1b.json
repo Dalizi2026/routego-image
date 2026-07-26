@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "3be612300fa5221e8961b441788e4db7d465e3701df71f9d7ede477d994fb28b",
+  "lane": "streamline-library",
+  "change": "streamline-routego-image-generation",
+  "taskId": "6.1b",
+  "status": "ready-after-task-6.1",
+  "sourceCommit": "83d5f2bc216c944df00487548895a07d106a390c",
+  "taskSource": {"path": "openspec/changes/streamline-routego-image-generation/tasks.md", "fileSha256": "a73bbccfb6cd84e1366c1dcd4b817ed2116b4634b6c69b092fffc6b90d2f13d4", "lineSha256": "034b9cdaeea5c0ec0b96d28aea07cdda3c0ba1c722d47a3acd04b7b672bb94f1", "lineBytes": 371},
+  "dependencies": ["6.1"],
+  "allowedFiles": ["packages/library/src/config/store.ts", "packages/library/src/zip/manifest.ts", "openspec/changes/streamline-routego-image-generation/tasks.md"],
+  "forbiddenFileGlobs": ["packages/contracts/**", "packages/foundation/**", "packages/creation/**", "packages/integration/**", "packages/studio/**", "package.json", "pnpm-lock.yaml", "node_modules/**", "**/.env*"],
+  "requiredBehavior": ["Remove only stale edit/input fields and restore strict TypeScript conformance in the existing Library configuration and ZIP projection.", "Do not alter migration behavior, operate on real data, use providers or credentials, or perform deployment, release, or installed-plugin replacement."],
+  "verification": ["openspec instructions apply --change streamline-routego-image-generation --json", "pnpm --filter @routego-image/library typecheck", "pnpm --filter @routego-image/library test", "git diff --check"],
+  "directSpecifications": [
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/durable-image-library/spec.md", "sha256": "a1430b378e7147a5e9a828b0529d1cd164060a0994b953b8c9b8bf9359a98a85", "reason": "Narrowed Library read and ZIP behavior."},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md", "sha256": "d38323ef71751330d4d5f1efa9f1aa576e3c83f38c87dd0ba83ff1cda6008e69", "reason": "Generation-only input model."},
+    {"path": "openspec/changes/streamline-routego-image-generation/design.md", "sha256": "bfa8c541a9d5c7ade99f9dcfd76c9e06c0b01344a0d08cfa5ce39a76810cd12d", "reason": "Scoped typecheck-baseline repair boundary."}
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-6.1b-library-typecheck-baseline-repair",
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "reportingContract": "Before activation send THREAD_HANDSHAKE and verify delivery. After activation directly report every checkpoint, blocker, deviation and delivery; final answers and heartbeat never advance this task."
+}

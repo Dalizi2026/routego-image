@@ -1,19 +1,22 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "64f9836fcc8f4eaec0c531ece5adb3c7b622382abc597fb4466b3e538b520f57",
+  "contentSha256": "b19d2d565d627cab1dbb7fbc055092d1c5024e76f127ee56fb066540d08281ea",
   "lane": "integration",
   "change": "streamline-routego-image-generation",
   "taskId": "6.2",
   "status": "ready-after-task-6.1",
-  "sourceCommit": "4baf17f4e4454ea5b8e07e06b54247cdd1849221",
+  "sourceCommit": "83d5f2bc216c944df00487548895a07d106a390c",
   "taskSource": {
     "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
-    "fileSha256": "50e90ec7d4e7411fee43677aba3bcc281f9537656e7d1eafb0e5c2f9fe0f66e2",
-    "lineSha256": "629a463f5773b2c3fee8e5ba9fda7779161db04485dffc97e1e2d2894c7d40fe",
-    "lineBytes": 539
+    "fileSha256": "a73bbccfb6cd84e1366c1dcd4b817ed2116b4634b6c69b092fffc6b90d2f13d4",
+    "lineSha256": "af57fd189a06f8c997cec767804d7229ef54bec1dec2b4d483cdbd443072c327",
+    "lineBytes": 611
   },
   "dependencies": [
-    "6.1"
+    "6.1",
+    "6.1a",
+    "6.1b",
+    "6.1c"
   ],
   "dependencyCommits": {
     "task6_1": "4baf17f4e4454ea5b8e07e06b54247cdd1849221"
