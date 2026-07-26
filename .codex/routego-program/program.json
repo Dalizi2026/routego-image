@@ -116,7 +116,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-14-task-6.2-implementation-blocked-by-typecheck-baseline",
+    "status": "authoritative-controller-generation-14-dispatching-task-6.1c",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -211,17 +211,17 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.1c-registered-awaiting-dispatch",
+      "status": "task-6.1c-dispatching-awaiting-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "6.1c",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+      "currentHead": "5cd6519aff39341f2af05b3a63f93082d421641a",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
-        "sha256": "ad91b715781a10b43a65bc1dfc5d174859009553d7da522863669a5fd94b0d12"
+        "sha256": "6c5c3bbbe986d88e3add97c04f13062a0ee61ece4bcdeb4521af9d34686b82a1"
       },
       "authorizedScope": "Task 6.1c only; remove stale Integration contract references. Task 6.2 remains locked pending 6.1a, 6.1b, and 6.1c.",
       "soleApplyOwner": false,
@@ -246,18 +246,20 @@
       "taskStateCommit": "e49a17d8972da7f33fe2a85a7e10e6f7f31517b1"
     },
     "streamlineLibrary": {
-      "status": "task-6.1b-scope-revised-activated",
+      "status": "task-6.1b-completed",
       "taskRef": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
       "threadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
       "generation": 1,
       "taskId": "6.1b",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "ac57fc8d1cb3402aa814d10ce8db061b36392254",
+      "currentHead": "5cd6519aff39341f2af05b3a63f93082d421641a",
       "taskCapsule": {"path": ".codex/routego-program/tasks/streamline-library-6.1b.json", "sha256": "94fb689613d89097330674a7f687b52709e22b21f4986a8d90c905c1974ce46b"},
       "authorizedScope": "Scope-revised Task 6.1b: retain the committed production repair and align only three named Library test fixtures with generation-only contracts; no public contract restoration.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "implementationCommit": "b0bbc8abf8bd7d2d8ed358693bb88a4f6e5fe6c2",
+      "taskStateCommit": "5cd6519aff39341f2af05b3a63f93082d421641a"
     }
   },
   "laneSuccessors": {
@@ -306,13 +308,13 @@
       "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+      "currentHead": "5cd6519aff39341f2af05b3a63f93082d421641a",
       "observableCompactions": 0,
       "lastCompletedTask": "6.1",
-      "status": "task-6.1c-registered-awaiting-dispatch",
+      "status": "task-6.1c-dispatching-awaiting-acceptance",
       "taskId": "6.1c",
       "taskCapsuleIntegrity": {
-        "canonicalSha256": "ad91b715781a10b43a65bc1dfc5d174859009553d7da522863669a5fd94b0d12"
+        "canonicalSha256": "6c5c3bbbe986d88e3add97c04f13062a0ee61ece4bcdeb4521af9d34686b82a1"
       }
     },
     "streamlineCreation": {
@@ -331,9 +333,9 @@
       "generation": 1,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "ac57fc8d1cb3402aa814d10ce8db061b36392254",
+      "currentHead": "5cd6519aff39341f2af05b3a63f93082d421641a",
       "observableCompactions": 0,
-      "status": "task-6.1b-scope-revised-activated",
+      "status": "task-6.1b-completed",
       "taskId": "6.1b",
       "taskCapsuleIntegrity": {"canonicalSha256": "94fb689613d89097330674a7f687b52709e22b21f4986a8d90c905c1974ce46b"}
     }
@@ -371,19 +373,20 @@
         "5.5",
         "5.6",
         "6.1",
-        "6.1a"
-      ],
-      "readyTaskIds": [
+        "6.1a",
         "6.1b"
       ],
-      "nextTaskId": "6.1b"
+      "readyTaskIds": [
+        "6.1c"
+      ],
+      "nextTaskId": "6.1c"
     },
     "currentTask": {
-      "id": "6.1b",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "6.1c",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Scope-revised Task 6.1b is activated for only three stale Library test fixtures to align with accepted generation-only contracts. Task 6.1c is queued serially; Task 6.2 remains locked until all three repairs complete."
+      "authorizedScope": "Task 6.1c awaits acceptance and activation for the registered Integration owner; Task 6.2 remains locked until 6.1c completes."
     }
   },
   "latestDirectCheckpoint": {

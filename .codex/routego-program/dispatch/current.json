@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "transitionId": "streamline-6.1a-checkpoint-20260726-001",
-  "eventFingerprint": "streamline-6.1b-test-fixture-scope-repair-20260726-001",
-  "state": "next-task-acknowledged",
+  "transitionId": "streamline-6.1c-dispatch-20260726-001",
+  "eventFingerprint": "streamline-6.1c-typecheck-baseline-repair-20260726-001",
+  "state": "task-message-sent",
   "resumeState": null,
   "sourceThreadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
-  "targetThreadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
+  "targetThreadId": "019f99ae-601b-7262-9457-8006de418f17",
   "completedTaskId": "6.1b",
-  "nextTaskId": "6.1b",
+  "nextTaskId": "6.1c",
   "attemptCount": 1,
-  "lastAttemptAt": "2026-07-26T04:28:59.643Z",
+  "lastAttemptAt": "2026-07-26T04:47:46.629Z",
   "lastError": null,
-  "receiptPath": ".codex/routego-program/dispatch/receipts/streamline-6.1b-dispatch-20260726-001.json",
+  "receiptPath": null,
   "lastTransitionId": null,
-  "updatedAt": "2026-07-26T04:31:14.834Z"
+  "updatedAt": "2026-07-26T04:47:46.628Z"
 }

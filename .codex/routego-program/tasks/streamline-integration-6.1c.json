@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "contentSha256": "ad91b715781a10b43a65bc1dfc5d174859009553d7da522863669a5fd94b0d12",
+  "contentSha256": "6c5c3bbbe986d88e3add97c04f13062a0ee61ece4bcdeb4521af9d34686b82a1",
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
   "taskId": "6.1c",
   "status": "ready-after-task-6.1",
   "sourceCommit": "83d5f2bc216c944df00487548895a07d106a390c",
-  "taskSource": {"path": "openspec/changes/streamline-routego-image-generation/tasks.md", "fileSha256": "a73bbccfb6cd84e1366c1dcd4b817ed2116b4634b6c69b092fffc6b90d2f13d4", "lineSha256": "adce57c3dfb557646a8afd7e2e1935b8cf1077ec9d614810c567cc1c83d478a5", "lineBytes": 517},
+  "taskSource": {"path": "openspec/changes/streamline-routego-image-generation/tasks.md", "fileSha256": "bfccb13a8ae83d3c6b49ce5e75d18ab55ff82b6543baa784f8e2ae9151b04e66", "lineSha256": "adce57c3dfb557646a8afd7e2e1935b8cf1077ec9d614810c567cc1c83d478a5", "lineBytes": 517},
   "dependencies": ["6.1"],
   "allowedFiles": [
     "packages/integration/src/composition/inputs.ts",

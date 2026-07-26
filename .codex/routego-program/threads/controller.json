@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-14-activating-task-6.1b-test-fixture-scope",
+  "status": "authoritative-controller-generation-14-dispatching-task-6.1c",
   "threadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "predecessorThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -26,12 +26,12 @@
       "workspaceHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
       "openspecProgress": "26/37",
     "acceptedTask": "6.1b",
-    "readyTasks": ["6.1b"],
+    "readyTasks": ["6.1c"],
       "independentVerification": "Task 6.1a is independently accepted at implementation commit 0d231314646f27d31086567eda4bf7d21157e2a4 and task-state commit e49a17d8972da7f33fe2a85a7e10e6f7f31517b1. Creation typecheck and all 77 tests pass."
   },
   "currentOperation": {
     "id": "task-6.2-typecheck-baseline-repair-plan",
-    "allowedNext": "Accept and activate the scope-revised Task 6.1b for the registered Library owner, then dispatch Task 6.1c. Re-dispatch Task 6.2 only after all three repair tasks are checked off.",
+    "allowedNext": "Dispatch Task 6.1c to the registered Integration owner. Re-dispatch Task 6.2 only after 6.1c is checked off.",
     "forbidden": [
       "Product code outside each task exact owner scope",
       "package.json or pnpm-lock.yaml changes",
