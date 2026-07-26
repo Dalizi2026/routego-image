@@ -3,7 +3,7 @@
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
   "role": "task-7.1-dead-surface-safety-owner",
-  "status": "task-7.1-dispatched-awaiting-acceptance",
+  "status": "task-7.1-accepted-awaiting-activation",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
@@ -17,7 +17,7 @@
   "applyAuthorized": false,
   "currentTask": {
     "id": "7.1",
-    "status": "dispatched-awaiting-acceptance",
+    "status": "accepted-awaiting-activation",
     "locked": true
   },
   "sourceOwner": {

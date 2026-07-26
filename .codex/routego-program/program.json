@@ -211,7 +211,7 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-7.1-dispatched-awaiting-acceptance",
+      "status": "task-7.1-accepted-awaiting-activation",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
