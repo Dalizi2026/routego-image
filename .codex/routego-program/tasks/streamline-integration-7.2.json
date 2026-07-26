@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "4c83989ffd5bbb5b7d28e3d554b21fc6a08c8a4d7fc44eb1142c48bdde1ab640",
+  "lane": "streamline-integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "7.2",
+  "status": "ready-after-task-7.1",
+  "sourceCommit": "11e930f74d5e275deb08bd9b6db626dd8bd1cb1c",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "0c3815bbbfa5b2c114ad4c0df995dc1d699efee9f8438eeff5ce91371ca71c85",
+    "lineSha256": "afc15ff5aac50dd2457c1d8dae6cdb681f1699f3ad0eb56144abf90351fa4beb"
+  },
+  "dependencies": ["7.1"],
+  "dependencyCommits": {
+    "task7_1Implementation": "f027b05ec905609e050c83be711dbe0878df8f2f",
+    "task7_1TaskState": "11e930f74d5e275deb08bd9b6db626dd8bd1cb1c"
+  },
+  "allowedFiles": [
+    "packages/contracts/**",
+    "packages/foundation/**",
+    "packages/creation/**",
+    "packages/library/**",
+    "packages/studio/**",
+    "packages/integration/**",
+    "packages/mock-relay/**",
+    "scripts/**",
+    "tests/**",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    ".codex/**",
+    "packages/integration/resources/**",
+    "packages/integration/resources/background-removal/**",
+    "packages/integration/test/install-smoke.test.ts",
+    "scripts/build-plugin-package.mjs",
+    "scripts/verify-plugin-package.mjs",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".env*",
+    "real-data/**",
+    "licenses/**"
+  ],
+  "requiredBehavior": [
+    "Restore complete generation-only type and runtime conformance at the root causes exposed by the required gates.",
+    "Run the complete typecheck, unit/integration, browser, package-export, and strict OpenSpec gates without deleting tests or weakening assertions.",
+    "Preserve the seven public operations, offline resource boundary, no-provider/no-credential policy, and the PD-016 WASM verification exception.",
+    "Use synthetic fixtures and local deterministic mocks only; do not install packages or alter binary resources."
+  ],
+  "verification": [
+    "pnpm typecheck",
+    "pnpm test",
+    "pnpm test:browser",
+    "pnpm check:exports",
+    "openspec validate streamline-routego-image-generation --strict --no-interactive",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "reason": "Final conformance gates and generation-only ownership boundaries."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/proposal.md",
+      "reason": "Complete change acceptance and prohibited external-state actions."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-7.2-final-conformance-root-cause-repair",
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "realProviderOrPaidRequestAuthorized": false,
+  "reportingContract": "Direct send_message_to_thread plus read_thread for every acceptance, activation, checkpoint, blocker, deviation and delivery; no final, heartbeat or polling continuation."
+}
