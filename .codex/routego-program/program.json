@@ -211,21 +211,21 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.3-completed-awaiting-task-6.4-acceptance",
+      "status": "task-6.4-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "6.4",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "ab8b79568bab84a0e15e6cfbba3ab3f7894b5579",
+      "currentHead": "14e9bca472927f20aaf019509e270f89d07cbc59",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.4.json",
         "sha256": "a43f63aac2982b9240c76b94909b2cd6f24ef51caefaf76bfd31032a545f0ad9"
       },
-      "authorizedScope": "Task 6.4 acceptance is pending for the registered Integration owner; Task 6.5+ and 7.3 remain locked.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 6.4 local quality gates are activated for the registered Integration owner; Task 6.5+ and 7.3 remain locked.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "6.3",
       "implementationCommit": "f4fec38a629e3cb0352eb97b13a8d4009453143a",
       "taskStateCommit": "ab8b79568bab84a0e15e6cfbba3ab3f7894b5579"
@@ -310,10 +310,10 @@
       "generation": 6,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "ab8b79568bab84a0e15e6cfbba3ab3f7894b5579",
+      "currentHead": "14e9bca472927f20aaf019509e270f89d07cbc59",
       "observableCompactions": 0,
       "lastCompletedTask": "6.3",
-      "status": "task-6.3-completed-awaiting-task-6.4-acceptance",
+      "status": "task-6.4-activated",
       "taskId": "6.4",
       "taskCapsuleIntegrity": {
         "canonicalSha256": "a43f63aac2982b9240c76b94909b2cd6f24ef51caefaf76bfd31032a545f0ad9"
