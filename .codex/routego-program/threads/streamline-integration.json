@@ -10,7 +10,7 @@
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "5cd6519aff39341f2af05b3a63f93082d421641a",
+  "currentHead": "3bed0bb54fc0626bbc04f697d84873291e5e5f9d",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
   "soleApplyOwner": false,
@@ -55,7 +55,7 @@
   },
   "taskCapsule": {
     "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
-    "contentSha256": "ad91b715781a10b43a65bc1dfc5d174859009553d7da522863669a5fd94b0d12"
+    "contentSha256": "6c5c3bbbe986d88e3add97c04f13062a0ee61ece4bcdeb4521af9d34686b82a1"
   },
   "registration": {
     "reason": "Task 6.2 implementation is committed but locked until the three independent typecheck-baseline repairs complete. This owner is registered for 6.1c only.",
