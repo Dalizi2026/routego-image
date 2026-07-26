@@ -3,22 +3,22 @@
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
   "role": "task-7.1-dead-surface-safety-owner",
-  "status": "task-7.1-scoped-exception-awaiting-activation",
+  "status": "task-7.1-scoped-exception-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "ec9ae2c78783f796cdd996749d5b075a3d2bf06f",
+  "currentHead": "dab6fc8b0b693489a3cb9dbe1bea9cd9490864ee",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "7.1",
-    "status": "accepted-awaiting-scoped-activation",
-    "locked": true
+    "status": "activated",
+    "locked": false
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",

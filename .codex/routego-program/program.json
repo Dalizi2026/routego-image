@@ -211,21 +211,21 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-7.1-scoped-exception-awaiting-activation",
+      "status": "task-7.1-scoped-exception-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "7.1",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "ec9ae2c78783f796cdd996749d5b075a3d2bf06f",
+      "currentHead": "dab6fc8b0b693489a3cb9dbe1bea9cd9490864ee",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-7.1.json",
         "sha256": "8b1106c6035ecbb69f5c604b76c75762940ff094b266397b376e4084191dd814"
       },
-      "authorizedScope": "PD-016 is recorded; await separately committed scoped activation for the 7.1 verification recheck and tasks.md checkoff only. Task 7.2+ remain locked.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "PD-016 scoped activation permits only the 7.1 verification recheck and tasks.md checkoff. Task 7.2+ remain locked.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "6.5",
       "implementationCommit": "6047d9a6c5da4a4cc1ca539411695c46cb14c2fb",
       "taskStateCommit": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3"
@@ -386,10 +386,10 @@
     },
     "currentTask": {
       "id": "7.1",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 7.1 is accepted under PD-016 and awaits scoped activation for verification recheck and tasks.md checkoff only. Task 7.2+ remain locked."
+      "authorizedScope": "Task 7.1 is scoped-activated under PD-016 for verification recheck and tasks.md checkoff only. Task 7.2+ remain locked."
     }
   },
   "latestDirectCheckpoint": {
