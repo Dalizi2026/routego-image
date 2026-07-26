@@ -29,7 +29,7 @@
     "completedBeforeAudit": 36,
     "requirementsReviewed": true
   },
-  "taskStatus": {"1.1":true,"1.2":true,"1.3":true,"1.4":true,"2.1":true,"2.2":true,"2.3":true,"2.4":true,"3.1":true,"3.2":true,"3.3":true,"3.4":true,"3.5":true,"4.1":true,"4.2":true,"4.3":true,"4.4":true,"4.5":true,"4.6":true,"5.1":true,"5.2":true,"5.3":true,"5.4":true,"5.5":true,"5.6":true,"6.1":true,"6.1a":true,"6.1b":true,"6.1c":true,"6.2":true,"6.3":true,"6.4":true,"6.5":true,"7.1":true,"7.2":true,"7.3":true,"7.4":false},
+  "taskStatus": {"1.1":true,"1.2":true,"1.3":true,"1.4":true,"2.1":true,"2.2":true,"2.3":true,"2.4":true,"3.1":true,"3.2":true,"3.3":true,"3.4":true,"3.5":true,"4.1":true,"4.2":true,"4.3":true,"4.4":true,"4.5":true,"4.6":true,"5.1":true,"5.2":true,"5.3":true,"5.4":true,"5.5":true,"5.6":true,"6.1":true,"6.1a":true,"6.1b":true,"6.1c":true,"6.2":true,"6.3":true,"6.4":true,"6.5":true,"7.1":true,"7.2":true,"7.3":true,"7.4":true},
   "commits": {
     "task6_2Implementation": "e3a2524ec5968032bc9311136d284430985e348c",
     "task6_2TaskState": "a319e5bb1880225d2b12b717e55021b587bae0b6",
@@ -46,7 +46,8 @@
     "task7_1": "Contracts 31/31; Integration 27/27; Mock Relay typecheck; smoke syntax; diff-check; lane doctor PASS",
     "task7_2": "full typecheck; full test; browser 12/12; exports; strict OpenSpec; diff-check; lane doctor PASS",
     "task7_3": "build:plugin PASS; verify:plugin PASS; install-smoke 5/5; node checks; diff-check; lane doctor PASS",
-    "finalDoctorBeforeEvidence": "PASS; clean Git; no lease; observableCompactions=0"
+    "finalDoctorBeforeEvidence": "PASS; clean Git; no lease; observableCompactions=0",
+    "taskStateAfterEvidence": "7.4 checked off in tasks.md after evidence commit"
   },
   "approvedException": {
     "id": "PD-016-task-7.1-approved-wasm-size-exception",
