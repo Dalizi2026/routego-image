@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "transitionId": "streamline-6.1a-checkpoint-20260726-001",
   "eventFingerprint": "streamline-6.1a-verified-delivery-e49a17d",
-  "state": "checkpoint-received",
+  "state": "task-message-sent",
   "resumeState": null,
   "sourceThreadId": "019f9bd6-1aef-73f0-8459-2b416a72ea86",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
-  "targetThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
+  "targetThreadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
   "completedTaskId": "6.1a",
-  "nextTaskId": null,
-  "attemptCount": 0,
-  "lastAttemptAt": null,
+  "nextTaskId": "6.1b",
+  "attemptCount": 1,
+  "lastAttemptAt": "2026-07-26T01:03:24.676Z",
   "lastError": null,
   "receiptPath": null,
   "lastTransitionId": null,
-  "updatedAt": "2026-07-26T01:00:15.909Z"
+  "updatedAt": "2026-07-26T01:03:24.675Z"
 }
