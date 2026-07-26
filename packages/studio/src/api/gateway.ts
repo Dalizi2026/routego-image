@@ -7,7 +7,6 @@ import {
   type BrowserResourceDescriptor,
   type LocalRoutegoService,
   type RoutegoManageLibraryInput,
-  type StudioEditInput,
   type StudioGenerateInput,
   type StudioImageOperationEvent,
   type StudioOperation,
@@ -57,7 +56,7 @@ export interface StudioGateway {
     objectUrlApi?: ObjectUrlApi
   ): Promise<ProtectedObjectUrl>;
   streamImageOperation(
-    input: StudioGenerateInput | StudioEditInput,
+    input: StudioGenerateInput,
     options?: StudioImageOperationStreamOptions
   ): AsyncIterable<StudioImageOperationEvent>;
 }
@@ -369,7 +368,7 @@ export class HttpStudioGateway implements StudioGateway {
   }
 
   streamImageOperation(
-    input: StudioGenerateInput | StudioEditInput,
+    input: StudioGenerateInput,
     options: StudioImageOperationStreamOptions = {}
   ): AsyncIterable<StudioImageOperationEvent> {
     const gateway = this;
