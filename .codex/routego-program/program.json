@@ -211,19 +211,19 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-7.1-activated",
+      "status": "task-7.1-scoped-exception-awaiting-activation",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "7.1",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "6e31a8d0cad7e1adb965e11ae6051e9f40f2812c",
+      "currentHead": "ec9ae2c78783f796cdd996749d5b075a3d2bf06f",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-7.1.json",
         "sha256": "8b1106c6035ecbb69f5c604b76c75762940ff094b266397b376e4084191dd814"
       },
-      "authorizedScope": "Task 7.1 dead-surface and safety scan is dispatched to the registered Integration owner; Task 7.2+ remain locked.",
+      "authorizedScope": "PD-016 is recorded; await separately committed scoped activation for the 7.1 verification recheck and tasks.md checkoff only. Task 7.2+ remain locked.",
       "soleApplyOwner": false,
       "applyAuthorized": false,
       "lastCompletedTask": "6.5",
@@ -386,10 +386,10 @@
     },
     "currentTask": {
       "id": "7.1",
-      "locked": false,
-      "activationAuthorized": true,
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 7.1 is activated for the registered Integration owner; only capsule-declared dead-surface and safety files are allowed. Task 7.2+ remain locked."
+      "authorizedScope": "Task 7.1 is accepted under PD-016 and awaits scoped activation for verification recheck and tasks.md checkoff only. Task 7.2+ remain locked."
     }
   },
   "latestDirectCheckpoint": {
