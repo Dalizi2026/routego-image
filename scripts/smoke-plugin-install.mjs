@@ -8,6 +8,7 @@ import {
   mkdir,
   mkdtemp,
   readFile,
+  readdir,
   realpath,
   rm,
   writeFile
@@ -20,7 +21,7 @@ import { pathToFileURL } from "node:url";
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 export const ACCEPTED_ARTIFACT_MANIFEST_SHA256 =
-  "e1154e518e429b1a7dbf223d27218744527f25278e958c3b8aa73417aca92ead";
+  "c35863e9717f2aa388b584f89bfd5087cbc242570b25512bd6e4909f45394d1c";
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
@@ -621,6 +622,103 @@ async function exerciseSyntheticInstalledRuntime(paths, folderId) {
   }
 }
 
+function legacyLibraryIndexFixture() {
+  const createdAt = "2026-07-26T00:00:00.000Z";
+  const blobSha256 = "a".repeat(64);
+  const parameters = {
+    kind: "generate", prompt: "Synthetic legacy Library", references: [], supportingImages: [],
+    size: "1024x1024", aspectRatio: "1:1", quality: "high", format: "png", count: 1,
+    partialImages: 0, transparentMode: "off", moderation: "auto", action: "generate",
+    imageIds: [], fileIds: [], outputDirectoryMode: "default", saveToLibrary: true
+  };
+  return {
+    schemaVersion: 1, revision: 1,
+    blobs: [{
+      sha256: blobSha256, relativePath: `blobs/2026/07/${blobSha256}.png`, mimeType: "image/png",
+      byteLength: 12, width: 2, height: 2, createdAt
+    }],
+    assets: [{
+      id: "asset-legacy", prompt: "Synthetic legacy Library", model: "synthetic-model", kind: "generate",
+      status: "succeeded", primaryArtifactId: "artifact-legacy", createdAt, updatedAt: createdAt,
+      requestedParams: parameters, effectiveParams: parameters,
+      execution: {
+        attemptCount: 1, providerRequestCount: 0, receivedAnyOutput: true,
+        mayHaveBilled: false, degradedContinuation: false, providerImageIds: []
+      },
+      renditions: [{ artifactId: "artifact-legacy", phase: "final", blobSha256, createdAt }],
+      relationships: [{
+        id: "relationship-output", role: "output", relatedAssetId: "asset-legacy",
+        artifactId: "artifact-legacy", order: 0
+      }],
+      folderIds: []
+    }],
+    folders: []
+  };
+}
+
+async function exerciseLegacyLibraryUpgrade(paths) {
+  const home = path.join(paths.data, "legacy-library-home");
+  const indexPath = path.join(home, "Pictures", "routego-image", "library", "index.json");
+  await mkdir(path.dirname(indexPath), { recursive: true });
+  await writeFile(indexPath, `${JSON.stringify(legacyLibraryIndexFixture(), null, 2)}\n`, "utf8");
+  const runtimeModule = await import(
+    `${pathToFileURL(path.join(paths.installedPackage, "runtime/index.js")).href}?legacy-smoke=${randomUUID()}`
+  );
+  const staticManifest = JSON.parse(
+    await readFile(path.join(paths.installedPackage, "runtime/studio-assets.json"), "utf8")
+  );
+  const input = new PassThrough();
+  const output = new PassThrough();
+  const error = new PassThrough();
+  const runtime = await runtimeModule.createProductionRoutegoMcpProcess({
+    homeDirectory: home,
+    runtimeRoot: path.join(paths.data, "legacy-runtime"),
+    stagingRoot: path.join(paths.data, "legacy-staging"),
+    staticAssets: { rootDirectory: path.join(paths.installedPackage, "runtime/studio"), assets: staticManifest.assets },
+    entryModuleRoute: staticManifest.entryModuleRoute,
+    styleRoutes: staticManifest.styleRoutes,
+    input, output, error,
+    serviceOptions: { executeCreation: syntheticExecution, defaultModel: "synthetic-model" }
+  });
+  const mcp = new StreamRpcClient(input, output);
+  try {
+    await runtime.start();
+    await mcp.request("initialize");
+    const launch = parsedToolResult(await mcp.request("tools/call", {
+      name: "routego_open_studio", arguments: { reuseExisting: false, address: "127.0.0.1" }
+    }));
+    const launchResponse = await fetch(launch.url, { redirect: "error" });
+    const session = sessionTokenFromBootstrap(await launchResponse.text());
+    const origin = new URL(launch.url).origin;
+    const migration = await checkedJson(await fetch(new URL("/api/v1/library/legacy-migration", origin), {
+      headers: browserReadHeaders(session)
+    }));
+    if (migration.status !== "ready" || typeof migration.fingerprint !== "string") {
+      fail("installed Studio did not recognize a compatible legacy Library");
+    }
+    const confirmation = await checkedJson(await fetch(
+      new URL("/api/v1/library/legacy-migration/confirm", origin),
+      {
+        method: "POST", headers: studioHeaders(origin, session, true),
+        body: JSON.stringify({ schemaVersion: 1, fingerprint: migration.fingerprint, confirmMigration: true })
+      }
+    ));
+    if (confirmation.status !== "succeeded") fail("installed Studio did not confirm the legacy Library upgrade");
+    const status = await checkedJson(await fetch(new URL("/api/v1/status", origin), {
+      headers: browserReadHeaders(session)
+    }));
+    const entries = await readdir(path.dirname(indexPath));
+    const upgraded = JSON.parse(await readFile(indexPath, "utf8"));
+    if (status.service?.status !== "ready" || upgraded.schemaVersion !== 2 ||
+        !entries.some((entry) => entry.startsWith("index.json.routego-v1-backup-"))) {
+      fail("installed legacy Library upgrade did not recover the local service safely");
+    }
+    return true;
+  } finally {
+    await runtime.shutdown("legacy-install-smoke-complete");
+  }
+}
+
 function childEnvironment(paths) {
   return {
     PATH: process.env.PATH ?? "",
@@ -719,6 +817,7 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
     }
     await client.close(paths.installedPackage);
     const studio = await exerciseSyntheticInstalledRuntime(paths, folderId);
+    const legacyLibraryUpgraded = await exerciseLegacyLibraryUpgrade(paths);
     const skillText = await readFile(
       path.join(paths.installedPackage, "skills/routego-image/SKILL.md"),
       "utf8"
@@ -749,7 +848,7 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
         serviceStatus: status.service.status,
         offlineSafe: status.hasApiKey === false && status.models.length === 0
       },
-      studio,
+      studio: { ...studio, legacyLibraryUpgraded },
       isolation: {
         sourceCheckoutIndependent: paths.workspace !== verification.root &&
           paths.installedPackage !== verification.root,

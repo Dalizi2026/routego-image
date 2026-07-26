@@ -3,28 +3,36 @@ import type { z } from "zod";
 import {
   executeLibraryMutationInputSchema,
   executeLibraryMutationResultSchema,
+  confirmLegacyLibraryMigrationInputSchema,
+  confirmLegacyLibraryMigrationResultSchema,
   getAssetDetailInputSchema,
   getAssetDetailResultSchema,
   getBrowserResourceInputSchema,
   getBrowserResourceResultSchema,
   listFoldersInputSchema,
   listFoldersResultSchema,
+  legacyLibraryMigrationStateSchema,
   preflightLibraryMutationInputSchema,
   preflightLibraryMutationResultSchema,
+  readLegacyLibraryMigrationInputSchema,
   reorderFoldersInputSchema,
   reorderFoldersResultSchema,
   studioLibrarySearchInputSchema,
   studioLibrarySearchResultSchema,
   type ExecuteLibraryMutationInput,
   type ExecuteLibraryMutationResult,
+  type ConfirmLegacyLibraryMigrationInput,
+  type ConfirmLegacyLibraryMigrationResult,
   type GetAssetDetailInput,
   type GetAssetDetailResult,
   type GetBrowserResourceInput,
   type GetBrowserResourceResult,
   type ListFoldersInput,
   type ListFoldersResult,
+  type LegacyLibraryMigrationState,
   type PreflightLibraryMutationInput,
   type PreflightLibraryMutationResult,
+  type ReadLegacyLibraryMigrationInput,
   type ReorderFoldersInput,
   type ReorderFoldersResult,
   type StudioLibrarySearchInput,
@@ -131,6 +139,8 @@ export const routegoOperationNames = [
 export type RoutegoOperation = (typeof routegoOperationNames)[number];
 
 export const studioOperationNames = [
+  "readLegacyLibraryMigration",
+  "confirmLegacyLibraryMigration",
   "readSettings",
   "upsertProviderProfile",
   "removeProviderProfile",
@@ -204,6 +214,16 @@ export const routegoOperationDefinitions = {
 >;
 
 export const studioOperationDefinitions = {
+  readLegacyLibraryMigration: {
+    http: { method: "GET", path: "/api/v1/library/legacy-migration" },
+    inputSchema: readLegacyLibraryMigrationInputSchema,
+    outputSchema: legacyLibraryMigrationStateSchema
+  },
+  confirmLegacyLibraryMigration: {
+    http: { method: "POST", path: "/api/v1/library/legacy-migration/confirm" },
+    inputSchema: confirmLegacyLibraryMigrationInputSchema,
+    outputSchema: confirmLegacyLibraryMigrationResultSchema
+  },
   readSettings: {
     http: { method: "GET", path: "/api/v1/settings" },
     inputSchema: readSettingsInputSchema,
@@ -341,6 +361,10 @@ export interface StudioSettingsService {
 }
 
 export interface StudioLibraryService {
+  readLegacyLibraryMigration(input: ReadLegacyLibraryMigrationInput): Promise<LegacyLibraryMigrationState>;
+  confirmLegacyLibraryMigration(
+    input: ConfirmLegacyLibraryMigrationInput
+  ): Promise<ConfirmLegacyLibraryMigrationResult>;
   searchStudioLibrary(input: StudioLibrarySearchInput): Promise<StudioLibrarySearchResult>;
   listFolders(input: ListFoldersInput): Promise<ListFoldersResult>;
   reorderFolders(input: ReorderFoldersInput): Promise<ReorderFoldersResult>;

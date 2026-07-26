@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 
 import {
+  confirmLegacyLibraryMigrationInputSchema,
+  confirmLegacyLibraryMigrationResultSchema,
   capabilityProbeInputSchema,
   capabilityProbeResultSchema,
   discardUploadResourceInputSchema,
@@ -19,8 +21,10 @@ import {
   imageOperationResultSchema,
   listFoldersInputSchema,
   listFoldersResultSchema,
+  legacyLibraryMigrationStateSchema,
   preflightLibraryMutationInputSchema,
   preflightLibraryMutationResultSchema,
+  readLegacyLibraryMigrationInputSchema,
   readSettingsInputSchema,
   readSettingsResultSchema,
   refreshModelsInputSchema,
@@ -63,6 +67,8 @@ import {
   type BrowserResourceDescriptor,
   type CapabilityProbeInput,
   type CapabilityProbeResult,
+  type ConfirmLegacyLibraryMigrationInput,
+  type ConfirmLegacyLibraryMigrationResult,
   type DiscardUploadResourceInput,
   type DiscardUploadResourceResult,
   type ExecuteLibraryMutationInput,
@@ -82,6 +88,7 @@ import {
   type LibraryFolderDescriptor,
   type LibraryMutationRequest,
   type LibraryOperationParameters,
+  type LegacyLibraryMigrationState,
   type ListFoldersInput,
   type ListFoldersResult,
   type LocalRoutegoService,
@@ -90,6 +97,7 @@ import {
   type ProviderProfileDescriptor,
   type ReadSettingsInput,
   type ReadSettingsResult,
+  type ReadLegacyLibraryMigrationInput,
   type RefreshModelsInput,
   type RefreshModelsResult,
   type RemoveProviderProfileInput,
@@ -883,6 +891,25 @@ export class MockRoutegoService implements LocalRoutegoService {
       throw this.#error("not_found", "The synthetic settings fixture is unavailable.");
     }
     return readSettingsResultSchema.parse(this.#settings);
+  }
+
+  async readLegacyLibraryMigration(
+    input: ReadLegacyLibraryMigrationInput
+  ): Promise<LegacyLibraryMigrationState> {
+    readLegacyLibraryMigrationInputSchema.parse(input);
+    return legacyLibraryMigrationStateSchema.parse({
+      schemaVersion: 1, status: "not-required", providerRequestCount: 0, mutatesData: false
+    });
+  }
+
+  async confirmLegacyLibraryMigration(
+    input: ConfirmLegacyLibraryMigrationInput
+  ): Promise<ConfirmLegacyLibraryMigrationResult> {
+    const parsed = confirmLegacyLibraryMigrationInputSchema.parse(input);
+    return confirmLegacyLibraryMigrationResultSchema.parse({
+      schemaVersion: 1, status: "blocked", fingerprint: parsed.fingerprint, providerRequestCount: 0,
+      error: this.#error("config_corrupt", "The synthetic Library has no legacy migration.")
+    });
   }
 
   async upsertProviderProfile(

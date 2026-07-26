@@ -45,7 +45,9 @@ export interface GalleryServiceOptions {
 }
 
 export class GalleryService
-  implements Pick<RoutegoService, "searchLibrary" | "manageLibrary">, StudioLibraryService
+  implements
+    Pick<RoutegoService, "searchLibrary" | "manageLibrary">,
+    Omit<StudioLibraryService, "readLegacyLibraryMigration" | "confirmLegacyLibraryMigration">
 {
   readonly #read: LibraryReadService;
   readonly #mutations: LibraryMutationStore;

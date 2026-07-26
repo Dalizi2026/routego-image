@@ -433,6 +433,8 @@ describe("separate Studio operation registry", () => {
       "routego_open_studio"
     ]);
     expect(studioOperationNames).toEqual([
+      "readLegacyLibraryMigration",
+      "confirmLegacyLibraryMigration",
       "readSettings",
       "upsertProviderProfile",
       "removeProviderProfile",

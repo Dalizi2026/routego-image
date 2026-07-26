@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useReducer, useRef, useState, type ReactNode } from "react";
 
-import type { ReadSettingsResult, RoutegoStatusResult } from "@routego-image/contracts";
+import type {
+  LegacyLibraryMigrationState,
+  ReadSettingsResult,
+  RoutegoStatusResult
+} from "@routego-image/contracts";
 
 import { StudioGatewayError, type StudioGateway } from "../api";
 import { AppNavigation, AsyncStatePanel, NoticeStack } from "../components";
@@ -29,6 +33,7 @@ type BootState =
       readonly status: "ready";
       readonly service: RoutegoStatusResult;
       readonly settings: ReadSettingsResult;
+      readonly migration: LegacyLibraryMigrationState;
     }
   | {
       readonly status: "failure";
@@ -131,6 +136,50 @@ function BootScreen({ state, onRetry }: { readonly state: BootState; readonly on
     );
   }
   return null;
+}
+
+function LegacyMigrationScreen({
+  gateway,
+  migration,
+  onRetry
+}: {
+  readonly gateway: StudioGateway;
+  readonly migration: LegacyLibraryMigrationState;
+  readonly onRetry: () => void;
+}) {
+  const { t } = useI18n();
+  const [working, setWorking] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const confirm = useCallback(() => {
+    if (migration.status !== "ready" || migration.fingerprint === undefined || working) return;
+    setWorking(true);
+    setFailed(false);
+    void gateway.invoke("confirmLegacyLibraryMigration", {
+      fingerprint: migration.fingerprint,
+      confirmMigration: true
+    }).then((result) => {
+      if (result.status === "succeeded") onRetry();
+      else setFailed(true);
+    }).catch(() => setFailed(true)).finally(() => setWorking(false));
+  }, [gateway, migration, onRetry, working]);
+  return (
+    <div className="boot-screen">
+      <AsyncStatePanel
+        state={migration.status === "ready" ? "degraded" : "failure"}
+        title={t("migration.title")}
+        action={migration.status === "ready" ? (
+          <button className="studio-button" type="button" disabled={working} onClick={confirm}>
+            {working ? t("migration.working") : t("migration.confirm")}
+          </button>
+        ) : (
+          <button className="studio-button" type="button" onClick={onRetry}>{t("app.retry")}</button>
+        )}
+      >
+        <p>{migration.status === "ready" ? t("migration.ready") : t("migration.blocked")}</p>
+        {failed ? <p>{t("migration.failed")}</p> : null}
+      </AsyncStatePanel>
+    </div>
+  );
 }
 
 function RouteOverview({ route }: { readonly route: StudioRoute }) {
@@ -479,8 +528,12 @@ export function StudioApp({
   useEffect(() => {
     let active = true;
     setBoot({ status: "loading" });
-    void Promise.all([gateway.invoke("status", {}), gateway.invoke("readSettings", {})])
-      .then(([service, settings]) => {
+    void Promise.all([
+      gateway.invoke("status", {}),
+      gateway.invoke("readSettings", {}),
+      gateway.invoke("readLegacyLibraryMigration", {})
+    ])
+      .then(([service, settings, migration]) => {
         if (!active) {
           return;
         }
@@ -492,7 +545,7 @@ export function StudioApp({
           });
           return;
         }
-        setBoot({ status: "ready", service, settings });
+        setBoot({ status: "ready", service, settings, migration });
       })
       .catch((error: unknown) => {
         if (!active) {
@@ -513,7 +566,13 @@ export function StudioApp({
 
   return (
     <I18nProvider>
-      {boot.status === "ready" ? (
+      {boot.status === "ready" && boot.migration.status !== "not-required" ? (
+        <LegacyMigrationScreen
+          gateway={gateway}
+          migration={boot.migration}
+          onRetry={() => setAttempt((value) => value + 1)}
+        />
+      ) : boot.status === "ready" ? (
         <StudioWorkspace
           gateway={gateway}
           service={boot.service}

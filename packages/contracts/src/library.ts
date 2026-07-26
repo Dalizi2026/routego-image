@@ -1029,6 +1029,56 @@ export const libraryMigrationConfirmationResultSchema = z
     }
   });
 
+export const legacyLibraryMigrationStateSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    status: z.enum(["not-required", "ready", "blocked"]),
+    fingerprint: sha256FingerprintSchema.optional(),
+    assetCount: z.number().int().min(0).max(100_000).default(0),
+    providerRequestCount: z.literal(0),
+    mutatesData: z.literal(false),
+    error: routegoServiceErrorSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.status === "ready" && value.fingerprint === undefined) {
+      context.addIssue({ code: "custom", path: ["fingerprint"], message: "Ready migration requires a fingerprint" });
+    }
+    if (value.status === "blocked" && value.error === undefined) {
+      context.addIssue({ code: "custom", path: ["error"], message: "Blocked migration requires an error" });
+    }
+  });
+
+export const readLegacyLibraryMigrationInputSchema = z
+  .object({ schemaVersion: routegoSchemaVersionSchema.default(1) })
+  .strict();
+
+export const confirmLegacyLibraryMigrationInputSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema.default(1),
+    fingerprint: sha256FingerprintSchema,
+    confirmMigration: z.literal(true)
+  })
+  .strict();
+
+export const confirmLegacyLibraryMigrationResultSchema = z
+  .object({
+    schemaVersion: routegoSchemaVersionSchema,
+    status: z.enum(["succeeded", "failed", "blocked"]),
+    fingerprint: sha256FingerprintSchema,
+    providerRequestCount: z.literal(0),
+    error: routegoServiceErrorSchema.optional()
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.status === "succeeded" && value.error !== undefined) {
+      context.addIssue({ code: "custom", path: ["error"], message: "Successful migration cannot include an error" });
+    }
+    if (value.status !== "succeeded" && value.error === undefined) {
+      context.addIssue({ code: "custom", path: ["error"], message: "Unsuccessful migration requires an error" });
+    }
+  });
+
 export type LibraryFolderDescriptor = z.infer<typeof libraryFolderDescriptorSchema>;
 export type ListFoldersInput = z.input<typeof listFoldersInputSchema>;
 export type ListFoldersResult = z.output<typeof listFoldersResultSchema>;
@@ -1053,6 +1103,10 @@ export type PreflightLibraryMutationResult = z.output<
 >;
 export type ExecuteLibraryMutationInput = z.input<typeof executeLibraryMutationInputSchema>;
 export type ExecuteLibraryMutationResult = z.output<typeof executeLibraryMutationResultSchema>;
+export type LegacyLibraryMigrationState = z.output<typeof legacyLibraryMigrationStateSchema>;
+export type ReadLegacyLibraryMigrationInput = z.input<typeof readLegacyLibraryMigrationInputSchema>;
+export type ConfirmLegacyLibraryMigrationInput = z.input<typeof confirmLegacyLibraryMigrationInputSchema>;
+export type ConfirmLegacyLibraryMigrationResult = z.output<typeof confirmLegacyLibraryMigrationResultSchema>;
 
 export type MarkLibraryAssetInput = z.input<typeof markLibraryAssetInputSchema>;
 export type MarkLibraryAssetResult = z.output<typeof markLibraryAssetResultSchema>;

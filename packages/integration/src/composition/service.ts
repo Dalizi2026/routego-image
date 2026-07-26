@@ -3,6 +3,8 @@ import path from "node:path";
 import { mkdir, readdir, realpath, rm } from "node:fs/promises";
 
 import {
+  confirmLegacyLibraryMigrationInputSchema,
+  confirmLegacyLibraryMigrationResultSchema,
   capabilityProbeInputSchema,
   capabilityProbeResultSchema,
   discardUploadResourceInputSchema,
@@ -23,6 +25,8 @@ import {
   listFoldersResultSchema,
   preflightLibraryMutationInputSchema,
   preflightLibraryMutationResultSchema,
+  readLegacyLibraryMigrationInputSchema,
+  legacyLibraryMigrationStateSchema,
   readSettingsInputSchema,
   readSettingsResultSchema,
   refreshModelsInputSchema,
@@ -67,6 +71,8 @@ import {
   upsertProviderProfileResultSchema,
   type CapabilityProbeInput,
   type CapabilityProbeResult,
+  type ConfirmLegacyLibraryMigrationInput,
+  type ConfirmLegacyLibraryMigrationResult,
   type DiscardUploadResourceInput,
   type DiscardUploadResourceResult,
   type ExecuteLibraryMutationInput,
@@ -84,11 +90,13 @@ import {
   type ImageOperationResult,
   type ListFoldersInput,
   type ListFoldersResult,
+  type LegacyLibraryMigrationState,
   type LocalRoutegoService,
   type PreflightLibraryMutationInput,
   type PreflightLibraryMutationResult,
   type ReadSettingsInput,
   type ReadSettingsResult,
+  type ReadLegacyLibraryMigrationInput,
   type RefreshModelsInput,
   type RefreshModelsResult,
   type RemoveProviderProfileInput,
@@ -695,17 +703,6 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
   async status(input: RoutegoStatusInput): Promise<RoutegoStatusResult> {
     const parsed = routegoStatusInputSchema.parse(input);
     const service = await this.#health();
-    if (this.#status !== "ready") {
-      return routegoStatusResultSchema.parse({
-        schemaVersion: 1,
-        configured: false,
-        hasApiKey: false,
-        models: [],
-        capabilities: [],
-        defaults: defaultDefaults(),
-        service
-      });
-    }
     try {
       // The public status contract has no exact probe descriptor. These flags only request a fresh
       // redacted status snapshot; billable probes remain the explicit Studio operation.
@@ -730,6 +727,26 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
 
   async readSettings(input: ReadSettingsInput): Promise<ReadSettingsResult> {
     return readSettingsResultSchema.parse(await this.#options.library.readSettings(readSettingsInputSchema.parse(input)));
+  }
+
+  async readLegacyLibraryMigration(
+    input: ReadLegacyLibraryMigrationInput
+  ): Promise<LegacyLibraryMigrationState> {
+    return legacyLibraryMigrationStateSchema.parse(
+      await this.#options.library.readLegacyLibraryMigration(readLegacyLibraryMigrationInputSchema.parse(input))
+    );
+  }
+
+  async confirmLegacyLibraryMigration(
+    input: ConfirmLegacyLibraryMigrationInput
+  ): Promise<ConfirmLegacyLibraryMigrationResult> {
+    const result = confirmLegacyLibraryMigrationResultSchema.parse(
+      await this.#options.library.confirmLegacyLibraryMigration(
+        confirmLegacyLibraryMigrationInputSchema.parse(input)
+      )
+    );
+    if (result.status === "succeeded") await this.recover();
+    return result;
   }
 
   async upsertProviderProfile(input: UpsertProviderProfileInput): Promise<UpsertProviderProfileResult> {

@@ -5,15 +5,21 @@ import os from "node:os";
 import path from "node:path";
 
 import {
+  confirmLegacyLibraryMigrationInputSchema,
+  confirmLegacyLibraryMigrationResultSchema,
   executeLibraryMutationInputSchema,
   executeLibraryMutationResultSchema,
   identifierSchema,
   preflightLibraryMutationInputSchema,
   preflightLibraryMutationResultSchema,
+  readLegacyLibraryMigrationInputSchema,
+  legacyLibraryMigrationStateSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
   type DiscardUploadResourceInput,
   type DiscardUploadResourceResult,
+  type ConfirmLegacyLibraryMigrationInput,
+  type ConfirmLegacyLibraryMigrationResult,
   type ExecuteLibraryMutationInput,
   type ExecuteLibraryMutationResult,
   type FinalizeUploadResourceInput,
@@ -26,10 +32,12 @@ import {
   type GetUploadResourceStatusResult,
   type ListFoldersInput,
   type ListFoldersResult,
+  type LegacyLibraryMigrationState,
   type PreflightLibraryMutationInput,
   type PreflightLibraryMutationResult,
   type ReadSettingsInput,
   type ReadSettingsResult,
+  type ReadLegacyLibraryMigrationInput,
   type RemoveProviderProfileInput,
   type RemoveProviderProfileResult,
   type ReorderFoldersInput,
@@ -818,6 +826,60 @@ export class RoutegoLibraryService implements LibraryApplicationService {
     return await this.settingsStore.updateSettings(input);
   }
 
+  async readLegacyLibraryMigration(
+    input: ReadLegacyLibraryMigrationInput
+  ): Promise<LegacyLibraryMigrationState> {
+    readLegacyLibraryMigrationInputSchema.parse(input);
+    const inspection = await this.indexStore.inspectLegacyUpgrade();
+    if (inspection.status === "not-required") {
+      return legacyLibraryMigrationStateSchema.parse({
+        schemaVersion: 1, status: "not-required", providerRequestCount: 0, mutatesData: false
+      });
+    }
+    if (inspection.status === "ready") {
+      return legacyLibraryMigrationStateSchema.parse({
+        schemaVersion: 1, status: "ready", fingerprint: inspection.fingerprint,
+        assetCount: inspection.assetCount, providerRequestCount: 0, mutatesData: false
+      });
+    }
+    return legacyLibraryMigrationStateSchema.parse({
+      schemaVersion: 1, status: "blocked", providerRequestCount: 0, mutatesData: false,
+      error: {
+        code: inspection.error.code,
+        category: "persistence",
+        stage: "persist",
+        safeMessage: "This Library version needs a compatible recovery before it can be opened.",
+        retryDisposition: "user-confirmation",
+        partialArtifacts: [], receivedAnyOutput: false, mayHaveBilled: false
+      }
+    });
+  }
+
+  async confirmLegacyLibraryMigration(
+    input: ConfirmLegacyLibraryMigrationInput
+  ): Promise<ConfirmLegacyLibraryMigrationResult> {
+    const parsed = confirmLegacyLibraryMigrationInputSchema.parse(input);
+    try {
+      await this.indexStore.confirmLegacyUpgrade(parsed.fingerprint);
+      await this.recover();
+      return confirmLegacyLibraryMigrationResultSchema.parse({
+        schemaVersion: 1, status: "succeeded", fingerprint: parsed.fingerprint, providerRequestCount: 0
+      });
+    } catch (error) {
+      const code = error instanceof LibraryError ? error.code : "file_write_failed";
+      return confirmLegacyLibraryMigrationResultSchema.parse({
+        schemaVersion: 1, status: code === "unsupported_version" ? "blocked" : "failed",
+        fingerprint: parsed.fingerprint, providerRequestCount: 0,
+        error: {
+          code, category: "persistence", stage: "persist",
+          safeMessage: "The Library upgrade could not be completed. Your existing Library was left unchanged.",
+          retryDisposition: code === "conflict" || code === "unsupported_version" ? "user-confirmation" : "never",
+          partialArtifacts: [], receivedAnyOutput: false, mayHaveBilled: false
+        }
+      });
+    }
+  }
+
   async reserveUploadResource(
     input: ReserveUploadResourceInput
   ): Promise<ReserveUploadResourceResult> {
@@ -986,6 +1048,13 @@ export class RoutegoLibraryService implements LibraryApplicationService {
   }
 
   async recover(): Promise<void> {
+    const migration = await this.indexStore.inspectLegacyUpgrade();
+    if (migration.status !== "not-required") {
+      throw new LibraryError(
+        "unsupported_version",
+        "The Image Library requires an explicit migration before it can be opened."
+      );
+    }
     await this.indexStore.read();
     await this.galleryService.recover();
     await this.portabilityService.recover();

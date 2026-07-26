@@ -1,25 +1,34 @@
 import os from "node:os";
 import path from "node:path";
-import { lstat, mkdir, readFile, stat, unlink } from "node:fs/promises";
+import { copyFile, lstat, mkdir, readFile, stat, unlink } from "node:fs/promises";
 import { TextDecoder } from "node:util";
 
 import { LibraryError, isNodeError } from "../errors";
 import { cleanupAtomicJsonTemporaryFiles, writeJsonAtomic } from "../fs/atomic-json";
 import {
   listTransactionJournals,
+  markTransactionJournalCommitted,
   removeTransactionJournal,
+  writeTransactionJournal,
   type FileTransactionJournal
 } from "../fs/journal";
 import { acquireFileLock, type AcquireFileLockOptions } from "../fs/lock";
 import { resolveApprovedPath } from "../fs/paths";
 import {
   createEmptyImageLibraryIndex,
+  planLegacyImageLibraryUpgrade,
   parseImageLibraryIndex,
   referencedBlobPaths,
   type ImageLibraryIndex
 } from "./model";
 
 export const IMAGE_LIBRARY_BLOB_TRANSACTION_KIND = "image-library-blob-v1";
+export const IMAGE_LIBRARY_LEGACY_UPGRADE_TRANSACTION_KIND = "image-library-v1-upgrade";
+
+export type LegacyLibraryUpgradeInspection =
+  | { readonly status: "not-required" }
+  | { readonly status: "ready"; readonly fingerprint: string; readonly assetCount: number }
+  | { readonly status: "blocked"; readonly error: LibraryError };
 
 export interface ImageLibraryStoragePaths {
   readonly root: string;
@@ -319,6 +328,77 @@ export class ImageLibraryIndexStore {
 
   async read(): Promise<ImageLibraryIndex> {
     return await this.runExclusive(async ({ index }) => structuredClone(index));
+  }
+
+  async inspectLegacyUpgrade(): Promise<LegacyLibraryUpgradeInspection> {
+    await this.#ensureLayout();
+    const lock = await acquireFileLock(this.#paths.indexLock, "routego-image-library-index", this.#lockOptions);
+    try {
+      let source: unknown;
+      try {
+        source = await readIndexValue(this.#paths.index);
+      } catch (error) {
+        if (isNodeError(error, "ENOENT")) return { status: "not-required" };
+        throw error;
+      }
+      if (source === null || typeof source !== "object" || Array.isArray(source)) {
+        throw safeIndexError();
+      }
+      const schemaVersion = (source as Record<string, unknown>)["schemaVersion"];
+      if (schemaVersion !== 1) {
+        parseImageLibraryIndex(source);
+        return { status: "not-required" };
+      }
+      try {
+        const plan = planLegacyImageLibraryUpgrade(source);
+        return { status: "ready", fingerprint: plan.fingerprint, assetCount: plan.assetCount };
+      } catch (error) {
+        return {
+          status: "blocked",
+          error: error instanceof LibraryError
+            ? error
+            : new LibraryError("config_corrupt", "The legacy Image Library cannot be upgraded safely.")
+        };
+      }
+    } finally {
+      await lock.release();
+    }
+  }
+
+  async confirmLegacyUpgrade(fingerprint: string): Promise<void> {
+    await this.#ensureLayout();
+    const lock = await acquireFileLock(this.#paths.indexLock, "routego-image-library-index", this.#lockOptions);
+    try {
+      const source = await readIndexValue(this.#paths.index);
+      const plan = planLegacyImageLibraryUpgrade(source);
+      if (plan.fingerprint !== fingerprint) {
+        throw new LibraryError("conflict", "The legacy Image Library changed before confirmation.");
+      }
+      const backupRelative = `index.json.routego-v1-backup-${plan.fingerprint.slice(0, 16)}`;
+      const backupPath = resolveApprovedPath({ root: this.#paths.root, candidate: backupRelative, operation: "create" });
+      const journalId = `legacy-upgrade-${plan.fingerprint.slice(0, 16)}`;
+      const journal: FileTransactionJournal = {
+        schemaVersion: 1,
+        id: journalId,
+        kind: IMAGE_LIBRARY_LEGACY_UPGRADE_TRANSACTION_KIND,
+        state: "prepared",
+        createdAt: new Date().toISOString(),
+        createdPaths: [backupRelative],
+        deleteAfterCommitPaths: [],
+        metadata: { fingerprint: plan.fingerprint }
+      };
+      await writeTransactionJournal(this.#paths.root, journal);
+      try {
+        await copyFile(this.#paths.index, backupPath);
+        await writeJsonAtomic(this.#paths.index, plan.index);
+        parseImageLibraryIndex(await readIndexValue(this.#paths.index));
+        await markTransactionJournalCommitted(this.#paths.root, journal);
+      } finally {
+        await removeTransactionJournal(this.#paths.root, journalId).catch(() => undefined);
+      }
+    } finally {
+      await lock.release();
+    }
   }
 
   async recover(): Promise<void> {

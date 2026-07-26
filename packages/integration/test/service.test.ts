@@ -372,7 +372,7 @@ describe("task 3.5 contract surface and recovery", () => {
       "routego_manage_library",
       "routego_open_studio"
     ]);
-    expect(studioOperationNames).toHaveLength(21);
+    expect(studioOperationNames).toHaveLength(23);
     expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
     expect(imageArtifactPhaseSchema.safeParse("source").success).toBe(false);
   });

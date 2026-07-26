@@ -131,7 +131,8 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
         uploadResourceReadable: true,
         missingResourceRejected: true,
         streamTerminalType: "completed",
-        sharedLibraryIdentity: true
+        sharedLibraryIdentity: true,
+        legacyLibraryUpgraded: true
       },
       isolation: {
         sourceCheckoutIndependent: true,

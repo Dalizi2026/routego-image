@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import {
   identifierSchema,
   libraryAssetRenditionPhaseSchema,
@@ -112,6 +114,12 @@ export interface LegacyLibraryRelationship {
   readonly relatedAssetId: string;
   readonly artifactId?: string;
   readonly order: number;
+}
+
+export interface LegacyLibraryUpgradePlan {
+  readonly fingerprint: string;
+  readonly assetCount: number;
+  readonly index: ImageLibraryIndex;
 }
 
 function asRecord(value: unknown, label: string): Record<string, unknown> {
@@ -630,6 +638,59 @@ export function parseLegacyImageLibraryIndex(value: unknown): LegacyImageLibrary
     blobs,
     assets,
     folders
+  };
+}
+
+function canonicalValue(value: unknown): string {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalValue).join(",")}]`;
+  const record = value as Record<string, unknown>;
+  return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${canonicalValue(record[key])}`).join(",")}}`;
+}
+
+/**
+ * Converts the one supported v1 shape without changing the source value. Any
+ * historical edit/trash/unknown-field record remains deliberately blocked.
+ */
+export function planLegacyImageLibraryUpgrade(value: unknown): LegacyLibraryUpgradePlan {
+  const legacy = parseLegacyImageLibraryIndex(value);
+  const source = asRecord(value, "Legacy Image Library index");
+  const rawAssets = source["assets"];
+  if (!Array.isArray(rawAssets) || rawAssets.length !== legacy.assets.length) {
+    throw new LibraryError("config_corrupt", "Legacy Library assets are invalid.");
+  }
+  if (legacy.assets.some((asset) => asset.kind !== "generate" || asset.status === "deleted")) {
+    throw new LibraryError("unsupported_version", "This legacy Library contains records that cannot be upgraded safely.");
+  }
+  const assets = rawAssets.map((rawAsset) => {
+    const asset = asRecord(rawAsset, "Legacy Library asset");
+    const projectParameters = (raw: unknown, label: string): Record<string, unknown> => {
+      const parameters = asRecord(raw, label);
+      if (parameters["kind"] !== "generate") {
+        throw new LibraryError("unsupported_version", "This legacy Library contains records that cannot be upgraded safely.");
+      }
+      const projected = { ...parameters };
+      delete projected["supportingImages"];
+      delete projected["action"];
+      delete projected["imageIds"];
+      delete projected["fileIds"];
+      return projected;
+    };
+    return {
+      ...asset,
+      requestedParams: projectParameters(asset["requestedParams"], "Legacy requested parameters"),
+      effectiveParams: projectParameters(asset["effectiveParams"], "Legacy effective parameters")
+    };
+  });
+  const projected = parseImageLibraryIndex({
+    ...source,
+    schemaVersion: IMAGE_LIBRARY_SCHEMA_VERSION,
+    assets
+  });
+  return {
+    fingerprint: createHash("sha256").update(canonicalValue(source), "utf8").digest("hex"),
+    assetCount: projected.assets.length,
+    index: projected
   };
 }
 
