@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "transitionId": "streamline-7.2-dispatch-20260726-001",
-  "eventFingerprint": "streamline-7.2-dispatch-20260726-001",
-  "state": "next-task-acknowledged",
+  "transitionId": "streamline-7.3-dispatch-20260726-001",
+  "eventFingerprint": "streamline-7.3-dispatch-20260726-001",
+  "state": "awaiting-ack",
   "resumeState": null,
   "sourceThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "targetThreadId": "019f99ae-601b-7262-9457-8006de418f17",
-  "completedTaskId": "7.1",
-  "nextTaskId": "7.2",
+  "completedTaskId": "7.2",
+  "nextTaskId": "7.3",
   "attemptCount": 1,
-  "lastAttemptAt": "2026-07-26T07:30:46.245Z",
+  "lastAttemptAt": "2026-07-26T07:41:18.794Z",
   "lastError": null,
-  "receiptPath": ".codex/routego-program/dispatch/receipts/streamline-7.2-dispatch-20260726-001.json",
+  "receiptPath": null,
   "lastTransitionId": null,
-  "updatedAt": "2026-07-26T07:33:46.921Z"
+  "updatedAt": "2026-07-26T07:41:18.874Z"
 }
