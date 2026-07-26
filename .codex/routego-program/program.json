@@ -211,19 +211,19 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-7.3-dispatched-awaiting-acceptance",
+      "status": "task-7.3-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "7.3",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "0c10fa1dcb31c7ccde4fe471f1fb27954e3d1022",
+      "currentHead": "5484e032537b2bdfad08bd91343cbb0dec24ed97",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-7.3.json",
         "sha256": "190f0f6379e741832118035e23226b6d3ae1508092ee5abbbf565a5e2637c319"
       },
-      "authorizedScope": "Task 7.3 temporary package build and isolated offline smoke is dispatched to the registered owner; acceptance and activation are required before mutation. Task 7.4 remains locked.",
+      "authorizedScope": "Task 7.3 temporary package build and isolated offline smoke is activated for the registered owner; only capsule-declared packaging and smoke files plus task-state checkoff are allowed. Task 7.4 remains locked.",
       "soleApplyOwner": true,
       "applyAuthorized": true,
       "lastCompletedTask": "7.2",
@@ -386,10 +386,10 @@
     },
     "currentTask": {
       "id": "7.3",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 7.3 temporary package build and isolated offline smoke is dispatched; activation is required. Task 7.4 remains locked."
+      "authorizedScope": "Task 7.3 temporary package build and isolated offline smoke is activated; Task 7.4 remains locked."
     }
   },
   "latestDirectCheckpoint": {
