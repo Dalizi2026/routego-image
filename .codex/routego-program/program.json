@@ -211,21 +211,21 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.1c-dispatching-awaiting-acceptance",
+      "status": "task-6.1c-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "6.1c",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "5cd6519aff39341f2af05b3a63f93082d421641a",
+      "currentHead": "0410d0a01375c3e93650a2293774d0a362a41831",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.1c.json",
         "sha256": "6c5c3bbbe986d88e3add97c04f13062a0ee61ece4bcdeb4521af9d34686b82a1"
       },
       "authorizedScope": "Task 6.1c only; remove stale Integration contract references. Task 6.2 remains locked pending 6.1a, 6.1b, and 6.1c.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "6.1"
     },
     "streamlineCreation": {
@@ -253,7 +253,7 @@
       "taskId": "6.1b",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "5cd6519aff39341f2af05b3a63f93082d421641a",
+      "currentHead": "0410d0a01375c3e93650a2293774d0a362a41831",
       "taskCapsule": {"path": ".codex/routego-program/tasks/streamline-library-6.1b.json", "sha256": "94fb689613d89097330674a7f687b52709e22b21f4986a8d90c905c1974ce46b"},
       "authorizedScope": "Scope-revised Task 6.1b: retain the committed production repair and align only three named Library test fixtures with generation-only contracts; no public contract restoration.",
       "soleApplyOwner": false,
@@ -311,7 +311,7 @@
       "currentHead": "5cd6519aff39341f2af05b3a63f93082d421641a",
       "observableCompactions": 0,
       "lastCompletedTask": "6.1",
-      "status": "task-6.1c-dispatching-awaiting-acceptance",
+      "status": "task-6.1c-activated",
       "taskId": "6.1c",
       "taskCapsuleIntegrity": {
         "canonicalSha256": "6c5c3bbbe986d88e3add97c04f13062a0ee61ece4bcdeb4521af9d34686b82a1"
@@ -383,10 +383,10 @@
     },
     "currentTask": {
       "id": "6.1c",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 6.1c awaits acceptance and activation for the registered Integration owner; Task 6.2 remains locked until 6.1c completes."
+      "authorizedScope": "Task 6.1c is activated for the registered Integration owner; only the capsule-declared Integration typecheck and fixture repairs are allowed. Task 6.2 remains locked until 6.1c completes."
     }
   },
   "latestDirectCheckpoint": {

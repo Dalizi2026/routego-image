@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "transitionId": "streamline-6.1c-dispatch-20260726-001",
   "eventFingerprint": "streamline-6.1c-typecheck-baseline-repair-20260726-001",
-  "state": "task-message-sent",
+  "state": "next-task-acknowledged",
   "resumeState": null,
   "sourceThreadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
@@ -12,7 +12,7 @@
   "attemptCount": 1,
   "lastAttemptAt": "2026-07-26T04:47:46.629Z",
   "lastError": null,
-  "receiptPath": null,
+  "receiptPath": ".codex/routego-program/dispatch/receipts/streamline-6.1c-dispatch-20260726-001.json",
   "lastTransitionId": null,
-  "updatedAt": "2026-07-26T04:47:46.628Z"
+  "updatedAt": "2026-07-26T04:53:50.651Z"
 }
