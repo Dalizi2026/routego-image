@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "38074f6751883d06c8bb5feaad3d67137f83acd502ff5e017e83653d84934598",
+  "lane": "streamline-integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "6.5",
+  "status": "ready-after-task-6.4",
+  "sourceCommit": "8b4e854ccbcb39b45c8d79ed9632e6b04415fe69",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "566aad3cfd258eb9994abd29befd0363af573355b7f069c4df7423ad06f149f4",
+    "lineSha256": "837968848701a8a897ae767a6b4bd2e8f49eb5d87468480ed052df0cf7e35357",
+    "lineBytes": 318
+  },
+  "dependencies": ["6.4"],
+  "dependencyCommits": {
+    "task6_4": "8b4e854ccbcb39b45c8d79ed9632e6b04415fe69"
+  },
+  "allowedFiles": [
+    "packages/integration/src/composition/service.ts",
+    "packages/integration/test/provider.test.ts",
+    "packages/integration/test/end-to-end.test.ts",
+    "packages/integration/test/background-removal.test.ts",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    "packages/contracts/**",
+    "packages/foundation/**",
+    "packages/creation/**",
+    "packages/library/**",
+    "packages/mock-relay/**",
+    "packages/studio/**",
+    "scripts/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".codex-plugin/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "real-data/**",
+    "**/.env*"
+  ],
+  "requiredBehavior": [
+    "Use the already selected single provider generation result; never add a capability probe, retry, transport replay, or second provider request.",
+    "Accept supported native transparency only after alpha inspection; route unknown, unsupported, and opaque-native results to the existing local background-removal queue.",
+    "Preserve the validated provider original and return a structured transparent-rendition failure when local processing fails; never claim transparent success for a failed fallback.",
+    "Keep provider request counts and possible-billing metadata unchanged while applying local transparency to final outputs."
+  ],
+  "verification": [
+    "openspec instructions apply --change streamline-routego-image-generation --json",
+    "pnpm --filter @routego-image/integration typecheck",
+    "pnpm --filter @routego-image/integration test -- provider.test.ts end-to-end.test.ts background-removal.test.ts",
+    "git diff --check"
+  ],
+  "directSpecifications": [
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/specs/local-background-removal/spec.md",
+      "sha256": "8bc15925c68fa2160a7b05a1f6a29172820e7a21a603f77092e4692f82768a51",
+      "reason": "Defines native alpha acceptance, opaque/unknown/unsupported local fallback, no replay and original-preserving failure."
+    },
+    {
+      "path": "openspec/changes/streamline-routego-image-generation/design.md",
+      "sha256": "bfa8c541a9d5c7ade99f9dcfd76c9e06c0b01344a0d08cfa5ce39a76810cd12d",
+      "reason": "Defines four-state transparency routing through one provider attempt and optional local inference."
+    }
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-6.5-integration-transparency-fallback",
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "reportingContract": "Before activation send THREAD_HANDSHAKE and verify delivery. After activation use direct messages for every acceptance, activation, checkpoint, blocker, deviation and delivery; heartbeat and final answers never advance this task."
+}

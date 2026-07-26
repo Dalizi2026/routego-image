@@ -2,23 +2,23 @@
   "schemaVersion": 2,
   "lane": "streamline-integration",
   "change": "streamline-routego-image-generation",
-  "role": "task-6.4-local-background-removal-quality-owner",
-  "status": "task-6.4-activated",
+  "role": "task-6.5-transparency-fallback-owner",
+  "status": "task-6.5-dispatched-awaiting-acceptance",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f99ae-601b-7262-9457-8006de418f17",
   "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "branch": "codex/routego-controller-g12",
   "generation": 6,
-  "currentHead": "14e9bca472927f20aaf019509e270f89d07cbc59",
+  "currentHead": "8b4e854ccbcb39b45c8d79ed9632e6b04415fe69",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": true,
-  "applyAuthorized": true,
+  "soleApplyOwner": false,
+  "applyAuthorized": false,
   "currentTask": {
-    "id": "6.4",
-    "status": "activated",
-    "locked": false
+    "id": "6.5",
+    "status": "dispatched-awaiting-acceptance",
+    "locked": true
   },
   "sourceOwner": {
     "threadId": "019f93ed-45f3-7680-a2fa-eba318806e30",
@@ -49,22 +49,22 @@
   },
   "externalStateAuthorized": false,
   "lastCompletedTask": {
-    "id": "6.1c",
-    "implementationCommit": "9a8c5909172151875aaefcd236186051788d95c7",
-    "taskStateCommit": "ded3aed3620fd9eaeeef37a304a8e0333f86c687",
+    "id": "6.4",
+    "implementationCommit": "63e9834b0b2a0f7d6bbf5e9a0ceea3e5b4d4fcf9",
+    "taskStateCommit": "8b4e854ccbcb39b45c8d79ed9632e6b04415fe69",
     "handoffAcceptanceObservableCompactions": 0
   },
   "taskCapsule": {
-    "path": ".codex/routego-program/tasks/streamline-integration-6.4.json",
-    "contentSha256": "a43f63aac2982b9240c76b94909b2cd6f24ef51caefaf76bfd31032a545f0ad9"
+    "path": ".codex/routego-program/tasks/streamline-integration-6.5.json",
+    "contentSha256": "38074f6751883d06c8bb5feaad3d67137f83acd502ff5e017e83653d84934598"
   },
   "registration": {
-    "reason": "Task 6.3 is complete; this owner is registered for the next Task 6.4 local quality-gate scope.",
+    "reason": "Task 6.4 is complete; this owner is registered for the next Task 6.5 transparency fallback scope.",
       "permittedScope": [
-        "packages/integration/src/runtime/background-removal.ts",
-        "packages/integration/src/runtime/background-removal-worker.ts",
+        "packages/integration/src/composition/service.ts",
+        "packages/integration/test/provider.test.ts",
+        "packages/integration/test/end-to-end.test.ts",
         "packages/integration/test/background-removal.test.ts",
-        "packages/integration/test/image.test.ts",
         "openspec/changes/streamline-routego-image-generation/tasks.md"
     ],
     "externalStateAuthorized": false,
