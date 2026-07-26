@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 
@@ -14,6 +15,10 @@ import { PNG } from "pngjs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createRoutegoMcpProcess } from "../src/runtime/mcp-process";
+import {
+  BackgroundRemovalQueue,
+  type BackgroundRemovalResult
+} from "../src/runtime/background-removal";
 import {
   ControlledMcpInput,
   FIXED_NOW,
@@ -73,6 +78,33 @@ function decodeSse(text: string): StudioImageOperationEvent[] {
     expect(eventName).toBe(event.type);
     return event;
   });
+}
+
+function transparentSyntheticArtifact(id: string, slot = 0) {
+  const artifact = syntheticArtifact(id, "final", slot, 0x55 + slot);
+  const encoded = artifact.display?.dataUrl?.split(",")[1];
+  if (encoded === undefined) throw new Error("The synthetic artifact has no image bytes.");
+  const decoded = PNG.sync.read(Buffer.from(encoded, "base64"));
+  decoded.data[3] = 0;
+  const bytes = PNG.sync.write(decoded, {
+    colorType: 6,
+    inputColorType: 6,
+    inputHasAlpha: true
+  });
+  return {
+    ...artifact,
+    byteLength: bytes.byteLength,
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+    display: { type: "image" as const, dataUrl: `data:image/png;base64,${bytes.toString("base64")}` }
+  };
+}
+
+function failedLocalRemoval(bytes: Uint8Array): BackgroundRemovalResult {
+  return {
+    status: "failed",
+    originalBytes: new Uint8Array(bytes),
+    error: { code: "worker-failed", message: "Synthetic local inference failed." }
+  };
 }
 
 function studioTextGenerate() {
@@ -298,5 +330,90 @@ describe("task 6.1 offline production composition", () => {
     input.end();
     await runtime.waitUntilClosed();
     expect(error.responses()).toEqual([]);
+  });
+});
+
+describe("task 6.5 native transparency fallback", () => {
+  it("accepts meaningful native alpha without local processing or a second provider request", async () => {
+    const providerCalls: ImageOperationRequest[] = [];
+    const localRemoval = vi.spyOn(BackgroundRemovalQueue.prototype, "remove");
+    const created = await harness({
+      executeCreation: async (request, context) => {
+        providerCalls.push(request);
+        const result = syntheticResult(request, context.requestId);
+        return { ...result, finalArtifacts: [transparentSyntheticArtifact(`${context.requestId}:final:0`)] };
+      }
+    });
+
+    const result = await created.service.generate(publicGenerate({
+      transparentMode: "native",
+      saveToLibrary: false,
+      outputDir: created.outputRoot
+    }));
+
+    expect(result.status).toBe("succeeded");
+    expect(result.execution.providerRequestCount).toBe(1);
+    expect(providerCalls).toHaveLength(1);
+    expect(localRemoval).not.toHaveBeenCalled();
+    const output = result.finalArtifacts[0]!;
+    const bytes = Buffer.from(output.display!.dataUrl!.split(",")[1]!, "base64");
+    expect(PNG.sync.read(bytes).data[3]).toBe(0);
+  });
+
+  it("processes an opaque native result locally without replaying the provider request", async () => {
+    const providerCalls: ImageOperationRequest[] = [];
+    let localCalls = 0;
+    const localRemoval = vi.spyOn(BackgroundRemovalQueue.prototype, "remove").mockImplementation(async (bytes) => {
+      localCalls += 1;
+      const replacement = transparentSyntheticArtifact("local-fallback:final:0");
+      const encoded = replacement.display!.dataUrl!.split(",")[1]!;
+      return {
+        status: "succeeded",
+        originalBytes: new Uint8Array(bytes),
+        transparentBytes: new Uint8Array(Buffer.from(encoded, "base64")),
+        width: replacement.width!,
+        height: replacement.height!
+      };
+    });
+    const created = await harness({
+      executeCreation: async (request, context) => {
+        providerCalls.push(request);
+        return syntheticResult(request, context.requestId);
+      }
+    });
+
+    const result = await created.service.generate(publicGenerate({
+      transparentMode: "native",
+      saveToLibrary: false,
+      outputDir: created.outputRoot
+    }));
+
+    expect(result.status).toBe("succeeded");
+    expect(result.execution.providerRequestCount).toBe(1);
+    expect(providerCalls).toHaveLength(1);
+    expect(localRemoval).toHaveBeenCalledTimes(1);
+    expect(localCalls).toBe(1);
+    const output = result.finalArtifacts[0]!;
+    expect(PNG.sync.read(Buffer.from(output.display!.dataUrl!.split(",")[1]!, "base64")).data[3]).toBe(0);
+  });
+
+  it("keeps the provider original and reports a structured failure when local processing fails", async () => {
+    const localRemoval = vi.spyOn(BackgroundRemovalQueue.prototype, "remove").mockImplementation(async (bytes) => failedLocalRemoval(bytes));
+    const created = await harness({
+      executeCreation: async (request, context) => syntheticResult(request, context.requestId)
+    });
+
+    const result = await created.service.generate(publicGenerate({
+      transparentMode: "native",
+      saveToLibrary: false,
+      outputDir: created.outputRoot
+    }));
+
+    expect(result.status).toBe("partial");
+    expect(result.error).toMatchObject({ code: "postprocess_failed", stage: "postprocess" });
+    expect(result.execution.providerRequestCount).toBe(1);
+    expect(localRemoval).toHaveBeenCalledTimes(1);
+    const output = result.finalArtifacts[0]!;
+    expect(PNG.sync.read(Buffer.from(output.display!.dataUrl!.split(",")[1]!, "base64")).data[3]).toBe(255);
   });
 });

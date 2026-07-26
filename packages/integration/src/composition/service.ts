@@ -152,6 +152,11 @@ import {
   type ChromakeyContentClass
 } from "../image/chromakey";
 import {
+  removeBackground,
+  type BackgroundRemovalResult
+} from "../runtime/background-removal";
+import { inspectPngAlpha } from "../runtime/background-removal-worker";
+import {
   createOutputMaterializationTransaction,
   ImageMaterializationError,
   type MaterializationBatchResult,
@@ -243,6 +248,10 @@ export interface LocalRoutegoServiceOptions {
     request: ImageOperationRequest,
     output: MaterializedImageOutput
   ) => ChromakeyPolicy | undefined;
+  readonly backgroundRemoval?: (
+    bytes: Uint8Array,
+    options?: { readonly signal?: AbortSignal }
+  ) => Promise<BackgroundRemovalResult>;
 }
 
 export interface StudioExecutionOptions {
@@ -945,8 +954,12 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     request: ImageOperationRequest,
     result: ImageOperationResult,
     materialization: MaterializationBatchResult,
-    transaction: OutputMaterializationTransaction
+    transaction: OutputMaterializationTransaction,
+    signal?: AbortSignal
   ): Promise<{ readonly result: ImageOperationResult; readonly materialization: MaterializationBatchResult }> {
+    if (request.transparentMode === "native") {
+      return await this.#postprocessNativeTransparency(result, materialization, transaction, signal);
+    }
     if (request.transparentMode !== "chromakey" && request.transparentMode !== "auto") {
       return { result, materialization };
     }
@@ -988,6 +1001,73 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
           safeMessage: issues[0] ?? "Transparency post-processing did not complete.",
           mayHaveBilled: result.execution.mayHaveBilled,
           details: { warnings: issues.slice(0, 4) }
+        })
+      })
+    });
+    return {
+      result: updatedResult,
+      materialization: combineMaterialization(transaction, updatedResult, materialization.failures)
+    };
+  }
+
+  async #postprocessNativeTransparency(
+    result: ImageOperationResult,
+    materialization: MaterializationBatchResult,
+    transaction: OutputMaterializationTransaction,
+    signal?: AbortSignal
+  ): Promise<{ readonly result: ImageOperationResult; readonly materialization: MaterializationBatchResult }> {
+    const replacements = new Map<string, MaterializedImageOutput>();
+    const issues: string[] = [];
+    const outputs = materialization.outputs.filter((candidate) => candidate.phase === "final");
+    for (const output of outputs) {
+      let originalBytes: Uint8Array;
+      try {
+        originalBytes = await transaction.readValidatedBytes(output);
+      } catch {
+        issues.push("The validated provider original could not be read for transparency inspection.");
+        continue;
+      }
+      const alpha = inspectPngAlpha(originalBytes, output.width, output.height);
+      if (!("code" in alpha)) continue;
+
+      let processed: BackgroundRemovalResult;
+      try {
+        const removalOptions = signal === undefined ? undefined : { signal };
+        processed = await (this.#options.backgroundRemoval ?? removeBackground)(originalBytes, removalOptions);
+      } catch {
+        issues.push("Local transparency processing failed safely; the provider original remains available.");
+        continue;
+      }
+      if (processed.status !== "succeeded") {
+        issues.push(processed.error.message);
+        continue;
+      }
+      try {
+        replacements.set(
+          output.artifactId,
+          await transaction.stageReplacement(output, processed.transparentBytes, "image/png")
+        );
+      } catch {
+        issues.push("The transparent rendition failed bounded output validation; the provider original remains available.");
+      }
+    }
+    if (replacements.size === 0 && issues.length === 0) return { result, materialization };
+    const updatedFinal = await Promise.all(result.finalArtifacts.map(async (artifact) => {
+      const replacement = replacements.get(artifact.id);
+      if (replacement === undefined) return artifact;
+      return outputArtifactWithBytes(artifact, replacement, await transaction.readValidatedBytes(replacement));
+    }));
+    const updatedResult = imageOperationResultSchema.parse({
+      ...result,
+      finalArtifacts: updatedFinal,
+      ...(issues.length === 0 ? {} : {
+        status: result.status === "failed" ? "failed" : "partial",
+        error: createProviderServiceError({
+          code: "postprocess_failed",
+          stage: "postprocess",
+          safeMessage: issues[0] ?? "Transparent rendition processing did not complete.",
+          mayHaveBilled: result.execution.mayHaveBilled,
+          details: { warnings: issues.slice(0, 4), providerRequestCount: result.execution.providerRequestCount }
         })
       })
     });
@@ -1057,7 +1137,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       }
       const creation = parsedCreation.data;
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
-      const processed = await this.#postprocess(staged.request, creation, materialized, transaction);
+      const processed = await this.#postprocess(staged.request, creation, materialized, transaction, signal);
       return imageOperationResultSchema.parse(await finalizePublicOperationResult({
         graph: staged.graph,
         creationResult: processed.result,
@@ -1274,7 +1354,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       }
       const creation = parsedCreation.data;
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
-      const processed = await this.#postprocess(staged.creationRequest, creation, materialized, transaction);
+      const processed = await this.#postprocess(staged.creationRequest, creation, materialized, transaction, signal);
       const final = await finalizeStudioOperationResult({
         prepared: { ...staged, studioRequest: prepared.studioRequest },
         creationResult: processed.result,
