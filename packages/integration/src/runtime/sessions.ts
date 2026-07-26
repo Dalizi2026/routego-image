@@ -6,8 +6,11 @@ import {
 } from "@routego-image/foundation";
 
 const DEFAULT_MAXIMUM_ACTIVE_SESSIONS = 16;
-const DEFAULT_SESSION_TTL_MS = 30 * 60 * 1_000;
-const DEFAULT_LAUNCH_TTL_MS = 60 * 1_000;
+const DEFAULT_SESSION_TTL_MS = 8 * 60 * 60 * 1_000;
+// Codex may preview a returned Studio URL before the user opens it. Keep the
+// launch credential short-lived, while allowing a delayed click before the
+// longer-lived in-memory Studio session takes over.
+const DEFAULT_LAUNCH_TTL_MS = 30 * 60 * 1_000;
 const DEFAULT_TOKEN_BYTES = 32;
 const MAXIMUM_SESSION_TTL_MS = 24 * 60 * 60 * 1_000;
 const MAXIMUM_ACTIVE_SESSIONS = 128;

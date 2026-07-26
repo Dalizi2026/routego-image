@@ -127,6 +127,25 @@ async function waitForStableCount(
 }
 
 describe("StudioSessionManager", () => {
+  it("keeps the default launch and Studio windows usable for a long session", () => {
+    let now = Date.parse("2026-07-19T00:00:00.000Z");
+    const manager = new StudioSessionManager({ now: () => now });
+    const issued = manager.issue();
+
+    expect(Date.parse(issued.launchExpiresAt) - Date.parse(issued.createdAt)).toBe(30 * 60 * 1_000);
+    expect(Date.parse(issued.expiresAt) - Date.parse(issued.createdAt)).toBe(8 * 60 * 60 * 1_000);
+    now += 10 * 60 * 1_000;
+    expect(manager.authorizeLaunchToken(issued.launchToken)).toMatchObject({
+      id: issued.id,
+      sessionToken: issued.sessionToken
+    });
+
+    now += 20 * 60 * 1_000;
+    expect(manager.authorizeLaunchToken(issued.launchToken)).toBeUndefined();
+    now += 3 * 60 * 60 * 1_000;
+    expect(manager.authorizeSessionToken(issued.sessionToken)).toMatchObject({ id: issued.id });
+  });
+
   it("keeps bounded independent launch/API tokens and prunes exact expiry boundaries", () => {
     let now = Date.parse("2026-07-19T00:00:00.000Z");
     const manager = new StudioSessionManager({
