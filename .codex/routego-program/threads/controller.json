@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "lane": "controller",
   "role": "program-controller",
-  "status": "authoritative-controller-generation-14-revising-task-6.1b-test-fixture-scope",
+  "status": "authoritative-controller-generation-14-activating-task-6.1b-test-fixture-scope",
   "threadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "predecessorThreadId": "019f900e-0d10-7c41-9ffd-6c2e41930ac2",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
@@ -31,7 +31,7 @@
   },
   "currentOperation": {
     "id": "task-6.2-typecheck-baseline-repair-plan",
-    "allowedNext": "Re-dispatch the scope-revised Task 6.1b to the registered Library owner, then dispatch Task 6.1c. Re-dispatch Task 6.2 only after all three repair tasks are checked off.",
+    "allowedNext": "Accept and activate the scope-revised Task 6.1b for the registered Library owner, then dispatch Task 6.1c. Re-dispatch Task 6.2 only after all three repair tasks are checked off.",
     "forbidden": [
       "Product code outside each task exact owner scope",
       "package.json or pnpm-lock.yaml changes",
