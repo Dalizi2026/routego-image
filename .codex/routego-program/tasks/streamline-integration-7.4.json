@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "contentSha256": "6aa17caa7c28c46120bb7502e433ddf172568707f66cc80439fc5c39b6f0e740",
+  "lane": "streamline-integration",
+  "change": "streamline-routego-image-generation",
+  "taskId": "7.4",
+  "status": "ready-after-task-7.3",
+  "sourceCommit": "d5ca1e8a2a725d1aac0bebe2d33e7e733d256897",
+  "taskSource": {
+    "path": "openspec/changes/streamline-routego-image-generation/tasks.md",
+    "fileSha256": "75bbef845fe2cfee6961a3a7e9e81c3c4129d2ec66cc0dfa4ae586f752676d1d"
+  },
+  "dependencies": ["7.3"],
+  "dependencyCommits": {
+    "task7_3Implementation": "7d58174cdb3fb3f470eca0acbcdce4db0d217a7a",
+    "task7_3TaskState": "d5ca1e8a2a725d1aac0bebe2d33e7e733d256897"
+  },
+  "allowedFiles": [
+    ".codex/routego-program/evidence/streamline-7.4-final-audit.json",
+    "openspec/changes/streamline-routego-image-generation/tasks.md"
+  ],
+  "forbiddenFileGlobs": [
+    ".codex/routego-program/program.json",
+    ".codex/routego-program/threads/**",
+    ".codex/routego-program/dispatch/**",
+    "packages/**",
+    "scripts/**",
+    "package.json",
+    "pnpm-lock.yaml",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".env*",
+    "real-data/**",
+    "licenses/**",
+    "plugin/**",
+    "marketplace/**"
+  ],
+  "requiredBehavior": [
+    "Audit the proposal, design, every delta spec and task graph against the committed implementation and task-state commits.",
+    "Record exact commit, verification, resource-exception and residual-risk evidence without modifying product code or resource bytes.",
+    "Keep the existing cross-platform Task 9.1 external blocker separate and do not request or perform real Library migration or installed-plugin replacement.",
+    "Mark only Task 7.4 complete after the audit evidence is committed and all OpenSpec and Git gates are clean."
+  ],
+  "verification": [
+    "pnpm openspec instructions apply --change streamline-routego-image-generation --json",
+    "openspec validate streamline-routego-image-generation --strict --no-interactive",
+    "verify all 37 OpenSpec tasks are checked and dependencies/commits/evidence are recorded",
+    "git diff --check",
+    "workflow-doctor --mode lane --lane streamline-integration --thread-id 019f99ae-601b-7262-9457-8006de418f17 --require-clean"
+  ],
+  "directSpecifications": [
+    {"path": "openspec/changes/streamline-routego-image-generation/proposal.md", "sha256": "1212725c03d16c97957bf2cf792908439bb3dc3e91367c5014d7a5e7ad728d2f"},
+    {"path": "openspec/changes/streamline-routego-image-generation/design.md", "sha256": "bfa8c541a9d5c7ade99f9dcfd76c9e06c0b01344a0d08cfa5ce39a76810cd12d"},
+    {"path": "openspec/changes/streamline-routego-image-generation/tasks.md", "sha256": "75bbef845fe2cfee6961a3a7e9e81c3c4129d2ec66cc0dfa4ae586f752676d1d"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/durable-image-library/spec.md", "sha256": "a1430b378e7147a5e9a828b0529d1cd164060a0994b953b8c9b8bf9359a98a85"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/image-job-execution/spec.md", "sha256": "5cd0ebea97edb6f900ae96d2090b8f8adde70b4e5471a482db115c266b260d15"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/library-simplification-migration/spec.md", "sha256": "5c0747039a9937ffa1c4b4082e495dc3100c9c6b7c80f7ab68d06c94ad437ba2"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/local-background-removal/spec.md", "sha256": "8bc15925c68fa2160a7b05a1f6a29172820e7a21a603f77092e4692f82768a51"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/provider-capability-model/spec.md", "sha256": "ae672e4f589549563e46246c34798049527bb3b4a2cf922a7b3e70974367e3e2"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/regeneration-preparation/spec.md", "sha256": "010f5e42ce8d842a17791f7d885dc36248b226fc4f6773ea8fe5cc5d1767cb03"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/shared-image-contracts/spec.md", "sha256": "d38323ef71751330d4d5f1efa9f1aa576e3c83f38c87dd0ba83ff1cda6008e69"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/studio-application-shell/spec.md", "sha256": "97b70925bf28811730ed6efe4ed4b0c38769604dbcd7ac1b9231397480391900"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/studio-creation-workbench/spec.md", "sha256": "ae1a5e1809e045c9f5b00c9ee9931e1d8e322059224038c1de930a2e0090e9dc"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/studio-library-experience/spec.md", "sha256": "e9415fcbe56ace8f1934d0a336c3ba330ca3a007abf1445d15762550dce9e5d0"},
+    {"path": "openspec/changes/streamline-routego-image-generation/specs/studio-mask-editor/spec.md", "sha256": "8df5c1c66b3c22980bbb8fe725c6e27119b44f3faa94edf5848da6aa4e0abe71"}
+  ],
+  "publicContractFingerprint": "913c5220379655a250dc728d9c5b4514ec8dc6c1a820c0a87f8536fb827c3b01",
+  "ownershipFingerprint": "streamline-task-7.4-final-governance-audit-evidence-only",
+  "externalStateAuthorized": false,
+  "networkAuthorized": false,
+  "packageInstallationAuthorized": false,
+  "targetPluginInstallationAuthorized": false,
+  "realProviderOrPaidRequestAuthorized": false,
+  "reportingContract": "Direct send_message_to_thread plus read_thread for every acceptance, activation, checkpoint, blocker, deviation and delivery; no final, heartbeat or polling continuation."
+}
