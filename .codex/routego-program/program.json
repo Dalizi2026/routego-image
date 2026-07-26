@@ -218,7 +218,7 @@
       "taskId": "6.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "0f6ceadf6e38dbbe0db2588575ff00ed941f25b4",
+      "currentHead": "1ec6462fe7531d7017adc7eb26fcfaeec3d07068",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.5.json",
         "sha256": "38074f6751883d06c8bb5feaad3d67137f83acd502ff5e017e83653d84934598"
