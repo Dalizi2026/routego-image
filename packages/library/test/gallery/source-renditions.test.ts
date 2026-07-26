@@ -204,7 +204,7 @@ describe("Library source/output operation graphs", () => {
           { artifactId: "artifact-final", phase: "final", sourceRoot: harness.sourceRoot, sourceRelativePath: "final.png" }
         ],
         relationships: [
-          { id: "relationship-target", role: "target", relatedAssetId: "asset-operation", artifactId: "artifact-target", order: 0 },
+          { id: "relationship-target", role: "reference", relatedAssetId: "asset-operation", artifactId: "artifact-target", order: 0 },
           { id: "relationship-reference", role: "reference", relatedAssetId: "asset-operation", artifactId: "artifact-reference", order: 1 },
           { id: "relationship-partial", role: "output", relatedAssetId: "asset-operation", artifactId: "artifact-partial", order: 2 },
           { id: "relationship-final", role: "output", relatedAssetId: "asset-operation", artifactId: "artifact-final", order: 3 }

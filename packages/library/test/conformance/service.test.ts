@@ -178,7 +178,7 @@ describe("@routego-image/library service composition", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
-      "edit",
+      "prepareRegeneration",
       "batch",
       "searchLibrary",
       "manageLibrary",

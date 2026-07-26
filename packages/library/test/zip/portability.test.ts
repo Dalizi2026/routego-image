@@ -312,7 +312,7 @@ async function seedSourceGraph(
     relationships: [
       {
         id: "relationship-target-source-graph",
-        role: "target",
+        role: "reference",
         relatedAssetId: assetId,
         artifactId: "artifact-target-source-graph",
         order: 0,
@@ -592,7 +592,7 @@ describe("portable Library ZIP export and import", () => {
       artifactId,
       label
     }))).toEqual([
-      { role: "target", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[0], label: "目标 🙂" },
+      { role: "reference", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[0], label: "目标 🙂" },
       { role: "reference", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[1], label: "参考 🚀" },
       { role: "output", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[2], label: undefined },
       { role: "output", relatedAssetId: ids.assetId, artifactId: ids.artifactIds[3], label: undefined }
@@ -660,7 +660,7 @@ describe("portable Library ZIP export and import", () => {
     )).toBe(true);
     expect(importedAsset.relationships[0]).toMatchObject({
       relatedAssetId: importedAsset.id,
-      role: "target"
+      role: "reference"
     });
     expect(importedAsset.relationships[0]?.artifactId).not.toBe(ids.artifactIds[0]);
   });
