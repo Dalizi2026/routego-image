@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-14-dispatching-task-6.5",
+  "status": "controller-generation-14-activating-task-6.5",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -116,7 +116,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-14-dispatching-task-6.5",
+    "status": "authoritative-controller-generation-14-activating-task-6.5",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -211,21 +211,21 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.4-completed-awaiting-task-6.5-acceptance",
+      "status": "task-6.5-activated",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
       "taskId": "6.5",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "8b4e854ccbcb39b45c8d79ed9632e6b04415fe69",
+      "currentHead": "0f6ceadf6e38dbbe0db2588575ff00ed941f25b4",
       "taskCapsule": {
         "path": ".codex/routego-program/tasks/streamline-integration-6.5.json",
         "sha256": "38074f6751883d06c8bb5feaad3d67137f83acd502ff5e017e83653d84934598"
       },
-      "authorizedScope": "Task 6.5 is registered for acceptance; no apply owner or lease until explicit activation. Task 6.6+ and 7.3 remain locked.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false,
+      "authorizedScope": "Task 6.5 transparency fallback is activated for the registered Integration owner; Task 6.6+ and 7.3 remain locked.",
+      "soleApplyOwner": true,
+      "applyAuthorized": true,
       "lastCompletedTask": "6.4",
       "implementationCommit": "63e9834b0b2a0f7d6bbf5e9a0ceea3e5b4d4fcf9",
       "taskStateCommit": "8b4e854ccbcb39b45c8d79ed9632e6b04415fe69"
