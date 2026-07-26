@@ -8,6 +8,7 @@ import {
   WORKER_MAX_OUTPUT_BYTES,
   WORKER_MAX_PIXELS,
   WORKER_MAX_WIDTH,
+  inspectPngAlpha,
   type BackgroundRemovalWorkerRequest,
   type BackgroundRemovalWorkerResponse
 } from "./background-removal-worker";
@@ -27,7 +28,8 @@ export type BackgroundRemovalFailureCode =
   | "worker-failed"
   | "worker-crashed"
   | "timeout"
-  | "cancelled";
+  | "cancelled"
+  | "quality-gate-failed";
 
 export interface BackgroundRemovalFailure {
   readonly code: BackgroundRemovalFailureCode;
@@ -210,12 +212,27 @@ export class BackgroundRemovalQueue {
       };
       const onAbort = (): void => finish(resultFailure("cancelled", item.bytes, { code: "cancelled", message: "Local background removal was cancelled." }, parsed.width, parsed.height));
       const onMessage = (response: BackgroundRemovalWorkerResponse): void => {
+        if (response === null || typeof response !== "object" ||
+            ((response as { readonly type?: unknown }).type !== "failure" &&
+             (response as { readonly type?: unknown }).type !== "success")) {
+          finish(resultFailure("failed", item.bytes, { code: "quality-gate-failed", message: "The local background-removal worker returned an invalid response." }, parsed.width, parsed.height));
+          return;
+        }
         if (response.type === "failure") {
           finish(resultFailure("failed", item.bytes, { code: response.code, message: response.message }, parsed.width, parsed.height));
           return;
         }
+        if (!(response.bytes instanceof Uint8Array) || response.width !== parsed.width || response.height !== parsed.height) {
+          finish(resultFailure("failed", item.bytes, { code: "quality-gate-failed", message: "The local background-removal worker returned mismatched output dimensions." }, parsed.width, parsed.height));
+          return;
+        }
         if (response.bytes.byteLength > (item.options.maxOutputBytes ?? BACKGROUND_REMOVAL_MAX_OUTPUT_BYTES)) {
           finish(resultFailure("failed", item.bytes, { code: "output-too-large", message: "The local background-removal output exceeds the byte limit." }, parsed.width, parsed.height));
+          return;
+        }
+        const outputQuality = inspectPngAlpha(response.bytes, parsed.width, parsed.height);
+        if ("code" in outputQuality) {
+          finish(resultFailure("failed", item.bytes, outputQuality, parsed.width, parsed.height));
           return;
         }
         finish({ status: "succeeded", originalBytes: new Uint8Array(item.bytes), transparentBytes: new Uint8Array(response.bytes), width: response.width, height: response.height });

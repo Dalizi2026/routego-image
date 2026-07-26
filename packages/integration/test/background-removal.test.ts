@@ -5,7 +5,11 @@ import {
   BackgroundRemovalQueue,
   type BackgroundRemovalWorkerLike
 } from "../src/runtime/background-removal";
-import { compositeMask } from "../src/runtime/background-removal-worker";
+import {
+  compositeMask,
+  inspectPngAlpha,
+  validateMaskQuality
+} from "../src/runtime/background-removal-worker";
 
 function pngBytes(width = 2, height = 2): Uint8Array {
   const png = new PNG({ width, height });
@@ -17,7 +21,7 @@ function pngBytes(width = 2, height = 2): Uint8Array {
 class FakeWorker implements BackgroundRemovalWorkerLike {
   readonly listeners = new Map<string, Set<(...args: any[]) => void>>();
   terminated = false;
-  constructor(private readonly behavior: "success" | "crash" | "hang", private readonly delayMs = 0) {}
+  constructor(private readonly behavior: "success" | "crash" | "hang" | "invalid-output", private readonly delayMs = 0) {}
   on(event: string, listener: (...args: any[]) => void): this { const set = this.listeners.get(event) ?? new Set(); set.add(listener); this.listeners.set(event, set); return this; }
   once(event: string, listener: (...args: any[]) => void): this { const wrapped = (...args: any[]) => { this.removeListener(event, wrapped); listener(...args); }; return this.on(event, wrapped); }
   removeListener(event: string, listener: (...args: any[]) => void): this { this.listeners.get(event)?.delete(listener); return this; }
@@ -27,7 +31,14 @@ class FakeWorker implements BackgroundRemovalWorkerLike {
     setTimeout(() => {
       if (this.terminated) return;
       if (this.behavior === "crash") this.emit("exit", 1);
-      else this.emit("message", { type: "success", bytes: compositeMask(new Uint8Array([220, 220, 220, 255, 220, 220, 220, 255, 220, 220, 220, 255, 220, 220, 220, 255]), 2, 2, Uint8Array.of(255, 0, 255, 0)), width: 2, height: 2 });
+      else this.emit("message", {
+        type: "success",
+        bytes: this.behavior === "invalid-output"
+          ? pngBytes()
+          : compositeMask(new Uint8Array([220, 220, 220, 255, 220, 220, 220, 255, 220, 220, 220, 255, 220, 220, 220, 255]), 2, 2, Uint8Array.of(255, 0, 255, 0)),
+        width: 2,
+        height: 2
+      });
     }, this.delayMs);
   }
   terminate(): number { this.terminated = true; return 0; }
@@ -84,5 +95,33 @@ describe("local background-removal worker lifecycle", () => {
     const cancelled = await pending;
     expect(cancelled.status).toBe("cancelled");
     expect(cancelledWorker.terminated).toBe(true);
+  });
+
+  it("rejects empty, full, mismatched, non-finite, and boundary-anomalous masks", () => {
+    expect(validateMaskQuality(Uint8Array.of(0, 0, 0, 0), 2, 2)).toMatchObject({ code: "quality-gate-failed" });
+    expect(validateMaskQuality(Uint8Array.of(255, 255, 255, 255), 2, 2)).toMatchObject({ code: "quality-gate-failed" });
+    expect(validateMaskQuality(Uint8Array.of(255, 0, 255), 2, 2)).toMatchObject({ code: "quality-gate-failed" });
+    expect(validateMaskQuality(new Float32Array([Number.NaN, 0, 1, 0]), 2, 2)).toMatchObject({ code: "quality-gate-failed" });
+    expect(validateMaskQuality(Uint8Array.of(255, 255, 255, 255, 255, 255, 255, 255, 255, 0), 3, 3)).toMatchObject({ code: "quality-gate-failed" });
+
+    const plausible = validateMaskQuality(new Float32Array([1, 0, 1, 0]), 2, 2);
+    expect(plausible).toEqual(Uint8Array.of(255, 0, 255, 0));
+    expect(validateMaskQuality(Uint8Array.of(0, 0, 0, 0, 255, 0, 0, 0, 0), 3, 3)).toEqual(
+      Uint8Array.of(0, 0, 0, 0, 255, 0, 0, 0, 0)
+    );
+  });
+
+  it("revalidates output alpha and preserves the original on a quality failure", async () => {
+    const original = pngBytes();
+    const invalidOutputWorker = new FakeWorker("invalid-output");
+    const result = await new BackgroundRemovalQueue().remove(original, {
+      workerFactory: () => invalidOutputWorker,
+      timeoutMs: 100,
+      mask: Uint8Array.of(255, 0, 255, 0)
+    });
+    expect(result).toMatchObject({ status: "failed", error: { code: "quality-gate-failed" } });
+    if (result.status === "succeeded") throw new Error("unexpected success");
+    expect(Buffer.from(result.originalBytes)).toEqual(Buffer.from(original));
+    expect(inspectPngAlpha(pngBytes(), 2, 2)).toMatchObject({ code: "quality-gate-failed" });
   });
 });
