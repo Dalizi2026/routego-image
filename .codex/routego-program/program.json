@@ -229,18 +229,18 @@
       "lastCompletedTask": "6.1"
     },
     "streamlineCreation": {
-      "status": "task-6.1a-registered-awaiting-dispatch",
+      "status": "task-6.1a-activated",
       "taskRef": "019f9bd6-1aef-73f0-8459-2b416a72ea86",
       "threadId": "019f9bd6-1aef-73f0-8459-2b416a72ea86",
       "generation": 1,
       "taskId": "6.1a",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+      "currentHead": "f7706130872a1c25778be2c719919c91e4c41f77",
       "taskCapsule": {"path": ".codex/routego-program/tasks/streamline-creation-6.1a.json", "sha256": "211f9a76a6d52bbecabadee3682c62b38e36fcc6082c9ddc5485f8e6faf19c31"},
       "authorizedScope": "Task 6.1a only; remove stale Creation generation-only contract references.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false
+      "soleApplyOwner": true,
+      "applyAuthorized": true
     },
     "streamlineLibrary": {
       "status": "task-6.1b-registered-awaiting-dispatch",
@@ -317,9 +317,9 @@
       "generation": 1,
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
       "plannedBranch": "codex/routego-controller-g12",
-      "currentHead": "0d37a4dbb6f1c2ab0a9cfb0e695df30497edadce",
+      "currentHead": "f7706130872a1c25778be2c719919c91e4c41f77",
       "observableCompactions": 0,
-      "status": "task-6.1a-registered-awaiting-dispatch",
+      "status": "task-6.1a-activated",
       "taskId": "6.1a",
       "taskCapsuleIntegrity": {"canonicalSha256": "211f9a76a6d52bbecabadee3682c62b38e36fcc6082c9ddc5485f8e6faf19c31"}
     },
