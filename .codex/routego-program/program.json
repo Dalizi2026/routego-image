@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "program": "routego-image-1.0",
-  "status": "controller-generation-14-activating-task-6.5",
+  "status": "controller-generation-14-dispatching-task-7.1",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "defaultBranch": "main",
   "threadPolicy": {
@@ -116,7 +116,7 @@
     "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
     "branch": "codex/routego-controller-g12",
     "startingCommit": "6306441298ef3cf75cd0a328ac589b4c223daaae",
-    "status": "authoritative-controller-generation-14-activating-task-6.5",
+    "status": "authoritative-controller-generation-14-dispatching-task-7.1",
     "authoritative": true,
     "observableCompactions": 0,
     "lastCompactionFingerprint": null
@@ -211,24 +211,24 @@
       "worktreePrunedDuringWorkspaceConsolidation": true
     },
     "streamlineIntegration": {
-      "status": "task-6.5-activated",
+      "status": "task-7.1-dispatched-awaiting-acceptance",
       "taskRef": "019f99ae-601b-7262-9457-8006de418f17",
       "threadId": "019f99ae-601b-7262-9457-8006de418f17",
       "generation": 6,
-      "taskId": "6.5",
+      "taskId": "7.1",
       "branch": "codex/routego-controller-g12",
       "worktree": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
-      "currentHead": "1ec6462fe7531d7017adc7eb26fcfaeec3d07068",
+      "currentHead": "c26286b6a42f22b7069faa7c9d5e0b83c8d288ea",
       "taskCapsule": {
-        "path": ".codex/routego-program/tasks/streamline-integration-6.5.json",
-        "sha256": "38074f6751883d06c8bb5feaad3d67137f83acd502ff5e017e83653d84934598"
+        "path": ".codex/routego-program/tasks/streamline-integration-7.1.json",
+        "sha256": "857f00a01123f69f8fe7986302ef10c0fd86edc83dcba095fb48b74a7cff9c7c"
       },
-      "authorizedScope": "Task 6.5 transparency fallback is activated for the registered Integration owner; Task 6.6+ and 7.3 remain locked.",
-      "soleApplyOwner": true,
-      "applyAuthorized": true,
-      "lastCompletedTask": "6.4",
-      "implementationCommit": "63e9834b0b2a0f7d6bbf5e9a0ceea3e5b4d4fcf9",
-      "taskStateCommit": "8b4e854ccbcb39b45c8d79ed9632e6b04415fe69"
+      "authorizedScope": "Task 7.1 dead-surface and safety scan is dispatched to the registered Integration owner; Task 7.2+ remain locked.",
+      "soleApplyOwner": false,
+      "applyAuthorized": false,
+      "lastCompletedTask": "6.5",
+      "implementationCommit": "6047d9a6c5da4a4cc1ca539411695c46cb14c2fb",
+      "taskStateCommit": "e9ddf72e243a18bc8ccac7cb780664cbc03ee0d3"
     },
     "streamlineCreation": {
       "status": "task-6.1a-completed-awaiting-controller-archive",
@@ -347,7 +347,7 @@
     "lane": "multi-lane",
     "openspec": {
       "totalTasks": 37,
-      "completedTasks": 27,
+      "completedTasks": 33,
       "completedTaskIds": [
         "1.1",
         "1.2",
@@ -380,16 +380,16 @@
         "6.1c"
       ],
       "readyTaskIds": [
-        "6.2"
+        "7.1"
       ],
-      "nextTaskId": "6.2"
+      "nextTaskId": "7.1"
     },
     "currentTask": {
-      "id": "6.2",
-      "locked": false,
-      "activationAuthorized": true,
+      "id": "7.1",
+      "locked": true,
+      "activationAuthorized": false,
       "parallelReadyTaskIds": [],
-      "authorizedScope": "Task 6.2 is activated for the registered Integration owner; only capsule-declared offline resource/package files are allowed. Task 6.3+ and 7.3 remain locked."
+      "authorizedScope": "Task 7.1 is dispatched to the registered Integration owner and remains locked until explicit activation; Task 7.2+ remain locked."
     }
   },
   "latestDirectCheckpoint": {
