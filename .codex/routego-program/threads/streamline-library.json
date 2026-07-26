@@ -3,7 +3,7 @@
   "lane": "streamline-library",
   "change": "streamline-routego-image-generation",
   "role": "task-6.1b-library-typecheck-baseline-repair-owner",
-  "status": "task-6.1b-dispatching-awaiting-acceptance",
+  "status": "task-6.1b-activated",
   "projectPath": "/Users/dalizi/Documents/Routego Image 1.0/controller-g12",
   "controllerThreadId": "019f997e-225a-7623-a52a-2a9590b55d07",
   "threadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
@@ -13,12 +13,12 @@
   "currentHead": "7704a6770452d0687372936ffef44cd27551e210",
   "observableCompactions": 0,
   "lastCompactionFingerprint": null,
-  "soleApplyOwner": false,
-  "applyAuthorized": false,
+  "soleApplyOwner": true,
+  "applyAuthorized": true,
   "currentTask": {
     "id": "6.1b",
-    "status": "dispatching-awaiting-acceptance",
-    "locked": true
+    "status": "activated",
+    "locked": false
   },
   "taskCapsule": {
     "path": ".codex/routego-program/tasks/streamline-library-6.1b.json",

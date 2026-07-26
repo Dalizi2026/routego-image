@@ -246,7 +246,7 @@
       "taskStateCommit": "e49a17d8972da7f33fe2a85a7e10e6f7f31517b1"
     },
     "streamlineLibrary": {
-      "status": "task-6.1b-dispatching-awaiting-acceptance",
+      "status": "task-6.1b-activated",
       "taskRef": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
       "threadId": "019f9bd6-1c5f-7a12-8d78-086f4408e6eb",
       "generation": 1,
@@ -256,8 +256,8 @@
       "currentHead": "7704a6770452d0687372936ffef44cd27551e210",
       "taskCapsule": {"path": ".codex/routego-program/tasks/streamline-library-6.1b.json", "sha256": "3be612300fa5221e8961b441788e4db7d465e3701df71f9d7ede477d994fb28b"},
       "authorizedScope": "Task 6.1b only; remove stale Library generation-only contract references.",
-      "soleApplyOwner": false,
-      "applyAuthorized": false
+      "soleApplyOwner": true,
+      "applyAuthorized": true
     }
   },
   "laneSuccessors": {
@@ -380,8 +380,8 @@
     },
     "currentTask": {
       "id": "6.1b",
-      "locked": true,
-      "activationAuthorized": false,
+      "locked": false,
+      "activationAuthorized": true,
       "parallelReadyTaskIds": [],
       "authorizedScope": "Task 6.1b only after lane acceptance and committed activation. Task 6.1c is queued serially; Task 6.2 remains locked until all three repairs complete."
     }
