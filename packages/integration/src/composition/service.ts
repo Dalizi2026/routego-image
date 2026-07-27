@@ -403,6 +403,49 @@ function resolvePublicGenerationRequest(
   return imageOperationRequestSchema.parse(resolved);
 }
 
+function outputContractError(
+  request: ImageOperationRequest,
+  result: ImageOperationResult
+): ProviderIntegrationError | undefined {
+  if (result.status !== "succeeded") return undefined;
+  const expectedMimeType = request.format === "png"
+    ? "image/png"
+    : request.format === "jpeg"
+      ? "image/jpeg"
+      : "image/webp";
+  const sizeMatch = request.size === "auto" ? undefined : /^(\d+)x(\d+)$/u.exec(request.size);
+  const size = sizeMatch === null ? undefined : sizeMatch;
+  const ratio = request.size !== "auto" || request.aspectRatio === "auto"
+    ? undefined
+    : request.aspectRatio === "square"
+      ? [1, 1] as const
+      : /^(\d+):(\d+)$/u.exec(request.aspectRatio)?.slice(1).map(Number) as [number, number] | undefined;
+  const violations: string[] = [];
+  if (result.finalArtifacts.length !== request.count) {
+    violations.push("count");
+  }
+  for (const artifact of result.finalArtifacts) {
+    if (artifact.mimeType !== expectedMimeType) violations.push("format");
+    if (size !== undefined && (artifact.width !== Number(size[1]) || artifact.height !== Number(size[2]))) {
+      violations.push("size");
+    }
+    if (
+      ratio !== undefined &&
+      (artifact.width === undefined || artifact.height === undefined || artifact.width * ratio[1] !== artifact.height * ratio[0])
+    ) {
+      violations.push("aspectRatio");
+    }
+  }
+  if (violations.length === 0) return undefined;
+  return new ProviderIntegrationError(createProviderServiceError({
+    code: "invalid_response",
+    stage: "complete",
+    safeMessage: "The provider output does not match the requested size, aspect ratio, format, or count.",
+    mayHaveBilled: result.execution.mayHaveBilled,
+    details: { mismatches: [...new Set(violations)] }
+  }));
+}
+
 function defaultHealth(status: RoutegoStatusResult["service"]["status"]): RoutegoStatusResult["service"] {
   return routegoServiceHealthSchema.parse({
     status,
@@ -1180,6 +1223,8 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         }));
       }
       const creation = parsedCreation.data;
+      const outputMismatch = outputContractError(staged.request, creation);
+      if (outputMismatch !== undefined) throw outputMismatch;
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
       const processed = await this.#postprocess(staged.request, creation, materialized, transaction, signal);
       return imageOperationResultSchema.parse(await finalizePublicOperationResult({
@@ -1414,6 +1459,8 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         }));
       }
       const creation = parsedCreation.data;
+      const outputMismatch = outputContractError(staged.creationRequest, creation);
+      if (outputMismatch !== undefined) throw outputMismatch;
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
       const processed = await this.#postprocess(staged.creationRequest, creation, materialized, transaction, signal);
       const final = await finalizeStudioOperationResult({

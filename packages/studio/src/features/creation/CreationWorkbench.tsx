@@ -297,11 +297,11 @@ export function CreationWorkbench({
   const mountedRef = useRef(true);
 
   const sizeOptions = useMemo(
-    () => ["auto", "1024x1024", "1536x1024", "1024x1536"] as const,
+    () => ["auto", "1024x1024", "1536x1024", "1024x1536", "2048x2048", "4096x4096"] as const,
     []
   );
   const aspectOptions = useMemo(
-    () => ["auto", "square", "landscape", "portrait"] as const,
+    () => ["auto", "square", "landscape", "portrait", "1:1", "4:3", "3:4", "16:9", "9:16"] as const,
     []
   );
   const formatOptions = useMemo(() => ["png", "jpeg", "webp"] as const, []);

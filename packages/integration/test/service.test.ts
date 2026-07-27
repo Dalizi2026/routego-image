@@ -159,17 +159,19 @@ function artifact(
   id: string,
   phase: "partial" | "final",
   slot = 0,
-  color = phase === "partial" ? 0x25 : 0x55
+  color = phase === "partial" ? 0x25 : 0x55,
+  width = 3 + slot,
+  height = 2 + slot
 ): ImageArtifact {
-  const bytes = pngBytes(3 + slot, 2 + slot, color);
+  const bytes = pngBytes(width, height, color);
   return {
     id,
     slot,
     phase,
     mimeType: "image/png",
     byteLength: bytes.byteLength,
-    width: 3 + slot,
-    height: 2 + slot,
+    width,
+    height,
     sha256: createHash("sha256").update(bytes).digest("hex"),
     display: { type: "image", dataUrl: `data:image/png;base64,${bytes.toString("base64")}` },
     createdAt: BASE_NOW.toISOString()
@@ -181,7 +183,11 @@ function succeededResult(
   requestId: string,
   options: { readonly partial?: boolean; readonly degraded?: boolean } = {}
 ): ImageOperationResult {
-  const final = artifact(`${requestId}:final`, "final");
+  const exactSizeMatch = request.size === "auto" ? undefined : /^(\d+)x(\d+)$/u.exec(request.size);
+  const exactSize = exactSizeMatch === null ? undefined : exactSizeMatch;
+  const width = exactSize === undefined ? request.aspectRatio === "square" || request.aspectRatio === "1:1" ? 3 : 3 : Number(exactSize[1]);
+  const height = exactSize === undefined ? request.aspectRatio === "square" || request.aspectRatio === "1:1" ? 3 : 2 : Number(exactSize[2]);
+  const finals = Array.from({ length: request.count }, (_, slot) => artifact(`${requestId}:final:${slot}`, "final", slot, 0x55, width, height));
   const partial = options.partial ? [artifact(`${requestId}:partial`, "partial")] : [];
   return imageOperationResultSchema.parse({
     schemaVersion: 1,
@@ -198,7 +204,7 @@ function succeededResult(
       degradedContinuation: options.degraded === true,
       providerImageIds: []
     },
-    finalArtifacts: [final],
+    finalArtifacts: finals,
     partialArtifacts: partial,
     failedSlots: [],
     relationships: [
@@ -207,7 +213,7 @@ function succeededResult(
         outputArtifactId: item.id,
         order: index
       })),
-      { inputRole: "output" as const, outputArtifactId: final.id, order: partial.length }
+      ...finals.map((item, index) => ({ inputRole: "output" as const, outputArtifactId: item.id, order: partial.length + index }))
     ]
   });
 }
@@ -522,7 +528,7 @@ describe("task 3.5 public composition", () => {
     await library.updateSettings({
       defaults: {
         ...settings.defaults,
-        size: "2048x2048",
+        size: "30x20",
         aspectRatio: "1:1",
         quality: "medium",
         format: "png",
@@ -546,10 +552,10 @@ describe("task 3.5 public composition", () => {
           operation: {
             kind: "generate",
             prompt: "Explicit batch item",
-            size: "1536x1024",
+            size: "40x30",
             aspectRatio: "landscape",
             quality: "high",
-            format: "jpeg",
+            format: "png",
             count: 1,
             partialImages: 0,
             transparentMode: "off",
@@ -562,8 +568,8 @@ describe("task 3.5 public composition", () => {
     });
 
     expect(single).toMatchObject({
-      requestedParams: { size: "2048x2048", aspectRatio: "1:1" },
-      effectiveParams: { size: "2048x2048", aspectRatio: "1:1" }
+      requestedParams: { size: "30x20", aspectRatio: "1:1" },
+      effectiveParams: { size: "30x20", aspectRatio: "1:1" }
     });
     expect(batch.status).toBe("succeeded");
     expect(observed.map((request) => ({
@@ -574,9 +580,9 @@ describe("task 3.5 public composition", () => {
       moderation: request.moderation,
       saveToLibrary: request.saveToLibrary
     }))).toEqual([
-      { size: "2048x2048", aspectRatio: "1:1", quality: "medium", format: "png", moderation: "auto", saveToLibrary: true },
-      { size: "2048x2048", aspectRatio: "1:1", quality: "medium", format: "png", moderation: "auto", saveToLibrary: true },
-      { size: "1536x1024", aspectRatio: "landscape", quality: "high", format: "jpeg", moderation: "low", saveToLibrary: false }
+      { size: "30x20", aspectRatio: "1:1", quality: "medium", format: "png", moderation: "auto", saveToLibrary: true },
+      { size: "30x20", aspectRatio: "1:1", quality: "medium", format: "png", moderation: "auto", saveToLibrary: true },
+      { size: "40x30", aspectRatio: "landscape", quality: "high", format: "png", moderation: "low", saveToLibrary: false }
     ]);
   });
 
@@ -608,7 +614,7 @@ describe("task 3.5 public composition", () => {
     expect(JSON.stringify(studioSearch)).not.toMatch(/data:image|base64|"path"/u);
   });
 
-  it("persists a valid JPEG provider result even when the effective format preference is PNG", async () => {
+  it("rejects a provider output whose file format differs from the effective preference", async () => {
     const { service } = await createHarness({
       executeCreation: async (request, context) => succeededJpegResult(request, context.requestId)
     });
@@ -617,12 +623,35 @@ describe("task 3.5 public composition", () => {
     const library = await service.searchLibrary({});
 
     expect(result).toMatchObject({
-      status: "succeeded",
+      status: "failed",
       effectiveParams: { format: "png" },
-      finalArtifacts: [{ mimeType: "image/jpeg", width: 4, height: 3 }]
+      error: { code: "invalid_response" }
     });
-    expect(library.items).toHaveLength(1);
-    expect(library.items[0]).toMatchObject({ mimeType: "image/jpeg", width: 4, height: 3 });
+    expect(library.items).toHaveLength(0);
+  });
+
+  it("rejects mismatched size, aspect ratio, and output count before saving", async () => {
+    const { service } = await createHarness({
+      executeCreation: async (request, context) => {
+        const result = succeededResult(request, context.requestId);
+        const first = result.finalArtifacts[0]!;
+        return imageOperationResultSchema.parse({
+          ...result,
+          finalArtifacts: [{ ...first, width: 3, height: 2 }],
+          relationships: [{ inputRole: "output", outputArtifactId: first.id, order: 0 }]
+        });
+      }
+    });
+    const result = await service.generate(publicRequest({
+      size: "auto",
+      aspectRatio: "1:1",
+      count: 2,
+      format: "png"
+    }));
+    const library = await service.searchLibrary({});
+
+    expect(result).toMatchObject({ status: "failed", error: { code: "invalid_response" } });
+    expect(library.items).toHaveLength(0);
   });
 
   it("rejects an unsaved request without an output directory before provider work", async () => {

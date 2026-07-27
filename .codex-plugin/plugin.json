@@ -1,6 +1,6 @@
 {
   "name": "routego-image",
-  "version": "1.0.0+codex.20260727033351",
+  "version": "1.0.0+codex.20260727035020",
   "description": "Create, edit, organize, and review images with the local Routego Image runtime.",
   "author": {
     "name": "Routego Image"
