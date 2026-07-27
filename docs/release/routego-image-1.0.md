@@ -43,6 +43,38 @@ codex plugin add routego-image@<confirmed-local-marketplace>
 
 Do not run `codex plugin marketplace add` for the default personal marketplace. If the plugin is surfaced by a different marketplace, first confirm it is local and already points at the approved source. A remote or mismatched marketplace stops the release.
 
+### Desktop-safe local update rule
+
+The desktop app can keep the currently registered plugin MCP process alive while a package update
+is being installed. Therefore an update **MUST NOT** run `codex plugin remove routego-image@personal`
+as part of the normal cachebuster/reinstall path: removing the versioned cache beneath a running
+desktop process can leave a new chat with the Skill loaded but without the seven MCP tools.
+
+Routego Image's personal-marketplace source is the stable local source directory
+`~/plugins/routego-image`; update that source atomically from the verified package, then run only
+`codex plugin add routego-image@personal`. The versioned Codex cache is an installation output, not
+an update target.
+
+Keep the one-time global `routego-image-runtime` MCP configuration enabled. It launches the same
+stable source directory and provides the seven Routego tools even while the plugin marketplace is
+refreshing its per-version cache. Create or inspect it through Codex commands only:
+
+```bash
+codex mcp get routego-image-runtime --json
+codex mcp add routego-image-runtime -- node ~/plugins/routego-image/scripts/start-routego-image.mjs
+```
+
+After every local update, verify both the packaged plugin and the configured fallback in a fresh
+Codex process. The acceptance result must list exactly these seven tools:
+
+```text
+routego_status, routego_generate, routego_prepare_regeneration,
+routego_batch, routego_search_library, routego_manage_library, routego_open_studio
+```
+
+If a desktop chat was already open during the update, it cannot gain newly registered tools in
+place. Close that failed chat and start one new chat; do not remove/reinstall the plugin again.
+
 ## Stage and atomic switch
 
 1. Create an identity-marked staging root on the same filesystem as the approved target.
