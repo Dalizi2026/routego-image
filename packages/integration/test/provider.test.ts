@@ -351,10 +351,10 @@ describe("Library-owned provider runtime context and status", () => {
       model: "synthetic-image-model",
       apiKey: credential,
       deadlines: {
-        responseHeaderMs: 30_000,
-        bodyMs: 120_000,
-        downloadMs: 30_000,
-        totalMs: 180_000
+        responseHeaderMs: 300_000,
+        bodyMs: 300_000,
+        downloadMs: 300_000,
+        totalMs: 300_000
       },
       retry: { maxAttempts: 3, baseDelayMs: 500, maxDelayMs: 5_000 }
     });

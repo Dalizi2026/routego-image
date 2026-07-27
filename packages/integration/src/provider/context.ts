@@ -20,10 +20,10 @@ import {
 import type { RuntimeProviderProfile } from "@routego-image/library";
 
 export const DEFAULT_PROVIDER_DEADLINES: ProviderDeadlinePolicy = Object.freeze({
-  responseHeaderMs: 30_000,
-  bodyMs: 120_000,
-  downloadMs: 30_000,
-  totalMs: 180_000
+  responseHeaderMs: 300_000,
+  bodyMs: 300_000,
+  downloadMs: 300_000,
+  totalMs: 300_000
 });
 
 export const DEFAULT_PROVIDER_RETRY: ProviderRetryPolicy = Object.freeze({
