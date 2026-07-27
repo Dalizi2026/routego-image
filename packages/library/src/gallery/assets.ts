@@ -162,6 +162,7 @@ interface PreparedAssetIngestion {
     readonly phase: "source" | "partial" | "final";
     readonly requestedBaseName: string;
     readonly image: ValidatedLibraryImage;
+    readonly verifiedProviderMime: boolean;
   }[];
 }
 
@@ -192,12 +193,6 @@ function extensionForMime(mimeType: LibraryImageMimeType): string {
   if (mimeType === "image/png") return ".png";
   if (mimeType === "image/jpeg") return ".jpg";
   return ".webp";
-}
-
-function mimeForFormat(format: LibraryOperationParameters["format"]): LibraryImageMimeType {
-  if (format === "png") return "image/png";
-  if (format === "jpeg") return "image/jpeg";
-  return "image/webp";
 }
 
 function parseGenerationParameters(value: LibraryOperationParameters): LibraryOperationParameters {
@@ -883,10 +878,11 @@ export class LibraryAssetStore {
     }
     const renditions = [] as Array<{
       readonly artifactId: string;
-      readonly phase: "source" | "partial" | "final";
-      readonly requestedBaseName: string;
-      readonly image: ValidatedLibraryImage;
-    }>;
+    readonly phase: "source" | "partial" | "final";
+    readonly requestedBaseName: string;
+    readonly image: ValidatedLibraryImage;
+    readonly verifiedProviderMime: boolean;
+  }>;
     for (const rendition of input.renditions) {
       const phase = libraryAssetRenditionPhaseSchema.parse(rendition.phase);
       const artifactId =
@@ -901,7 +897,8 @@ export class LibraryAssetStore {
           rendition.sourceRoot,
           rendition.sourceRelativePath,
           rendition.expected
-        )
+        ),
+        verifiedProviderMime: rendition.expected?.mimeType !== undefined
       });
     }
     if (new Set(renditions.map((item) => item.artifactId)).size !== renditions.length) {
@@ -927,13 +924,17 @@ export class LibraryAssetStore {
     ) {
       throw new LibraryError("invalid_input", "A succeeded asset requires a final primary rendition.");
     }
-    const effectiveMimeType = mimeForFormat(effectiveParams.format);
-    if (
-      renditions.some(
-        (item) => item.phase !== "source" && item.image.mimeType !== effectiveMimeType
-      )
-    ) {
-      throw new LibraryError("invalid_input", "The image type disagrees with effective parameters.");
+    const effectiveMimeType = effectiveParams.format === "png"
+      ? "image/png"
+      : effectiveParams.format === "jpeg"
+        ? "image/jpeg"
+        : "image/webp";
+    if (renditions.some(
+      (item) => item.phase !== "source" &&
+        item.image.mimeType !== effectiveMimeType &&
+        !item.verifiedProviderMime
+    )) {
+      throw new LibraryError("invalid_input", "The output image type is not verified against the provider result.");
     }
     for (const relationship of relationships) {
       if (relationship.role !== "output") continue;

@@ -285,7 +285,6 @@ interface PublicInputDescriptor {
   readonly targetSlot?: 0;
 }
 
-type ParsedRoutegoBatchInput = ReturnType<typeof routegoBatchInputSchema.parse>;
 type ParsedStudioBatchInput = ReturnType<typeof studioBatchInputSchema.parse>;
 
 const FIXED_BATCH_CONCURRENCY = 2 as const;
@@ -374,6 +373,34 @@ function defaultDefaults(): RoutegoStatusResult["defaults"] {
     moderation: "auto",
     saveToLibrary: true
   };
+}
+
+const PUBLIC_DEFAULT_CONTROL_KEYS = [
+  "size",
+  "aspectRatio",
+  "quality",
+  "format",
+  "count",
+  "partialImages",
+  "transparentMode",
+  "moderation",
+  "saveToLibrary"
+] as const;
+
+function hasOwn(input: unknown, key: string): boolean {
+  return input !== null && typeof input === "object" && Object.hasOwn(input, key);
+}
+
+function resolvePublicGenerationRequest(
+  input: RoutegoGenerateInput,
+  defaults: RoutegoStatusResult["defaults"]
+): ImageOperationRequest {
+  const parsed = routegoGenerateInputSchema.parse(input);
+  const resolved = { ...parsed } as Record<string, unknown>;
+  for (const key of PUBLIC_DEFAULT_CONTROL_KEYS) {
+    if (!hasOwn(input, key)) resolved[key] = defaults[key];
+  }
+  return imageOperationRequestSchema.parse(resolved);
 }
 
 function defaultHealth(status: RoutegoStatusResult["service"]["status"]): RoutegoStatusResult["service"] {
@@ -921,6 +948,10 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     return freezeProviderSnapshot({ context, model: context.model });
   }
 
+  async #publicDefaults(): Promise<RoutegoStatusResult["defaults"]> {
+    return (await this.#options.library.readSettings({})).defaults;
+  }
+
   async #executeCreation(
     request: ImageOperationRequest,
     context: CreationExecutionContext
@@ -1176,14 +1207,36 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
   async generate(input: RoutegoGenerateInput): Promise<ImageOperationResult> {
     const parsed = routegoGenerateInputSchema.parse(input);
     if (this.#status !== "ready") return failureResult(parsed, this.#id("request"), this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt"));
-    return await this.#executePublic(parsed);
+    try {
+      return await this.#executePublic(resolvePublicGenerationRequest(input, await this.#publicDefaults()));
+    } catch (error) {
+      return failureResult(parsed, this.#id("request"), errorFromUnknown(error, "config_corrupt"));
+    }
   }
 
-  async #runPublicBatch(parsed: ParsedRoutegoBatchInput, signal?: AbortSignal): Promise<RoutegoBatchResult> {
+  async #runPublicBatch(input: RoutegoBatchInput, signal?: AbortSignal): Promise<RoutegoBatchResult> {
+    const parsed = routegoBatchInputSchema.parse(input);
     const requestId = this.#id("batch");
-    const tasks = parsed.tasks.map((task) => Object.freeze({
+    let defaults: RoutegoStatusResult["defaults"];
+    try {
+      defaults = await this.#publicDefaults();
+    } catch (error) {
+      const serviceError = errorFromUnknown(error, "config_corrupt");
+      return routegoBatchResultSchema.parse({
+        schemaVersion: 1,
+        requestId,
+        status: "failed",
+        concurrency: FIXED_BATCH_CONCURRENCY,
+        items: parsed.tasks.map((task) => ({
+          id: task.id,
+          result: failureResult(task.operation, this.#id("batch-item"), serviceError)
+        })),
+        error: serviceError
+      });
+    }
+    const tasks = parsed.tasks.map((task, index) => Object.freeze({
       id: task.id,
-      operation: freezeSnapshot(imageOperationRequestSchema.parse(task.operation))
+      operation: freezeSnapshot(resolvePublicGenerationRequest(input.tasks[index]!.operation, defaults))
     }));
     let provider: ProviderSnapshot;
     try {
@@ -1248,7 +1301,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       const error = this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt");
       return routegoBatchResultSchema.parse({ schemaVersion: 1, requestId: this.#id("batch"), status: "failed", concurrency: FIXED_BATCH_CONCURRENCY, items: parsed.tasks.map((task) => ({ id: task.id, result: failureResult(task.operation, this.#id("batch-item"), error) })), error });
     }
-    return await this.#runPublicBatch(parsed);
+    return await this.#runPublicBatch(input);
   }
 
   async #executeStudio(

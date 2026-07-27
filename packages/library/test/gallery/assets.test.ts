@@ -278,6 +278,38 @@ describe("validated asset ingestion and deduplication", () => {
     expect((await indexStore.read()).assets).toHaveLength(3);
   });
 
+  it("persists a validated JPEG provider output even when the requested format was PNG", async () => {
+    const { assets, sourceRoot, indexStore } = await createHarness();
+    const bytes = validJpeg(7, 5);
+    await writeSource(sourceRoot, "provider-output.jpg", bytes);
+    const params = operationParameters("Provider returned JPEG", "png");
+
+    const result = await assets.ingestAsset({
+      prompt: "Provider returned JPEG",
+      model: "synthetic-image-model",
+      requestedParams: params,
+      effectiveParams: params,
+      execution,
+      renditions: [{
+        phase: "final",
+        sourceRoot,
+        sourceRelativePath: "provider-output.jpg",
+        requestedBaseName: "provider-output",
+        expected: {
+          mimeType: "image/jpeg",
+          byteLength: bytes.byteLength,
+          sha256: sha256(bytes),
+          width: 7,
+          height: 5
+        }
+      }]
+    });
+
+    expect(result.blobs[0]).toMatchObject({ mimeType: "image/jpeg", width: 7, height: 5 });
+    expect(result.blobs[0]!.relativePath).toMatch(/provider-output\.jpg$/u);
+    expect((await indexStore.read()).assets).toHaveLength(1);
+  });
+
   it("rejects stale edit-record ingestion before publishing a blob or mutating the index", async () => {
     const { assets, sourceRoot, indexStore } = await createHarness();
     await writeSource(sourceRoot, "legacy-edit.png", validPng());

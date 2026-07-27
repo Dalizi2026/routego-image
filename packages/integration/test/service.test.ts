@@ -142,6 +142,19 @@ function pngBytes(width = 3, height = 2, color = 0x45): Buffer {
   return PNG.sync.write(png);
 }
 
+function jpegBytes(width = 4, height = 3): Buffer {
+  return Buffer.from([
+    0xff, 0xd8,
+    0xff, 0xc0, 0x00, 0x0b, 0x08,
+    (height >>> 8) & 0xff, height & 0xff,
+    (width >>> 8) & 0xff, width & 0xff,
+    0x01, 0x01, 0x11, 0x00,
+    0xff, 0xda, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00, 0x3f, 0x00,
+    0x12, 0x34, 0xff, 0x00, 0x56,
+    0xff, 0xd9
+  ]);
+}
+
 function artifact(
   id: string,
   phase: "partial" | "final",
@@ -196,6 +209,42 @@ function succeededResult(
       })),
       { inputRole: "output" as const, outputArtifactId: final.id, order: partial.length }
     ]
+  });
+}
+
+function succeededJpegResult(request: ImageOperationRequest, requestId: string): ImageOperationResult {
+  const bytes = jpegBytes();
+  const final = {
+    id: `${requestId}:final`,
+    slot: 0,
+    phase: "final" as const,
+    mimeType: "image/jpeg" as const,
+    byteLength: bytes.byteLength,
+    width: 4,
+    height: 3,
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+    display: { type: "image" as const, dataUrl: `data:image/jpeg;base64,${bytes.toString("base64")}` },
+    createdAt: BASE_NOW.toISOString()
+  };
+  return imageOperationResultSchema.parse({
+    schemaVersion: 1,
+    requestId,
+    status: "succeeded",
+    requestedParams: request,
+    effectiveParams: request,
+    execution: {
+      transport: "single-endpoint-json",
+      attemptCount: 1,
+      providerRequestCount: 1,
+      receivedAnyOutput: true,
+      mayHaveBilled: true,
+      degradedContinuation: false,
+      providerImageIds: []
+    },
+    finalArtifacts: [final],
+    partialArtifacts: [],
+    failedSlots: [],
+    relationships: [{ inputRole: "output", outputArtifactId: final.id, order: 0 }]
   });
 }
 
@@ -462,6 +511,86 @@ describe("Task 4.4 provider activation projection", () => {
 });
 
 describe("task 3.5 public composition", () => {
+  it("resolves omitted public controls from one active default snapshot while preserving explicit overrides", async () => {
+    const observed: ImageOperationRequest[] = [];
+    const execute: CreationExecution = async (request, context) => {
+      observed.push(request);
+      return succeededResult(request, context.requestId);
+    };
+    const { service, library, output } = await createHarness({ executeCreation: execute });
+    const settings = await library.readSettings({});
+    await library.updateSettings({
+      defaults: {
+        ...settings.defaults,
+        size: "2048x2048",
+        aspectRatio: "1:1",
+        quality: "medium",
+        format: "png",
+        count: 1,
+        partialImages: 0,
+        transparentMode: "off",
+        moderation: "auto",
+        saveToLibrary: true
+      }
+    });
+
+    const single = await service.generate({
+      kind: "generate",
+      prompt: "Use the saved square defaults"
+    });
+    const batch = await service.batch({
+      tasks: [
+        { id: "defaulted", operation: { kind: "generate", prompt: "Defaulted batch item" } },
+        {
+          id: "explicit",
+          operation: {
+            kind: "generate",
+            prompt: "Explicit batch item",
+            size: "1536x1024",
+            aspectRatio: "landscape",
+            quality: "high",
+            format: "jpeg",
+            count: 1,
+            partialImages: 0,
+            transparentMode: "off",
+            moderation: "low",
+            saveToLibrary: false,
+            outputDir: output
+          }
+        }
+      ]
+    });
+
+    expect(single).toMatchObject({
+      requestedParams: { size: "2048x2048", aspectRatio: "1:1" },
+      effectiveParams: { size: "2048x2048", aspectRatio: "1:1" }
+    });
+    expect(batch.status).toBe("succeeded");
+    expect(observed.map((request) => ({
+      size: request.size,
+      aspectRatio: request.aspectRatio,
+      quality: request.quality,
+      format: request.format,
+      moderation: request.moderation,
+      saveToLibrary: request.saveToLibrary
+    }))).toEqual([
+      { size: "2048x2048", aspectRatio: "1:1", quality: "medium", format: "png", moderation: "auto", saveToLibrary: true },
+      { size: "2048x2048", aspectRatio: "1:1", quality: "medium", format: "png", moderation: "auto", saveToLibrary: true },
+      { size: "1536x1024", aspectRatio: "landscape", quality: "high", format: "jpeg", moderation: "low", saveToLibrary: false }
+    ]);
+  });
+
+  it("stops before Creation when public defaults cannot be read", async () => {
+    const execute = vi.fn<CreationExecution>();
+    const { service, library } = await createHarness({ executeCreation: execute });
+    vi.spyOn(library, "readSettings").mockRejectedValueOnce(new Error("synthetic settings failure"));
+
+    const result = await service.generate({ kind: "generate", prompt: "Cannot resolve defaults" });
+
+    expect(result).toMatchObject({ status: "failed", error: { code: "config_corrupt" } });
+    expect(execute).not.toHaveBeenCalled();
+  });
+
   it("materializes one saved public result and exposes the same durable state to Studio", async () => {
     const { service } = await createHarness();
     const result = await service.generate(publicRequest());
@@ -477,6 +606,23 @@ describe("task 3.5 public composition", () => {
     expect(studioSearch.items).toHaveLength(1);
     expect(studioSearch.items[0]?.assetId).toBe(publicSearch.items[0]?.id);
     expect(JSON.stringify(studioSearch)).not.toMatch(/data:image|base64|"path"/u);
+  });
+
+  it("persists a valid JPEG provider result even when the effective format preference is PNG", async () => {
+    const { service } = await createHarness({
+      executeCreation: async (request, context) => succeededJpegResult(request, context.requestId)
+    });
+
+    const result = await service.generate(publicRequest({ format: "png" }));
+    const library = await service.searchLibrary({});
+
+    expect(result).toMatchObject({
+      status: "succeeded",
+      effectiveParams: { format: "png" },
+      finalArtifacts: [{ mimeType: "image/jpeg", width: 4, height: 3 }]
+    });
+    expect(library.items).toHaveLength(1);
+    expect(library.items[0]).toMatchObject({ mimeType: "image/jpeg", width: 4, height: 3 });
   });
 
   it("rejects an unsaved request without an output directory before provider work", async () => {
