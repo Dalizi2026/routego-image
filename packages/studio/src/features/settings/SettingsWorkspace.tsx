@@ -10,6 +10,7 @@ import {
 } from "@routego-image/contracts";
 
 import { useI18n } from "../../i18n";
+import { CapabilityProbePanel } from "./CapabilityProbePanel";
 import {
   SettingsFormError,
   activeSettingsProfile,
@@ -785,6 +786,7 @@ export function SettingsWorkspace({
 
         <form className="settings-output-directory" onSubmit={(event) => void saveOutputDirectory(event)}><div className="settings-section-heading"><p>OUTPUT / REDACTED</p><h2>{labels.outputDirectory}</h2></div><p>{labels.outputLead}</p><div className="settings-output-directory__current"><span>{settings.outputDirectory.configured ? labels.configured : labels.notConfigured}</span><strong>{settings.outputDirectory.display ?? "—"}</strong></div><fieldset><legend>{labels.outputDirectory}</legend>{(["unchanged", "default", "clear", "replace"] as const).map((operation) => <label key={operation}><input type="radio" name="output-operation" checked={outputDraft.operation === operation} onChange={() => setOutputDraft({ operation, path: "", confirmLocalPath: false })} />{operation === "unchanged" ? labels.unchanged : operation === "default" ? labels.useDefault : operation === "clear" ? labels.clear : labels.replace}</label>)}</fieldset>{outputDraft.operation === "replace" ? <div className="settings-output-directory__replace"><label><span>{labels.localPath}</span><input autoComplete="off" spellCheck={false} value={outputDraft.path} onChange={(event) => setOutputDraft((current) => ({ ...current, path: event.target.value, confirmLocalPath: false }))} /><FieldError value={outputErrors["outputDirectory.path"]} /></label><label className="settings-check settings-check--warning"><input type="checkbox" checked={outputDraft.confirmLocalPath} onChange={(event) => setOutputDraft((current) => ({ ...current, confirmLocalPath: event.target.checked }))} />{labels.confirmPath}</label></div> : null}<button type="submit" disabled={outputDraft.operation === "replace" && !outputDraft.confirmLocalPath}>{labels.applyOutput}</button><StateMessage state={outputState} labels={labels} /></form>
       </div>
+      <CapabilityProbePanel gateway={gateway} settings={settings} />
         </div>
       </details>
     </section>

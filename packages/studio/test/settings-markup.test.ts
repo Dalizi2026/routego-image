@@ -37,8 +37,8 @@ const settings: ReadSettingsResult = {
   ],
   defaults: {
     model: "synthetic-image-model",
-    size: "auto",
-    aspectRatio: "auto",
+    size: "2048x2048",
+    aspectRatio: "1:1",
     quality: "auto",
     format: "png",
     count: 1,
@@ -103,6 +103,9 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).toContain("Response wait limit");
     expect(markup).toContain('value="300000"');
     expect(markup).toContain("cannot extend an earlier timeout imposed by the provider itself");
+    expect(markup).toContain("Verify current defaults");
+    expect(markup).toContain("Start verification (may be billable)");
+    expect(markup).toContain("Custom size and aspect ratio");
   });
 
   it("renders first run as endpoint, key, and explicit model fetch only", () => {
@@ -126,7 +129,7 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).not.toContain("Profile name");
     expect(markup).not.toContain("Generation endpoint mode");
     expect(markup).not.toContain("Refresh models (non-billable)");
-    expect(markup).not.toContain("Capability probe");
+    expect(markup).not.toContain("Verify current defaults");
     expect(markup).not.toContain("Four-state capability evidence");
   });
 
@@ -150,7 +153,7 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).toContain("Advanced settings");
     expect(markup).not.toContain('<details class="settings-advanced" open=""');
     expect(markup).toContain("Refresh models (non-billable)");
-    expect(markup).not.toContain("Potentially billable");
+    expect(markup).toContain("Start verification (may be billable)");
     expect(markup).not.toContain("Four-state capability evidence");
     expect(markup).toContain("Replace");
     expect(markup).toContain("hidden query data");

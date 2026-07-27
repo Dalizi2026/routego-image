@@ -37,6 +37,19 @@
 .generation-defaults__message.is-success { color: var(--cyan-300); }
 .generation-defaults__message.is-failure { color: var(--red-400); }
 
+.capability-probe { display: grid; gap: 12px; padding: 18px; border: 1px solid var(--line-strong); background: rgba(9, 12, 10, .72); }
+.capability-probe > p { margin: 0; color: var(--paper-400); font-size: .78rem; line-height: 1.6; }
+.capability-probe__requirements, .capability-probe__result ul { display: grid; gap: 6px; margin: 0; padding-left: 20px; color: var(--paper-200); font-size: .78rem; }
+.capability-probe__scope { color: var(--paper-500) !important; }
+.capability-probe > button { width: fit-content; min-height: 42px; padding: 0 14px; border: 1px solid var(--amber-400); color: var(--ink-950); background: var(--amber-400); font-weight: 800; cursor: pointer; }
+.capability-probe > button:disabled { cursor: wait; opacity: .65; }
+.capability-probe__message, .capability-probe__result { margin: 0; padding: 12px; border: 1px solid var(--line); font-size: .78rem; line-height: 1.55; }
+.capability-probe__message.is-failure { color: var(--red-400); }
+.capability-probe__result { display: grid; gap: 8px; }
+.capability-probe__result.is-success { border-color: var(--cyan-300); color: var(--cyan-300); }
+.capability-probe__result.is-warning { border-color: var(--amber-400); color: var(--paper-100); }
+.capability-probe__result p { margin: 0; color: var(--paper-300); }
+
 @media (max-width: 560px) {
   .generation-defaults { padding: 18px; }
   .generation-defaults__identity, .generation-defaults__grid { grid-template-columns: minmax(0, 1fr); }

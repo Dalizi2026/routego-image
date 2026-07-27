@@ -4,6 +4,7 @@ import type { ReadSettingsResult } from "@routego-image/contracts";
 
 import type { StudioGateway } from "../../api";
 import { useI18n } from "../../i18n";
+import { CapabilityProbePanel } from "./CapabilityProbePanel";
 import { SettingsFormError, buildDefaultsSettingsInput } from "./state";
 import type { SettingsAsyncState } from "./types";
 import "./settings.css";
@@ -145,6 +146,7 @@ export function GenerationDefaultsPanel({
         {state.status === "success" ? <p className="generation-defaults__message is-success" role="status">{state.message}</p> : null}
         {state.status === "failure" ? <p className="generation-defaults__message is-failure" role="alert">{state.safeMessage}</p> : null}
       </form>
+      <CapabilityProbePanel gateway={gateway} settings={settings} />
     </section>
   );
 }
