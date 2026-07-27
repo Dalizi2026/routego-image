@@ -8,14 +8,8 @@ import type {
 
 import { StudioGatewayError, type StudioGateway } from "../api";
 import { AppNavigation, AsyncStatePanel, NoticeStack } from "../components";
-import { CreationWorkbench } from "../features/creation";
 import { LibraryWorkspace } from "../features/library";
-import { SettingsWorkspace } from "../features/settings";
-import {
-  activeSettingsModel,
-  isValidatedActiveProviderResult,
-  mergeActiveProviderProfile
-} from "../features/settings/state";
+import { GenerationDefaultsPanel, SettingsWorkspace } from "../features/settings";
 import { I18nProvider, useI18n, type MessageKey } from "../i18n";
 import "../styles/index.css";
 import {
@@ -23,7 +17,6 @@ import {
   initialStudioRouteForSettings,
   studioAppReducer,
   type AppNotice,
-  type ProviderSwitchState,
   type StudioRoute
 } from "./state";
 
@@ -257,134 +250,36 @@ function StatusLedger({
 }
 
 export function HeaderProviderSelector({
-  gateway,
   settings,
-  state,
-  onSettingsChange,
-  onStateChange
+  onOpenSettings
 }: {
-  readonly gateway: StudioGateway;
   readonly settings: ReadSettingsResult;
-  readonly state: ProviderSwitchState;
-  readonly onSettingsChange: (settings: ReadSettingsResult) => void;
-  readonly onStateChange: (
-    action:
-      | { readonly type: "provider-switch-start"; readonly providerId: string }
-      | {
-          readonly type: "provider-switch-success";
-          readonly providerId: string;
-          readonly model: string;
-          readonly retainedModel: boolean;
-        }
-      | {
-          readonly type: "provider-switch-failure";
-          readonly providerId: string;
-          readonly message: string;
-        }
-  ) => void;
+  readonly onOpenSettings: () => void;
 }) {
   const { language, t } = useI18n();
-  const activeModel = activeSettingsModel(settings);
   const activeProvider = settings.profiles.find(
     (profile) => profile.id === settings.activeProviderId && profile.isActive
   );
-  const loading = state.status === "loading";
   const copy =
     language === "zh"
       ? {
           label: "服务商",
-          snapshot: "已提交的请求保留提交时的服务商和模型；新选择仅影响后续提交。",
-          loading: "正在切换服务商……",
-          retained: "当前模型已保留，后续提交将使用此服务商。",
-          fallback: "当前模型不可用，已切换到目标服务商默认模型。",
-          failure: "服务商切换失败，仍保留原来的选择。",
+          settings: "前往设置",
           noModel: "未配置模型"
         }
       : {
           label: "Provider",
-          snapshot:
-            "Submitted requests keep their provider and model snapshots; this selection affects future submissions only.",
-          loading: "Switching provider...",
-          retained: "The current model was retained for future submissions.",
-          fallback: "The current model was unavailable; the target default model is active.",
-          failure: "Provider switch failed; the previous selection is still active.",
+          settings: "Settings",
           noModel: "No model configured"
         };
 
-  const handleChange = async (providerId: string) => {
-    if (!providerId || providerId === settings.activeProviderId || loading) return;
-    onStateChange({ type: "provider-switch-start", providerId });
-    try {
-      const result = await gateway.invoke("setActiveProviderProfile", {
-        schemaVersion: 1,
-        profileId: providerId
-      });
-      if (!isValidatedActiveProviderResult(result, providerId)) {
-        throw new Error("Invalid provider activation response.");
-      }
-      const nextSettings = mergeActiveProviderProfile(settings, result);
-      const nextModel = activeSettingsModel(nextSettings);
-      if (nextModel === undefined) {
-        throw new Error("Provider activation did not return a model.");
-      }
-      onSettingsChange(nextSettings);
-      onStateChange({
-        type: "provider-switch-success",
-        providerId,
-        model: nextModel,
-        retainedModel: activeModel !== undefined && nextModel === activeModel
-      });
-    } catch {
-      onStateChange({
-        type: "provider-switch-failure",
-        providerId,
-        message: copy.failure
-      });
-    }
-  };
-
   return (
-    <div className="provider-switch" data-provider-switch-state={state.status}>
-      <label className="provider-switch__label" htmlFor="studio-provider-select">
-        {copy.label}
-      </label>
-      <select
-        id="studio-provider-select"
-        className="provider-switch__select"
-        value={settings.activeProviderId ?? ""}
-        disabled={loading || settings.profiles.length < 2}
-        aria-busy={loading}
-        onChange={(event) => void handleChange(event.currentTarget.value)}
-      >
-        {settings.profiles.length === 0 ? (
-          <option value="">{t("status.unconfigured")}</option>
-        ) : (
-          settings.profiles.map((profile) => (
-            <option key={profile.id} value={profile.id}>
-              {profile.name}
-            </option>
-          ))
-        )}
-      </select>
+    <div className="provider-switch">
+      <span className="provider-switch__label">{copy.label}</span>
       <span className="provider-switch__model">
-        {activeProvider?.name ?? t("status.unconfigured")} / {activeModel ?? copy.noModel}
+        {activeProvider?.name ?? t("status.unconfigured")} / {settings.defaults.model ?? activeProvider?.defaultModel ?? copy.noModel}
       </span>
-      <p className="provider-switch__snapshot">{copy.snapshot}</p>
-      {state.status === "loading" ? (
-        <p className="provider-switch__status" role="status" aria-live="polite">
-          {copy.loading}
-        </p>
-      ) : null}
-      {state.status === "success" ? (
-        <p className="provider-switch__status provider-switch__status--success" role="status">
-          {state.retainedModel ? copy.retained : copy.fallback} ({state.model})
-        </p>
-      ) : null}
-      {state.status === "failure" ? (
-        <p className="provider-switch__status provider-switch__status--failure" role="alert">
-          {state.message}
-        </p>
-      ) : null}
+      <button className="provider-switch__settings" type="button" onClick={onOpenSettings}>{copy.settings}</button>
     </div>
   );
 }
@@ -411,8 +306,8 @@ function StudioWorkspace({
   });
   const firstRunSetupVisible = firstRunSession && state.route === "settings";
   const workbenchContent = routeContent?.workbench ?? (
-      <CreationWorkbench gateway={gateway} defaults={settings.defaults} />
-    );
+    <GenerationDefaultsPanel gateway={gateway} settings={settings} onSettingsChange={onSettingsChange} />
+  );
   const content = {
     library:
       routeContent?.library ?? (
@@ -462,11 +357,8 @@ function StudioWorkspace({
             {t("app.localOnly")}
           </span>
           <HeaderProviderSelector
-            gateway={gateway}
             settings={settings}
-            state={state.providerSwitch}
-            onSettingsChange={onSettingsChange}
-            onStateChange={(action) => dispatch(action)}
+            onOpenSettings={() => dispatch({ type: "navigate", route: "settings" })}
           />
           <button
             className="language-toggle"

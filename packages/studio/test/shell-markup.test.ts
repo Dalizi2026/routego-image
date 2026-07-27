@@ -53,13 +53,12 @@ describe("accessible Studio shell markup", () => {
     expect(loading).toContain('aria-busy="true"');
   });
 
-  it("renders an accessible Header provider selector with snapshot messaging", () => {
+  it("renders truthful read-only provider state with a settings action", () => {
     const markup = renderToStaticMarkup(
       createElement(
         I18nProvider,
         null,
         createElement(HeaderProviderSelector, {
-          gateway: {} as never,
           settings: {
             schemaVersion: 1,
             activeProviderId: "provider-a",
@@ -98,16 +97,12 @@ describe("accessible Studio shell markup", () => {
             },
             outputDirectory: { configured: false }
           },
-          state: { status: "idle" },
-          onSettingsChange: () => undefined,
-          onStateChange: () => undefined
+          onOpenSettings: () => undefined
         })
       )
     );
-    expect(markup).toContain('id="studio-provider-select"');
-    expect(markup).toContain('data-provider-switch-state="idle"');
-    expect(markup).toContain("已提交的请求保留提交时的服务商和模型");
+    expect(markup).not.toContain("studio-provider-select");
+    expect(markup).toContain("前往设置");
     expect(markup).toContain("Synthetic provider A / image-1");
-    expect(markup).toContain("disabled");
   });
 });

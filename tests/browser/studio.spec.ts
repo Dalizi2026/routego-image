@@ -365,14 +365,14 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
   const readyNavigation = page.goto("/");
   await expect(page.getByText("正在显影工作区")).toBeVisible();
   await readyNavigation;
-  await expect(page.getByRole("heading", { name: "把想法放进显影盘" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "为 Codex 设定默认出图参数" })).toBeVisible();
   await expect(page).toHaveURL(`${STUDIO_BASE_URL}/`);
   await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toBeVisible();
 
-  await page.getByLabel("提示词").fill("保留语言切换前的草稿");
+  await page.getByLabel("图片比例").selectOption("16:9");
   await page.getByRole("button", { name: "界面语言" }).click();
-  await expect(page.getByRole("heading", { name: "Place the idea in the developer tray" })).toBeVisible();
-  await expect(page.getByLabel("Prompt")).toHaveValue("保留语言切换前的草稿");
+  await expect(page.getByRole("heading", { name: "Set Codex image defaults" })).toBeVisible();
+  await expect(page.getByLabel("Aspect ratio")).toHaveValue("16:9");
   await expect(page.getByRole("button", { name: "Library" })).toBeVisible();
 
   await page.keyboard.press("Tab");
@@ -400,7 +400,7 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
     return { position: style.position, bottom: style.bottom };
   });
   expect(mobileNavigation).toEqual({ position: "fixed", bottom: "0px" });
-  await page.getByRole("button", { name: "Settings" }).click();
+  await page.getByRole("navigation", { name: "Studio main navigation" }).getByRole("button", { name: "Settings" }).click();
   await expect(page.getByRole("heading", { name: "Image API settings" })).toBeVisible();
   await expect(page.getByLabel("Call endpoint")).toBeVisible();
   await expect(page.getByLabel("API Key")).toBeVisible();
@@ -420,7 +420,7 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
   await expect(rejectedPage.getByRole("heading", { name: "本地工作区无法载入" })).toBeVisible();
   await expect(rejectedPage.getByText("本地会话已失效或被拒绝。")).toBeVisible();
   await expect(rejectedPage.getByText("请关闭此页面，再从 Routego Image 重新打开 Studio。")).toBeVisible();
-  await expect(rejectedPage.getByRole("heading", { name: "把想法放进显影盘" })).toHaveCount(0);
+  await expect(rejectedPage.getByRole("heading", { name: "为 Codex 设定默认出图参数" })).toHaveCount(0);
   await expect(rejectedPage).toHaveURL(STUDIO_BASE_URL + "/");
   await expectSecurityClean(rejectedPage, rejectedAudit, {
     sensitiveMarkers: [rejectedSessionToken],
@@ -488,13 +488,14 @@ test("first run connects with endpoint and key, fetches models once, then return
 
   await page.getByRole("button", { name: "进入工作台" }).click();
   await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "把想法放进显影盘" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "为 Codex 设定默认出图参数" })).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await expectSecurityClean(page, audit, { sensitiveMarkers: [replacementMarker] });
 });
 
+test.describe.skip("retired Studio stream controls", () => {
 test("creation reports success, partial, failure, and degraded outcomes without automatic replay", async ({ context }) => {
   const scenarios = [
     { fixture: "success", title: "图像已生成" },
@@ -741,6 +742,24 @@ test("mobile and desktop generation surfaces remain accessible without a batch q
   await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toBeVisible();
   await expect(page.getByLabel("提示词")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  await expectSecurityClean(page, audit);
+});
+});
+
+test("Studio saves compact Codex defaults without exposing a prompt or dispatching generation", async ({ page }) => {
+  const audit = observeBrowserSecurity(page);
+  await installDeterministicMock(page);
+  await openStudio(page);
+
+  await expect(page.getByRole("heading", { name: "为 Codex 设定默认出图参数" })).toBeVisible();
+  await expect(page.getByLabel("提示词")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "开始生成" })).toHaveCount(0);
+  await page.getByLabel("图片比例").selectOption("16:9");
+  await page.getByLabel("输出分辨率").selectOption("2048x2048");
+  await page.getByLabel("背景透明").selectOption("chromakey");
+  await page.getByRole("button", { name: "保存并作为 Codex 默认值" }).click();
+  await expect(page.getByRole("status")).toContainText("之后在 Codex 对话生图将默认使用这些参数");
+  expect(audit.requests.some((request) => new URL(request.url).pathname === STUDIO_CREATION_STREAM_PATH)).toBe(false);
   await expectSecurityClean(page, audit);
 });
 

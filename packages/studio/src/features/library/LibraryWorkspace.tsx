@@ -80,6 +80,8 @@ const copy = {
     statuses: "状态",
     sort: "排序",
     limit: "每页",
+    advanced: "更多筛选",
+    activeFilters: "项高级条件已启用",
     apply: "应用筛选",
     reset: "重置",
     allFolders: "全部档案夹",
@@ -138,6 +140,8 @@ const copy = {
     statuses: "Status",
     sort: "Sort",
     limit: "Per page",
+    advanced: "More filters",
+    activeFilters: "advanced filters active",
     apply: "Apply filters",
     reset: "Reset",
     allFolders: "All folders",
@@ -232,6 +236,13 @@ function FilterPanel({
   readonly onSubmit: () => void;
   readonly onReset: () => void;
 }) {
+  const activeAdvancedCount = [
+    filters.models.trim() !== "",
+    filters.from !== "",
+    filters.to !== "",
+    filters.sizes.length > 0,
+    filters.statuses.length > 0
+  ].filter(Boolean).length;
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSubmit();
@@ -242,7 +253,7 @@ function FilterPanel({
         <p>FILTER / CONTRACT</p>
         <h2>{labels.filterTitle}</h2>
       </div>
-      <div className="library-filters__grid">
+      <div className="library-filters__grid library-filters__grid--quick">
         <label>
           <span>{labels.query}</span>
           <input
@@ -250,32 +261,6 @@ function FilterPanel({
             placeholder={labels.queryPlaceholder}
             onChange={(event) => onChange({ ...filters, query: event.target.value })}
           />
-        </label>
-        <label>
-          <span>{labels.models}</span>
-          <input
-            value={filters.models}
-            placeholder={labels.modelsPlaceholder}
-            onChange={(event) => onChange({ ...filters, models: event.target.value })}
-          />
-        </label>
-        <label>
-          <span>{labels.from}</span>
-          <input
-            type="date"
-            value={filters.from}
-            onChange={(event) => onChange({ ...filters, from: event.target.value })}
-          />
-          {errors["from"] ? <small role="alert">{errors["from"]}</small> : null}
-        </label>
-        <label>
-          <span>{labels.to}</span>
-          <input
-            type="date"
-            value={filters.to}
-            onChange={(event) => onChange({ ...filters, to: event.target.value })}
-          />
-          {errors["to"] ? <small role="alert">{errors["to"]}</small> : null}
         </label>
         <label>
           <span>{labels.sort}</span>
@@ -303,47 +288,17 @@ function FilterPanel({
           </select>
         </label>
       </div>
-      <fieldset>
-        <legend>{labels.kinds}</legend>
-        {kindOptions.map((value) => (
-          <label key={value}>
-            <input
-              type="checkbox"
-              checked={filters.kinds.includes(value)}
-              onChange={() => onChange({ ...filters, kinds: toggleValue(filters.kinds, value) })}
-            />
-            {value}
-          </label>
-        ))}
-      </fieldset>
-      <fieldset>
-        <legend>{labels.sizes}</legend>
-        {sizeOptions.map((value) => (
-          <label key={value}>
-            <input
-              type="checkbox"
-              checked={filters.sizes.includes(value)}
-              onChange={() => onChange({ ...filters, sizes: toggleValue(filters.sizes, value) })}
-            />
-            {value}
-          </label>
-        ))}
-      </fieldset>
-      <fieldset>
-        <legend>{labels.statuses}</legend>
-        {statusOptions.map((value) => (
-          <label key={value}>
-            <input
-              type="checkbox"
-              checked={filters.statuses.includes(value)}
-              onChange={() =>
-                onChange({ ...filters, statuses: toggleValue(filters.statuses, value) })
-              }
-            />
-            {value}
-          </label>
-        ))}
-      </fieldset>
+      <details className="library-filters__advanced">
+        <summary>{labels.advanced}{activeAdvancedCount > 0 ? ` · ${activeAdvancedCount} ${labels.activeFilters}` : ""}</summary>
+        <div className="library-filters__grid">
+          <label><span>{labels.models}</span><input value={filters.models} placeholder={labels.modelsPlaceholder} onChange={(event) => onChange({ ...filters, models: event.target.value })} /></label>
+          <label><span>{labels.from}</span><input type="date" value={filters.from} onChange={(event) => onChange({ ...filters, from: event.target.value })} />{errors["from"] ? <small role="alert">{errors["from"]}</small> : null}</label>
+          <label><span>{labels.to}</span><input type="date" value={filters.to} onChange={(event) => onChange({ ...filters, to: event.target.value })} />{errors["to"] ? <small role="alert">{errors["to"]}</small> : null}</label>
+        </div>
+        <fieldset><legend>{labels.kinds}</legend>{kindOptions.map((value) => <label key={value}><input type="checkbox" checked={filters.kinds.includes(value)} onChange={() => onChange({ ...filters, kinds: toggleValue(filters.kinds, value) })} />{value}</label>)}</fieldset>
+        <fieldset><legend>{labels.sizes}</legend>{sizeOptions.map((value) => <label key={value}><input type="checkbox" checked={filters.sizes.includes(value)} onChange={() => onChange({ ...filters, sizes: toggleValue(filters.sizes, value) })} />{value}</label>)}</fieldset>
+        <fieldset><legend>{labels.statuses}</legend>{statusOptions.map((value) => <label key={value}><input type="checkbox" checked={filters.statuses.includes(value)} onChange={() => onChange({ ...filters, statuses: toggleValue(filters.statuses, value) })} />{value}</label>)}</fieldset>
+      </details>
       <div className="library-filters__actions">
         <button type="submit">{labels.apply}</button>
         <button type="button" onClick={onReset}>{labels.reset}</button>

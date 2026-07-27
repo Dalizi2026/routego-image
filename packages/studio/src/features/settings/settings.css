@@ -5,6 +5,43 @@
   animation: route-reveal 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+.generation-defaults {
+  display: grid;
+  width: min(100%, 760px);
+  gap: 20px;
+  padding: clamp(20px, 4vw, 36px);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-panel);
+  background: rgba(12, 15, 12, 0.9);
+  box-shadow: var(--shadow-panel);
+}
+
+.generation-defaults header { display: grid; gap: 10px; }
+.generation-defaults header > * { margin: 0; }
+.generation-defaults header > p { color: var(--amber-400); font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.16em; }
+.generation-defaults header > h1 { font-family: var(--font-display); font-size: clamp(2.2rem, 6vw, 4.6rem); font-weight: 400; line-height: 0.95; }
+.generation-defaults header > span { max-width: 640px; color: var(--paper-300); line-height: 1.65; }
+.generation-defaults__identity { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.generation-defaults__identity div { min-width: 0; padding: 12px; border: 1px solid var(--line); background: var(--ink-900); }
+.generation-defaults__identity dt, .generation-defaults__grid span { color: var(--paper-500); font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: .1em; text-transform: uppercase; }
+.generation-defaults__identity dd { overflow: hidden; margin: 6px 0 0; color: var(--paper-100); text-overflow: ellipsis; white-space: nowrap; }
+.generation-defaults form { display: grid; gap: 16px; }
+.generation-defaults__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.generation-defaults__grid label { display: grid; gap: 7px; }
+.generation-defaults__grid select { min-height: 46px; padding: 0 10px; border: 1px solid var(--line-strong); color: var(--paper-100); background: var(--ink-950); }
+.generation-defaults__wide { grid-column: 1 / -1; }
+.generation-defaults__wide small { color: var(--paper-500); font-size: .72rem; line-height: 1.45; }
+.generation-defaults__save { min-height: 50px; border: 0; color: var(--ink-950); background: var(--amber-400); font-weight: 800; cursor: pointer; }
+.generation-defaults__save:disabled { cursor: wait; opacity: .65; }
+.generation-defaults__message { margin: 0; font-size: .8rem; }
+.generation-defaults__message.is-success { color: var(--cyan-300); }
+.generation-defaults__message.is-failure { color: var(--red-400); }
+
+@media (max-width: 560px) {
+  .generation-defaults { padding: 18px; }
+  .generation-defaults__identity, .generation-defaults__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
 .settings-setup {
   display: grid;
   width: min(100%, 760px);
