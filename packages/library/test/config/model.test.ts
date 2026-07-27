@@ -33,6 +33,7 @@ describe("versioned configuration models", () => {
       schemaVersion: 1,
       revision: 0,
       profiles: [],
+      defaults: { responseTimeoutMs: 300_000 },
       outputDirectory: { mode: "default" }
     });
     expect(parseCredentialsDocument(createEmptyCredentialsDocument())).toEqual({

@@ -64,6 +64,14 @@ codex mcp get routego-image-runtime --json
 codex mcp add routego-image-runtime -- node ~/plugins/routego-image/scripts/start-routego-image.mjs
 ```
 
+The isolated install smoke must also receive the exact SHA-256 produced by
+the package verification; it deliberately does not fall back to a stale
+hard-coded hash:
+
+```bash
+node scripts/smoke-plugin-install.mjs <routego-image-package> --artifact-sha256 <verified-sha256>
+```
+
 After every local update, verify both the packaged plugin and the configured fallback in a fresh
 Codex process. The acceptance result must list exactly these seven tools:
 

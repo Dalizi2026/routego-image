@@ -53,7 +53,8 @@ const defaults = {
   partialImages: 0,
   transparentMode: "off" as const,
   moderation: "auto" as const,
-  saveToLibrary: true
+  saveToLibrary: true,
+  responseTimeoutMs: 300_000
 };
 
 describe("write-only provider profile settings contracts", () => {
@@ -127,6 +128,18 @@ describe("write-only provider profile settings contracts", () => {
         outputDirectory: { configured: false }
       }).success
     ).toBe(false);
+  });
+
+  it("accepts a bounded user-selected response wait limit and rejects unsafe values", () => {
+    expect(updateSettingsInputSchema.parse({
+      defaults: { ...defaults, responseTimeoutMs: 120_000 }
+    }).defaults?.responseTimeoutMs).toBe(120_000);
+    expect(updateSettingsInputSchema.safeParse({
+      defaults: { ...defaults, responseTimeoutMs: 25_000 }
+    }).success).toBe(false);
+    expect(updateSettingsInputSchema.safeParse({
+      defaults: { ...defaults, responseTimeoutMs: 605_000 }
+    }).success).toBe(false);
   });
 });
 

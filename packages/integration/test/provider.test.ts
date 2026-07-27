@@ -370,6 +370,23 @@ describe("Library-owned provider runtime context and status", () => {
     });
   });
 
+  it("uses the saved Studio response wait limit for every local provider deadline", async () => {
+    const { store } = await createStore();
+    const settings = await store.readSettings({});
+    await store.updateSettings({
+      defaults: { ...settings.defaults, responseTimeoutMs: 120_000 }
+    });
+
+    const context = await loadProviderContext(store);
+
+    expect(context.deadlines).toEqual({
+      responseHeaderMs: 120_000,
+      bodyMs: 120_000,
+      downloadMs: 120_000,
+      totalMs: 120_000
+    });
+  });
+
   it("fails safely for missing active profile, missing key, and unavailable requested model", async () => {
     const empty = await createStore({ active: false });
     await expect(loadProviderContext(empty.store)).rejects.toMatchObject({

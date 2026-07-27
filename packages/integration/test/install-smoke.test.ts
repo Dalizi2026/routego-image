@@ -17,7 +17,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 // @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
 import { buildPluginPackage } from "../../../scripts/build-plugin-package.mjs";
 // @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { ACCEPTED_ARTIFACT_MANIFEST_SHA256, INSTALLED_PACKAGE_ARGUMENT_PREFIX, cleanupOwnedTemporaryRoot, runPluginInstallSmoke } from "../../../scripts/smoke-plugin-install.mjs";
+import { INSTALLED_PACKAGE_ARGUMENT_PREFIX, cleanupOwnedTemporaryRoot, runPluginInstallSmoke } from "../../../scripts/smoke-plugin-install.mjs";
 
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
 const EXPECTED_TOOLS = [
@@ -41,6 +41,8 @@ async function fingerprint(file: string): Promise<{ sha256: string; mtimeMs: num
 describe.sequential("task 5.3 isolated plugin install smoke", () => {
   let root: string;
   let packageRoot: string;
+  let acceptedArtifactManifestSha256: string;
+  let expectedPluginVersion: string;
 
   beforeAll(async () => {
     root = await mkdtemp(path.join(os.tmpdir(), "routego-install-smoke-test-"));
@@ -49,6 +51,12 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
       repositoryRoot: REPOSITORY_ROOT,
       outputDirectory: packageRoot
     });
+    const [artifactManifest, pluginManifest] = await Promise.all([
+      readFile(path.join(packageRoot, "artifact-manifest.json")),
+      readFile(path.join(packageRoot, ".codex-plugin", "plugin.json"), "utf8")
+    ]);
+    acceptedArtifactManifestSha256 = createHash("sha256").update(artifactManifest).digest("hex");
+    expectedPluginVersion = (JSON.parse(pluginManifest) as { version: string }).version;
   }, 120_000);
 
   afterAll(async () => {
@@ -81,6 +89,7 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
     try {
       result = await runPluginInstallSmoke({
         packageDirectory: packageRoot,
+        acceptedArtifactManifestSha256,
         freshProcessCommand: {
           executable: process.execPath,
           arguments: [
@@ -103,9 +112,9 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
     expect(after).toEqual(before);
     expect(result).toMatchObject({
       artifact: {
-        manifestSha256: ACCEPTED_ARTIFACT_MANIFEST_SHA256,
+        manifestSha256: acceptedArtifactManifestSha256,
         name: "routego-image",
-        version: "1.0.0",
+        version: expectedPluginVersion,
         strictVerificationPassed: true
       },
       codex: {
@@ -159,6 +168,7 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
 
     await expect(runPluginInstallSmoke({
       packageDirectory: candidate,
+      acceptedArtifactManifestSha256,
       temporaryParent: path.join(root, "dependent-roots")
     })).rejects.toThrow(/allowlisted|forbidden/u);
   });
@@ -169,6 +179,7 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
 
     await expect(runPluginInstallSmoke({
       packageDirectory: packageRoot,
+      acceptedArtifactManifestSha256,
       codexExecutable: process.execPath,
       temporaryParent: parent
     })).rejects.toThrow(/Codex app-server/u);

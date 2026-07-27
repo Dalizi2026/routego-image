@@ -20,8 +20,6 @@ import { pathToFileURL } from "node:url";
 
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
-export const ACCEPTED_ARTIFACT_MANIFEST_SHA256 =
-  "c35863e9717f2aa388b584f89bfd5087cbc242570b25512bd6e4909f45394d1c";
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
@@ -1029,10 +1027,9 @@ export async function runPluginInstallSmoke(options) {
     fail("options are required");
   }
   const packageDirectory = path.resolve(options.packageDirectory);
-  const acceptedArtifactManifestSha256 = options.acceptedArtifactManifestSha256 ??
-    ACCEPTED_ARTIFACT_MANIFEST_SHA256;
+  const acceptedArtifactManifestSha256 = options.acceptedArtifactManifestSha256;
   if (!/^[a-f0-9]{64}$/u.test(acceptedArtifactManifestSha256)) {
-    fail("accepted artifact manifest SHA-256 must be 64 lowercase hexadecimal characters");
+    fail("an explicit accepted artifact manifest SHA-256 must be 64 lowercase hexadecimal characters");
   }
   const artifactManifestBytes = await readFile(path.join(packageDirectory, "artifact-manifest.json"));
   const artifactManifestSha256 = sha256(artifactManifestBytes);
@@ -1072,9 +1069,6 @@ export async function runPluginInstallSmoke(options) {
 }
 
 function parseArguments(argv) {
-  if (argv.length === 1) {
-    return { packageDirectory: path.resolve(argv[0]) };
-  }
   if (argv.length === 3 && argv[1] === "--artifact-sha256") {
     return {
       packageDirectory: path.resolve(argv[0]),
@@ -1082,7 +1076,7 @@ function parseArguments(argv) {
     };
   }
   throw new Error(
-    "Usage: node scripts/smoke-plugin-install.mjs <routego-image-package> [--artifact-sha256 <sha256>]"
+    "Usage: node scripts/smoke-plugin-install.mjs <routego-image-package> --artifact-sha256 <sha256>"
   );
 }
 

@@ -104,6 +104,17 @@ export const routegoStatusInputSchema = z
     }
   });
 
+/**
+ * Routego's own bounded wait for an image-provider response. An upstream
+ * provider or relay may still return its own timeout sooner.
+ */
+export const responseTimeoutMsSchema = z
+  .number()
+  .int()
+  .min(30_000)
+  .max(600_000)
+  .refine((value) => value % 30_000 === 0, "Response timeout must use 30-second increments");
+
 export const routegoDefaultsSchema = z
   .object({
     model: z.string().trim().min(1).max(200).optional(),
@@ -115,7 +126,8 @@ export const routegoDefaultsSchema = z
     partialImages: z.number().int().min(0).max(3),
     transparentMode: transparentModeSchema,
     moderation: moderationSchema,
-    saveToLibrary: z.boolean()
+    saveToLibrary: z.boolean(),
+    responseTimeoutMs: responseTimeoutMsSchema.optional()
   })
   .strict();
 

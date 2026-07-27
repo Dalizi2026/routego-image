@@ -26,6 +26,16 @@ export const DEFAULT_PROVIDER_DEADLINES: ProviderDeadlinePolicy = Object.freeze(
   totalMs: 300_000
 });
 
+export function providerDeadlinesForResponseTimeout(responseTimeoutMs?: number): ProviderDeadlinePolicy {
+  const timeout = responseTimeoutMs ?? DEFAULT_PROVIDER_DEADLINES.totalMs;
+  return Object.freeze({
+    responseHeaderMs: timeout,
+    bodyMs: timeout,
+    downloadMs: timeout,
+    totalMs: timeout
+  });
+}
+
 export const DEFAULT_PROVIDER_RETRY: ProviderRetryPolicy = Object.freeze({
   maxAttempts: 3,
   baseDelayMs: 500,
@@ -40,6 +50,7 @@ const REDACTED_PATH = "[REDACTED_PATH]";
 
 export interface ProviderProfileReader {
   getRuntimeProviderProfile(profileId?: string): Promise<RuntimeProviderProfile>;
+  readSettings?(input?: Record<string, never>): Promise<ReadSettingsResult>;
 }
 
 export interface ProviderStatusReader extends ProviderProfileReader {
@@ -304,6 +315,22 @@ export async function loadProviderContext(
       })
     );
   }
+  let deadlines = options.deadlines;
+  if (deadlines === undefined && owner.readSettings !== undefined) {
+    try {
+      const settings = await owner.readSettings({});
+      deadlines = providerDeadlinesForResponseTimeout(settings.defaults.responseTimeoutMs);
+    } catch (error) {
+      throw new ProviderIntegrationError(
+        toProviderServiceError(error, {
+          code: "config_missing",
+          stage: "configure",
+          safeMessage: "The saved image response wait limit is unavailable."
+        }),
+        { cause: error }
+      );
+    }
+  }
   return {
     providerId: profile.id,
     model: selectedModel(profile, input.model),
@@ -311,7 +338,7 @@ export async function loadProviderContext(
     capabilities: [...profile.capabilities],
     apiKey: profile.credential,
     fetch: options.fetch ?? globalThis.fetch,
-    deadlines: options.deadlines ?? DEFAULT_PROVIDER_DEADLINES,
+    deadlines: deadlines ?? DEFAULT_PROVIDER_DEADLINES,
     retry: options.retry ?? DEFAULT_PROVIDER_RETRY,
     ...(options.now === undefined ? {} : { now: options.now }),
     ...(options.random === undefined ? {} : { random: options.random })

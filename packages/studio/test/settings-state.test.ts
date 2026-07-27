@@ -75,6 +75,13 @@ describe("secret-safe Settings state and request construction", () => {
     });
   });
 
+  it("keeps a selected response wait limit in the saved defaults payload", () => {
+    expect(buildDefaultsSettingsInput({
+      ...settings.defaults,
+      responseTimeoutMs: 300_000
+    }).defaults?.responseTimeoutMs).toBe(300_000);
+  });
+
   it("immediately exposes replacement mode for an existing profile without a key", () => {
     const draft = createProviderProfileDraft({ ...profile, hasApiKey: false, apiKeyPreview: undefined });
     expect(draft).toMatchObject({

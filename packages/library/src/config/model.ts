@@ -25,7 +25,8 @@ export const DEFAULT_ROUTEGO_DEFAULTS: RoutegoDefaults = routegoDefaultsSchema.p
   partialImages: 0,
   transparentMode: "off",
   moderation: "auto",
-  saveToLibrary: true
+  saveToLibrary: true,
+  responseTimeoutMs: 300_000
 });
 
 export type StoredOutputDirectory =

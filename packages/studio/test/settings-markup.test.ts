@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import type { ReadSettingsResult } from "@routego-image/contracts";
 
 import type { StudioGateway } from "../src/api";
-import { SettingsWorkspace } from "../src/features/settings";
+import { GenerationDefaultsPanel, SettingsWorkspace } from "../src/features/settings";
 import { I18nProvider } from "../src/i18n";
 
 const settings: ReadSettingsResult = {
@@ -88,6 +88,23 @@ const incompleteSettings: ReadSettingsResult = {
 };
 
 describe("secret-safe Settings workspace markup", () => {
+  it("renders a saved response wait control with a five-minute default and upstream-timeout note", () => {
+    const markup = renderToStaticMarkup(
+      createElement(I18nProvider, {
+        initialLanguage: "en",
+        children: createElement(GenerationDefaultsPanel, {
+          gateway: {} as StudioGateway,
+          settings,
+          onSettingsChange: () => undefined
+        })
+      })
+    );
+
+    expect(markup).toContain("Response wait limit");
+    expect(markup).toContain('value="300000"');
+    expect(markup).toContain("cannot extend an earlier timeout imposed by the provider itself");
+  });
+
   it("renders first run as endpoint, key, and explicit model fetch only", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
