@@ -59,6 +59,63 @@
   .generation-defaults__identity, .generation-defaults__grid { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* Shared sidebar workbench surface.  All controls retain their existing form bindings. */
+.generation-defaults {
+  width: 100%;
+  max-width: none;
+  gap: 22px;
+  padding: clamp(18px, 3vw, 32px);
+  border-color: var(--line-strong);
+  border-radius: var(--radius-panel);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.035), transparent 30%),
+    rgba(12, 16, 13, 0.9);
+}
+
+.generation-defaults header {
+  gap: 7px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.generation-defaults header > p { color: var(--amber-300); }
+.generation-defaults header > h1 { max-width: 720px; font-size: clamp(1.7rem, 3.8vw, 2.65rem); font-weight: 780; letter-spacing: -0.035em; line-height: 1.08; }
+.generation-defaults header > span { color: var(--paper-500); font-size: 0.84rem; }
+
+.generation-defaults__identity { gap: 12px; }
+.generation-defaults__identity div { min-height: 82px; padding: 16px; border-radius: var(--radius-small); background: linear-gradient(135deg, rgba(184, 245, 44, 0.055), rgba(255, 255, 255, 0.018)); }
+.generation-defaults__identity dt { color: var(--paper-500); }
+.generation-defaults__identity dd { margin-top: 9px; color: var(--paper-100); font-size: 1.05rem; font-weight: 760; }
+
+.generation-defaults form { gap: 18px; }
+.generation-defaults__grid { gap: 14px; }
+.generation-defaults__grid label { gap: 8px; }
+.generation-defaults__grid span { color: var(--paper-300); font-size: 0.68rem; font-weight: 700; }
+.generation-defaults__grid select,
+.generation-defaults__custom-size input {
+  min-height: 50px;
+  border-radius: var(--radius-small);
+  border-color: var(--line-strong);
+  background: rgba(5, 7, 6, 0.72);
+  font-weight: 700;
+}
+.generation-defaults__grid select:focus,
+.generation-defaults__custom-size input:focus { border-color: var(--amber-300); outline: 0; box-shadow: 0 0 0 3px rgba(184, 245, 44, 0.12); }
+.generation-defaults__grid small,
+.generation-defaults__custom-size small { color: var(--paper-500); }
+.generation-defaults__wide { padding-top: 2px; }
+.generation-defaults__custom-size { gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-small); background: rgba(255, 255, 255, 0.018); }
+.generation-defaults__save { min-height: 54px; border: 1px solid var(--amber-300); border-radius: var(--radius-small); background: linear-gradient(100deg, var(--amber-300), #a9eb27); box-shadow: 0 10px 26px rgba(150, 219, 34, 0.16); font-size: 0.92rem; }
+
+.capability-probe { border-radius: var(--radius-small); border-color: var(--line); background: rgba(7, 10, 8, 0.58); }
+.capability-probe > button { border-radius: var(--radius-small); border-color: var(--amber-300); background: var(--amber-300); }
+
+@media (max-width: 760px) {
+  .generation-defaults__identity,
+  .generation-defaults__grid { grid-template-columns: minmax(0, 1fr); }
+  .generation-defaults { padding: 18px; }
+}
+
 .settings-setup {
   display: grid;
   width: min(100%, 760px);
@@ -1165,5 +1222,155 @@
   .provider-manager__picker,
   .provider-manager__model-row {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar provider page: Figure 2 supplies the shared chrome, this keeps the
+ * real provider editor aligned with that visual system without changing its
+ * form, requests, or cached-model behaviour. */
+.studio-shell--sidebar .provider-manager {
+  width: min(100%, 1040px);
+  max-width: none;
+  gap: 14px;
+  margin: 0 auto;
+  padding: clamp(18px, 3vw, 34px) clamp(16px, 3.2vw, 38px) 112px;
+}
+
+.studio-shell--sidebar .provider-manager__heading {
+  display: grid;
+  gap: 6px;
+  padding: 0 2px 6px;
+}
+
+.studio-shell--sidebar .provider-manager__heading p {
+  color: var(--amber-400);
+  font-size: 0.66rem;
+}
+
+.studio-shell--sidebar .provider-manager__heading h1 {
+  margin: 0;
+  color: var(--paper-100);
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 4vw, 2.45rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.studio-shell--sidebar .provider-manager__heading span {
+  max-width: 720px;
+  margin: 0;
+  color: var(--paper-400);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.studio-shell--sidebar .provider-manager__picker,
+.studio-shell--sidebar .provider-manager__summary,
+.studio-shell--sidebar .provider-manager__form {
+  border: 1px solid color-mix(in srgb, var(--line-strong) 88%, transparent);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent 42%),
+    rgba(20, 22, 20, 0.92);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
+}
+
+.studio-shell--sidebar .provider-manager__picker {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  padding: 16px;
+}
+
+.studio-shell--sidebar .provider-manager__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  padding: 1px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.studio-shell--sidebar .provider-manager__summary > * {
+  min-height: 86px;
+  padding: 17px;
+  background: rgba(18, 20, 18, 0.95);
+}
+
+.studio-shell--sidebar .provider-manager__summary strong {
+  display: flex;
+  align-items: center;
+  color: var(--paper-100);
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+}
+
+.studio-shell--sidebar .provider-manager__summary span {
+  display: grid;
+  align-content: center;
+  color: var(--amber-300);
+  font-size: 0.77rem;
+  line-height: 1.4;
+}
+
+.studio-shell--sidebar .provider-manager__form {
+  gap: 16px;
+  padding: clamp(18px, 3vw, 30px);
+}
+
+.studio-shell--sidebar .provider-manager__form > label {
+  grid-template-columns: minmax(104px, 0.23fr) minmax(0, 1fr);
+  gap: 10px 18px;
+  align-items: center;
+}
+
+.studio-shell--sidebar .provider-manager__form > label > span {
+  color: var(--paper-300);
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  letter-spacing: 0;
+}
+
+.studio-shell--sidebar .provider-manager__form > label > small,
+.studio-shell--sidebar .provider-manager__form > label > .settings-field-error {
+  grid-column: 2;
+}
+
+.studio-shell--sidebar .provider-manager input,
+.studio-shell--sidebar .provider-manager select {
+  min-height: 46px;
+  border-radius: 8px;
+  border-color: color-mix(in srgb, var(--line-strong) 84%, transparent);
+  background-color: rgba(8, 10, 8, 0.82);
+}
+
+.studio-shell--sidebar .provider-manager button {
+  min-height: 46px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.studio-shell--sidebar .provider-manager__picker > button:first-of-type,
+.studio-shell--sidebar .provider-manager__actions button:first-child {
+  border-color: var(--amber-400);
+  background: linear-gradient(135deg, var(--amber-300), var(--amber-400));
+  color: var(--ink-950);
+}
+
+.studio-shell--sidebar .provider-manager__actions {
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+@media (max-width: 680px) {
+  .studio-shell--sidebar .provider-manager__picker,
+  .studio-shell--sidebar .provider-manager__summary,
+  .studio-shell--sidebar .provider-manager__model-row,
+  .studio-shell--sidebar .provider-manager__form > label {
+    grid-template-columns: 1fr;
+  }
+
+  .studio-shell--sidebar .provider-manager__form > label > small,
+  .studio-shell--sidebar .provider-manager__form > label > .settings-field-error {
+    grid-column: auto;
   }
 }

@@ -751,3 +751,181 @@
     display: none;
   }
 }
+
+/* Codex sidebar composition.  The wide-screen treatment is intentionally deferred
+   until the sidebar layout is accepted, so every Studio route shares this shell. */
+.studio-shell {
+  grid-template: var(--header-height) minmax(0, 1fr) 82px / minmax(0, 1fr);
+  overflow: visible;
+  background-image:
+    linear-gradient(rgba(202, 230, 202, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(202, 230, 202, 0.018) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.studio-header,
+.studio-workspace,
+.studio-footer {
+  grid-column: 1;
+}
+
+.studio-header {
+  gap: 14px;
+  padding: 0 clamp(16px, 3.4vw, 34px);
+  border-bottom-color: var(--line);
+  background: linear-gradient(180deg, rgba(14, 17, 15, 0.98), rgba(10, 13, 11, 0.94));
+}
+
+.studio-header__identity p {
+  font-size: 0;
+  line-height: 1;
+}
+
+.studio-header__identity p::after {
+  color: var(--amber-300);
+  content: "ROUTEGO";
+  font-family: var(--font-body);
+  font-size: clamp(1.35rem, 3vw, 1.82rem);
+  font-weight: 850;
+  letter-spacing: -0.065em;
+}
+
+.studio-header__identity span,
+.local-chip,
+.provider-switch__label {
+  display: none;
+}
+
+.studio-header__controls {
+  min-width: 0;
+  gap: 8px;
+}
+
+.provider-switch {
+  min-width: 0;
+  max-width: min(56vw, 520px);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.provider-switch select {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-small);
+  color: var(--paper-100);
+  background: rgba(255, 255, 255, 0.025);
+  font-weight: 700;
+}
+
+.provider-switch__model {
+  grid-column: 1;
+  max-width: 100%;
+  color: var(--paper-500);
+}
+
+.provider-switch__settings {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  min-height: 40px;
+  padding: 0 11px;
+  border-radius: var(--radius-small);
+  font-weight: 700;
+}
+
+.language-toggle {
+  min-height: 40px;
+  gap: 0;
+  padding: 4px;
+  border-radius: var(--radius-small);
+}
+
+.language-toggle span {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--amber-300);
+}
+
+.language-toggle > :not(span) {
+  display: none;
+}
+
+.studio-nav {
+  position: fixed;
+  z-index: 30;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  height: 82px;
+  border-top: 1px solid var(--line-strong);
+  border-right: 0;
+  background: linear-gradient(180deg, rgba(18, 22, 19, 0.96), rgba(8, 10, 9, 0.99));
+  box-shadow: 0 -12px 34px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(18px);
+}
+
+.studio-nav__brand,
+.studio-nav__local {
+  display: none;
+}
+
+.studio-nav__routes {
+  display: grid;
+  height: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0;
+}
+
+.studio-nav__item {
+  min-height: 82px;
+  padding: 9px 6px 8px;
+  border-top: 3px solid transparent;
+  border-left: 0;
+  gap: 5px;
+}
+
+.studio-nav__item::before {
+  color: var(--paper-500);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.studio-nav__item:nth-child(1)::before { content: "▦"; }
+.studio-nav__item:nth-child(2)::before { content: "▧"; }
+.studio-nav__item:nth-child(3)::before { content: "⚙"; }
+
+.studio-nav__item[aria-current="page"] {
+  border-top-color: var(--amber-300);
+  border-left: 0;
+  color: var(--amber-300);
+  background: linear-gradient(180deg, rgba(184, 245, 44, 0.13), transparent 82%);
+}
+
+.studio-nav__item[aria-current="page"]::after { display: none; }
+.studio-nav__item[aria-current="page"]::before { color: var(--amber-300); }
+.studio-nav__index { display: none; }
+.studio-nav__label { font-size: 0.78rem; font-weight: 750; writing-mode: horizontal-tb; }
+
+.studio-workspace { grid-row: 2; }
+.studio-workspace__primary { width: min(100%, 1180px); margin: 0 auto; padding: clamp(22px, 3.4vw, 42px) clamp(14px, 3vw, 30px) 38px; }
+.studio-footer { display: none; }
+
+.notice-stack {
+  top: calc(var(--header-height) + 12px);
+  right: 12px;
+  width: min(390px, calc(100vw - 24px));
+}
+
+@media (max-width: 620px) {
+  .studio-header { padding: 0 12px; }
+  .studio-header__identity p::after { font-size: 1.28rem; }
+  .provider-switch { max-width: 48vw; }
+  .provider-switch__settings { display: none; }
+  .provider-switch { grid-template-columns: minmax(0, 1fr); }
+  .provider-switch__model { display: none; }
+  .language-toggle { display: none; }
+}

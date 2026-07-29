@@ -300,7 +300,7 @@ function StudioWorkspace({
 
   return (
     <div
-      className={`studio-shell${firstRunSetupVisible ? " studio-shell--setup" : ""}`}
+      className={`studio-shell studio-shell--sidebar${firstRunSetupVisible ? " studio-shell--setup" : ""}`}
       data-language={language}
     >
       <a className="skip-link" href="#studio-workspace">
