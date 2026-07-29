@@ -10,6 +10,7 @@ import { StudioGatewayError, type StudioGateway } from "../api";
 import { AppNavigation, AsyncStatePanel, NoticeStack } from "../components";
 import { LibraryWorkspace } from "../features/library";
 import { GenerationDefaultsPanel, SettingsWorkspace } from "../features/settings";
+import { mergeStudioProviderSwitch } from "../features/settings/state";
 import { I18nProvider, useI18n, type MessageKey } from "../i18n";
 import "../styles/index.css";
 import {
@@ -71,14 +72,6 @@ function noticesFor(service: RoutegoStatusResult, settings: ReadSettingsResult):
       tone: "degraded",
       title: "notice.degradedTitle",
       body: "notice.degradedBody"
-    });
-  } else {
-    notices.push({
-      id: "service-ready",
-      tone: "success",
-      title: "notice.readyTitle",
-      body: "notice.readyBody",
-      dismissible: true
     });
   }
   if (settings.profiles.length === 0) {
@@ -198,68 +191,22 @@ function RouteOverview({ route }: { readonly route: StudioRoute }) {
   );
 }
 
-function StatusLedger({
-  service,
-  settings
-}: {
-  readonly service: RoutegoStatusResult;
-  readonly settings: ReadSettingsResult;
-}) {
-  const { t } = useI18n();
-  const isDegraded = service.service.status === "degraded";
-  return (
-    <aside className="status-ledger" aria-labelledby="status-ledger-title">
-      <div className="status-ledger__heading">
-        <p>SYS / 01</p>
-        <h2 id="status-ledger-title">{t("status.title")}</h2>
-      </div>
-      <dl>
-        <div>
-          <dt>{t("status.service")}</dt>
-          <dd className={isDegraded ? "is-degraded" : "is-ready"}>
-            <span aria-hidden="true" />
-            {isDegraded ? t("app.degraded") : t("app.ready")}
-          </dd>
-        </div>
-        <div>
-          <dt>{t("status.provider")}</dt>
-          <dd>{settings.activeProviderId ?? service.providerId ?? t("status.unconfigured")}</dd>
-        </div>
-        <div>
-          <dt>{t("app.profiles")}</dt>
-          <dd>
-            {settings.profiles.length} {t("app.profilesUnit")}
-          </dd>
-        </div>
-        <div>
-          <dt>{t("status.security")}</dt>
-          <dd>{t("status.protected")}</dd>
-        </div>
-        <div>
-          <dt>{t("app.session")}</dt>
-          <dd>{t("app.memoryOnly")}</dd>
-        </div>
-      </dl>
-      <div className="status-ledger__scale" aria-hidden="true">
-        {Array.from({ length: 18 }, (_, index) => (
-          <i key={index} />
-        ))}
-      </div>
-    </aside>
-  );
-}
-
 export function HeaderProviderSelector({
   settings,
+  gateway,
+  onSettingsChange,
   onOpenSettings
 }: {
   readonly settings: ReadSettingsResult;
+  readonly gateway: StudioGateway;
+  readonly onSettingsChange: (settings: ReadSettingsResult) => void;
   readonly onOpenSettings: () => void;
 }) {
   const { language, t } = useI18n();
   const activeProvider = settings.profiles.find(
     (profile) => profile.id === settings.activeProviderId && profile.isActive
   );
+  const [switching, setSwitching] = useState(false);
   const copy =
     language === "zh"
       ? {
@@ -276,9 +223,25 @@ export function HeaderProviderSelector({
   return (
     <div className="provider-switch">
       <span className="provider-switch__label">{copy.label}</span>
-      <span className="provider-switch__model">
-        {activeProvider?.name ?? t("status.unconfigured")} / {settings.defaults.model ?? activeProvider?.defaultModel ?? copy.noModel}
-      </span>
+      <select
+        aria-label={copy.label}
+        value={settings.activeProviderId ?? ""}
+        disabled={switching || settings.profiles.length === 0}
+        onChange={(event) => {
+          const profileId = event.target.value;
+          if (profileId === "" || profileId === settings.activeProviderId) return;
+          setSwitching(true);
+          void gateway.invoke("studioProviderSwitch", {
+            profileId,
+            ...(settings.defaults.model === undefined ? {} : { preferredModel: settings.defaults.model })
+          }).then((result) => {
+            if (result.status === "succeeded") onSettingsChange(mergeStudioProviderSwitch(settings, result));
+          }).finally(() => setSwitching(false));
+        }}
+      >
+        {settings.profiles.length === 0 ? <option value="">{t("status.unconfigured")}</option> : settings.profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}
+      </select>
+      <span className="provider-switch__model">{switching ? "…" : settings.defaults.model ?? activeProvider?.defaultModel ?? copy.noModel}</span>
       <button className="provider-switch__settings" type="button" onClick={onOpenSettings}>{copy.settings}</button>
     </div>
   );
@@ -358,6 +321,8 @@ function StudioWorkspace({
           </span>
           <HeaderProviderSelector
             settings={settings}
+            gateway={gateway}
+            onSettingsChange={onSettingsChange}
             onOpenSettings={() => dispatch({ type: "navigate", route: "settings" })}
           />
           <button
@@ -392,7 +357,6 @@ function StudioWorkspace({
             </div>
           )}
         </section>
-        {firstRunSetupVisible ? null : <StatusLedger service={service} settings={settings} />}
       </main>
       <footer className="studio-footer">
         <span>ROUTEGO IMAGE / LOCAL PRODUCTION SURFACE</span>

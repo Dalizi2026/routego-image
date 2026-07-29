@@ -277,7 +277,10 @@ describe("frozen public and Studio dispatch", () => {
     }));
     expect(generated.status).toBe(200);
     expect(generate).toHaveBeenCalledTimes(1);
-    expect(generate.mock.calls[0]?.[0]).toMatchObject({ prompt: "中文 HTTP prompt", count: 1 });
+    expect(generate.mock.calls[0]?.[0]).toMatchObject({ prompt: "中文 HTTP prompt" });
+    expect(generate.mock.calls[0]?.[0]).not.toHaveProperty("size");
+    expect(generate.mock.calls[0]?.[0]).not.toHaveProperty("aspectRatio");
+    expect(generate.mock.calls[0]?.[0]).not.toHaveProperty("count");
     expect(JSON.stringify(responseJson(generated))).toContain("data:image/png;base64,iVBORw0KGgo=");
 
     const folders = await dispatcher.dispatch(runtimeRequest(

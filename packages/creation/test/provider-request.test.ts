@@ -30,7 +30,9 @@ const ENDPOINTS: ProviderEndpointSet = {
 };
 
 let fixtureDirectory = "";
+let targetPng = "";
 let referencePng = "";
+let secondReferencePng = "";
 let invalidPng = "";
 
 function uint32Be(value: number): Buffer {
@@ -63,10 +65,14 @@ function syntheticPng(width: number, height: number): Buffer {
 
 beforeAll(async () => {
   fixtureDirectory = await mkdtemp(join(tmpdir(), "routego-creation-provider-"));
+  targetPng = join(fixtureDirectory, "target.png");
   referencePng = join(fixtureDirectory, "reference.png");
+  secondReferencePng = join(fixtureDirectory, "reference-two.png");
   invalidPng = join(fixtureDirectory, "invalid.png");
   await Promise.all([
+    writeFile(targetPng, syntheticPng(5, 4)),
     writeFile(referencePng, syntheticPng(4, 3)),
+    writeFile(secondReferencePng, syntheticPng(6, 3)),
     writeFile(invalidPng, Buffer.from("not-an-image", "utf8"))
   ]);
 });
@@ -142,7 +148,7 @@ function tierCapabilities(
   return names.map((name) => capability(name, { endpoint, transport, requestShape }));
 }
 
-describe("generation-only provider request preparation", () => {
+describe("provider request preparation", () => {
   it("detects bounded PNG metadata", () => {
     expect(detectImageMetadata(syntheticPng(4, 3))).toEqual({
       mimeType: "image/png",
@@ -248,9 +254,9 @@ describe("generation-only provider request preparation", () => {
     expect(value.submission.body).not.toHaveProperty("previous_response_id");
   });
 
-  it("rejects removed edit, target, mask, and continuation fields before input preparation", async () => {
+  it("rejects missing edit fields, masks, and continuation fields before input preparation", async () => {
     for (const staleRequest of [
-      { kind: "edit", prompt: "Removed edit" },
+      { kind: "edit", prompt: "Missing edit target and invariants" },
       { kind: "generate", prompt: "Removed target", targetImage: { path: join(fixtureDirectory, "missing.png") } },
       { kind: "generate", prompt: "Removed mask", maskPath: join(fixtureDirectory, "missing.png") },
       { kind: "generate", prompt: "Removed continuation", previousResponseId: "response-previous" }
@@ -293,5 +299,119 @@ describe("generation-only provider request preparation", () => {
     expect(description).toContain("?[REDACTED]");
     expect(description).toContain("[REDACTED_IMAGE_DATA]");
     expect(description).not.toContain(referencePng);
+  });
+
+  it("serializes a direct single-image edit to the configured generation endpoint as target JSON", async () => {
+    const value = prepared(await prepareProviderRequest(
+      context([], { allowUnverifiedDirectEdit: true }),
+      {
+        kind: "edit",
+        prompt: "Change only the clothing",
+        targetImage: { path: targetPng },
+        invariants: { preserve: ["identity"] }
+      }
+    ));
+
+    expect(value.route).toMatchObject({
+      tier: "A",
+      endpoint: GENERATION_ENDPOINT,
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+      effectiveKind: "edit"
+    });
+    expect(value.inputs.images).toMatchObject([{
+      kind: "target",
+      slot: 0,
+      sourceIndex: 0,
+      role: "target"
+    }]);
+    if (value.submission.bodyType !== "json") throw new Error("Expected JSON");
+    expect(value.submission.body).toMatchObject({
+      model: "gpt-image-2",
+      prompt: [
+        "Change only the clothing",
+        "",
+        "Editing constraints:",
+        "Preserve exactly:",
+        "- identity"
+      ].join("\n"),
+      image: `data:image/png;base64,${syntheticPng(5, 4).toString("base64")}`
+    });
+    expect(value.submission.body).not.toHaveProperty("images");
+  });
+
+  it("serializes an edit target first and preserves ordered references for the legacy JSON adapter", async () => {
+    const value = prepared(await prepareProviderRequest(
+      context([], { allowUnverifiedDirectEdit: true }),
+      {
+        kind: "edit",
+        prompt: "Use the references only for styling",
+        targetImage: { path: targetPng },
+        references: [
+          { path: referencePng, role: "style" },
+          { path: secondReferencePng, role: "composition" }
+        ],
+        invariants: { preserve: ["identity", "pose"] }
+      }
+    ));
+
+    expect(value.route.requestShape).toBe(PROVIDER_REQUEST_SHAPES.singleEndpointImages);
+    expect(value.inputs.images.map((image) => [image.kind, image.role, image.slot])).toEqual([
+      ["target", "target", 0],
+      ["reference", "style", 1],
+      ["reference", "composition", 2]
+    ]);
+    if (value.submission.bodyType !== "json") throw new Error("Expected JSON");
+    expect(value.submission.body["images"]).toEqual([
+      `data:image/png;base64,${syntheticPng(5, 4).toString("base64")}`,
+      `data:image/png;base64,${syntheticPng(4, 3).toString("base64")}`,
+      `data:image/png;base64,${syntheticPng(6, 3).toString("base64")}`
+    ]);
+    expect(value.submission.body).not.toHaveProperty("image");
+  });
+
+  it("uses the explicit Images Edits endpoint with multipart target and ordered image[] references", async () => {
+    const editsEndpoint = "https://relay.example/custom/edits";
+    const value = prepared(await prepareProviderRequest(
+      context([], {
+        endpoints: { ...ENDPOINTS, edits: editsEndpoint },
+        preferredTransports: ["openai-images"],
+        allowUnverifiedDirectEdit: true
+      }),
+      {
+        kind: "edit",
+        prompt: "Change the wardrobe only",
+        targetImage: { path: targetPng },
+        references: [
+          { path: referencePng, role: "style" },
+          { path: secondReferencePng, role: "subject" }
+        ],
+        invariants: { preserve: ["identity"] }
+      }
+    ));
+
+    expect(value.route).toMatchObject({
+      tier: "B",
+      endpoint: editsEndpoint,
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
+    });
+    expect(value.submission.bodyType).toBe("multipart");
+    if (value.submission.bodyType !== "multipart") throw new Error("Expected multipart");
+    expect(value.submission.headers).toEqual({});
+    const entries = Array.from(value.submission.body.entries());
+    expect(entries.map(([name]) => name)).toEqual(["model", "prompt", "image", "image[]", "image[]"]);
+    expect(entries[1]?.[1]).toBe([
+      "Change the wardrobe only",
+      "",
+      "Editing constraints:",
+      "Preserve exactly:",
+      "- identity"
+    ].join("\n"));
+    const files = entries.slice(2).map(([, item]) => item);
+    expect(files.every((item) => item instanceof Blob)).toBe(true);
+    expect(await Promise.all(files.map(async (item) => Buffer.from(await (item as Blob).arrayBuffer())))).toEqual([
+      syntheticPng(5, 4),
+      syntheticPng(4, 3),
+      syntheticPng(6, 3)
+    ]);
   });
 });

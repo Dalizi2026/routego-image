@@ -5,6 +5,7 @@ import path from "node:path";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 
 import {
+  imageOperationResultSchema,
   studioGenerateInputSchema,
   studioProviderSwitchResultSchema,
   routegoPrepareRegenerationResultSchema,
@@ -299,7 +300,7 @@ async function createHarness(options: {
 }
 
 describe("task 4.2 protected upload and resource routes", () => {
-  it("maps only the read-only regeneration route and rejects the removed edit route", async () => {
+  it("maps direct editing alongside the read-only regeneration route", async () => {
     const prepareRegeneration = vi.fn(async () => routegoPrepareRegenerationResultSchema.parse({
       schemaVersion: 1,
       recipe: {
@@ -321,8 +322,23 @@ describe("task 4.2 protected upload and resource routes", () => {
       providerRequestCount: 0,
       markUnchanged: true
     }));
+    const edit = vi.fn(async (input: unknown) => {
+      const request = input as { kind: string };
+      return imageOperationResultSchema.parse({
+        schemaVersion: 1,
+        requestId: "route-edit-1",
+        status: "succeeded",
+        requestedParams: request,
+        effectiveParams: request,
+        execution: { attemptCount: 1, providerRequestCount: 1, receivedAnyOutput: true, mayHaveBilled: true, degradedContinuation: false, providerImageIds: [] },
+        finalArtifacts: [{ id: "route-edit-output", slot: 0, phase: "final", mimeType: "image/png", display: { type: "image", dataUrl: "data:image/png;base64,iVBORw0KGgo=" }, createdAt: "2026-07-19T08:00:00.000Z" }],
+        partialArtifacts: [],
+        failedSlots: [],
+        relationships: [{ inputRole: "output", outputArtifactId: "route-edit-output", order: 0 }]
+      });
+    });
     const dispatcher = createRoutegoHttpDispatcher({
-      service: new Proxy({ prepareRegeneration }, {
+      service: new Proxy({ prepareRegeneration, edit }, {
         get(target, property) {
           if (property in target) return target[property as keyof typeof target];
           return async () => { throw new Error(`Unexpected public service call: ${String(property)}`); };
@@ -337,8 +353,17 @@ describe("task 4.2 protected upload and resource routes", () => {
     expect(json(prepared)).toMatchObject({ providerRequestCount: 0, markUnchanged: true });
     expect(prepareRegeneration).toHaveBeenCalledWith({ schemaVersion: 1, recordId: "record-1" });
 
-    const removed = await dispatcher.dispatch(jsonRequest("/api/v1/edit", { kind: "edit" }));
-    expect(removed.status).toBe(404);
+    const edited = await dispatcher.dispatch(jsonRequest("/api/v1/edit", {
+      kind: "edit",
+      prompt: "Change the clothing only",
+      targetImage: { path: "/tmp/target.png" },
+      invariants: { preserve: ["identity"] }
+    }));
+    expect(edited.status).toBe(200);
+    expect(edit).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "edit",
+      targetImage: { path: "/tmp/target.png" }
+    }));
     expect(prepareRegeneration).toHaveBeenCalledTimes(1);
   });
 
@@ -900,7 +925,7 @@ describe("Task 4.3 browser-safe Library routes", () => {
     expect(JSON.stringify(json(copied))).not.toMatch(/path|Authorization|data:image|base64/u);
   });
 
-  it("rejects invalid, cross-origin, oversized, and removed routes before Library work", async () => {
+  it("rejects invalid, cross-origin, oversized, and forbidden routes before Library work", async () => {
     const created = await createHarness();
     const preflight = vi.spyOn(created.library, "preflightLibraryMutation");
     const execute = vi.spyOn(created.library, "executeLibraryMutation");
@@ -929,8 +954,13 @@ describe("Task 4.3 browser-safe Library routes", () => {
     }));
     expect(crossOrigin.status).toBe(403);
 
+    const invalidEdit = await runtime.dispatch(jsonRequest("/api/v1/edit", {
+      kind: "edit",
+      prompt: "Missing target and invariants"
+    }));
+    expect(invalidEdit.status).toBe(400);
+
     for (const pathname of [
-      "/api/v1/edit",
       "/api/v1/library/trash",
       "/api/v1/library/delete",
       "/api/v1/library/restore",

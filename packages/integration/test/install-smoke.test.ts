@@ -22,6 +22,7 @@ import { INSTALLED_PACKAGE_ARGUMENT_PREFIX, cleanupOwnedTemporaryRoot, runPlugin
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
 const EXPECTED_TOOLS = [
   "routego_batch",
+  "routego_edit",
   "routego_generate",
   "routego_manage_library",
   "routego_open_studio",
@@ -124,7 +125,7 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
         pluginDiscovered: true,
         pluginVersion: "1.0.0"
       },
-      skill: { bilingual: true, exactPublicToolCount: 7 },
+      skill: { bilingual: true, exactPublicToolCount: 8 },
       mcp: {
         tools: EXPECTED_TOOLS,
         publicArtifactPhases: ["partial", "final"],

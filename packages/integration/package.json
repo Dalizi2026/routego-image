@@ -11,7 +11,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "test:package": "vitest run --config vitest.config.ts test/package.test.ts",
@@ -23,6 +25,7 @@
     "@routego-image/creation": "workspace:*",
     "@routego-image/foundation": "workspace:*",
     "@routego-image/library": "workspace:*",
+    "jpeg-js": "0.4.4",
     "pngjs": "7.0.0"
   },
   "devDependencies": {

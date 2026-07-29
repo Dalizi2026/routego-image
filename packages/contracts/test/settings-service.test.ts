@@ -426,10 +426,11 @@ describe("browser-safe Header provider switch contracts", () => {
 });
 
 describe("separate Studio operation registry", () => {
-  it("keeps the seven public operations and MCP tool names frozen", () => {
+  it("keeps the eight public operations and MCP tool names frozen", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
+      "edit",
       "prepareRegeneration",
       "batch",
       "searchLibrary",
@@ -439,6 +440,7 @@ describe("separate Studio operation registry", () => {
     expect(Object.values(routegoOperationDefinitions).map((item) => item.toolName)).toEqual([
       "routego_status",
       "routego_generate",
+      "routego_edit",
       "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
@@ -518,7 +520,7 @@ describe("separate Studio operation registry", () => {
       outputSchema: studioProviderSwitchResultSchema
     });
     expect(studioOperationNames).toContain("studioProviderSwitch");
-    expect(routegoOperationNames).toHaveLength(7);
+    expect(routegoOperationNames).toHaveLength(8);
     expect(routegoOperationNames).not.toContain("studioProviderSwitch" as never);
   });
 });

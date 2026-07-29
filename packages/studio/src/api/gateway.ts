@@ -6,7 +6,9 @@ import {
   uploadResourceDescriptorSchema,
   type BrowserResourceDescriptor,
   type LocalRoutegoService,
+  routegoManageLibraryResultSchema,
   type RoutegoManageLibraryInput,
+  type RoutegoManageLibraryResult,
   type StudioGenerateInput,
   type StudioImageOperationEvent,
   type StudioOperation,
@@ -29,7 +31,16 @@ import {
 
 export type StudioManageLibraryInput = Extract<
   RoutegoManageLibraryInput,
-  { readonly action: "create-folder" | "rename-folder" }
+  {
+    readonly action:
+      | "create-folder"
+      | "rename-folder"
+      | "list-locations"
+      | "add-location"
+      | "move-assets"
+      | "delete-assets"
+      | "rename-asset";
+  }
 >;
 
 export type StudioGatewayOperation = "status" | "manageLibrary" | StudioOperation;
@@ -50,6 +61,7 @@ export interface StudioGateway {
     input: StudioGatewayInput<Operation>
   ): Promise<StudioGatewayOutput<Operation>>;
   uploadBinary(resource: UploadResourceDescriptor, body: Blob): Promise<void>;
+  selectLibraryDirectory(): Promise<{ readonly selected: boolean; readonly result?: RoutegoManageLibraryResult }>;
   fetchProtectedBlob(resource: BrowserResourceDescriptor): Promise<Blob>;
   fetchProtectedObjectUrl(
     resource: BrowserResourceDescriptor,
@@ -96,7 +108,15 @@ function operationDefinition(operation: StudioGatewayOperation): OperationDefini
 function isAllowedManageLibraryInput(value: unknown): value is StudioManageLibraryInput {
   if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
   const action = (value as { readonly action?: unknown }).action;
-  return action === "create-folder" || action === "rename-folder";
+  return [
+    "create-folder",
+    "rename-folder",
+    "list-locations",
+    "add-location",
+    "move-assets",
+    "delete-assets",
+    "rename-asset"
+  ].includes(action as string);
 }
 
 function normalizeLoopbackBaseUrl(value: string | URL): URL {
@@ -188,7 +208,7 @@ export class HttpStudioGateway implements StudioGateway {
     if (operation === "manageLibrary" && !isAllowedManageLibraryInput(input)) {
       throw new StudioGatewayError(
         "invalid_input",
-        "Studio permits only folder creation and rename through the public Library bridge."
+        "Studio blocked a Library action that is not safe for the local browser bridge."
       );
     }
     const definition = operationDefinition(operation);
@@ -308,6 +328,43 @@ export class HttpStudioGateway implements StudioGateway {
         await safeHttpMessage(response),
         response.status
       );
+    }
+  }
+
+  async selectLibraryDirectory(): Promise<{ readonly selected: boolean; readonly result?: RoutegoManageLibraryResult }> {
+    const url = protectedUrl(this.#baseUrl, "/api/v1/library/select-directory");
+    let response: Response;
+    try {
+      response = await this.#fetch(url, {
+        method: "POST",
+        headers: this.#session.apply({ accept: "application/json", "content-type": "application/json" }),
+        body: "{}",
+        cache: "no-store",
+        credentials: "omit",
+        redirect: "error"
+      });
+    } catch {
+      throw new StudioGatewayError("network_error", "Studio could not reach the local Routego service.");
+    }
+    if (!response.ok) throw new StudioGatewayError("http_error", await safeHttpMessage(response), response.status);
+    if (normalizedContentType(response.headers.get("content-type")) !== "application/json") {
+      throw new StudioGatewayError("invalid_output", "The local service returned an invalid response type.");
+    }
+    try {
+      const value: unknown = await response.json();
+      if (value === null || typeof value !== "object" || Array.isArray(value)) throw new Error("invalid-picker-result");
+      const record = value as Record<string, unknown>;
+      if (record["schemaVersion"] !== 1 || typeof record["selected"] !== "boolean") throw new Error("invalid-picker-result");
+      if (!record["selected"]) {
+        if (Object.keys(record).length !== 2) throw new Error("invalid-picker-result");
+        return { selected: false };
+      }
+      if (Object.keys(record).length !== 3 || record["result"] === undefined) throw new Error("invalid-picker-result");
+      const result = routegoManageLibraryResultSchema.parse(record["result"]);
+      if (result.action !== "add-location") throw new Error("invalid-picker-result");
+      return { selected: true, result };
+    } catch {
+      throw new StudioGatewayError("invalid_output", "Studio rejected an invalid directory-picker response.");
     }
   }
 

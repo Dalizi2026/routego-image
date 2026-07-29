@@ -37,6 +37,7 @@ const DEFAULT_CODEX_ARGUMENTS = [
 ];
 const EXPECTED_TOOLS = [
   "routego_batch",
+  "routego_edit",
   "routego_generate",
   "routego_manage_library",
   "routego_open_studio",
@@ -781,7 +782,7 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
       .filter((name) => typeof name === "string")
       .sort((left, right) => left.localeCompare(right, "en"));
     if (JSON.stringify(tools) !== JSON.stringify(EXPECTED_TOOLS)) {
-      fail("the portable installed process did not expose the exact seven frozen MCP tools");
+      fail("the portable installed process did not expose the exact eight MCP tools");
     }
     const creationSchemas = listedTools
       .filter((tool) => ["routego_generate", "routego_batch"].includes(tool?.name))
@@ -822,7 +823,7 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
     );
     if (!/[A-Za-z]{4}/u.test(skillText) || !/\p{Script=Han}/u.test(skillText) ||
         !EXPECTED_TOOLS.every((name) => skillText.includes(`\`${name}\``))) {
-      fail("the installed Skill is not bilingual or does not name the exact seven tools");
+      fail("the installed Skill is not bilingual or does not name the exact eight tools");
     }
     return {
       artifact: {
@@ -934,7 +935,7 @@ async function runInsideOwnedRoot(options, root, verification) {
     }
     const tools = Object.keys(server.tools ?? {}).sort((left, right) => left.localeCompare(right, "en"));
     if (JSON.stringify(tools) !== JSON.stringify(EXPECTED_TOOLS)) {
-      fail("fresh Codex did not discover the exact seven frozen MCP tools");
+      fail("fresh Codex did not discover the exact eight MCP tools");
     }
     const creationSchemas = ["routego_generate", "routego_batch"]
       .map((name) => server.tools[name]?.outputSchema)
@@ -980,7 +981,7 @@ async function runInsideOwnedRoot(options, root, verification) {
     );
     if (!/[A-Za-z]{4}/u.test(skillText) || !/\p{Script=Han}/u.test(skillText) ||
         !EXPECTED_TOOLS.every((name) => skillText.includes(`\`${name}\``))) {
-      fail("the installed Skill is not bilingual or does not name the exact seven tools");
+      fail("the installed Skill is not bilingual or does not name the exact eight tools");
     }
 
     return {

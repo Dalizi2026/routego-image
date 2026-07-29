@@ -44,6 +44,15 @@ export function normalizeGenerationEndpoint(input: GenerationEndpointInput): str
   return endpoint.href;
 }
 
+export function deriveImagesEditsEndpoint(generationEndpoint: string): string {
+  const endpoint = new URL(generationEndpoint);
+  if (!endpoint.pathname.endsWith("/images/generations")) {
+    throw new Error("The normalized generation endpoint cannot derive an Images Edits endpoint.");
+  }
+  endpoint.pathname = endpoint.pathname.replace(/\/generations$/u, "/edits");
+  return endpoint.href;
+}
+
 export function normalizeProviderEndpoints(input: ProviderEndpointSet): NormalizedProviderEndpointSet {
   const parsed = providerEndpointSetSchema.parse(input);
   const normalized: NormalizedProviderEndpointSet = {

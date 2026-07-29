@@ -9,6 +9,7 @@ import {
   ProviderPreparationError,
   type ImageFileMetadata,
   type PrepareImageInputOptions,
+  type PreparedImageKind,
   type PreparedImageInput,
   type PreparedImageInputs,
   type SupportedImageMimeType
@@ -17,6 +18,7 @@ import {
 const PNG_SIGNATURE = Uint8Array.of(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a);
 const MAX_IMAGE_DIMENSION = 65_535;
 const MAX_GENERATION_REFERENCES = 5;
+const MAX_EDIT_INPUTS = MAX_GENERATION_REFERENCES + 1;
 
 function matches(bytes: Uint8Array, offset: number, expected: Uint8Array): boolean {
   if (offset + expected.length > bytes.length) {
@@ -384,18 +386,30 @@ export async function prepareImageInputs(
   const maxFileBytes = options.maxFileBytes ?? MAX_PROVIDER_INPUT_BYTES;
   const maxTotalBytes =
     options.maxTotalBytes ??
-    Math.min(MAX_PROVIDER_INPUTS, MAX_GENERATION_REFERENCES) * MAX_PROVIDER_INPUT_BYTES;
-  const descriptors = request.references.map((value, sourceIndex) => ({
-    kind: "reference" as const,
-    sourceIndex,
-    role: value.role,
-    value
-  }));
-  if (descriptors.length > MAX_GENERATION_REFERENCES) {
+    (request.kind === "edit" ? MAX_EDIT_INPUTS : MAX_GENERATION_REFERENCES) * MAX_PROVIDER_INPUT_BYTES;
+  const descriptors: Array<{
+    readonly kind: PreparedImageKind;
+    readonly sourceIndex: number;
+    readonly role: PreparedImageInput["role"];
+    readonly value: ImageOperationRequest["references"][number] | NonNullable<Extract<ImageOperationRequest, { kind: "edit" }>["targetImage"]>;
+  }> = [];
+  if (request.kind === "edit") {
+    descriptors.push({
+      kind: "target",
+      sourceIndex: 0,
+      role: "target",
+      value: request.targetImage
+    });
+  }
+  request.references.forEach((value, sourceIndex) => {
+    descriptors.push({ kind: "reference", sourceIndex, role: value.role, value });
+  });
+  const maximumInputs = request.kind === "edit" ? MAX_EDIT_INPUTS : MAX_GENERATION_REFERENCES;
+  if (descriptors.length > maximumInputs) {
     throw new ProviderPreparationError(
       "too-many-images",
-      "A generation request can contain at most five ordered reference images.",
-      { requested: descriptors.length, maximum: MAX_GENERATION_REFERENCES }
+      "This image operation contains too many ordered image inputs.",
+      { requested: descriptors.length, maximum: maximumInputs }
     );
   }
 

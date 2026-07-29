@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
-import { access, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 
 import {
   capabilityProbeInputSchema,
@@ -22,6 +22,7 @@ import {
   type StudioImageOperationRequest
 } from "@routego-image/contracts";
 import { createRoutegoLibraryService, type RoutegoLibraryService } from "@routego-image/library";
+import { decode as decodeJpeg } from "jpeg-js";
 import { PNG } from "pngjs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -104,6 +105,8 @@ describe("Task 4.2 batch snapshots", () => {
 const LOCAL_METHODS = [
   "status",
   "generate",
+  "edit",
+  "prepareRegeneration",
   "batch",
   "searchLibrary",
   "manageLibrary",
@@ -411,16 +414,17 @@ async function collectEvents(source: AsyncIterable<StudioImageOperationEvent>) {
 }
 
 describe("task 3.5 contract surface and recovery", () => {
-  it("implements the exact local method matrix while preserving seven public tools and phases", async () => {
+  it("implements the exact local method matrix while preserving eight public tools and phases", async () => {
     const { service } = await createHarness();
-    expect(LOCAL_METHODS).toHaveLength(27);
+    expect(LOCAL_METHODS).toHaveLength(29);
     for (const method of LOCAL_METHODS) expect(typeof service[method]).toBe("function");
     expect(routegoOperationNames).toEqual([
-      "status", "generate", "prepareRegeneration", "batch", "searchLibrary", "manageLibrary", "openStudio"
+      "status", "generate", "edit", "prepareRegeneration", "batch", "searchLibrary", "manageLibrary", "openStudio"
     ]);
     expect(Object.values(routegoOperationDefinitions).map((definition) => definition.toolName)).toEqual([
       "routego_status",
       "routego_generate",
+      "routego_edit",
       "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
@@ -630,6 +634,29 @@ describe("task 3.5 public composition", () => {
     expect(library.items).toHaveLength(0);
   });
 
+  it("converts a larger same-ratio provider PNG into the exact requested JPEG", async () => {
+    const { service } = await createHarness({
+      executeCreation: async (request, context) => {
+        const result = succeededResult(request, context.requestId);
+        const final = artifact(`${context.requestId}:jpeg-source`, "final", 0, 0x68, 125, 125);
+        return imageOperationResultSchema.parse({
+          ...result,
+          finalArtifacts: [final],
+          relationships: [{ inputRole: "output", outputArtifactId: final.id, order: 0 }]
+        });
+      }
+    });
+
+    const result = await service.generate(publicRequest({ size: "100x100", format: "jpeg" }));
+
+    expect(result).toMatchObject({
+      status: "succeeded",
+      finalArtifacts: [{ width: 100, height: 100, mimeType: "image/jpeg" }]
+    });
+    const bytes = await readFile(result.finalArtifacts[0]!.path!);
+    expect(decodeJpeg(bytes, { useTArray: true })).toMatchObject({ width: 100, height: 100 });
+  });
+
   it("rejects mismatched size, aspect ratio, and output count before saving", async () => {
     const { service } = await createHarness({
       executeCreation: async (request, context) => {
@@ -650,8 +677,64 @@ describe("task 3.5 public composition", () => {
     }));
     const library = await service.searchLibrary({});
 
-    expect(result).toMatchObject({ status: "failed", error: { code: "invalid_response" } });
+    expect(result).toMatchObject({
+      status: "failed",
+      error: {
+        code: "invalid_response",
+        details: {
+          mismatches: ["count", "aspectRatio"],
+          actualOutputs: [{ width: 3, height: 2, mimeType: "image/png" }],
+          observedExecution: { transport: "single-endpoint-json", providerRequestCount: 1 }
+        }
+      }
+    });
     expect(library.items).toHaveLength(0);
+  });
+
+  it("normalizes bounded provider PNG rounding to the exact requested dimensions before saving", async () => {
+    const { service } = await createHarness({
+      executeCreation: async (request, context) => {
+        const result = succeededResult(request, context.requestId);
+        const final = artifact(`${context.requestId}:rounded-final`, "final", 0, 0x58, 101, 99);
+        return imageOperationResultSchema.parse({
+          ...result,
+          finalArtifacts: [final],
+          relationships: [{ inputRole: "output", outputArtifactId: final.id, order: 0 }]
+        });
+      }
+    });
+
+    const result = await service.generate(publicRequest({ size: "100x100", format: "png" }));
+
+    expect(result).toMatchObject({
+      status: "succeeded",
+      finalArtifacts: [{ width: 100, height: 100, mimeType: "image/png" }]
+    });
+    const bytes = await readFile(result.finalArtifacts[0]!.path!);
+    expect(PNG.sync.read(bytes)).toMatchObject({ width: 100, height: 100 });
+  });
+
+  it("downscales a larger same-ratio provider PNG to the exact requested resolution", async () => {
+    const { service } = await createHarness({
+      executeCreation: async (request, context) => {
+        const result = succeededResult(request, context.requestId);
+        const final = artifact(`${context.requestId}:larger-final`, "final", 0, 0x5a, 125, 125);
+        return imageOperationResultSchema.parse({
+          ...result,
+          finalArtifacts: [final],
+          relationships: [{ inputRole: "output", outputArtifactId: final.id, order: 0 }]
+        });
+      }
+    });
+
+    const result = await service.generate(publicRequest({ size: "100x100", format: "png" }));
+
+    expect(result).toMatchObject({
+      status: "succeeded",
+      finalArtifacts: [{ width: 100, height: 100, mimeType: "image/png" }]
+    });
+    const bytes = await readFile(result.finalArtifacts[0]!.path!);
+    expect(PNG.sync.read(bytes)).toMatchObject({ width: 100, height: 100 });
   });
 
   it("rejects an unsaved request without an output directory before provider work", async () => {

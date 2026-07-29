@@ -138,6 +138,22 @@ describe("provider result download authorization", () => {
     ).toBe(false);
   });
 
+  it("allows an explicit cleartext result fallback without forwarding credentials", () => {
+    expect(
+      decideResultDownloadPolicy({
+        resourceUrl: "http://images.example/generated.png",
+        providerEndpoint: "https://relay.example/v1/images/generations",
+        explicitSameOriginAuthorization: true,
+        allowCleartextWithoutAuthorization: true
+      })
+    ).toEqual({
+      allowed: true,
+      forwardAuthorization: false,
+      revalidateTarget: true,
+      reason: "cleartext-result-without-authorization"
+    });
+  });
+
   it("revalidates every redirect and strips credentials when the origin changes", () => {
     expect(
       decideResultDownloadPolicy({

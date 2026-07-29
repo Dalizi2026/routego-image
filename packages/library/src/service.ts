@@ -95,6 +95,7 @@ import {
   type StableImageLocator
 } from "./gallery/resolver";
 import { GalleryService } from "./gallery/service";
+import { LibraryLocationStore } from "./gallery/locations";
 import { UploadStore, type UploadStoreOptions } from "./upload/store";
 import {
   LibraryPortabilityService,
@@ -284,6 +285,7 @@ export class RoutegoLibraryService implements LibraryApplicationService {
   readonly assetStore: LibraryAssetStore;
   readonly resourceRegistry: BrowserResourceRegistry;
   readonly galleryService: GalleryService;
+  readonly locationStore: LibraryLocationStore;
   readonly portabilityService: LibraryPortabilityService;
   readonly resourceResolver: LibraryResourceResolver;
 
@@ -340,6 +342,11 @@ export class RoutegoLibraryService implements LibraryApplicationService {
           ...options.mutations
         }
       });
+    this.locationStore = new LibraryLocationStore({
+      indexStore: this.indexStore,
+      assets: this.assetStore,
+      now: this.#now
+    });
     this.portabilityService =
       options.portabilityService ??
       new LibraryPortabilityService({
@@ -961,6 +968,56 @@ export class RoutegoLibraryService implements LibraryApplicationService {
 
   async manageLibrary(input: RoutegoManageLibraryInput): Promise<RoutegoManageLibraryResult> {
     const parsed = routegoManageLibraryInputSchema.parse(input);
+    if (parsed.action === "list-locations") {
+      return routegoManageLibraryResultSchema.parse({
+        schemaVersion: 1,
+        action: parsed.action,
+        affectedAssetIds: [],
+        affectedFolderIds: [],
+        locations: await this.locationStore.descriptors(),
+        warnings: []
+      });
+    }
+    if (parsed.action === "add-location") {
+      return routegoManageLibraryResultSchema.parse({
+        schemaVersion: 1,
+        action: parsed.action,
+        affectedAssetIds: [],
+        affectedFolderIds: [],
+        locations: await this.locationStore.add(parsed.locationPath, parsed.name),
+        warnings: []
+      });
+    }
+    if (parsed.action === "move-assets") {
+      const affectedAssetIds = await this.locationStore.move(parsed.assetIds, parsed.destinationLocationId);
+      return routegoManageLibraryResultSchema.parse({
+        schemaVersion: 1,
+        action: parsed.action,
+        affectedAssetIds,
+        affectedFolderIds: [],
+        warnings: []
+      });
+    }
+    if (parsed.action === "delete-assets") {
+      const affectedAssetIds = await this.locationStore.delete(parsed.assetIds);
+      return routegoManageLibraryResultSchema.parse({
+        schemaVersion: 1,
+        action: parsed.action,
+        affectedAssetIds,
+        affectedFolderIds: [],
+        warnings: affectedAssetIds.length === parsed.assetIds.length ? [] : ["Some selected assets could not be deleted safely."]
+      });
+    }
+    if (parsed.action === "rename-asset") {
+      await this.locationStore.rename(parsed.assetId, parsed.name);
+      return routegoManageLibraryResultSchema.parse({
+        schemaVersion: 1,
+        action: parsed.action,
+        affectedAssetIds: [parsed.assetId],
+        affectedFolderIds: [],
+        warnings: []
+      });
+    }
     if (parsed.action !== "export-zip" && parsed.action !== "import-zip") {
       return await this.galleryService.manageLibrary(parsed);
     }

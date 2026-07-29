@@ -370,7 +370,19 @@ function replaceCreationPaths(
     ...reference,
     path: reference.id === undefined ? reference.path : pathByArtifact.get(reference.id) ?? reference.path
   }));
-  return imageOperationRequestSchema.parse({ ...request, references });
+  if (request.kind !== "edit") {
+    return imageOperationRequestSchema.parse({ ...request, references });
+  }
+  return imageOperationRequestSchema.parse({
+    ...request,
+    targetImage: {
+      ...request.targetImage,
+      path: request.targetImage.id === undefined
+        ? request.targetImage.path
+        : pathByArtifact.get(request.targetImage.id) ?? request.targetImage.path
+    },
+    references
+  });
 }
 
 function stagedSourceName(item: DurableInputGraphItem): string {
@@ -456,12 +468,12 @@ function outputIssue(safeMessage: string): ResultIssue {
   };
 }
 
-function persistenceIssue(safeMessage: string): ResultIssue {
+function persistenceIssue(error: unknown, fallbackMessage: string): ResultIssue {
   return {
     code: "file_write_failed",
     category: "persistence",
     stage: "persist",
-    safeMessage
+    safeMessage: error instanceof LibraryError ? error.message : fallbackMessage
   };
 }
 
@@ -581,10 +593,20 @@ function operationParameters(
       role: item.referenceRole ?? "reference",
       ...(item.label === undefined ? {} : { label: item.label })
     }));
+  const target = ordered.find((item) => item.role === "target");
   return libraryOperationParametersSchema.parse({
     kind: request.kind,
     prompt: request.prompt,
     references,
+    ...(request.kind !== "edit"
+      ? {}
+      : {
+          target: {
+            assetId: target?.relatedAssetId,
+            ...(request.targetImage.label === undefined ? {} : { label: request.targetImage.label })
+          },
+          invariants: request.invariants
+        }),
     size: request.size,
     aspectRatio: request.aspectRatio,
     quality: request.quality,
@@ -667,7 +689,7 @@ function validateGraphRequest(
         relationship.artifactId !== item.artifactId ||
         relationship.order !== item.order ||
         (item.origin === "upload") !== (item.sourceRendition !== undefined) ||
-        item.role !== "reference" ||
+        (item.role !== "target" && item.role !== "reference") ||
         item.targetSlot !== undefined
       );
     })
@@ -700,7 +722,7 @@ function validateGraphRequest(
       "The prepared source rendition graph is incomplete or inconsistent."
     );
   }
-  const expectedCount = request.references.length;
+  const expectedCount = request.references.length + (request.kind === "edit" ? 1 : 0);
   if (graph.inputs.length !== expectedCount) {
     throw new ResultCompositionError(
       "relationship-invalid",
@@ -710,7 +732,22 @@ function validateGraphRequest(
   for (const item of graph.inputs) {
     let id: string | undefined;
     let inputPath: string | undefined;
-    if (item.key.startsWith("reference:")) {
+    if (item.key === "target" && request.kind === "edit") {
+      if (item.role !== "target" || item.order !== 0) {
+        throw new ResultCompositionError(
+          "relationship-invalid",
+          "The edit target must be the first prepared physical input."
+        );
+      }
+      id = request.targetImage.id;
+      inputPath = request.targetImage.path;
+    } else if (item.key.startsWith("reference:")) {
+      if (item.role !== "reference") {
+        throw new ResultCompositionError(
+          "relationship-invalid",
+          "The prepared reference relationship has an invalid role."
+        );
+      }
       const reference = request.references[
         Number.parseInt(item.key.slice("reference:".length), 10)
       ];
@@ -1004,9 +1041,9 @@ export async function finalizeStudioOperationResult(
           input.idFactory,
           now
         );
-      } catch {
+      } catch (error) {
         context.issues.push(
-          persistenceIssue("The operation output could not be committed to the Library atomically.")
+          persistenceIssue(error, "The operation output could not be committed to the Library atomically.")
         );
       }
     }
@@ -1026,6 +1063,7 @@ export async function finalizeStudioOperationResult(
           } catch {
             context.issues.push(
               persistenceIssue(
+                undefined,
                 "A saved output could not use its durable descriptor and was projected ephemerally."
               )
             );
@@ -1040,7 +1078,7 @@ export async function finalizeStudioOperationResult(
         projected.push(artifact);
       } catch {
         context.issues.push(
-          persistenceIssue("A validated output could not be projected as a protected Studio resource.")
+          persistenceIssue(undefined, "A validated output could not be projected as a protected Studio resource.")
         );
       }
     }
@@ -1249,9 +1287,9 @@ export async function finalizePublicOperationResult(
           input.idFactory,
           now
         );
-      } catch {
+      } catch (error) {
         context.issues.push(
-          persistenceIssue("The operation output could not be committed to the Library atomically.")
+          persistenceIssue(error, "The operation output could not be committed to the Library atomically.")
         );
       }
     }
@@ -1262,9 +1300,9 @@ export async function finalizePublicOperationResult(
         approvedDirectory = await verifyApprovedDirectory(
           input.outputDestination.approvedDirectory
         );
-      } catch {
+      } catch (error) {
         context.issues.push(
-          persistenceIssue("The approved public output directory became unavailable.")
+          persistenceIssue(error, "The approved public output directory became unavailable.")
         );
       }
     }
@@ -1293,9 +1331,9 @@ export async function finalizePublicOperationResult(
             context.result.requestId
           );
         }
-      } catch {
+      } catch (error) {
         context.issues.push(
-          persistenceIssue("A validated output could not be placed at its approved public path.")
+          persistenceIssue(error, "A validated output could not be placed at its approved public path.")
         );
       }
       try {

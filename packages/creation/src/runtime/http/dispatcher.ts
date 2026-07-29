@@ -297,6 +297,10 @@ async function callService(
   return (method as (this: unknown, value: unknown) => Promise<unknown>).call(target, input);
 }
 
+function preservesOmittedPublicControls(route: RuntimeRoute): boolean {
+  return route.scope === "public" && (route.operation === "generate" || route.operation === "batch");
+}
+
 export function createRoutegoHttpDispatcher(options: RoutegoHttpRuntimeOptions): RoutegoHttpDispatcher {
   const maximumJsonBodyBytes = options.maximumJsonBodyBytes ?? DEFAULT_MAXIMUM_JSON_BODY_BYTES;
   const maximumQueryBytes = options.maximumQueryBytes ?? DEFAULT_MAXIMUM_QUERY_BYTES;
@@ -421,7 +425,11 @@ export function createRoutegoHttpDispatcher(options: RoutegoHttpRuntimeOptions):
             safeIssues(parsedInput.error)
           );
         }
-        const output = await callService(route, options.service, options.localService, parsedInput.data);
+        // The schema above validates the request. Generation and batch requests
+        // still need their raw shape so the service can distinguish a caller's
+        // explicit "auto" from a field omitted to use saved Studio defaults.
+        const serviceInput = preservesOmittedPublicControls(route) ? rawInput : parsedInput.data;
+        const output = await callService(route, options.service, options.localService, serviceInput);
         const parsedOutput = route.outputSchema.safeParse(output);
         if (!parsedOutput.success) {
           await diagnose({ code: "internal_contract", operation: route.operation, issues: parsedOutput.error.issues });

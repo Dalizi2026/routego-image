@@ -94,6 +94,21 @@ function portableParameters(parameters: LibraryOperationParameters): LibraryOper
   return {
     ...parameters,
     prompt: redactPortableText(parameters.prompt),
+    ...(parameters.kind !== "edit"
+      ? {}
+      : {
+          target: {
+            ...parameters.target,
+            ...(parameters.target.label === undefined
+              ? {}
+              : { label: redactPortableText(parameters.target.label) })
+          },
+          invariants: {
+            allowedChanges: parameters.invariants.allowedChanges.map(redactPortableText),
+            preserve: parameters.invariants.preserve.map(redactPortableText),
+            forbiddenChanges: parameters.invariants.forbiddenChanges.map(redactPortableText)
+          }
+        }),
     references: parameters.references.map((reference) => ({
       ...reference,
       ...(reference.label === undefined
@@ -193,7 +208,10 @@ function parsePortableBlob(value: unknown): PortableImageBlob {
 }
 
 function parameterAssetIds(parameters: LibraryOperationParameters): readonly string[] {
-  return parameters.references.map((item) => item.assetId);
+  return [
+    ...parameters.references.map((item) => item.assetId),
+    ...(parameters.kind === "edit" ? [parameters.target.assetId] : [])
+  ];
 }
 
 export function portableAssetDependencyIds(asset: StoredLibraryAsset): ReadonlySet<string> {

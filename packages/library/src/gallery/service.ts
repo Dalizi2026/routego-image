@@ -145,11 +145,16 @@ export class GalleryService
         "ZIP portability is not available in the current Library implementation."
       );
     }
+    if (
+      parsed.action !== "assign-folders" &&
+      parsed.action !== "remove-folders"
+    ) {
+      throw new LibraryError("invalid_request", "This Library action is handled by the local Library service.");
+    }
     const assetIds = [...new Set(parsed.assetIds)];
     const action = String(parsed.action);
     const mutation:
       | Extract<LibraryMutationRequest, { readonly action: "assign-folders" | "remove-folders" }>
-      | Extract<LibraryMutationRequest, { readonly action: "mark" }>
       | undefined =
       action === "assign-folders" || action === "remove-folders"
         ? {
@@ -157,9 +162,7 @@ export class GalleryService
             assetIds,
             folderIds: [...new Set((parsed as { readonly folderIds: readonly string[] }).folderIds)]
           }
-        : action === "mark"
-          ? { action: "mark", assetIds }
-          : undefined;
+        : undefined;
     if (mutation === undefined) {
       throw new LibraryError(
         "invalid_request",

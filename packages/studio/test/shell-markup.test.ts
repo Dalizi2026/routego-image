@@ -97,12 +97,15 @@ describe("accessible Studio shell markup", () => {
             },
             outputDirectory: { configured: false }
           },
+          gateway: { invoke: async () => { throw new Error("not invoked during markup rendering"); } } as never,
+          onSettingsChange: () => undefined,
           onOpenSettings: () => undefined
         })
       )
     );
-    expect(markup).not.toContain("studio-provider-select");
+    expect(markup).toContain('aria-label="服务商"');
     expect(markup).toContain("前往设置");
-    expect(markup).toContain("Synthetic provider A / image-1");
+    expect(markup).toContain("Synthetic provider A");
+    expect(markup).toContain("image-1");
   });
 });

@@ -297,7 +297,11 @@ async function materializeImage(
   context: ProviderResponseParseContext,
   kind: "auto" | "base64" | "url" = "auto"
 ): Promise<DecodedProviderImage> {
-  if (kind === "url" || (kind === "auto" && /^[a-z][a-z0-9+.-]*:/iu.test(value))) {
+  const inlineDataUrl = /^data:image\/(?:png|jpeg|webp);base64,/iu.test(value);
+  if (
+    !inlineDataUrl &&
+    (kind === "url" || (kind === "auto" && /^[a-z][a-z0-9+.-]*:/iu.test(value)))
+  ) {
     const options = downloadOptions(context);
     if (options === undefined) throw new Error("download-fetch-missing");
     return downloadProviderImage(value, options);
@@ -331,7 +335,11 @@ export async function normalizeImagesJsonResponse(
     }
     const base64 = typeof item["b64_json"] === "string" ? item["b64_json"] : undefined;
     const url = typeof item["url"] === "string" ? item["url"] : undefined;
-    if ((base64 === undefined) === (url === undefined)) {
+    const inlineDataUrl = url !== undefined && /^data:image\/(?:png|jpeg|webp);base64,/iu.test(url);
+    if (
+      (base64 === undefined && url === undefined) ||
+      (base64 !== undefined && url !== undefined && !inlineDataUrl)
+    ) {
       return invalidResult(context, "A provider image result is ambiguous or empty.", "ambiguous-image-item", {
         finalArtifacts,
         providerImageIds
@@ -339,7 +347,11 @@ export async function normalizeImagesJsonResponse(
     }
     const providerImageId = safeProviderId(item["id"]);
     try {
-      const decoded = await materializeImage(base64 ?? url ?? "", context, url === undefined ? "base64" : "url");
+      const decoded = await materializeImage(
+        base64 ?? url ?? "",
+        context,
+        base64 === undefined ? "url" : "base64"
+      );
       finalArtifacts.push(createArtifact(decoded, context, slot, "final", providerImageId));
       if (providerImageId !== undefined) providerImageIds.push(providerImageId);
       if (typeof item["revised_prompt"] === "string") {

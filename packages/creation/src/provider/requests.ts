@@ -19,9 +19,11 @@ import {
   type EffectiveProviderPlan,
   type PrepareImageInputOptions,
   type PreparedImageInputs,
+  type PreparedImageInput,
   type PreparedProviderRequest,
   type ProviderJsonObject,
   type ProviderJsonSubmission,
+  type ProviderMultipartSubmission,
   type ProviderRequestPreparationContext,
   type ProviderRequestPreparationResult,
   type ProviderSubmission
@@ -83,13 +85,13 @@ export function planEffectiveProviderControls(
     size,
     nativeTransparency: request.transparentMode === "native",
     stream: request.partialImages > 0,
-    ...(request.quality === "auto" ? {} : { quality: request.quality }),
-    ...(request.format === "png" ? {} : { outputFormat: request.format }),
+    quality: request.quality,
+    outputFormat: request.format,
     ...(request.compression === undefined
       ? {}
       : { outputCompression: request.compression }),
     ...(request.partialImages === 0 ? {} : { partialImages: request.partialImages }),
-    ...(request.moderation === "auto" ? {} : { moderation: request.moderation })
+    moderation: request.moderation
   };
 
   return {
@@ -109,26 +111,60 @@ function jsonSubmission(endpoint: string, body: ProviderJsonObject): ProviderJso
   };
 }
 
+function effectiveProviderPrompt(request: ImageOperationRequest): string {
+  if (request.kind !== "edit") return request.prompt;
+
+  const constraints: readonly (readonly [string, readonly string[]])[] = [
+    ["Allowed changes", request.invariants.allowedChanges],
+    ["Preserve exactly", request.invariants.preserve],
+    ["Do not change", request.invariants.forbiddenChanges]
+  ];
+  const sections = constraints.flatMap(([label, values]) =>
+    values.length === 0
+      ? []
+      : [`${label}:\n${values.map((value) => `- ${value}`).join("\n")}`]
+  );
+
+  return `${request.prompt}\n\nEditing constraints:\n${sections.join("\n\n")}`;
+}
+
 function commonJsonFields(
   model: string,
   request: ImageOperationRequest,
-  controls: EffectiveProviderControls
+  controls: EffectiveProviderControls,
+  openAiCompatible = false
 ): ProviderJsonObject {
   return {
     model,
-    prompt: request.prompt,
-    n: controls.n,
+    prompt: effectiveProviderPrompt(request),
+    ...(openAiCompatible && controls.n === 1 ? {} : { n: controls.n }),
     size: controls.size,
-    ...(controls.quality === undefined ? {} : { quality: controls.quality }),
-    ...(controls.outputFormat === undefined ? {} : { output_format: controls.outputFormat }),
+    ...(openAiCompatible || controls.quality !== "auto" ? { quality: controls.quality } : {}),
+    ...(openAiCompatible || controls.outputFormat !== "png" ? { output_format: controls.outputFormat } : {}),
     ...(controls.outputCompression === undefined
       ? {}
       : { output_compression: controls.outputCompression }),
     ...(controls.partialImages === undefined ? {} : { partial_images: controls.partialImages }),
     ...(controls.nativeTransparency ? { background: "transparent" } : {}),
-    ...(controls.moderation === undefined ? {} : { moderation: controls.moderation }),
+    ...(openAiCompatible || controls.moderation !== "auto" ? { moderation: controls.moderation } : {}),
     ...(controls.stream ? { stream: true } : {})
   };
+}
+
+function imageBlob(image: PreparedImageInput): Blob {
+  return new Blob([new Uint8Array(image.bytes)], { type: image.mimeType });
+}
+
+function appendMultipartControls(form: FormData, controls: EffectiveProviderControls): void {
+  if (controls.n !== 1) form.append("n", String(controls.n));
+  if (controls.size !== "auto") form.append("size", controls.size);
+  if (controls.quality !== "auto") form.append("quality", controls.quality);
+  if (controls.outputFormat !== "png") form.append("output_format", controls.outputFormat);
+  if (controls.outputCompression !== undefined) form.append("output_compression", String(controls.outputCompression));
+  if (controls.partialImages !== undefined) form.append("partial_images", String(controls.partialImages));
+  if (controls.nativeTransparency) form.append("background", "transparent");
+  if (controls.moderation !== "auto") form.append("moderation", controls.moderation);
+  if (controls.stream) form.append("stream", "true");
 }
 
 function assertTierRoute(
@@ -208,6 +244,37 @@ export function serializeTierBRequest(
   effective: EffectiveProviderPlan
 ): ProviderSubmission {
   assertTierRoute(route, "B", "openai-images");
+  if (route.requestShape === PROVIDER_REQUEST_SHAPES.imagesEditsMultipart) {
+    if (request.kind !== "edit") {
+      throw new ProviderPreparationError(
+        "request-shape-mismatch",
+        "Images Edits multipart is only valid for an edit operation."
+      );
+    }
+    const target = inputs.images[0];
+    if (target === undefined || target.kind !== "target") {
+      throw new ProviderPreparationError(
+        "request-shape-mismatch",
+        "Images Edits multipart requires the target image in slot zero."
+      );
+    }
+    const form = new FormData();
+    form.append("model", model);
+    form.append("prompt", effectiveProviderPrompt(request));
+    form.append("image", imageBlob(target), target.fileName);
+    for (const reference of inputs.images.slice(1)) {
+      form.append("image[]", imageBlob(reference), reference.fileName);
+    }
+    appendMultipartControls(form, effective.controls);
+    const submission: ProviderMultipartSubmission = {
+      bodyType: "multipart",
+      method: "POST",
+      endpoint: route.endpoint,
+      headers: {},
+      body: form
+    };
+    return submission;
+  }
   if (route.requestShape !== PROVIDER_REQUEST_SHAPES.imagesGenerationsJson) {
     throw new ProviderPreparationError(
       "request-shape-mismatch",
@@ -215,13 +282,13 @@ export function serializeTierBRequest(
       { requestShape: route.requestShape }
     );
   }
-  if (inputs.images.length !== 0) {
+  if (request.kind !== "generate" || inputs.images.length !== 0) {
     throw new ProviderPreparationError(
       "request-shape-mismatch",
       "Images generations JSON cannot contain prepared image inputs."
     );
   }
-  return jsonSubmission(route.endpoint, commonJsonFields(model, request, effective.controls));
+  return jsonSubmission(route.endpoint, commonJsonFields(model, request, effective.controls, true));
 }
 
 export function serializeTierCRequest(
@@ -241,17 +308,17 @@ export function serializeTierCRequest(
   }
 
   const content: ProviderJsonObject[] = [
-    { type: "input_text", text: request.prompt },
+    { type: "input_text", text: effectiveProviderPrompt(request) },
     ...inputs.images.map((image) => ({ type: "input_image", image_url: imageDataUrl(image) }))
   ];
   const tool: ProviderJsonObject = {
     type: "image_generation",
     ...(effective.controls.n === 1 ? {} : { n: effective.controls.n }),
     ...(effective.controls.size === "auto" ? {} : { size: effective.controls.size }),
-    ...(effective.controls.quality === undefined
+    ...(effective.controls.quality === "auto"
       ? {}
       : { quality: effective.controls.quality }),
-    ...(effective.controls.outputFormat === undefined
+    ...(effective.controls.outputFormat === "png"
       ? {}
       : { output_format: effective.controls.outputFormat }),
     ...(effective.controls.outputCompression === undefined
@@ -261,7 +328,7 @@ export function serializeTierCRequest(
       ? {}
       : { partial_images: effective.controls.partialImages }),
     ...(effective.controls.nativeTransparency ? { background: "transparent" } : {}),
-    ...(effective.controls.moderation === undefined
+    ...(effective.controls.moderation === "auto"
       ? {}
       : { moderation: effective.controls.moderation })
   };

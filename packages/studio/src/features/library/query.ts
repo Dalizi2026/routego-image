@@ -21,11 +21,11 @@ export function createLibraryFilters(view: LibraryView): LibraryFilters {
     models: "",
     from: "",
     to: "",
-    kinds: ["generate"],
+    kinds: ["generate", "edit"],
     sizes: [],
     statuses: [],
     sort: "created-desc",
-    limit: 12
+    limit: 20
   };
 }
 

@@ -164,6 +164,7 @@ function detailFromIndex(index: ImageLibraryIndex, asset: StoredLibraryAsset): L
     }));
   return {
     id: asset.id,
+    ...(asset.displayName === undefined ? {} : { displayName: asset.displayName }),
     prompt: asset.prompt,
     model: asset.model,
     kind: asset.kind,
@@ -276,6 +277,7 @@ export class LibraryReadService {
     const items = await Promise.all(
       page.items.map(async ({ asset, rendition, blob }) => ({
         assetId: asset.id,
+        ...(asset.displayName === undefined ? {} : { displayName: asset.displayName }),
         artifactId: rendition.artifactId,
         prompt: asset.prompt,
         model: asset.model,

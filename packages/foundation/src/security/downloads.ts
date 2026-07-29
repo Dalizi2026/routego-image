@@ -2,6 +2,7 @@ export interface ResultDownloadPolicyInput {
   readonly resourceUrl: string;
   readonly providerEndpoint: string;
   readonly explicitSameOriginAuthorization?: boolean;
+  readonly allowCleartextWithoutAuthorization?: boolean;
   readonly redirectFromUrl?: string;
 }
 
@@ -13,6 +14,7 @@ export type ResultDownloadPolicyDecision =
       readonly reason:
         | "authorization-disabled"
         | "same-origin-explicit-policy"
+        | "cleartext-result-without-authorization"
         | "cross-origin-resource"
         | "redirect-origin-changed"
         | "redirect-same-origin";
@@ -28,7 +30,10 @@ export type ResultDownloadPolicyDecision =
         | "url-userinfo";
     };
 
-function parseSafeDownloadUrl(value: string): URL | ResultDownloadPolicyDecision {
+function parseSafeDownloadUrl(
+  value: string,
+  allowCleartextWithoutAuthorization = false
+): URL | ResultDownloadPolicyDecision {
   let parsed: URL;
   try {
     parsed = new URL(value);
@@ -58,6 +63,7 @@ function parseSafeDownloadUrl(value: string): URL | ResultDownloadPolicyDecision
   }
   if (
     parsed.protocol === "http:" &&
+    !allowCleartextWithoutAuthorization &&
     parsed.hostname !== "127.0.0.1" &&
     parsed.hostname !== "[::1]" &&
     parsed.hostname !== "::1"
@@ -75,7 +81,10 @@ function parseSafeDownloadUrl(value: string): URL | ResultDownloadPolicyDecision
 export function decideResultDownloadPolicy(
   input: ResultDownloadPolicyInput
 ): ResultDownloadPolicyDecision {
-  const resource = parseSafeDownloadUrl(input.resourceUrl);
+  const resource = parseSafeDownloadUrl(
+    input.resourceUrl,
+    input.allowCleartextWithoutAuthorization === true
+  );
   if (!(resource instanceof URL)) {
     return resource;
   }
@@ -86,8 +95,21 @@ export function decideResultDownloadPolicy(
 
   const explicit = input.explicitSameOriginAuthorization === true;
   const sameProviderOrigin = resource.origin === provider.origin;
+  if (
+    resource.protocol === "http:" &&
+    resource.hostname !== "127.0.0.1" &&
+    resource.hostname !== "[::1]" &&
+    resource.hostname !== "::1"
+  ) {
+    return {
+      allowed: true,
+      forwardAuthorization: false,
+      revalidateTarget: true,
+      reason: "cleartext-result-without-authorization"
+    };
+  }
   if (input.redirectFromUrl !== undefined) {
-    const previous = parseSafeDownloadUrl(input.redirectFromUrl);
+    const previous = parseSafeDownloadUrl(input.redirectFromUrl, true);
     if (!(previous instanceof URL)) {
       return previous;
     }

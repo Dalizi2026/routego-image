@@ -53,6 +53,7 @@ export interface McpServerOptions {
 const TOOL_DESCRIPTIONS: Readonly<Record<RoutegoOperation, string>> = {
   status: "Inspect Routego Image health, defaults, and redacted provider capabilities.",
   generate: "Generate image variants from a validated Routego Image request.",
+  edit: "Edit one target image with ordered references and explicit preservation constraints.",
   prepareRegeneration: "Prepare read-only generation information for an explicit library image.",
   batch: "Execute an ordered bounded batch of independent image operations.",
   searchLibrary: "Search the Routego Image library through the composed service.",
@@ -70,6 +71,10 @@ const IMAGE_DATA_URL_PATTERN =
   /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*(?:;base64)?,(?:(?:%[0-9a-f]{2})|[a-z0-9+/_~.!$&*=@?:-])*/giu;
 const LONG_BASE64_TOKEN_PATTERN =
   /(^|[^A-Za-z0-9+/_=-])([A-Za-z0-9+/_-]{64,}={0,2})(?=$|[^A-Za-z0-9+/_=-])/gu;
+
+function preservesOmittedPublicControls(operation: RoutegoOperation): boolean {
+  return operation === "generate" || operation === "batch";
+}
 
 function inputJsonSchema(operation: RoutegoOperation): Record<string, unknown> {
   const generated = routegoOperationDefinitions[operation].inputSchema.toJSONSchema({
@@ -234,7 +239,10 @@ function imageSuccessProjection(value: unknown, key?: string): unknown | typeof 
     return value.map((item) => imageSuccessProjection(item, key));
   }
   if (typeof value === "string") {
-    return replaceImagePayloadsInText(value, !isOpaquePublicStringKey(key));
+    const withoutImagePayloads = replaceImagePayloadsInText(value, !isOpaquePublicStringKey(key));
+    return isPathDiagnosticKey(key)
+      ? REDACTED_LOCAL_PATH
+      : withoutImagePayloads;
   }
   if (!isPlainRecord(value)) return value;
 
@@ -271,7 +279,7 @@ function nonImageSuccessProjection(value: unknown): unknown {
 
 function successToolResult(operation: RoutegoOperation, output: unknown): McpToolResult {
   const projected =
-    operation === "generate" || operation === "batch"
+    operation === "generate" || operation === "edit" || operation === "batch"
       ? imageSuccessProjection(output)
       : nonImageSuccessProjection(output);
   const images = finalImageContents(output);
@@ -356,7 +364,14 @@ export class RoutegoMcpServer {
 
     try {
       const method = this.#service[operation] as (input: unknown) => Promise<unknown>;
-      const rawOutput = await method.call(this.#service, parsedInput.data);
+      // Validate with the frozen schema, but preserve omitted public controls for
+      // the service layer. That layer merges the saved Studio defaults only when
+      // a caller did not explicitly provide a control; Zod defaults would erase
+      // that distinction by turning omissions into "auto" here.
+      const serviceInput = preservesOmittedPublicControls(operation)
+        ? record["arguments"] ?? {}
+        : parsedInput.data;
+      const rawOutput = await method.call(this.#service, serviceInput);
       const parsedOutput = definition.outputSchema.safeParse(rawOutput);
       if (!parsedOutput.success) {
         await this.#diagnose({

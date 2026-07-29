@@ -516,6 +516,121 @@ describe("task 3.4 Studio result projection", () => {
     await registry.shutdown();
   });
 
+  it("atomically saves an edit with a staged upload target", async () => {
+    const root = await createRoot("public-edit-saved");
+    const library = await createLibrary(root);
+    const transaction = await createOutputMaterializationTransaction({
+      stagingRoot: path.join(root, "staging"),
+      requestId: "request-public-edit-saved"
+    });
+    const targetArtifactId = "artifact-upload-target";
+    const targetName = "target.png";
+    const targetPath = path.join(transaction.directory, targetName);
+    const targetBytes = pngBytes(4, 3, 0x72);
+    await writeFile(targetPath, targetBytes);
+    const targetHash = createHash("sha256").update(targetBytes).digest("hex");
+    const operation = request({
+      kind: "edit",
+      prompt: "Replace only the outfit.",
+      targetImage: { id: targetArtifactId, path: targetPath, label: "Uploaded target" },
+      invariants: {
+        preserve: ["identity"],
+        allowedChanges: ["outfit"],
+        forbiddenChanges: ["background"]
+      },
+      saveToLibrary: true
+    });
+    const operationResult = result(operation);
+    const materialization = await transaction.materializeArtifacts(
+      [...operationResult.partialArtifacts, ...operationResult.finalArtifacts],
+      { sourceCount: 1, mayHaveBilled: operationResult.execution.mayHaveBilled }
+    );
+    const graph: DurableInputGraphPlan = Object.freeze({
+      operationAssetId: "asset-public-edit",
+      inputs: Object.freeze([Object.freeze({
+        key: "target" as const,
+        role: "target" as const,
+        order: 0,
+        origin: "upload" as const,
+        relatedAssetId: "asset-public-edit",
+        artifactId: targetArtifactId,
+        path: targetPath,
+        mimeType: "image/png" as const,
+        byteLength: targetBytes.byteLength,
+        sha256: targetHash,
+        width: 4,
+        height: 3,
+        relationship: Object.freeze({
+          id: "relationship-upload-target",
+          role: "target" as const,
+          relatedAssetId: "asset-public-edit",
+          artifactId: targetArtifactId,
+          order: 0,
+          label: "Uploaded target"
+        }),
+        label: "Uploaded target",
+        sourceRendition: Object.freeze({
+          artifactId: targetArtifactId,
+          phase: "source" as const,
+          sourceRoot: transaction.directory,
+          sourceRelativePath: targetName,
+          requestedBaseName: "target-0",
+          expected: Object.freeze({
+            mimeType: "image/png" as const,
+            byteLength: targetBytes.byteLength,
+            sha256: targetHash,
+            width: 4,
+            height: 3
+          })
+        })
+      })]),
+      sourceRenditions: Object.freeze([Object.freeze({
+        artifactId: targetArtifactId,
+        phase: "source" as const,
+        sourceRoot: transaction.directory,
+        sourceRelativePath: targetName,
+        requestedBaseName: "target-0",
+        expected: Object.freeze({
+          mimeType: "image/png" as const,
+          byteLength: targetBytes.byteLength,
+          sha256: targetHash,
+          width: 4,
+          height: 3
+        })
+      })]),
+      relationships: Object.freeze([Object.freeze({
+        id: "relationship-upload-target",
+        role: "target" as const,
+        relatedAssetId: "asset-public-edit",
+        artifactId: targetArtifactId,
+        order: 0,
+        label: "Uploaded target"
+      })]),
+      physicalImageCount: 1,
+      maskCount: 0
+    });
+
+    const projected = await finalizePublicOperationResult({
+      graph,
+      creationResult: operationResult,
+      materialization,
+      transaction,
+      model: "synthetic-model",
+      idFactory: resultIdFactory,
+      library,
+      now: () => new Date(BASE_NOW)
+    });
+
+    expect(projected.status).toBe("succeeded");
+    expect(projected.finalArtifacts[0]?.path).toBeDefined();
+    const detail = await library.getAssetDetail({ assetId: "asset-public-edit" });
+    expect(detail.asset).toMatchObject({
+      id: "asset-public-edit",
+      kind: "edit",
+      status: "succeeded"
+    });
+  });
+
   it("atomically preserves text-only partial output and exact output relationships", async () => {
     const root = await createRoot("studio-text-partial-graph");
     const library = await createLibrary(root);

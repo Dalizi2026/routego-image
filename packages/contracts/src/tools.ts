@@ -163,23 +163,10 @@ export const routegoGenerateInputSchema = imageOperationRequestSchema.refine(
   { message: "routego_generate requires kind=generate", path: ["kind"] }
 );
 
-/**
- * @deprecated Removed from the public seven-tool surface. Retained only so
- * temporary in-package consumers can still typecheck until later cutover tasks.
- * Validation always fails.
- */
-export const routegoEditInputSchema = z
-  .object({
-    kind: z.literal("edit")
-  })
-  .strict()
-  .superRefine((_value, context) => {
-    context.addIssue({
-      code: "custom",
-      path: ["kind"],
-      message: "routego_edit is removed; use routego_prepare_regeneration then routego_generate"
-    });
-  });
+export const routegoEditInputSchema = imageOperationRequestSchema.refine(
+  (value) => value.kind === "edit",
+  { message: "routego_edit requires kind=edit", path: ["kind"] }
+);
 
 export const routegoPrepareRegenerationInputSchema = z
   .object({
@@ -355,6 +342,15 @@ export const routegoSearchLibraryResultSchema = z
 
 const assetIdsSchema = z.array(identifierSchema).min(1).max(200);
 const folderIdsSchema = z.array(identifierSchema).min(1).max(100);
+const libraryLocationDescriptorSchema = z
+  .object({
+    id: identifierSchema,
+    name: z.string().trim().min(1).max(200),
+    folderId: identifierSchema.optional(),
+    assetCount: z.number().int().min(0),
+    isDefault: z.boolean()
+  })
+  .strict();
 
 export const routegoManageLibraryInputSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("create-folder"), name: z.string().trim().min(1).max(200) }).strict(),
@@ -367,6 +363,27 @@ export const routegoManageLibraryInputSchema = z.discriminatedUnion("action", [
     .strict(),
   z.object({ action: z.literal("assign-folders"), assetIds: assetIdsSchema, folderIds: folderIdsSchema }).strict(),
   z.object({ action: z.literal("remove-folders"), assetIds: assetIdsSchema, folderIds: folderIdsSchema }).strict(),
+  z.object({ action: z.literal("list-locations") }).strict(),
+  z.object({
+    action: z.literal("add-location"),
+    locationPath: filePathSchema,
+    name: z.string().trim().min(1).max(200).optional()
+  }).strict(),
+  z.object({
+    action: z.literal("move-assets"),
+    assetIds: assetIdsSchema,
+    destinationLocationId: identifierSchema
+  }).strict(),
+  z.object({
+    action: z.literal("delete-assets"),
+    assetIds: assetIdsSchema,
+    confirmDelete: z.literal(true)
+  }).strict(),
+  z.object({
+    action: z.literal("rename-asset"),
+    assetId: identifierSchema,
+    name: z.string().trim().min(1).max(200)
+  }).strict(),
   z.object({ action: z.literal("soft-delete"), assetIds: assetIdsSchema }).strict(),
   z.object({ action: z.literal("restore"), assetIds: assetIdsSchema }).strict(),
   z
@@ -394,6 +411,11 @@ export const routegoManageLibraryResultSchema = z
       "rename-folder",
       "assign-folders",
       "remove-folders",
+      "list-locations",
+      "add-location",
+      "move-assets",
+      "delete-assets",
+      "rename-asset",
       "soft-delete",
       "restore",
       "permanent-delete",
@@ -405,6 +427,7 @@ export const routegoManageLibraryResultSchema = z
     outputPath: filePathSchema.optional(),
     importedCount: z.number().int().min(0).optional(),
     skippedCount: z.number().int().min(0).optional(),
+    locations: z.array(libraryLocationDescriptorSchema).max(1_000).optional(),
     warnings: z.array(z.string().trim().min(1).max(1_000)).max(100).default([])
   })
   .strict();
@@ -438,7 +461,6 @@ export type ImageOperationResult = z.infer<typeof imageOperationResultSchema>;
 export type RoutegoStatusInput = z.input<typeof routegoStatusInputSchema>;
 export type RoutegoStatusResult = z.output<typeof routegoStatusResultSchema>;
 export type RoutegoGenerateInput = z.input<typeof routegoGenerateInputSchema>;
-/** @deprecated Removed public tool input. */
 export type RoutegoEditInput = z.input<typeof routegoEditInputSchema>;
 export type RoutegoPrepareRegenerationInput = z.input<typeof routegoPrepareRegenerationInputSchema>;
 export type GenerationRecipe = z.output<typeof generationRecipeSchema>;
@@ -456,6 +478,7 @@ export type RoutegoOpenStudioResult = z.output<typeof routegoOpenStudioResultSch
 export const routegoOperationNames = [
   "status",
   "generate",
+  "edit",
   "prepareRegeneration",
   "batch",
   "searchLibrary",
@@ -476,6 +499,12 @@ export const routegoOperationDefinitions = {
     toolName: "routego_generate",
     http: { method: "POST" as const, path: "/api/v1/generate" },
     inputSchema: routegoGenerateInputSchema,
+    outputSchema: imageOperationResultSchema
+  },
+  edit: {
+    toolName: "routego_edit",
+    http: { method: "POST" as const, path: "/api/v1/edit" },
+    inputSchema: routegoEditInputSchema,
     outputSchema: imageOperationResultSchema
   },
   prepareRegeneration: {
@@ -521,6 +550,7 @@ export const routegoOperationDefinitions = {
 export interface RoutegoService {
   status(input: RoutegoStatusInput): Promise<RoutegoStatusResult>;
   generate(input: RoutegoGenerateInput): Promise<ImageOperationResult>;
+  edit(input: RoutegoEditInput): Promise<ImageOperationResult>;
   prepareRegeneration(
     input: RoutegoPrepareRegenerationInput
   ): Promise<RoutegoPrepareRegenerationResult>;

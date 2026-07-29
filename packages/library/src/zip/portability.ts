@@ -294,6 +294,14 @@ function remapParameters(
   const { references, ...rest } = parameters;
   return {
     ...rest,
+    ...(parameters.kind !== "edit"
+      ? {}
+      : {
+          target: {
+            ...parameters.target,
+            assetId: assetMap.get(parameters.target.assetId) ?? parameters.target.assetId
+          }
+        }),
     references: references.map((reference) => ({
       ...reference,
       assetId: assetMap.get(reference.assetId) ?? reference.assetId

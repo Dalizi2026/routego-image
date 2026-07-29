@@ -3,6 +3,8 @@ import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  imageOperationRequestSchema,
+  imageOperationResultSchema,
   imageArtifactPhaseSchema,
   routegoOpenStudioResultSchema,
   routegoOperationDefinitions,
@@ -24,6 +26,7 @@ import type { RuntimeSignalSource } from "../src/runtime/lifecycle";
 const EXPECTED_TOOLS = [
   "routego_status",
   "routego_generate",
+  "routego_edit",
   "routego_prepare_regeneration",
   "routego_batch",
   "routego_search_library",
@@ -209,7 +212,7 @@ function toolText(response: Record<string, unknown>): Record<string, unknown> {
 }
 
 describe("task 4.3 MCP process protocol", () => {
-  it("recovers before readiness and exposes exactly the frozen seven tools and phases", async () => {
+  it("recovers before readiness and exposes exactly the eight tools and phases", async () => {
     const input = new ControlledInput();
     const output = new MemoryOutput();
     const error = new MemoryOutput();
@@ -237,7 +240,7 @@ describe("task 4.3 MCP process protocol", () => {
     expect(tools.map((tool) => tool.name)).toEqual(
       routegoOperationNames.map((operation) => routegoOperationDefinitions[operation].toolName)
     );
-    expect(tools).toHaveLength(7);
+    expect(tools).toHaveLength(8);
     expect(tools.every((tool) => tool.inputSchema["type"] === "object")).toBe(true);
     expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
     expect(http.shutdown).not.toHaveBeenCalled();
@@ -298,12 +301,27 @@ describe("task 4.3 MCP process protocol", () => {
     await runtime.waitUntilClosed();
   });
 
-  it("exposes read-only regeneration preparation and rejects the removed edit tool", async () => {
+  it("exposes direct editing alongside read-only regeneration preparation", async () => {
     const prepareRegeneration = vi.fn(async () => regenerationResult());
+    const edit = vi.fn(async (input: unknown) => {
+      const request = imageOperationRequestSchema.parse(input);
+      return imageOperationResultSchema.parse({
+        schemaVersion: 1,
+        requestId: "edit-result-1",
+        status: "succeeded",
+        requestedParams: request,
+        effectiveParams: request,
+        execution: { attemptCount: 1, providerRequestCount: 1, receivedAnyOutput: true, mayHaveBilled: true, degradedContinuation: false, providerImageIds: [] },
+        finalArtifacts: [{ id: "edit-artifact-1", slot: 0, phase: "final", mimeType: "image/png", display: { type: "image", dataUrl: "data:image/png;base64,iVBORw0KGgo=" }, createdAt: "2026-07-19T12:00:00.000Z" }],
+        partialArtifacts: [],
+        failedSlots: [],
+        relationships: [{ inputRole: "output", outputArtifactId: "edit-artifact-1", order: 0 }]
+      });
+    });
     const input = new ControlledInput();
     const output = new MemoryOutput();
     const runtime = createRoutegoMcpProcess({
-      service: managedService({ prepareRegeneration }),
+      service: managedService({ prepareRegeneration, edit }),
       httpLifecycle: httpLifecycle(),
       input,
       output,
@@ -317,14 +335,26 @@ describe("task 4.3 MCP process protocol", () => {
         name: "routego_prepare_regeneration",
         arguments: { recordId: "record-1" }
       }),
-      request(3, "tools/call", { name: "routego_edit", arguments: { kind: "edit" } })
+      request(3, "tools/call", {
+        name: "routego_edit",
+        arguments: {
+          kind: "edit",
+          prompt: "Change the dress only",
+          targetImage: { path: "/tmp/target.png" },
+          invariants: { preserve: ["identity"] }
+        }
+      })
     ].join(""));
     await waitForResponses(output, 3);
 
     const responses = output.responses();
     expect(toolText(responses[1]!)).toEqual(regenerationResult());
     expect(prepareRegeneration).toHaveBeenCalledWith({ schemaVersion: 1, recordId: "record-1" });
-    expect(responses[2]).toMatchObject({ error: { code: -32601 } });
+    expect(edit).toHaveBeenCalledTimes(1);
+    expect(toolText(responses[2]!)).toMatchObject({
+      status: "succeeded",
+      requestedParams: { kind: "edit", targetImage: { path: "[REDACTED_PATH]" } }
+    });
 
     input.end();
     await runtime.waitUntilClosed();

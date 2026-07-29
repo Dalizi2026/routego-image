@@ -27,9 +27,11 @@ const OWNER_MARKER = ".routego-plugin-ci-smoke-owner.json";
 const OWNER_PURPOSE = "routego-image-plugin-ci-smoke";
 const EXPECTED_TOOLS = [
   "routego_batch",
+  "routego_edit",
   "routego_generate",
   "routego_manage_library",
   "routego_open_studio",
+  "routego_prepare_regeneration",
   "routego_search_library",
   "routego_status"
 ];
@@ -114,7 +116,7 @@ function assertSmokeResult(result) {
       result.artifact?.strictVerificationPassed !== true ||
       result.codex?.freshProcess !== true || result.codex?.pluginDiscovered !== true ||
       result.codex?.pluginVersion !== "1.0.0" ||
-      result.skill?.bilingual !== true || result.skill?.exactPublicToolCount !== 7 ||
+      result.skill?.bilingual !== true || result.skill?.exactPublicToolCount !== 8 ||
       JSON.stringify(result.mcp?.tools) !== JSON.stringify(EXPECTED_TOOLS) ||
       JSON.stringify(result.mcp?.publicArtifactPhases) !== JSON.stringify(["partial", "final"]) ||
       result.mcp?.configured !== false || result.mcp?.serviceStatus !== "ready" ||

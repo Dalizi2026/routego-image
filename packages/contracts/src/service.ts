@@ -86,11 +86,14 @@ import {
   imageOperationResultSchema,
   routegoBatchInputSchema,
   routegoBatchResultSchema,
+  routegoEditInputSchema,
   routegoGenerateInputSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
   routegoOpenStudioInputSchema,
   routegoOpenStudioResultSchema,
+  routegoPrepareRegenerationInputSchema,
+  routegoPrepareRegenerationResultSchema,
   routegoSearchLibraryInputSchema,
   routegoSearchLibraryResultSchema,
   routegoStatusInputSchema,
@@ -98,11 +101,14 @@ import {
   type ImageOperationResult,
   type RoutegoBatchInput,
   type RoutegoBatchResult,
+  type RoutegoEditInput,
   type RoutegoGenerateInput,
   type RoutegoManageLibraryInput,
   type RoutegoManageLibraryResult,
   type RoutegoOpenStudioInput,
   type RoutegoOpenStudioResult,
+  type RoutegoPrepareRegenerationInput,
+  type RoutegoPrepareRegenerationResult,
   type RoutegoSearchLibraryInput,
   type RoutegoSearchLibraryResult,
   type RoutegoStatusInput,
@@ -130,6 +136,8 @@ import {
 export const routegoOperationNames = [
   "status",
   "generate",
+  "edit",
+  "prepareRegeneration",
   "batch",
   "searchLibrary",
   "manageLibrary",
@@ -178,6 +186,18 @@ export const routegoOperationDefinitions = {
     http: { method: "POST", path: "/api/v1/generate" },
     inputSchema: routegoGenerateInputSchema,
     outputSchema: imageOperationResultSchema
+  },
+  edit: {
+    toolName: "routego_edit",
+    http: { method: "POST", path: "/api/v1/edit" },
+    inputSchema: routegoEditInputSchema,
+    outputSchema: imageOperationResultSchema
+  },
+  prepareRegeneration: {
+    toolName: "routego_prepare_regeneration",
+    http: { method: "POST", path: "/api/v1/prepare-regeneration" },
+    inputSchema: routegoPrepareRegenerationInputSchema,
+    outputSchema: routegoPrepareRegenerationResultSchema
   },
   batch: {
     toolName: "routego_batch",
@@ -341,6 +361,10 @@ export const studioOperationDefinitions = {
 export interface RoutegoService {
   status(input: RoutegoStatusInput): Promise<RoutegoStatusResult>;
   generate(input: RoutegoGenerateInput): Promise<ImageOperationResult>;
+  edit(input: RoutegoEditInput): Promise<ImageOperationResult>;
+  prepareRegeneration(
+    input: RoutegoPrepareRegenerationInput
+  ): Promise<RoutegoPrepareRegenerationResult>;
   batch(input: RoutegoBatchInput): Promise<RoutegoBatchResult>;
   searchLibrary(input: RoutegoSearchLibraryInput): Promise<RoutegoSearchLibraryResult>;
   manageLibrary(input: RoutegoManageLibraryInput): Promise<RoutegoManageLibraryResult>;

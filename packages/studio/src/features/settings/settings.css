@@ -31,6 +31,10 @@
 .generation-defaults__grid select { min-height: 46px; padding: 0 10px; border: 1px solid var(--line-strong); color: var(--paper-100); background: var(--ink-950); }
 .generation-defaults__wide { grid-column: 1 / -1; }
 .generation-defaults__wide small { color: var(--paper-500); font-size: .72rem; line-height: 1.45; }
+.generation-defaults__custom-size { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: end; }
+.generation-defaults__custom-size > span { padding-bottom: 13px; color: var(--paper-400); font-size: 1.1rem; }
+.generation-defaults__custom-size input { min-width: 0; min-height: 46px; padding: 0 10px; border: 1px solid var(--line-strong); color: var(--paper-100); background: var(--ink-950); }
+.generation-defaults__custom-size small { grid-column: 1 / -1; color: var(--paper-500); font-size: .72rem; line-height: 1.45; }
 .generation-defaults__save { min-height: 50px; border: 0; color: var(--ink-950); background: var(--amber-400); font-weight: 800; cursor: pointer; }
 .generation-defaults__save:disabled { cursor: wait; opacity: .65; }
 .generation-defaults__message { margin: 0; font-size: .8rem; }
@@ -592,6 +596,28 @@
   box-shadow: var(--shadow-panel);
 }
 
+.settings-provider-switch {
+  display: grid;
+  gap: 7px;
+  max-width: 520px;
+}
+
+.settings-provider-switch > span {
+  color: var(--paper-500);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.settings-provider-switch > select {
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  color: var(--paper-100);
+  background: var(--ink-950);
+}
+
 .settings-section-heading > p,
 .settings-section-heading > h2 {
   margin: 0;
@@ -1005,5 +1031,139 @@
 @media (prefers-reduced-motion: reduce) {
   .settings-workspace {
     animation: none;
+  }
+}
+/* The daily settings surface intentionally stays small: provider switching and editing only. */
+.provider-manager {
+  display: grid;
+  max-width: 980px;
+  gap: 22px;
+  padding: clamp(28px, 5vw, 64px);
+}
+
+.provider-manager__heading p,
+.provider-manager__heading h1,
+.provider-manager__heading span {
+  margin: 0;
+}
+
+.provider-manager__heading p {
+  color: var(--amber-400);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.18em;
+}
+
+.provider-manager__heading h1 {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 7vw, 4.2rem);
+  font-weight: 400;
+}
+
+.provider-manager__heading span {
+  display: block;
+  max-width: 720px;
+  margin-top: 16px;
+  color: var(--paper-300);
+  line-height: 1.65;
+}
+
+.provider-manager__picker,
+.provider-manager__summary,
+.provider-manager__form {
+  border: 1px solid var(--line-strong);
+  background: rgba(14, 16, 14, 0.84);
+}
+
+.provider-manager__picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  padding: 16px;
+  align-items: end;
+}
+
+.provider-manager label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.provider-manager label > span {
+  color: var(--paper-500);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+
+.provider-manager input,
+.provider-manager select {
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid var(--line-strong);
+  color: var(--paper-100);
+  background: var(--ink-950);
+  font: inherit;
+}
+
+.provider-manager button {
+  min-height: 48px;
+  padding: 0 17px;
+}
+
+.provider-manager__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  padding: 22px;
+  color: var(--paper-400);
+}
+
+.provider-manager__summary strong {
+  color: var(--paper-100);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+}
+
+.provider-manager__form {
+  display: grid;
+  gap: 20px;
+  padding: clamp(20px, 4vw, 38px);
+}
+
+.provider-manager__form small {
+  color: var(--paper-500);
+  line-height: 1.45;
+}
+
+.provider-manager__model-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.provider-manager__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.provider-manager__actions button:first-child {
+  border-color: var(--amber-400);
+  background: var(--amber-400);
+  color: var(--ink-950);
+}
+
+@media (max-width: 620px) {
+  .provider-manager {
+    padding: 34px 18px;
+  }
+
+  .provider-manager__picker,
+  .provider-manager__model-row {
+    grid-template-columns: 1fr;
   }
 }

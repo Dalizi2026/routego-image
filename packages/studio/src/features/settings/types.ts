@@ -22,6 +22,7 @@ export interface ProviderProfileDraft {
   readonly name: string;
   readonly generation: ProviderEndpointDraft;
   readonly models: OptionalProviderEndpointDraft;
+  readonly edits: OptionalProviderEndpointDraft;
   readonly responses: OptionalProviderEndpointDraft;
   readonly defaultModel: string;
   readonly apiKeyOperation: "unchanged" | "replace" | "clear";

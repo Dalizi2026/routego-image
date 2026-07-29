@@ -304,7 +304,7 @@ describe("task 6.1 offline production composition", () => {
     expect(alternate.status).toBe(404);
   });
 
-  it("exposes exactly seven MCP tools and freezes public artifact phases to partial and final", async () => {
+  it("exposes exactly eight MCP tools and freezes public artifact phases to partial and final", async () => {
     const created = await harness();
     const input = new ControlledMcpInput();
     const output = new MemoryMcpOutput();
@@ -324,7 +324,7 @@ describe("task 6.1 offline production composition", () => {
     expect(listed.tools.map((tool) => tool.name)).toEqual(
       routegoOperationNames.map((name) => routegoOperationDefinitions[name].toolName)
     );
-    expect(listed.tools).toHaveLength(7);
+    expect(listed.tools).toHaveLength(8);
     expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
     expect(imageArtifactPhaseSchema.safeParse("source").success).toBe(false);
     input.end();

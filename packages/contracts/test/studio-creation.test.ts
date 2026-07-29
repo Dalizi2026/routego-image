@@ -388,10 +388,11 @@ describe("ordered path-free Studio batch contracts", () => {
 });
 
 describe("Studio creation operation definitions", () => {
-  it("registers path-free generation/batch internally without changing the public seven", () => {
+  it("registers path-free generation/batch internally without changing public tools", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
+      "edit",
       "prepareRegeneration",
       "batch",
       "searchLibrary",
@@ -401,6 +402,7 @@ describe("Studio creation operation definitions", () => {
     expect(Object.values(routegoOperationDefinitions).map((item) => item.toolName)).toEqual([
       "routego_status",
       "routego_generate",
+      "routego_edit",
       "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",

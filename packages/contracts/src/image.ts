@@ -87,10 +87,9 @@ export const transparentModeSchema = z.enum(["off", "auto", "chromakey", "native
 export const moderationSchema = z.enum(["auto", "low"]);
 export const continuationActionSchema = z.enum(["auto", "generate", "edit"]);
 
-export const imageOperationRequestSchema = z
+const imageOperationOptionsSchema = z
   .object({
     schemaVersion: routegoSchemaVersionSchema.default(1),
-    kind: z.literal("generate"),
     prompt: nonEmptyTextSchema,
     references: z.array(referenceImageSchema).max(5).default([]),
     size: imageSizeSchema.default("auto"),
@@ -105,7 +104,25 @@ export const imageOperationRequestSchema = z
     outputDir: filePathSchema.optional(),
     saveToLibrary: z.boolean().default(true)
   })
-  .strict()
+  .strict();
+
+export const generateImageOperationRequestSchema = imageOperationOptionsSchema
+  .extend({ kind: z.literal("generate") })
+  .strict();
+
+export const editImageOperationRequestSchema = imageOperationOptionsSchema
+  .extend({
+    kind: z.literal("edit"),
+    targetImage: targetImageSchema,
+    invariants: editInvariantsSchema
+  })
+  .strict();
+
+export const imageOperationRequestSchema = z
+  .discriminatedUnion("kind", [
+    generateImageOperationRequestSchema,
+    editImageOperationRequestSchema
+  ])
   .superRefine((value, context) => {
     if (value.compression !== undefined && value.format === "png") {
       context.addIssue({

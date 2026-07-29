@@ -231,6 +231,24 @@ describe("provider route selection", () => {
     });
   });
 
+  it("uses the OpenAI Images request shape for a legacy API base text request", () => {
+    const decision = selectProviderRoute(
+      context([], {
+        endpoints: {
+          generation: { mode: "legacy-api-base", value: "https://relay.example" }
+        }
+      }),
+      { kind: "generate", prompt: "OpenAI-compatible image request" }
+    );
+    expect(decision).toMatchObject({
+      selected: true,
+      tier: "B",
+      transport: "openai-images",
+      endpoint: "https://relay.example/v1/images/generations",
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesGenerationsJson
+    });
+  });
+
   it("supports explicitly preferred Tier B text generation without using an edit endpoint", () => {
     const text = selectProviderRoute(
       context([], { preferredTransports: ["openai-images"] }),
@@ -398,6 +416,44 @@ describe("provider route selection", () => {
     });
   });
 
+  it("forwards a configured custom size without capability-probe evidence", () => {
+    const decision = selectProviderRoute(
+      context([
+        capability("text-generation", {
+          requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText
+        })
+      ], { preferredTransports: ["single-endpoint-json"] }),
+      {
+        kind: "generate",
+        prompt: "Provider-defined square output",
+        size: "1024x1024",
+        aspectRatio: "1:1"
+      }
+    );
+
+    expect(decision).toMatchObject({
+      selected: true,
+      transport: "single-endpoint-json"
+    });
+  });
+
+  it("forwards a configured output format without capability-probe evidence", () => {
+    const decision = selectProviderRoute(
+      context([], { preferredTransports: ["openai-images"] }),
+      {
+        kind: "generate",
+        prompt: "Provider-defined JPEG output",
+        format: "jpeg"
+      }
+    );
+
+    expect(decision).toMatchObject({
+      selected: true,
+      transport: "openai-images",
+      requiredCapabilities: expect.arrayContaining(["output-format"])
+    });
+  });
+
   it.each([
     ["unknown", "local-fallback"],
     ["unsupported", "local-fallback"],
@@ -443,10 +499,103 @@ describe("provider route selection", () => {
     }
   });
 
-  it("rejects removed edit and continuation request fields before route selection", () => {
+  it("allows one authorized direct edit on the configured generation endpoint without deriving an edits endpoint", () => {
+    const request = {
+      kind: "edit",
+      prompt: "Change the dress only",
+      targetImage: { path: "/tmp/target.png" },
+      invariants: { preserve: ["identity"] }
+    };
+    const unavailable = selectProviderRoute(context(), request);
+    expect(unavailable.selected).toBe(false);
+
+    const selected = selectProviderRoute(context([], { allowUnverifiedDirectEdit: true }), request);
+    expect(selected).toMatchObject({
+      selected: true,
+      tier: "A",
+      transport: "single-endpoint-json",
+      endpoint: ENDPOINTS.generation.value,
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+      effectiveKind: "edit",
+      replayPolicy: "never"
+    });
+  });
+
+  it("keeps explicitly unsupported direct edit evidence unavailable even with one-request authorization", () => {
+    const shape = PROVIDER_REQUEST_SHAPES.singleEndpointImage;
+    const records = ["single-image-input", "data-url-input", "target-edit"].map((name) =>
+      capability(name as ProviderCapability, { state: "unsupported", requestShape: shape })
+    );
+    const decision = selectProviderRoute(
+      context(records, { allowUnverifiedDirectEdit: true }),
+      {
+        kind: "edit",
+        prompt: "Do not bypass explicit rejection",
+        targetImage: { path: "/tmp/target.png" },
+        invariants: { preserve: ["identity"] }
+      }
+    );
+    expect(decision.selected).toBe(false);
+    if (!decision.selected) {
+      expect(decision.missingCapabilities).toEqual(expect.arrayContaining([
+        "single-image-input",
+        "data-url-input",
+        "target-edit"
+      ]));
+    }
+  });
+
+  it("uses multipart only when an explicit Images Edits endpoint is configured", () => {
+    const editsEndpoint = "https://relay.example/custom/edits";
+    const decision = selectProviderRoute(
+      context([], {
+        endpoints: { ...ENDPOINTS, edits: editsEndpoint },
+        preferredTransports: ["openai-images"],
+        allowUnverifiedDirectEdit: true
+      }),
+      {
+        kind: "edit",
+        prompt: "Explicit multipart route",
+        targetImage: { path: "/tmp/target.png" },
+        references: [{ path: "/tmp/reference.png", role: "style" }],
+        invariants: { preserve: ["identity"] }
+      }
+    );
+    expect(decision).toMatchObject({
+      selected: true,
+      tier: "B",
+      transport: "openai-images",
+      endpoint: editsEndpoint,
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
+    });
+  });
+
+  it("derives and prefers the standard Images Edits endpoint for a legacy API base edit", () => {
+    const legacyEndpoints: ProviderEndpointSet = {
+      generation: { mode: "legacy-api-base", value: "https://relay.example" }
+    };
+    const decision = selectProviderRoute(
+      context([], { endpoints: legacyEndpoints, allowUnverifiedDirectEdit: true }),
+      {
+        kind: "edit",
+        prompt: "Use the provider edit endpoint",
+        targetImage: { path: "/tmp/target.png" },
+        invariants: { preserve: ["identity"] }
+      }
+    );
+    expect(decision).toMatchObject({
+      selected: true,
+      tier: "B",
+      transport: "openai-images",
+      endpoint: "https://relay.example/v1/images/edits",
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart
+    });
+  });
+
+  it("rejects missing edit fields and removed continuation fields before route selection", () => {
     expect(() => selectProviderRoute(context(), {
       kind: "edit",
-      prompt: "Removed edit"
+      prompt: "Missing edit target and invariants"
     })).toThrow();
     expect(() => selectProviderRoute(context(), {
       kind: "generate",

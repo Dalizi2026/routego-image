@@ -16,6 +16,7 @@ import {
   PROVIDER_REQUEST_SHAPES,
   transitionCapability
 } from "@routego-image/foundation";
+import { downloadProviderImage, ProviderDownloadException } from "@routego-image/creation";
 import type { RuntimeProviderProfile } from "@routego-image/library";
 import { PNG } from "pngjs";
 
@@ -210,7 +211,7 @@ function jsonProbeBody(input: CapabilityProbeInput): string {
   };
   const controls = {
     ...(input.capability === "native-variants" ? { n: 2 } : {}),
-    ...(input.capability === "custom-size" ? { size: "256x256" } : {}),
+    ...(input.capability === "custom-size" ? { size: customProbeSize(input).value } : {}),
     ...(input.capability === "output-format" ? { output_format: "jpeg" } : {}),
     ...(input.capability === "native-transparency" ? { background: "transparent" } : {})
   };
@@ -308,6 +309,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 interface ProbeImageOutput {
   readonly kind: "inline" | "url";
+  readonly url?: string;
   readonly mimeType?: "image/png" | "image/jpeg" | "image/webp";
   readonly width?: number;
   readonly height?: number;
@@ -437,6 +439,29 @@ function jpegDimensions(bytes: Buffer): { readonly width: number; readonly heigh
   return undefined;
 }
 
+function webpDimensions(bytes: Buffer): { readonly width: number; readonly height: number } | undefined {
+  if (bytes.length < 30 || !bytes.subarray(0, 4).equals(Buffer.from("RIFF")) || !bytes.subarray(8, 12).equals(Buffer.from("WEBP"))) {
+    return undefined;
+  }
+  const chunk = bytes.subarray(12, 16).toString("ascii");
+  if (chunk === "VP8X") {
+    const width = 1 + bytes.readUIntLE(24, 3);
+    const height = 1 + bytes.readUIntLE(27, 3);
+    return width > 0 && height > 0 ? { width, height } : undefined;
+  }
+  if (chunk === "VP8 " && bytes.subarray(23, 26).equals(Buffer.from([0x9d, 0x01, 0x2a]))) {
+    const width = bytes.readUInt16LE(26) & 0x3fff;
+    const height = bytes.readUInt16LE(28) & 0x3fff;
+    return width > 0 && height > 0 ? { width, height } : undefined;
+  }
+  if (chunk === "VP8L" && bytes[20] === 0x2f) {
+    const width = 1 + (bytes[21]! | ((bytes[22]! & 0x3f) << 8));
+    const height = 1 + ((bytes[22]! >> 6) | (bytes[23]! << 2) | ((bytes[24]! & 0x0f) << 10));
+    return width > 0 && height > 0 ? { width, height } : undefined;
+  }
+  return undefined;
+}
+
 function strictBase64Bytes(value: string): Uint8Array | undefined {
   const encoded = value.startsWith("data:")
     ? /^data:image\/(?:png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})$/u.exec(value)?.[1]
@@ -497,6 +522,10 @@ function inspectInlineImage(value: string): ProbeImageOutput | undefined {
   if (jpeg !== undefined) {
     return { kind: "inline", mimeType: "image/jpeg", ...jpeg };
   }
+  const webp = webpDimensions(Buffer.from(bytes));
+  if (webp !== undefined) {
+    return { kind: "inline", mimeType: "image/webp", ...webp };
+  }
   return undefined;
 }
 
@@ -512,23 +541,50 @@ function inspectOutputUrl(value: string): ProbeImageOutput | undefined {
     ) {
       return undefined;
     }
-    return { kind: "url" };
+    return { kind: "url", url: parsed.href };
   } catch {
     return undefined;
   }
 }
 
+function imageOutputFromItem(item: unknown): ProbeImageOutput | undefined {
+  if (!isRecord(item)) return undefined;
+  const base64 = ["b64_json", "b64", "base64", "image_base64"]
+    .map((key) => typeof item[key] === "string" ? item[key] : undefined)
+    .find((value) => value !== undefined);
+  const url = ["url", "image_url", "imageUrl"]
+    .map((key) => typeof item[key] === "string" ? item[key] : undefined)
+    .find((value) => value !== undefined);
+  const image = typeof item["image"] === "string" ? item["image"] : undefined;
+  const encoded = base64 ?? (image !== undefined && !image.startsWith("http") ? image : undefined);
+  const resource = url ?? (image !== undefined && image.startsWith("http") ? image : undefined);
+  if ((encoded === undefined) === (resource === undefined)) return undefined;
+  if (encoded !== undefined) return inspectInlineImage(encoded);
+  // Some OpenAI-compatible relays put a data:image URL in the `url` field.
+  // Decode it as image bytes before treating it as a network resource.
+  return inspectInlineImage(resource!) ?? inspectOutputUrl(resource!);
+}
+
+function imageOutputItems(body: Record<string, unknown>): readonly unknown[] | undefined {
+  const candidates = [body["data"], body["images"], body["result"]];
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate) && candidate.length >= 1 && candidate.length <= 4) return candidate;
+    if (!isRecord(candidate)) continue;
+    for (const nested of [candidate["data"], candidate["images"], candidate["result"]]) {
+      if (Array.isArray(nested) && nested.length >= 1 && nested.length <= 4) return nested;
+    }
+    return [candidate];
+  }
+  return undefined;
+}
+
 function imagesOutputs(body: unknown): readonly ProbeImageOutput[] | undefined {
-  if (!isRecord(body) || !Array.isArray(body["data"])) return undefined;
-  const data = body["data"];
-  if (data.length < 1 || data.length > 4) return undefined;
+  if (!isRecord(body)) return undefined;
+  const data = imageOutputItems(body);
+  if (data === undefined) return undefined;
   const outputs: ProbeImageOutput[] = [];
   for (const item of data) {
-    if (!isRecord(item)) return undefined;
-    const base64 = typeof item["b64_json"] === "string" ? item["b64_json"] : undefined;
-    const url = typeof item["url"] === "string" ? item["url"] : undefined;
-    if ((base64 === undefined) === (url === undefined)) return undefined;
-    const output = base64 === undefined ? inspectOutputUrl(url!) : inspectInlineImage(base64);
+    const output = imageOutputFromItem(item);
     if (output === undefined) return undefined;
     outputs.push(output);
   }
@@ -559,10 +615,66 @@ function responsesOutputs(body: unknown): readonly ProbeImageOutput[] | undefine
   return outputs.length > 0 && outputs.length <= 4 ? outputs : undefined;
 }
 
-function responseProvesCapability(body: unknown, proof: ProbeResponseProof): boolean {
-  const outputs = proof === "responses-completed-output"
-    ? responsesOutputs(body)
-    : imagesOutputs(body);
+function customProbeSize(input: CapabilityProbeInput): {
+  readonly value: string;
+  readonly width: number;
+  readonly height: number;
+} {
+  const value = input.capability === "custom-size" && input.requestedSize !== undefined && input.requestedSize !== "auto"
+    ? input.requestedSize
+    : "256x256";
+  const match = /^(?<width>[1-9]\d{1,4})x(?<height>[1-9]\d{1,4})$/u.exec(value);
+  const width = Number(match?.groups?.["width"]);
+  const height = Number(match?.groups?.["height"]);
+  if (
+    !Number.isSafeInteger(width) ||
+    !Number.isSafeInteger(height) ||
+    width > MAX_CAPABILITY_PROBE_PNG_DIMENSION ||
+    height > MAX_CAPABILITY_PROBE_PNG_DIMENSION ||
+    width * height > MAX_CAPABILITY_PROBE_PNG_PIXELS
+  ) {
+    throw new ProviderIntegrationError(
+      createProviderServiceError({
+        code: "invalid_request",
+        stage: "validate",
+        safeMessage: "The requested probe size exceeds Routego's bounded verification limit.",
+        capability: input.capability,
+        details: { requestedSize: value }
+      })
+    );
+  }
+  return { value, width, height };
+}
+
+async function resolveProbeUrls(
+  outputs: readonly ProbeImageOutput[],
+  endpoint: string,
+  fetchImpl: typeof fetch,
+  timeoutMs: number
+): Promise<readonly ProbeImageOutput[]> {
+  return Promise.all(outputs.map(async (output) => {
+    if (output.kind !== "url" || output.url === undefined) return output;
+    const downloaded = await downloadProviderImage(output.url, {
+      fetch: fetchImpl,
+      providerEndpoint: endpoint,
+      maximumBytes: MAX_CAPABILITY_PROBE_SUCCESS_BYTES,
+      timeoutMs
+    });
+    return {
+      kind: "inline" as const,
+      mimeType: downloaded.mimeType,
+      width: downloaded.width,
+      height: downloaded.height,
+      hasTransparency: downloaded.hasAlpha
+    };
+  }));
+}
+
+function responseProvesCapability(
+  outputs: readonly ProbeImageOutput[] | undefined,
+  proof: ProbeResponseProof,
+  expectedSize: { readonly width: number; readonly height: number }
+): boolean {
   if (outputs === undefined) return false;
   switch (proof) {
     case "images-output":
@@ -571,7 +683,9 @@ function responseProvesCapability(body: unknown, proof: ProbeResponseProof): boo
     case "images-two-outputs":
       return outputs.length >= 2;
     case "images-custom-size":
-      return outputs.every((output) => output.width === 256 && output.height === 256);
+      return outputs.every(
+        (output) => output.width === expectedSize.width && output.height === expectedSize.height
+      );
     case "images-jpeg-output":
       return outputs.every((output) => output.mimeType === "image/jpeg");
     case "images-alpha-output":
@@ -581,13 +695,48 @@ function responseProvesCapability(body: unknown, proof: ProbeResponseProof): boo
   }
 }
 
-function inconclusiveSuccess(response: Response, reason: string): CapabilityProbeOutcome {
+function responseBodyShape(body: unknown): string {
+  if (!isRecord(body)) return Array.isArray(body) ? "top-level-array" : typeof body;
+  const keys = Object.keys(body)
+    .filter((key) => /^[A-Za-z0-9_:-]{1,48}$/u.test(key))
+    .sort()
+    .slice(0, 8);
+  const data = body["data"];
+  const dataShape = Array.isArray(data)
+    ? "array"
+    : data === null
+      ? "null"
+      : typeof data;
+  const firstItem = Array.isArray(data) ? data[0] : undefined;
+  const firstItemKeys = isRecord(firstItem)
+    ? Object.keys(firstItem)
+      .filter((key) => /^[A-Za-z0-9_:-]{1,48}$/u.test(key))
+      .sort()
+      .slice(0, 8)
+    : [];
+  return `object(${keys.join(",") || "no-safe-keys"});data=${dataShape}${firstItemKeys.length === 0 ? "" : `;data0=object(${firstItemKeys.join(",")})`}`;
+}
+
+function probeInconclusiveMessage(reason: string, body?: unknown): string {
+  switch (reason) {
+    case "returned-image-url-could-not-be-verified":
+      return "The provider accepted the request, but Routego could not safely read the returned test-image URL to verify pixels.";
+    case "returned-image-url-inspection-failed":
+      return "The provider returned a test-image URL that Routego could not inspect to verify pixels.";
+    case "capability-specific-proof-missing":
+      return `The provider accepted the request but did not return a recognizable image output for pixel verification (response ${responseBodyShape(body)}).`;
+    default:
+      return "The confirmed capability probe returned no conclusive capability evidence.";
+  }
+}
+
+function inconclusiveSuccess(response: Response, reason: string, body?: unknown): CapabilityProbeOutcome {
   return {
     outcome: "transient",
     error: createProviderServiceError({
       code: "invalid_response",
       stage: "complete",
-      safeMessage: "The confirmed capability probe returned no conclusive capability evidence.",
+      safeMessage: probeInconclusiveMessage(reason, body),
       httpStatus: response.status,
       mayHaveBilled: true,
       details: {
@@ -600,7 +749,13 @@ function inconclusiveSuccess(response: Response, reason: string): CapabilityProb
 
 async function defaultInterpretResponse(
   response: Response,
-  definition: CapabilityProbeDefinition
+  definition: CapabilityProbeDefinition,
+  options: {
+    readonly endpoint: string;
+    readonly fetch: typeof fetch;
+    readonly timeoutMs: number;
+    readonly expectedSize: { readonly width: number; readonly height: number };
+  }
 ): Promise<CapabilityProbeOutcome> {
   const shape = responseShape(response);
   if (response.ok) {
@@ -617,8 +772,30 @@ async function defaultInterpretResponse(
     } catch {
       return inconclusiveSuccess(response, "invalid-or-oversized-success-body");
     }
-    if (!responseProvesCapability(body, definition.responseProof)) {
-      return inconclusiveSuccess(response, "capability-specific-proof-missing");
+    const parsedOutputs = definition.responseProof === "responses-completed-output"
+      ? responsesOutputs(body)
+      : imagesOutputs(body);
+    let outputs = parsedOutputs;
+    if (outputs?.some((output) => output.kind === "url") === true) {
+      try {
+        outputs = await resolveProbeUrls(outputs, options.endpoint, options.fetch, options.timeoutMs);
+      } catch (error) {
+        if (definition.responseProof === "images-custom-size" && error instanceof ProviderDownloadException) {
+          return {
+            outcome: "degraded",
+            degradedReason: "The provider accepted the requested size, but Routego could not safely read the returned test image to verify its pixels."
+          };
+        }
+        return inconclusiveSuccess(
+          response,
+          error instanceof ProviderDownloadException
+            ? "returned-image-url-could-not-be-verified"
+            : "returned-image-url-inspection-failed"
+        );
+      }
+    }
+    if (!responseProvesCapability(outputs, definition.responseProof, options.expectedSize)) {
+      return inconclusiveSuccess(response, "capability-specific-proof-missing", body);
     }
     const declaredState = response.headers.get("x-routego-capability-state")?.trim().toLowerCase();
     if (declaredState === "degraded") {
@@ -770,6 +947,7 @@ export async function probeProviderCapability(
     );
   }
   const definition = validateProbeShape(parsed);
+  const expectedSize = customProbeSize(parsed);
   let profile: RuntimeProviderProfile;
   try {
     profile = await owner.getRuntimeProviderProfile(parsed.providerId);
@@ -844,7 +1022,12 @@ export async function probeProviderCapability(
       };
     }
     if (response) {
-      outcome = await defaultInterpretResponse(response, definition);
+      outcome = await defaultInterpretResponse(response, definition, {
+        endpoint: descriptor.endpoint,
+        fetch: options.fetch ?? globalThis.fetch,
+        timeoutMs: safeTimeout(options.timeoutMs),
+        expectedSize
+      });
     }
   } finally {
     clearTimeout(timeout);
@@ -900,6 +1083,9 @@ export async function probeProviderCapability(
     }
     return capabilityProbeResultSchema.parse({ ...transient, record });
   }
+  const customSizeLimits = parsed.capability === "custom-size"
+    ? { supportedSizes: [expectedSize.value] }
+    : undefined;
   const observation = finalOutcome.outcome === "supported"
     ? {
         outcome: "supported" as const,
@@ -910,7 +1096,8 @@ export async function probeProviderCapability(
           requestShape: parsed.requestShape,
           ...(shape === undefined ? {} : { responseShape: shape }),
           ...(status === undefined ? {} : { httpStatus: status })
-        })
+        }),
+        ...(customSizeLimits === undefined ? {} : { limits: customSizeLimits })
       }
     : finalOutcome.outcome === "unsupported"
       ? {
@@ -935,10 +1122,11 @@ export async function probeProviderCapability(
             observedAt,
             summary: "The confirmed provider path completed only with weaker semantics.",
             requestShape: parsed.requestShape,
-            ...(shape === undefined ? {} : { responseShape: shape }),
-            ...(status === undefined ? {} : { httpStatus: status })
-          })
-        };
+          ...(shape === undefined ? {} : { responseShape: shape }),
+          ...(status === undefined ? {} : { httpStatus: status })
+        }),
+        ...(customSizeLimits === undefined ? {} : { limits: customSizeLimits })
+      };
   const record = transitionCapability(current, observation);
   const result = capabilityProbeResultSchema.parse({
     schemaVersion: 1,

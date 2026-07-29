@@ -62,6 +62,26 @@ function capabilityStateLabel(state: CapabilityProbeResult["record"]["state"], l
   return labels[state];
 }
 
+function probeErrorMessage(result: CapabilityProbeResult, language: "zh" | "en"): string | undefined {
+  if (result.record.capability === "custom-size" && result.record.state === "degraded") {
+    return language === "zh"
+      ? "上游已接受本次尺寸参数，但测试图链接无法读取，尚未核对实际像素。工作台仅会放行本次尺寸，成图仍会严格核验。"
+      : "The provider accepted this size, but its test-image URL could not be read for pixel verification. Only this size is allowed; completed images are still checked strictly.";
+  }
+  if (result.error === undefined) return undefined;
+  if (language === "zh" && result.error.code === "invalid_response") {
+    const reason = result.error.details?.["reason"];
+    if (reason === "returned-image-url-could-not-be-verified" || reason === "returned-image-url-inspection-failed") {
+      return "上游已返回测试图链接，但该链接无法被安全读取，无法核对实际像素尺寸。";
+    }
+    if (reason === "capability-specific-proof-missing") {
+      return "上游接受了请求，但没有按可识别的图片格式返回测试图，无法核对实际像素尺寸。";
+    }
+    return "本次响应没有提供可用于核对实际像素尺寸的证据。";
+  }
+  return result.error.safeMessage;
+}
+
 export function CapabilityProbePanel({
   gateway,
   settings
@@ -89,6 +109,9 @@ export function CapabilityProbePanel({
           capability,
           transport: "single-endpoint-json",
           requestShape: "single-endpoint-json:text",
+          ...(capability === "custom-size" && settings.defaults.size !== "auto"
+            ? { requestedSize: settings.defaults.size }
+            : {}),
           confirmBillableProbe: true
         });
         results.push(result);
@@ -122,7 +145,14 @@ export function CapabilityProbePanel({
       {requirements.length > 0 ? (
         <>
           <ul className="capability-probe__requirements">
-            {requirements.map((capability) => <li key={capability}>{capabilityDetail(capability, language)}</li>)}
+            {requirements.map((capability) => <li key={capability}>
+              {capabilityDetail(capability, language)}
+              {capability === "custom-size" && settings.defaults.size !== "auto"
+                ? (isChinese
+                  ? `：将生成并核对实际 ${settings.defaults.size} 像素尺寸`
+                  : `: generates and checks the actual ${settings.defaults.size} pixel dimensions`)
+                : ""}
+            </li>)}
           </ul>
           <p className="capability-probe__scope">
             {isChinese
@@ -152,19 +182,19 @@ export function CapabilityProbePanel({
         <div className={`capability-probe__result ${allVerified ? "is-success" : "is-warning"}`} role="status">
           <strong>{allVerified
             ? (isChinese ? "验证完成：当前默认参数的可选控制已获服务商确认。" : "Verification complete: the provider confirmed the optional controls in these defaults.")
-            : (isChinese ? "验证完成：部分控制未获确认，请查看每项结果。" : "Verification complete: some controls were not confirmed; review each result.")}
+            : (isChinese ? "验证未获得完整确认：请查看每项可执行结论。" : "Verification did not obtain full confirmation: review each actionable result.")}
           </strong>
           <ul>
             {state.results.map((result) => (
               <li key={result.record.capability}>
                 {capabilityDetail(result.record.capability, language)}：{capabilityStateLabel(result.record.state, language)}
-                {result.error === undefined ? "" : `（${result.error.safeMessage}）`}
+                {probeErrorMessage(result, language) === undefined ? "" : `（${probeErrorMessage(result, language)}）`}
               </li>
             ))}
           </ul>
           <p>
             {isChinese
-              ? "验证“支持”表示服务商接受该参数通道。每次正式生成后，Routego 仍会核对图片的比例、分辨率、格式和数量；不一致会明确失败且不会存入图库。"
+              ? "尺寸验证“支持”表示服务商返回的测试图已实际匹配当前设置的像素尺寸。每次正式生成后，Routego 仍会核对图片的比例、分辨率、格式和数量；不一致会明确失败且不会存入图库。"
               : "Supported means the provider accepted that parameter channel. Routego still checks each completed generation for the requested ratio, resolution, format, and count; a mismatch fails clearly and is not saved to Library."}
           </p>
         </div>

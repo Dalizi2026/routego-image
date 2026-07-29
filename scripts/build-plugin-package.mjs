@@ -110,16 +110,11 @@ async function copyContainedSource(repositoryRoot, sourceRelative, targetRoot, t
   await copyFile(resolved, target);
 }
 
-async function copyGenerationOnlySkill(repositoryRoot, packageRoot) {
+async function copyRoutegoSkill(repositoryRoot, packageRoot) {
   const source = path.join(repositoryRoot, "skills/routego-image/SKILL.md");
   const target = path.join(packageRoot, "skills/routego-image/SKILL.md");
-  const content = await readFile(source, "utf8");
-  const generationOnly = content
-    .replaceAll("routego_edit", "routego_prepare_regeneration")
-    .replaceAll("edit one explicit target", "prepare regeneration for one explicit record")
-    .replaceAll("editing", "preparing regeneration");
   await mkdir(path.dirname(target), { recursive: true });
-  await writeFile(target, generationOnly, "utf8");
+  await copyFile(source, target);
 }
 
 async function collectRegularFiles(directory, relativeDirectory = "") {
@@ -304,7 +299,7 @@ export async function buildPluginPackage(options = {}) {
       if (source === "skills/routego-image/SKILL.md") continue;
       await copyContainedSource(repositoryRoot, source, packageRoot, target);
     }
-    await copyGenerationOnlySkill(repositoryRoot, packageRoot);
+    await copyRoutegoSkill(repositoryRoot, packageRoot);
     await chmod(path.join(packageRoot, "scripts/start-routego-image.mjs"), 0o755);
 
     const runtimeSource = path.join(integrationBuild, "index.js");

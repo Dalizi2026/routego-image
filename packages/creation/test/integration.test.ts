@@ -107,7 +107,7 @@ async function close(server: MockRelayTestServer): Promise<void> {
 }
 
 describe("Creation package integration", () => {
-  it("exports the approved runtime surface and exposes exactly the seven frozen MCP tools", async () => {
+  it("exports the approved runtime surface and exposes exactly the eight MCP tools", async () => {
     expect(ROUTEGO_CREATION_PACKAGE_VERSION).toBe(1);
     const server = createRoutegoMcpServer({
       service: createMockRoutegoService({ requestId: "request-integration-mcp" }) as unknown as RoutegoService
@@ -121,7 +121,7 @@ describe("Creation package integration", () => {
     expect(tools.map((tool) => tool.name)).toEqual(
       routegoOperationNames.map((operation) => routegoOperationDefinitions[operation].toolName)
     );
-    expect(tools).toHaveLength(7);
+    expect(tools).toHaveLength(8);
   });
 
   it("runs Tier A text generation through the offline relay", async () => {

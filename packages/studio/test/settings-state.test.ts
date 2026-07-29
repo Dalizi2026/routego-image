@@ -114,6 +114,34 @@ describe("secret-safe Settings state and request construction", () => {
       generation: { mode: "exact-generation-endpoint" },
       models: { value: "https://relay.example.invalid/v1/models" }
     });
+    expect(fromBase.edits).toEqual({ value: "", requiresReentry: false });
+    expect(fromGeneration.edits).toEqual({ value: "", requiresReentry: false });
+  });
+
+  it("preserves a user-entered edits endpoint without deriving one from generation settings", () => {
+    const configuredEditsProfile: ProviderProfileDescriptor = {
+      ...profile,
+      endpoints: {
+        generation: endpoint,
+        edits: {
+          mode: "exact-generation-endpoint",
+          origin: "https://relay.example.invalid",
+          pathname: "/v1/images/edits",
+          hasQuery: false,
+          display: "https://relay.example.invalid/v1/images/edits"
+        }
+      }
+    };
+
+    const draft = createProviderProfileDraft(configuredEditsProfile);
+    expect(draft.edits).toEqual({
+      value: "https://relay.example.invalid/v1/images/edits",
+      requiresReentry: false
+    });
+    expect(buildUpsertProviderProfileInput(draft).endpoints).toMatchObject({
+      generation: { value: endpoint.display },
+      edits: "https://relay.example.invalid/v1/images/edits"
+    });
   });
 
   it("never hydrates an existing secret and requires re-entry for hidden endpoint queries", () => {
@@ -124,6 +152,13 @@ describe("secret-safe Settings state and request construction", () => {
           ...endpoint,
           hasQuery: true,
           display: `${endpoint.display}?[REDACTED]`
+        },
+        edits: {
+          mode: "exact-generation-endpoint",
+          origin: "https://relay.example.invalid",
+          pathname: "/v1/images/edits",
+          hasQuery: true,
+          display: "https://relay.example.invalid/v1/images/edits?[REDACTED]"
         }
       }
     };
@@ -131,6 +166,7 @@ describe("secret-safe Settings state and request construction", () => {
     expect(draft).toMatchObject({
       profileId: profile.id,
       generation: { value: "", requiresReentry: true },
+      edits: { value: "", requiresReentry: true },
       apiKeyOperation: "unchanged",
       apiKeyReplacement: ""
     });
@@ -172,9 +208,11 @@ describe("secret-safe Settings state and request construction", () => {
     const afterCreate = mergeUpsertProviderProfile(settings, {
       schemaVersion: 1,
       profile: created,
-      activeProviderId: profile.id
+      activeProviderId: created.id
     });
     expect(afterCreate.profiles.map((item) => item.id)).toEqual(["provider-a", "provider-b"]);
+    expect(afterCreate.activeProviderId).toBe(created.id);
+    expect(afterCreate.defaults.model).toBe(created.defaultModel);
 
     const activated = mergeActiveProviderProfile(afterCreate, {
       schemaVersion: 1,

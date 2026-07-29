@@ -33,6 +33,7 @@ import {
   STUDIO_CREATION_STREAM_PATH,
   createStudioCreationStreamRoute
 } from "./stream-route";
+import { selectNativeLibraryDirectory } from "./native-directory-picker";
 
 export const UPLOAD_CONTENT_ROUTE_PATTERN =
   /^\/api\/v1\/uploads\/([A-Za-z0-9][A-Za-z0-9._:-]*)\/content$/u;
@@ -43,6 +44,7 @@ export const EPHEMERAL_RESOURCE_ROUTE_PATTERN =
 
 const LIBRARY_MARK_ROUTE = "/api/v1/library/mark";
 const LIBRARY_COPY_INFORMATION_ROUTE = "/api/v1/library/copy-generation-info";
+const LIBRARY_SELECT_DIRECTORY_ROUTE = "/api/v1/library/select-directory";
 const REMOVED_LIBRARY_ROUTE_PATHS = new Set([
   "/api/v1/edit",
   "/api/v1/library/trash",
@@ -82,7 +84,7 @@ export interface ProductionStudioStreamService {
 
 export interface IntegrationRuntimeRouteOptions {
   readonly service: Pick<LocalRoutegoService, "getUploadResourceStatus"> &
-    ProductionStudioStreamService;
+    Partial<Pick<LocalRoutegoService, "manageLibrary">> & ProductionStudioStreamService;
   readonly library: Pick<
     RoutegoLibraryService,
     | "resolveBrowserResource"
@@ -99,6 +101,8 @@ export interface IntegrationRuntimeRouteOptions {
   readonly now?: () => Date;
   readonly resourceChunkBytes?: number;
   readonly maximumStreamJsonBodyBytes?: number;
+  /** Injectable only for deterministic runtime-route tests. */
+  readonly selectLibraryDirectory?: () => Promise<string | undefined>;
 }
 
 class RuntimeRouteError extends Error {
@@ -562,9 +566,10 @@ export function createIntegrationRuntimeRoutes(
     const isStream = request.url.pathname === STUDIO_CREATION_STREAM_PATH;
     const isLibraryMark = request.url.pathname === LIBRARY_MARK_ROUTE;
     const isLibraryCopy = request.url.pathname === LIBRARY_COPY_INFORMATION_ROUTE;
+    const isLibraryDirectorySelection = request.url.pathname === LIBRARY_SELECT_DIRECTORY_ROUTE;
     const isRemovedLibraryRoute = REMOVED_LIBRARY_ROUTE_PATHS.has(request.url.pathname);
     if (uploadMatch === null && libraryMatch === null && ephemeralMatch === null && !isStream &&
-      !isLibraryMark && !isLibraryCopy && !isRemovedLibraryRoute) {
+      !isLibraryMark && !isLibraryCopy && !isLibraryDirectorySelection && !isRemovedLibraryRoute) {
       return undefined;
     }
 
@@ -575,7 +580,7 @@ export function createIntegrationRuntimeRoutes(
     if (extensionContext.preflight) {
       if (isStream) return await streamRoute(request, extensionContext);
       const expectedMethod = uploadMatch !== null ? "PUT" :
-        isLibraryMark || isLibraryCopy ? "POST" : "GET";
+        isLibraryMark || isLibraryCopy || isLibraryDirectorySelection ? "POST" : "GET";
       if (header(request, "access-control-request-method")?.trim().toUpperCase() !== expectedMethod) {
         return errorResponse(new RuntimeRouteError(405, "invalid_request", "The protected route preflight method is invalid."));
       }
@@ -643,6 +648,22 @@ export function createIntegrationRuntimeRoutes(
         return jsonResponse(200, await options.library.galleryService.copyGenerationInfo(
           parseCopyInput(await boundedJsonBody(request))
         ));
+      }
+      if (isLibraryDirectorySelection) {
+        if (request.method.toUpperCase() !== "POST") {
+          throw new RuntimeRouteError(405, "invalid_request", "The Library directory picker accepts POST only.");
+        }
+        const input = await boundedJsonBody(request);
+        if (input === null || typeof input !== "object" || Array.isArray(input) || Object.keys(input).length !== 0) {
+          throw new RuntimeRouteError(400, "invalid_request", "The Library directory picker request is invalid.");
+        }
+        const selected = await (options.selectLibraryDirectory ?? selectNativeLibraryDirectory)();
+        if (selected === undefined) return jsonResponse(200, { schemaVersion: 1, selected: false });
+        if (options.service.manageLibrary === undefined) {
+          throw new RuntimeRouteError(503, "runtime_unavailable", "The Library directory picker is unavailable.");
+        }
+        const result = await options.service.manageLibrary({ action: "add-location", locationPath: selected });
+        return jsonResponse(200, { schemaVersion: 1, selected: true, result });
       }
       if (uploadMatch !== null) {
         if (request.method.toUpperCase() !== "PUT") {
@@ -721,7 +742,9 @@ export function createIntegrationRuntimeRoutes(
       };
     } catch (error) {
       return errorResponse(error instanceof RuntimeRouteError ? error :
-        (isLibraryMark || isLibraryCopy ? safeLibraryRouteError(error) : safeRouteError(error, true)));
+        (isLibraryMark || isLibraryCopy || isLibraryDirectorySelection
+          ? safeLibraryRouteError(error)
+          : safeRouteError(error, true)));
     }
   };
 }

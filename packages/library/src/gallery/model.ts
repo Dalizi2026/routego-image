@@ -55,9 +55,11 @@ export interface StoredLibraryFolder {
 
 export interface StoredLibraryAsset {
   readonly id: string;
+  /** A user-controlled label. It never changes the original operation metadata. */
+  readonly displayName?: string;
   readonly prompt: string;
   readonly model: string;
-  readonly kind: "generate";
+  readonly kind: "generate" | "edit";
   readonly status: LibraryAssetStatus;
   readonly primaryArtifactId: string;
   readonly createdAt: string;
@@ -281,6 +283,7 @@ function parseAsset(value: unknown): StoredLibraryAsset {
     record,
     [
       "id",
+      "displayName",
       "prompt",
       "model",
       "kind",
@@ -301,6 +304,13 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   if (typeof record["prompt"] !== "string" || record["prompt"].length > 32_000) {
     throw new LibraryError("config_corrupt", "Library asset prompt is invalid.");
   }
+  const displayName = record["displayName"];
+  if (
+    displayName !== undefined &&
+    (typeof displayName !== "string" || displayName.trim().length < 1 || displayName.trim().length > 200)
+  ) {
+    throw new LibraryError("config_corrupt", "Library asset display name is invalid.");
+  }
   if (typeof record["model"] !== "string" || record["model"].trim() === "" || record["model"].length > 200) {
     throw new LibraryError("config_corrupt", "Library asset model is invalid.");
   }
@@ -317,11 +327,13 @@ function parseAsset(value: unknown): StoredLibraryAsset {
     throw new LibraryError("config_corrupt", "Library asset operation metadata is invalid.");
   }
   if (
-    record["kind"] !== "generate" ||
-    requestedParams.kind !== "generate" ||
-    effectiveParams.kind !== "generate"
+    record["kind"] !== requestedParams.kind ||
+    record["kind"] !== effectiveParams.kind
   ) {
-    throw new LibraryError("config_corrupt", "Current Library indexes contain generation records only.");
+    throw new LibraryError(
+      "config_corrupt",
+      "Library asset operation kinds must match their requested and effective parameters."
+    );
   }
   if (status === "deleted") {
     throw new LibraryError("config_corrupt", "Current Library indexes cannot contain Trash records.");
@@ -401,9 +413,10 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   }
   return {
     id: assetId,
+    ...(displayName === undefined ? {} : { displayName: displayName.trim() }),
     prompt: record["prompt"],
     model: record["model"].trim(),
-    kind: "generate",
+    kind: requestedParams.kind,
     status,
     primaryArtifactId,
     createdAt,

@@ -9,12 +9,17 @@ import {
 export type CapabilityScope = ProviderCapabilityRecord["scope"];
 
 export type CapabilityObservation =
-  | { readonly outcome: "supported"; readonly evidence: CapabilityEvidence }
+  | {
+      readonly outcome: "supported";
+      readonly evidence: CapabilityEvidence;
+      readonly limits?: ProviderCapabilityRecord["limits"];
+    }
   | { readonly outcome: "unsupported"; readonly evidence: CapabilityEvidence }
   | {
       readonly outcome: "degraded";
       readonly evidence: CapabilityEvidence;
       readonly degradedReason: string;
+      readonly limits?: ProviderCapabilityRecord["limits"];
     }
   | { readonly outcome: "transient"; readonly evidence: CapabilityEvidence }
   | { readonly outcome: "synthetic"; readonly evidence: CapabilityEvidence };
@@ -36,6 +41,22 @@ function appendEvidence(
   evidence: CapabilityEvidence
 ): CapabilityEvidence[] {
   return [...current, evidence].slice(-32);
+}
+
+function mergeLimits(
+  current: ProviderCapabilityRecord["limits"],
+  observed: ProviderCapabilityRecord["limits"]
+): ProviderCapabilityRecord["limits"] {
+  if (observed === undefined) return current;
+  const supportedSizes = [
+    ...(current?.supportedSizes ?? []),
+    ...(observed.supportedSizes ?? [])
+  ];
+  return {
+    ...current,
+    ...observed,
+    ...(supportedSizes.length === 0 ? {} : { supportedSizes: [...new Set(supportedSizes)] })
+  };
 }
 
 export function createUnknownCapabilityRecord(
@@ -91,7 +112,10 @@ export function transitionCapability(
       ...withoutDegradedReason,
       state: "supported",
       evidence: nextEvidence,
-      verifiedAt: evidence.observedAt
+      verifiedAt: evidence.observedAt,
+      ...(observation.limits === undefined
+        ? {}
+        : { limits: mergeLimits(current.limits, observation.limits) })
     });
   }
 
@@ -122,7 +146,10 @@ export function transitionCapability(
     state: "degraded",
     evidence: nextEvidence,
     verifiedAt: evidence.observedAt,
-    degradedReason: observation.degradedReason
+    degradedReason: observation.degradedReason,
+    ...(observation.limits === undefined
+      ? {}
+      : { limits: mergeLimits(current.limits, observation.limits) })
   });
 }
 

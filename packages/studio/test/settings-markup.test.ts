@@ -24,6 +24,13 @@ const settings: ReadSettingsResult = {
           pathname: "/v1/images/generations",
           hasQuery: true,
           display: "https://relay.example.invalid/v1/images/generations?[REDACTED]"
+        },
+        edits: {
+          mode: "exact-generation-endpoint",
+          origin: "https://relay.example.invalid",
+          pathname: "/v1/images/edits",
+          hasQuery: false,
+          display: "https://relay.example.invalid/v1/images/edits"
         }
       },
       defaultModel: "synthetic-image-model",
@@ -106,9 +113,11 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).toContain("Verify current defaults");
     expect(markup).toContain("Start verification (may be billable)");
     expect(markup).toContain("Custom size and aspect ratio");
+    expect(markup).toContain("Custom dimensions");
+    expect(markup).toContain("21:9");
   });
 
-  it("renders first run as endpoint, key, and explicit model fetch only", () => {
+  it("renders first run as a concise provider editor", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
         initialLanguage: "en",
@@ -121,19 +130,19 @@ describe("secret-safe Settings workspace markup", () => {
       })
     );
 
-    expect(markup).toContain("Configure once, then create directly in Codex");
-    expect(markup).toContain("Call endpoint");
+    expect(markup).toContain("Provider management");
+    expect(markup).toContain("API endpoint");
     expect(markup).toContain('type="password"');
-    expect(markup).toContain("Connect and fetch models");
+    expect(markup).toContain("Get models");
     expect(markup).toContain("https://relay.example.invalid/");
-    expect(markup).not.toContain("Profile name");
+    expect(markup).toContain("Name");
     expect(markup).not.toContain("Generation endpoint mode");
     expect(markup).not.toContain("Refresh models (non-billable)");
     expect(markup).not.toContain("Verify current defaults");
     expect(markup).not.toContain("Four-state capability evidence");
   });
 
-  it("keeps repeat configuration simple and places specialist controls in a closed disclosure", () => {
+  it("keeps repeat configuration to provider choice, summary, and an explicit edit action", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
         initialLanguage: "en",
@@ -145,20 +154,20 @@ describe("secret-safe Settings workspace markup", () => {
       })
     );
 
-    expect(markup).toContain("Image API settings");
-    expect(markup).toContain("Call endpoint");
-    expect(markup).toContain('type="password"');
-    expect(markup).toContain("Connect and fetch models");
-    expect(markup).toContain('<details class="settings-advanced"><summary>');
-    expect(markup).toContain("Advanced settings");
-    expect(markup).not.toContain('<details class="settings-advanced" open=""');
-    expect(markup).toContain("Refresh models (non-billable)");
-    expect(markup).toContain("Start verification (may be billable)");
+    expect(markup).toContain("Provider management");
+    expect(markup).toContain("Current provider");
+    expect(markup).toContain("Edit");
+    expect(markup).toContain("API key configured");
+    expect(markup).toContain("Current model");
+    expect(markup).not.toContain("Advanced settings");
+    expect(markup).toContain("New provider");
+    expect(markup).not.toContain("Edits endpoint (optional)");
+    expect(markup).not.toContain("https://relay.example.invalid/v1/images/edits");
+    expect(markup).not.toContain("Refresh models (non-billable)");
+    expect(markup).not.toContain("Start verification (may be billable)");
     expect(markup).not.toContain("Four-state capability evidence");
-    expect(markup).toContain("Replace");
-    expect(markup).toContain("hidden query data");
-    expect(markup).toContain("Pictures/routego-image");
-    expect(markup).toContain("synthetic-present");
+    expect(markup).not.toContain("Pictures/routego-image");
+    expect(markup).not.toContain("synthetic-present");
     expect(markup).not.toContain("synthetic-one-shot-secret");
     expect(markup).not.toMatch(/(?:C:\\|\/Users\/|data:image|base64,|Authorization)/u);
   });
@@ -182,24 +191,17 @@ describe("secret-safe Settings workspace markup", () => {
     expect(sources).not.toMatch(/dangerouslySetInnerHTML/iu);
     expect(sources).not.toMatch(/key=\{[^}]*defaults/iu);
     expect(sources).toContain('type="password"');
-    expect(sources).toContain('autoComplete="off"');
+    expect(sources).toContain('autoComplete="new-password"');
 
     const apiKeyClear = workspaceSource.indexOf(
-      "setProfileDraft((current) => clearApiKeyDraft(current));"
+      "setDraft((current) => clearApiKeyDraft(current));"
     );
     const profileDispatch = workspaceSource.indexOf(
       'gateway.invoke("upsertProviderProfile", input)'
     );
-    const outputPathClear = workspaceSource.indexOf(
-      "setOutputDraft((current) => clearOutputDirectorySensitiveDraft(current));"
-    );
-    const outputDispatch = workspaceSource.indexOf(
-      'gateway.invoke("updateSettings", input)',
-      outputPathClear
-    );
     expect(apiKeyClear).toBeGreaterThan(-1);
     expect(profileDispatch).toBeGreaterThan(apiKeyClear);
-    expect(outputPathClear).toBeGreaterThan(-1);
-    expect(outputDispatch).toBeGreaterThan(outputPathClear);
+    expect(workspaceSource).not.toContain("CapabilityProbePanel");
+    expect(workspaceSource).not.toContain("buildOutputDirectorySettingsInput");
   });
 });

@@ -322,10 +322,11 @@ describe("folder and complete asset detail contracts", () => {
     ).toBe(false);
   });
 
-  it("keeps the public MCP surface at exactly seven tool names", () => {
+  it("keeps the public MCP surface at exactly eight tool names", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
+      "edit",
       "prepareRegeneration",
       "batch",
       "searchLibrary",
@@ -337,6 +338,7 @@ describe("folder and complete asset detail contracts", () => {
     ).toEqual([
       "routego_status",
       "routego_generate",
+      "routego_edit",
       "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
@@ -440,7 +442,7 @@ describe("path-free Studio Library search", () => {
     expect(JSON.stringify(result)).not.toMatch(/(?:filePath|"path"|C:\\|\/Users\/)/u);
   });
 
-  it("rejects path leakage, unsafe thumbnails, deleted trash rows, and edit kinds", () => {
+  it("rejects path leakage, unsafe thumbnails, and deleted trash rows while allowing edits", () => {
     const base = {
       assetId: "asset-output",
       artifactId: "artifact-output",
@@ -482,7 +484,7 @@ describe("path-free Studio Library search", () => {
         schemaVersion: 1,
         items: [{ ...base, kind: "edit" }]
       }).success
-    ).toBe(false);
+    ).toBe(true);
   });
 });
 

@@ -52,7 +52,7 @@ describe("Studio Library path-free query and cursor state", () => {
     expect(buildLibrarySearchInput(createLibraryFilters("trash"), "trash")).toMatchObject({
       statuses: [],
       includeDeleted: false,
-      kinds: ["generate"]
+      kinds: ["generate", "edit"]
     });
 
     expect(() =>

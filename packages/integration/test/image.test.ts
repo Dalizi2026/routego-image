@@ -20,6 +20,7 @@ import {
   type MaterializedImageOutput,
   type OutputMaterializationTransaction
 } from "../src/image/materialize";
+import { normalizeProviderRasterOutput } from "../src/image/resize";
 import {
   EPHEMERAL_IMAGE_RESOURCE_TTL_MS,
   EphemeralImageResourceError,
@@ -216,6 +217,38 @@ async function registry(input: {
 }
 
 describe("bounded output materialization", () => {
+  it("accepts the 4096 raster boundary without allocating an output and rejects larger targets", async () => {
+    const output: MaterializedImageOutput = {
+      artifactId: "artifact-webp-boundary",
+      slot: 0,
+      phase: "final",
+      path: "/not-read.webp",
+      mimeType: "image/webp",
+      byteLength: 30,
+      width: 8,
+      height: 8,
+      sha256: "0".repeat(64),
+      createdAt: "2026-07-27T12:00:00.000Z",
+      source: "provider-original"
+    };
+    const transaction = {} as OutputMaterializationTransaction;
+
+    await expect(normalizeProviderRasterOutput({
+      transaction,
+      output,
+      targetWidth: 4_096,
+      targetHeight: 4_096,
+      targetMimeType: "image/jpeg"
+    })).resolves.toBeUndefined();
+    await expect(normalizeProviderRasterOutput({
+      transaction,
+      output,
+      targetWidth: 4_097,
+      targetHeight: 4_096,
+      targetMimeType: "image/jpeg"
+    })).rejects.toMatchObject({ code: "metadata-mismatch" });
+  });
+
   it("materializes PNG, JPEG, and WebP only after exact metadata and checksum validation", async () => {
     const root = await temporaryRoot();
     const png = pngBytes({ width: 3, height: 2 });

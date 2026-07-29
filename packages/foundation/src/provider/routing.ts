@@ -10,13 +10,18 @@ import {
   type RoutegoServiceError
 } from "@routego-image/contracts";
 
-import { fingerprintProviderEndpoint, normalizeProviderEndpoints } from "./endpoints";
+import {
+  deriveImagesEditsEndpoint,
+  fingerprintProviderEndpoint,
+  normalizeProviderEndpoints
+} from "./endpoints";
 
 export const PROVIDER_REQUEST_SHAPES = {
   singleEndpointText: "single-endpoint-json:text",
   singleEndpointImage: "single-endpoint-json:image",
   singleEndpointImages: "single-endpoint-json:images",
   imagesGenerationsJson: "openai-images:generations-json",
+  imagesEditsMultipart: "openai-images:edits-multipart",
   responsesImageGeneration: "openai-responses:image-generation"
 } as const;
 
@@ -45,6 +50,8 @@ export interface ProviderRoutingContext {
   readonly capabilities: readonly ProviderCapabilityRecord[];
   readonly preferredTransports?: readonly ProviderTransport[];
   readonly previousAttempt?: PreviousProviderAttempt;
+  /** Direct public edits may establish support with their one user-authorized request. */
+  readonly allowUnverifiedDirectEdit?: boolean;
 }
 
 export interface CapabilityLimitViolation {
@@ -60,7 +67,7 @@ export interface SelectedProviderRoute {
   readonly transport: ProviderTransport;
   readonly endpoint: string;
   readonly requestShape: string;
-  readonly effectiveKind: "generate";
+  readonly effectiveKind: "generate" | "edit";
   readonly requiredCapabilities: readonly ProviderCapability[];
   readonly degraded: boolean;
   /**
@@ -88,7 +95,7 @@ interface RouteCandidate {
   readonly transport: ProviderTransport;
   readonly endpoint: string;
   readonly requestShape: string;
-  readonly effectiveKind: "generate";
+  readonly effectiveKind: "generate" | "edit";
   readonly imageInputCount: number;
   readonly requiredCapabilities: readonly ProviderCapability[];
   readonly allowUnknownTextBaseline?: boolean;
@@ -147,7 +154,7 @@ function makeUnavailable(
 }
 
 function physicalImageInputCount(request: ImageOperationRequest): number {
-  return request.references.length;
+  return request.references.length + (request.kind === "edit" ? 1 : 0);
 }
 
 function requestedFeatureCapabilities(request: ImageOperationRequest): ProviderCapability[] {
@@ -176,6 +183,13 @@ function requestedFeatureCapabilities(request: ImageOperationRequest): ProviderC
   return required;
 }
 
+function isProviderDrivenControl(capability: ProviderCapability): boolean {
+  // Size and format are explicit provider controls whose results can be verified
+  // from the returned artifact. Forward them once and fail closed on a mismatch
+  // instead of requiring a separate, potentially billable probe first.
+  return capability === "custom-size" || capability === "output-format";
+}
+
 function transparencyFor(
   context: ProviderRoutingContext,
   request: ImageOperationRequest,
@@ -193,6 +207,7 @@ function tierACapabilities(
   const required: ProviderCapability[] = imageInputs === 0
     ? ["text-generation"]
     : [imageInputs === 1 ? "single-image-input" : "multi-image-input", "data-url-input"];
+  if (request.kind === "edit") required.push("target-edit");
   return uniqueCapabilities([...required, ...requestedFeatureCapabilities(request)]);
 }
 
@@ -206,6 +221,7 @@ function tierBCapabilities(
         imageInputs === 1 ? "single-image-input" : "multi-image-input",
         "multipart-input"
       ];
+  if (request.kind === "edit") required.push("target-edit");
   return uniqueCapabilities([...required, ...requestedFeatureCapabilities(request)]);
 }
 
@@ -216,6 +232,7 @@ function tierCCapabilities(request: ImageOperationRequest): ProviderCapability[]
     required.push(inputs === 1 ? "single-image-input" : "multi-image-input");
     required.push("data-url-input");
   }
+  if (request.kind === "edit") required.push("target-edit");
   return uniqueCapabilities([...required, ...requestedFeatureCapabilities(request)]);
 }
 
@@ -226,8 +243,12 @@ function configuredCandidates(
   const endpoints = normalizeProviderEndpoints(providerEndpointSetSchema.parse(context.endpoints));
   const physicalInputs = physicalImageInputCount(request);
   const order = context.preferredTransports ??
-    (physicalInputs === 0
-      ? ["single-endpoint-json", "openai-responses"]
+    (request.kind === "edit" && endpoints.mode === "legacy-api-base"
+      ? ["openai-images", "single-endpoint-json", "openai-responses"]
+      : physicalInputs === 0
+      ? endpoints.mode === "legacy-api-base"
+        ? ["openai-images", "single-endpoint-json", "openai-responses"]
+        : ["single-endpoint-json", "openai-responses"]
       : ["single-endpoint-json", "openai-images", "openai-responses"]);
 
   const candidates: RouteCandidate[] = [];
@@ -243,7 +264,7 @@ function configuredCandidates(
             : physicalInputs === 1
               ? PROVIDER_REQUEST_SHAPES.singleEndpointImage
               : PROVIDER_REQUEST_SHAPES.singleEndpointImages,
-        effectiveKind: "generate",
+        effectiveKind: request.kind,
         imageInputCount: physicalInputs,
         requiredCapabilities: tierACapabilities(request, physicalInputs),
         allowUnknownTextBaseline: physicalInputs === 0
@@ -265,6 +286,20 @@ function configuredCandidates(
         });
         continue;
       }
+      if (
+        request.kind === "edit" &&
+        (endpoints.editsEndpoint !== undefined || endpoints.mode === "legacy-api-base")
+      ) {
+        candidates.push({
+          tier: "B",
+          transport,
+          endpoint: endpoints.editsEndpoint ?? deriveImagesEditsEndpoint(endpoints.generationEndpoint),
+          requestShape: PROVIDER_REQUEST_SHAPES.imagesEditsMultipart,
+          effectiveKind: "edit",
+          imageInputCount: physicalInputs,
+          requiredCapabilities: tierBCapabilities(request, physicalInputs)
+        });
+      }
       continue;
     }
 
@@ -274,7 +309,7 @@ function configuredCandidates(
         transport,
         endpoint: endpoints.responsesEndpoint,
         requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration,
-        effectiveKind: "generate",
+        effectiveKind: request.kind,
         imageInputCount: physicalImageInputCount(request),
         requiredCapabilities: tierCCapabilities(request)
       });
@@ -425,10 +460,18 @@ function selectFromCandidates(
     let degraded = false;
     let candidateUnavailable = false;
     for (const capability of candidate.requiredCapabilities) {
+      if (isProviderDrivenControl(capability)) continue;
       const record = findCapabilityRecord(context, candidate, capability);
       if (
         candidate.allowUnknownTextBaseline === true &&
         capability === "text-generation" &&
+        (record === undefined || record.state === "unknown")
+      ) {
+        continue;
+      }
+      if (
+        request.kind === "edit" &&
+        context.allowUnverifiedDirectEdit === true &&
         (record === undefined || record.state === "unknown")
       ) {
         continue;

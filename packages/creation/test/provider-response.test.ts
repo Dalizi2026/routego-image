@@ -231,6 +231,22 @@ describe("bounded Base64 and synchronous provider response normalization", () =>
     }
   });
 
+  it("accepts a provider's duplicate inline image URL while preferring its Base64 result", async () => {
+    const duplicate = await normalizeImagesJsonResponse(
+      { data: [{ b64_json: PNG_BASE64, url: `data:image/png;base64,${PNG_BASE64}` }] },
+      context()
+    );
+    expect(duplicate.error).toBeUndefined();
+    expect(duplicate.finalArtifacts).toHaveLength(1);
+
+    const inlineOnly = await normalizeImagesJsonResponse(
+      { data: [{ url: `data:image/png;base64,${PNG_BASE64}` }] },
+      context()
+    );
+    expect(inlineOnly.error).toBeUndefined();
+    expect(inlineOnly.finalArtifacts).toHaveLength(1);
+  });
+
   it("normalizes completed and failed Responses JSON while preserving partial output and identifiers", async () => {
     const completed = await normalizeResponsesJsonResponse(
       {
@@ -289,12 +305,121 @@ describe("bounded Base64 and synchronous provider response normalization", () =>
 });
 
 describe("safe result URL downloads and redirect authorization", () => {
-  it("omits authorization cross-origin and forwards it only for explicit same-origin policy", async () => {
+  it("upgrades a same-authority provider result URL to HTTPS before downloading", async () => {
     const observed: Array<{ url: string; authorization: string | null }> = [];
+    const downloaded = await downloadProviderImage(
+      "http://provider.example:8443/results/generated.png",
+      {
+        fetch: async (input, init) => {
+          observed.push({
+            url: String(input),
+            authorization: new Headers(init?.headers).get("authorization")
+          });
+          return new Response(new Uint8Array(syntheticPng()), {
+            headers: { "content-type": "image/png" }
+          });
+        },
+        providerEndpoint: "https://provider.example:8443/v1/images/generations",
+        authorization: "Bearer synthetic-token",
+        explicitSameOriginAuthorization: true
+      }
+    );
+
+    expect(observed).toEqual([{
+      url: "https://provider.example:8443/results/generated.png",
+      authorization: "Bearer synthetic-token"
+    }]);
+    expect(downloaded).toMatchObject({ mimeType: "image/png", width: 1, height: 1 });
+  });
+
+  it("upgrades a cross-origin result URL to HTTPS without forwarding authorization", async () => {
+    const observed: Array<{ url: string; authorization: string | null }> = [];
+    await downloadProviderImage("http://images.example/generated.png", {
+      fetch: async (input, init) => {
+        observed.push({
+          url: String(input),
+          authorization: new Headers(init?.headers).get("authorization")
+        });
+        return new Response(new Uint8Array(syntheticPng()), {
+          headers: { "content-type": "image/png" }
+        });
+      },
+      providerEndpoint: PROVIDER_ENDPOINT,
+      authorization: "Bearer synthetic-token",
+      explicitSameOriginAuthorization: true
+    });
+
+    expect(observed).toEqual([{
+      url: "https://images.example/generated.png",
+      authorization: null
+    }]);
+  });
+
+  it("falls back to cleartext once after HTTPS fails and never forwards authorization", async () => {
+    const observed: Array<{ url: string; authorization: string | null }> = [];
+    const downloaded = await downloadProviderImage("http://images.example/generated.png", {
+      fetch: async (input, init) => {
+        const observation = {
+          url: String(input),
+          authorization: new Headers(init?.headers).get("authorization")
+        };
+        observed.push(observation);
+        if (observation.url.startsWith("https:")) throw new TypeError("synthetic TLS failure");
+        return new Response(new Uint8Array(syntheticPng()), {
+          headers: { "content-type": "image/png" }
+        });
+      },
+      providerEndpoint: PROVIDER_ENDPOINT,
+      authorization: "Bearer synthetic-token",
+      explicitSameOriginAuthorization: true
+    });
+
+    expect(observed).toEqual([
+      { url: "https://images.example/generated.png", authorization: null },
+      { url: "http://images.example/generated.png", authorization: null }
+    ]);
+    expect(downloaded).toMatchObject({ mimeType: "image/png", width: 1, height: 1 });
+  });
+
+  it("falls back to the original cleartext result when the HTTPS body cannot be read", async () => {
+    const observed: Array<{ url: string; authorization: string | null }> = [];
+    const downloaded = await downloadProviderImage("http://images.example/generated.png", {
+      fetch: async (input, init) => {
+        const observation = {
+          url: String(input),
+          authorization: new Headers(init?.headers).get("authorization")
+        };
+        observed.push(observation);
+        if (observation.url.startsWith("https:")) {
+          return new Response(new ReadableStream<Uint8Array>({
+            start(controller) {
+              controller.error(new TypeError("synthetic HTTPS body decoding failure"));
+            }
+          }), { headers: { "content-type": "image/png" } });
+        }
+        return new Response(new Uint8Array(syntheticPng()), {
+          headers: { "content-type": "image/png" }
+        });
+      },
+      providerEndpoint: PROVIDER_ENDPOINT,
+      authorization: "Bearer synthetic-token",
+      explicitSameOriginAuthorization: true
+    });
+
+    expect(observed).toEqual([
+      { url: "https://images.example/generated.png", authorization: null },
+      { url: "http://images.example/generated.png", authorization: null }
+    ]);
+    expect(downloaded).toMatchObject({ mimeType: "image/png", width: 1, height: 1 });
+  });
+
+  it("omits authorization cross-origin and forwards it only for explicit same-origin policy", async () => {
+    const observed: Array<{ url: string; authorization: string | null; accept: string | null }> = [];
     const fetchMock: typeof fetch = async (input, init) => {
       observed.push({
         url: String(input),
-        authorization: new Headers(init?.headers).get("authorization")
+        authorization: new Headers(init?.headers).get("authorization"),
+        accept: new Headers(init?.headers).get("accept")
       });
       return new Response(new Uint8Array(syntheticPng()), { headers: { "content-type": "image/png" } });
     };
@@ -312,8 +437,8 @@ describe("safe result URL downloads and redirect authorization", () => {
       explicitSameOriginAuthorization: true
     });
     expect(observed).toEqual([
-      { url: "https://cdn.example/image.png", authorization: null },
-      { url: "https://provider.example/result.png", authorization: "Bearer synthetic-token" }
+      { url: "https://cdn.example/image.png", authorization: null, accept: "*/*" },
+      { url: "https://provider.example/result.png", authorization: "Bearer synthetic-token", accept: "*/*" }
     ]);
   });
 
@@ -342,18 +467,18 @@ describe("safe result URL downloads and redirect authorization", () => {
     ]);
   });
 
-  it("rejects unsafe protocols, MIME mismatch, and byte limits without leaking target URLs", async () => {
+  it("rejects unsupported protocols, MIME mismatch, and byte limits without leaking target URLs", async () => {
     const fetchMock = vi.fn<typeof fetch>(async () =>
       new Response(new Uint8Array(syntheticPng()), {
         headers: { "content-type": "image/jpeg", "content-length": "999" }
       })
     );
     await expect(
-      downloadProviderImage("http://unsafe.example/image.png", {
+      downloadProviderImage("ftp://unsafe.example/image.png", {
         fetch: fetchMock,
         providerEndpoint: PROVIDER_ENDPOINT
       })
-    ).rejects.toMatchObject({ error: { code: "download_failed", details: { reason: "unsafe-cleartext-http" } } });
+    ).rejects.toMatchObject({ error: { code: "download_failed", details: { reason: "unsupported-protocol" } } });
     expect(fetchMock).not.toHaveBeenCalled();
 
     await expect(
@@ -363,11 +488,19 @@ describe("safe result URL downloads and redirect authorization", () => {
         maximumBytes: 100
       })
     ).rejects.toBeInstanceOf(ProviderDownloadException);
+    const sniffedRaster = await downloadProviderImage("https://cdn.example/mismatch.png", {
+      fetch: async () =>
+        new Response(new Uint8Array(syntheticPng()), {
+          headers: { "content-type": "image/jpeg" }
+        }),
+      providerEndpoint: PROVIDER_ENDPOINT
+    });
+    expect(sniffedRaster).toMatchObject({ mimeType: "image/png", width: 1, height: 1 });
     await expect(
-      downloadProviderImage("https://cdn.example/mismatch.png", {
+      downloadProviderImage("https://cdn.example/not-an-image-header.png", {
         fetch: async () =>
           new Response(new Uint8Array(syntheticPng()), {
-            headers: { "content-type": "image/jpeg" }
+            headers: { "content-type": "text/html" }
           }),
         providerEndpoint: PROVIDER_ENDPOINT
       })

@@ -327,7 +327,9 @@ class ExecutionEvents {
 }
 
 function requestBody(prepared: PreparedProviderRequest): BodyInit {
-  return JSON.stringify(prepared.submission.body);
+  return prepared.submission.bodyType === "multipart"
+    ? prepared.submission.body
+    : JSON.stringify(prepared.submission.body);
 }
 
 function wrapResponseBody(

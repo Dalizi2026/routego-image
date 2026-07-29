@@ -7,6 +7,7 @@ import {
   type RefreshModelsResult,
   type RemoveProviderProfileResult,
   type SetActiveProviderProfileResult,
+  type StudioProviderSwitchResult,
   type UpdateSettingsInput,
   type UpsertProviderProfileInput,
   type UpsertProviderProfileResult
@@ -54,6 +55,7 @@ function generationEndpoint(
 function optionalEndpoint(
   descriptor:
     | ProviderProfileDescriptor["endpoints"]["models"]
+    | ProviderProfileDescriptor["endpoints"]["edits"]
     | ProviderProfileDescriptor["endpoints"]["responses"]
 ): OptionalProviderEndpointDraft {
   return {
@@ -73,6 +75,7 @@ export function createProviderProfileDraft(
     name: profile?.name ?? "",
     generation: generationEndpoint(profile?.endpoints.generation),
     models: optionalEndpoint(profile?.endpoints.models),
+    edits: optionalEndpoint(profile?.endpoints.edits),
     responses: optionalEndpoint(profile?.endpoints.responses),
     defaultModel: profile?.defaultModel ?? "",
     apiKeyOperation: profile === undefined || !profile.hasApiKey ? "replace" : "unchanged",
@@ -137,6 +140,7 @@ function requireEndpointReentry(draft: ProviderProfileDraft): void {
   for (const [name, endpoint] of [
     ["generation", draft.generation],
     ["models", draft.models],
+    ["edits", draft.edits],
     ["responses", draft.responses]
   ] as const) {
     if (endpoint.requiresReentry && endpoint.value.trim() === "") {
@@ -166,6 +170,7 @@ export function buildUpsertProviderProfileInput(
         value: draft.generation.value.trim()
       },
       ...(draft.models.value.trim() === "" ? {} : { models: draft.models.value.trim() }),
+      ...(draft.edits.value.trim() === "" ? {} : { edits: draft.edits.value.trim() }),
       ...(draft.responses.value.trim() === ""
         ? {}
         : { responses: draft.responses.value.trim() })
@@ -210,10 +215,16 @@ export function mergeUpsertProviderProfile(
   if (existingIndex === -1) profiles.push(result.profile);
   else profiles[existingIndex] = result.profile;
   const activeProviderId = activeProviderIdAfter(current, result.activeProviderId);
+  const selectedDefaultModel =
+    activeProviderId === result.profile.id ? result.profile.defaultModel?.trim() : undefined;
   return {
     ...current,
     ...(activeProviderId === undefined ? { activeProviderId: undefined } : { activeProviderId }),
-    profiles: alignActiveProfiles(profiles, activeProviderId)
+    profiles: alignActiveProfiles(profiles, activeProviderId),
+    defaults:
+      selectedDefaultModel === undefined || selectedDefaultModel === ""
+        ? current.defaults
+        : { ...current.defaults, model: selectedDefaultModel }
   };
 }
 
@@ -246,6 +257,25 @@ export function mergeActiveProviderProfile(
       result.profile.defaultModel === undefined
         ? current.defaults
         : { ...current.defaults, model: result.profile.defaultModel }
+  };
+}
+
+export function mergeStudioProviderSwitch(
+  current: ReadSettingsResult,
+  result: StudioProviderSwitchResult
+): ReadSettingsResult {
+  if (result.status !== "succeeded" || result.profile === undefined || result.activeProviderId === undefined || result.selectedModel === undefined) {
+    return current;
+  }
+  const profiles = current.profiles.map((profile) =>
+    profile.id === result.profile!.id ? result.profile! : profile
+  );
+  if (!profiles.some((profile) => profile.id === result.profile!.id)) profiles.push(result.profile);
+  return {
+    ...current,
+    activeProviderId: result.activeProviderId,
+    profiles: alignActiveProfiles(profiles, result.activeProviderId),
+    defaults: { ...current.defaults, model: result.selectedModel }
   };
 }
 

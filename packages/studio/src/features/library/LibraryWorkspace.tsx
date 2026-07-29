@@ -8,8 +8,10 @@ import {
 } from "react";
 
 import type {
+  BrowserResourceDescriptor,
   ExecuteLibraryMutationResult,
   LibraryAssetDetail,
+  RoutegoManageLibraryResult,
   StudioLibrarySearchItem
 } from "@routego-image/contracts";
 
@@ -66,7 +68,7 @@ function invokeBrowserSafeLibraryAction<Result>(
 const copy = {
   zh: {
     libraryEyebrow: "ARCHIVE / 02",
-    libraryTitle: "底片档案与成片图库",
+    libraryTitle: "图库",
     librarySubtitle: "用受保护缩略图、稳定标识符和契约筛选浏览本地作品，不读取任意文件路径。",
     filterTitle: "检索暗袋",
     query: "提示词检索",
@@ -123,10 +125,24 @@ const copy = {
     selectPage: "选择当前页",
     clearPage: "取消当前页选择",
     selectedCount: "已选择"
+    ,locations: "图库目录"
+    ,addLocation: "选择文件夹"
+    ,add: "添加"
+    ,moveSelected: "移动所选图片"
+    ,moveTo: "移动到"
+    ,deleteSelected: "删除所选图片"
+    ,deleteConfirm: "将永久删除所选图片及其对应本地文件，无法撤销。是否继续？"
+    ,renameHint: "双击名称可重命名"
+    ,rename: "重命名"
+    ,preview: "查看原图"
+    ,closePreview: "关闭预览"
+    ,workInfo: "作品信息与提示词"
+    ,technicalInfo: "技术详情"
+    ,comparisonInfo: "编辑前后对比"
   },
   en: {
     libraryEyebrow: "ARCHIVE / 02",
-    libraryTitle: "Negative archive & finished Library",
+    libraryTitle: "Library",
     librarySubtitle: "Browse local work through protected thumbnails, stable identifiers, and contract filters—never arbitrary file paths.",
     filterTitle: "Archive search sleeve",
     query: "Prompt query",
@@ -183,12 +199,26 @@ const copy = {
     selectPage: "Select current page",
     clearPage: "Clear current-page selection",
     selectedCount: "Selected"
+    ,locations: "Library directories"
+    ,addLocation: "Choose folder"
+    ,add: "Add"
+    ,moveSelected: "Move selected images"
+    ,moveTo: "Move to"
+    ,deleteSelected: "Delete selected images"
+    ,deleteConfirm: "Selected images and their corresponding local files will be permanently deleted. Continue?"
+    ,renameHint: "Double-click a name to rename it"
+    ,rename: "Rename"
+    ,preview: "View original"
+    ,closePreview: "Close preview"
+    ,workInfo: "Artwork and prompt"
+    ,technicalInfo: "Technical details"
+    ,comparisonInfo: "Before / after comparison"
   }
 } as const;
 
 type Labels = { readonly [Key in keyof (typeof copy)["zh"]]: string };
 
-const kindOptions = ["generate"] as const;
+const kindOptions = ["generate", "edit"] as const;
 const sizeOptions = ["auto", "1024x1024", "1536x1024", "1024x1536"] as const;
 const statusOptions = ["queued", "running", "succeeded", "partial", "failed"] as const;
 
@@ -203,6 +233,13 @@ function formatTimestamp(value: string, language: "zh" | "en"): string {
   return new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en-US", {
     dateStyle: "medium",
     timeStyle: "short"
+  }).format(new Date(value));
+}
+
+function formatCompactTimestamp(value: string, language: "zh" | "en"): string {
+  return new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en-US", {
+    month: "2-digit",
+    day: "2-digit"
   }).format(new Date(value));
 }
 
@@ -249,12 +286,8 @@ function FilterPanel({
   };
   return (
     <form className="library-filters" onSubmit={submit}>
-      <div className="library-filters__heading">
-        <p>FILTER / CONTRACT</p>
-        <h2>{labels.filterTitle}</h2>
-      </div>
       <div className="library-filters__grid library-filters__grid--quick">
-        <label>
+        <label className="library-filters__control library-filters__control--query">
           <span>{labels.query}</span>
           <input
             value={filters.query}
@@ -262,7 +295,7 @@ function FilterPanel({
             onChange={(event) => onChange({ ...filters, query: event.target.value })}
           />
         </label>
-        <label>
+        <label className="library-filters__control library-filters__control--sort">
           <span>{labels.sort}</span>
           <select
             value={filters.sort}
@@ -276,17 +309,21 @@ function FilterPanel({
             <option value="prompt-desc">prompt Z–A</option>
           </select>
         </label>
-        <label>
+        <label className="library-filters__control library-filters__control--limit">
           <span>{labels.limit}</span>
           <select
             value={filters.limit}
             onChange={(event) => onChange({ ...filters, limit: Number(event.target.value) })}
           >
-            {[6, 12, 24, 50].map((value) => (
+            {[20, 30, 40, 50].map((value) => (
               <option key={value} value={value}>{value}</option>
             ))}
           </select>
         </label>
+        <div className="library-filters__actions">
+          <button type="submit">{labels.apply}</button>
+          <button type="button" onClick={onReset}>{labels.reset}</button>
+        </div>
       </div>
       <details className="library-filters__advanced">
         <summary>{labels.advanced}{activeAdvancedCount > 0 ? ` · ${activeAdvancedCount} ${labels.activeFilters}` : ""}</summary>
@@ -299,15 +336,11 @@ function FilterPanel({
         <fieldset><legend>{labels.sizes}</legend>{sizeOptions.map((value) => <label key={value}><input type="checkbox" checked={filters.sizes.includes(value)} onChange={() => onChange({ ...filters, sizes: toggleValue(filters.sizes, value) })} />{value}</label>)}</fieldset>
         <fieldset><legend>{labels.statuses}</legend>{statusOptions.map((value) => <label key={value}><input type="checkbox" checked={filters.statuses.includes(value)} onChange={() => onChange({ ...filters, statuses: toggleValue(filters.statuses, value) })} />{value}</label>)}</fieldset>
       </details>
-      <div className="library-filters__actions">
-        <button type="submit">{labels.apply}</button>
-        <button type="button" onClick={onReset}>{labels.reset}</button>
-      </div>
     </form>
   );
 }
 
-function GalleryCard({
+export function GalleryCard({
   gateway,
   item,
   labels,
@@ -315,15 +348,21 @@ function GalleryCard({
   detailSelected,
   checked,
   onCheckedChange,
+  editingName = false,
+  onStartRename = () => undefined,
+  onRename = () => undefined,
   onOpen
 }: {
   readonly gateway: StudioGateway;
   readonly item: StudioLibrarySearchItem;
-  readonly labels: Labels;
+  readonly labels: Pick<Labels, "selectItem" | "openDetail" | "noPreview"> & Partial<Pick<Labels, "renameHint" | "rename">>;
   readonly language: "zh" | "en";
   readonly detailSelected: boolean;
   readonly checked: boolean;
   readonly onCheckedChange: (checked: boolean) => void;
+  readonly editingName?: boolean;
+  readonly onStartRename?: () => void;
+  readonly onRename?: (name: string) => void;
   readonly onOpen: () => void;
 }) {
   return (
@@ -343,7 +382,7 @@ function GalleryCard({
         aria-label={`${labels.openDetail}: ${item.prompt}`}
         onClick={onOpen}
       >
-        <div className="library-card__image" style={{ aspectRatio: `${item.width} / ${item.height}` }}>
+        <div className="library-card__image">
           {item.thumbnail === undefined ? (
             <span>{labels.noPreview}</span>
           ) : (
@@ -352,16 +391,31 @@ function GalleryCard({
           <span className={`library-card__status library-card__status--${item.status}`}>
             {item.status}
           </span>
-        </div>
-        <div className="library-card__body">
-          <p>{item.kind.toUpperCase()} / {item.model}</p>
-          <h2>{item.prompt}</h2>
-          <dl>
-            <div><dt>{labels.createdAt}</dt><dd>{formatTimestamp(item.createdAt, language)}</dd></div>
-            <div><dt>FRAME</dt><dd>{item.width} × {item.height}</dd></div>
-          </dl>
+          <span className="library-card__frame">{item.width} × {item.height}</span>
         </div>
       </button>
+      <div className="library-card__meta">
+          {editingName ? (
+            <input
+              autoFocus
+              aria-label={labels.rename ?? "Rename"}
+              defaultValue={item.displayName ?? item.model}
+              onClick={(event) => event.stopPropagation()}
+              onBlur={(event) => onRename(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.currentTarget.blur();
+                if (event.key === "Escape") event.currentTarget.value = item.displayName ?? item.model;
+              }}
+            />
+          ) : (
+            <span title={labels.renameHint ?? "Double-click to rename"} onDoubleClick={(event) => { event.preventDefault(); event.stopPropagation(); onStartRename(); }}>
+              {item.displayName ?? item.model}
+            </span>
+          )}
+          <time dateTime={item.createdAt} title={formatTimestamp(item.createdAt, language)}>
+            {formatCompactTimestamp(item.createdAt, language)}
+          </time>
+      </div>
     </article>
   );
 }
@@ -427,6 +481,7 @@ function DetailDrawer({
   readonly onMarkImage: (asset: LibraryAssetDetail) => void;
   readonly onDownload: (asset: LibraryAssetDetail) => void;
 }) {
+  const [previewResource, setPreviewResource] = useState<BrowserResourceDescriptor | undefined>();
   if (state.status === "idle") return null;
   const asset = state.status === "ready" ? state.asset : undefined;
   const comparison = asset === undefined ? {} : selectComparisonRelationships(asset);
@@ -438,9 +493,9 @@ function DetailDrawer({
       <aside className="library-detail__panel">
         <header>
           <div>
-            <p>CONTACT SHEET / DETAIL</p>
+            <p>IMAGE / DETAIL</p>
             <h2 id="library-detail-title">
-              {asset?.prompt ?? (state.status === "loading" ? labels.detailLoading : labels.detailFailure)}
+              {asset?.displayName ?? (state.status === "loading" ? labels.detailLoading : labels.detailFailure)}
             </h2>
           </div>
           <button type="button" onClick={onClose}>{labels.close}</button>
@@ -451,6 +506,30 @@ function DetailDrawer({
           <AsyncStatePanel state="failure" title={labels.detailFailure}><p>{state.safeMessage}</p></AsyncStatePanel>
         ) : asset !== undefined ? (
           <div className="library-detail__content">
+            <section className="library-detail__preview">
+              {outputState?.status === "ready" ? (
+                <>
+                  <button
+                    type="button"
+                    className="library-detail__preview-image"
+                    onClick={() => setPreviewResource(outputState.resource)}
+                    aria-label={labels.preview}
+                  >
+                    <ProtectedImage
+                      gateway={gateway}
+                      descriptor={outputState.resource}
+                      alt={asset.displayName ?? asset.model}
+                    />
+                  </button>
+                  <button type="button" className="library-detail__preview-button" onClick={() => setPreviewResource(outputState.resource)}>
+                    {labels.preview}
+                  </button>
+                </>
+              ) : (
+                <p className="library-detail__preview-loading">{labels.loading}</p>
+              )}
+            </section>
+
             <section className="library-detail__hero">
               <div>
                 <span className={`library-detail__status library-detail__status--${asset.status}`}>{asset.status}</span>
@@ -480,8 +559,8 @@ function DetailDrawer({
             </section>
 
             {sourceState?.status === "ready" && outputState?.status === "ready" ? (
-              <section className="library-detail__section">
-                <h3>{labels.comparison}</h3>
+              <details className="library-detail__disclosure">
+                <summary>{labels.comparisonInfo}</summary>
                 <ImageComparison
                   gateway={gateway}
                   source={sourceState.resource}
@@ -490,86 +569,40 @@ function DetailDrawer({
                   outputLabel={labels.output}
                   controlLabel={labels.comparisonControl}
                 />
-              </section>
+              </details>
             ) : null}
 
-            <ParameterLedger title={labels.requested} parameters={asset.requestedParams} />
-            <ParameterLedger title={labels.effective} parameters={asset.effectiveParams} />
+            <details className="library-detail__disclosure">
+              <summary>{labels.workInfo}</summary>
+              <p className="library-detail__prompt">{asset.prompt}</p>
+              <p className="library-detail__meta">{asset.kind.toUpperCase()} · {asset.model} · {formatTimestamp(asset.createdAt, language)}</p>
+            </details>
 
-            <section className="library-detail__section">
-              <h3>{labels.execution}</h3>
-              <dl className="library-parameter-ledger">
-                <div><dt>TRANSPORT</dt><dd>{asset.execution.transport}</dd></div>
-                <div><dt>ATTEMPTS</dt><dd>{asset.execution.attemptCount}</dd></div>
-                <div><dt>PROVIDER CALLS</dt><dd>{asset.execution.providerRequestCount}</dd></div>
-                <div><dt>OUTPUT</dt><dd>{String(asset.execution.receivedAnyOutput)}</dd></div>
-                <div><dt>MAY HAVE BILLED</dt><dd>{String(asset.execution.mayHaveBilled)}</dd></div>
-                <div><dt>DEGRADED</dt><dd>{String(asset.execution.degradedContinuation)}</dd></div>
-              </dl>
-              {asset.error ? (
-                <div className="library-detail__error" role="alert">
-                  <strong>{labels.error}</strong>
-                  <span>{asset.error.safeMessage}</span>
-                </div>
-              ) : null}
-            </section>
-
-            <section className="library-detail__section">
-              <h3>{labels.relationships}</h3>
-              <div className="relationship-strip">
-                {orderedLibraryRelationships(asset)
-                  .filter((relationship) => ["source", "reference", "output"].includes(relationship.role))
-                  .map((relationship) => {
-                  const resource = resources.find((state) => state.relationship.id === relationship.id);
-                  return (
-                    <article key={relationship.id}>
-                      <div className="relationship-strip__image">
-                        {resource?.status === "ready" ? (
-                          <ProtectedImage
-                            gateway={gateway}
-                            descriptor={resource.resource}
-                            alt={`${relationLabel(relationship.role, language)} ${relationship.order + 1}`}
-                          />
-                        ) : resource?.status === "failure" ? (
-                          <span role="alert">{labels.relationFailure}</span>
-                        ) : (
-                          <span>{labels.loading}</span>
-                        )}
-                      </div>
-                      <p>{String(relationship.order + 1).padStart(2, "0")} / {relationLabel(relationship.role, language)}</p>
-                      <strong>{relationship.label ?? relationship.relatedAssetId}</strong>
-                    </article>
-                  );
-                  })}
+            <details className="library-detail__disclosure">
+              <summary>{labels.technicalInfo}</summary>
+              <div className="library-detail__technical-content">
+                <ParameterLedger title={labels.effective} parameters={asset.effectiveParams} />
+                <section className="library-detail__section">
+                  <h3>{labels.execution}</h3>
+                  <dl className="library-parameter-ledger">
+                    <div><dt>TRANSPORT</dt><dd>{asset.execution.transport}</dd></div>
+                    <div><dt>ATTEMPTS</dt><dd>{asset.execution.attemptCount}</dd></div>
+                    <div><dt>PROVIDER CALLS</dt><dd>{asset.execution.providerRequestCount}</dd></div>
+                    <div><dt>OUTPUT</dt><dd>{String(asset.execution.receivedAnyOutput)}</dd></div>
+                  </dl>
+                  {asset.error ? <div className="library-detail__error" role="alert"><strong>{labels.error}</strong><span>{asset.error.safeMessage}</span></div> : null}
+                </section>
               </div>
-            </section>
-
-            <section className="library-detail__section library-detail__split">
-              <div>
-                <h3>{labels.renditions}</h3>
-                <ul>{asset.renditions.map((rendition) => (
-                  <li key={rendition.artifactId}>{rendition.phase} · {rendition.mimeType} · {rendition.width} × {rendition.height}</li>
-                ))}</ul>
-              </div>
-              <div>
-                <h3>{labels.folders}</h3>
-                {asset.folders.length === 0 ? <p>{labels.foldersEmpty}</p> : (
-                  <ul>{asset.folders.map((folder) => <li key={folder.folderId}>{folder.name}</li>)}</ul>
-                )}
-              </div>
-            </section>
-
-            <section className="library-detail__section">
-              <h3>{labels.allowedActions}</h3>
-              <div className="library-action-ledger">
-                {asset.allowedActions
-                  .filter((action) => ["copy-generation-info", "mark", "download"].includes(action))
-                  .map((action) => <span key={action}>{action}</span>)}
-              </div>
-            </section>
+            </details>
           </div>
         ) : null}
       </aside>
+      {previewResource ? (
+        <div className="library-image-preview" role="dialog" aria-modal="true" aria-label={labels.preview} onClick={() => setPreviewResource(undefined)}>
+          <button type="button" className="library-image-preview__close" onClick={() => setPreviewResource(undefined)}>{labels.closePreview}</button>
+          <ProtectedImage gateway={gateway} descriptor={previewResource} alt={asset?.displayName ?? asset?.model ?? labels.preview} />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -604,6 +637,9 @@ export function LibraryWorkspace({
   >([]);
   const [actionBusy, setActionBusy] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | undefined>();
+  const [locations, setLocations] = useState<ReadonlyArray<NonNullable<RoutegoManageLibraryResult["locations"]>[number]>>([]);
+  const [destinationLocationId, setDestinationLocationId] = useState("");
+  const [editingAssetId, setEditingAssetId] = useState<string | undefined>();
   const [markState, setMarkState] = useState<{
     readonly known: boolean;
     readonly currentMarkRecordId?: string | undefined;
@@ -631,6 +667,13 @@ export function LibraryWorkspace({
       active = false;
     };
   }, [folderRevision, gateway, labels.folderFailure]);
+
+  const refreshLocations = useCallback(async () => {
+    const result = await gateway.invoke("manageLibrary", { action: "list-locations" });
+    setLocations(result.locations ?? []);
+  }, [gateway]);
+
+  useEffect(() => { void refreshLocations().catch(() => undefined); }, [refreshLocations]);
 
   useEffect(() => {
     const requestId = searchRequestRef.current + 1;
@@ -844,6 +887,56 @@ export function LibraryWorkspace({
     setDetailRevision((value) => value + 1);
   }, []);
 
+  const addLocation = useCallback(async () => {
+    setActionBusy(true);
+    try {
+      const picked = await gateway.selectLibraryDirectory();
+      if (!picked.selected || picked.result === undefined) return;
+      const result = picked.result;
+      setLocations(result.locations ?? []);
+      refreshLibraryState();
+      setActionMessage(language === "zh" ? "图库文件夹已读取。" : "Library folder loaded.");
+    } catch (error) { setActionMessage(error instanceof Error ? error.message : labels.searchFailure); }
+    finally { setActionBusy(false); }
+  }, [gateway, labels.searchFailure, language, refreshLibraryState]);
+
+  const moveSelected = useCallback(async () => {
+    if (destinationLocationId === "" || selectedAssetIds.length === 0) return;
+    setActionBusy(true);
+    try {
+      const result = await gateway.invoke("manageLibrary", { action: "move-assets", assetIds: [...selectedAssetIds], destinationLocationId });
+      setSelectedAssetIds((current) => current.filter((id) => !result.affectedAssetIds.includes(id)));
+      refreshLibraryState();
+      void refreshLocations();
+      setActionMessage(language === "zh" ? `已移动 ${result.affectedAssetIds.length} 张图片。` : `${result.affectedAssetIds.length} images moved.`);
+    } catch (error) { setActionMessage(error instanceof Error ? error.message : labels.searchFailure); }
+    finally { setActionBusy(false); }
+  }, [destinationLocationId, gateway, labels.searchFailure, language, refreshLibraryState, refreshLocations, selectedAssetIds]);
+
+  const deleteSelected = useCallback(async () => {
+    if (selectedAssetIds.length === 0 || !window.confirm(labels.deleteConfirm)) return;
+    setActionBusy(true);
+    try {
+      const result = await gateway.invoke("manageLibrary", { action: "delete-assets", assetIds: [...selectedAssetIds], confirmDelete: true });
+      setSelectedAssetIds((current) => current.filter((id) => !result.affectedAssetIds.includes(id)));
+      if (selectedAssetId && result.affectedAssetIds.includes(selectedAssetId)) setSelectedAssetId(undefined);
+      refreshLibraryState();
+      void refreshLocations();
+      setActionMessage(language === "zh" ? `已删除 ${result.affectedAssetIds.length} 张图片。` : `${result.affectedAssetIds.length} images deleted.`);
+    } catch (error) { setActionMessage(error instanceof Error ? error.message : labels.searchFailure); }
+    finally { setActionBusy(false); }
+  }, [gateway, labels.deleteConfirm, labels.searchFailure, language, refreshLibraryState, refreshLocations, selectedAssetId, selectedAssetIds]);
+
+  const renameAsset = useCallback(async (assetId: string, name: string) => {
+    const trimmed = name.trim();
+    setEditingAssetId(undefined);
+    if (trimmed === "") return;
+    try {
+      await gateway.invoke("manageLibrary", { action: "rename-asset", assetId, name: trimmed });
+      refreshLibraryState();
+    } catch (error) { setActionMessage(error instanceof Error ? error.message : labels.searchFailure); }
+  }, [gateway, labels.searchFailure, refreshLibraryState]);
+
   const handleMutationResult = useCallback(
     (result: ExecuteLibraryMutationResult) => {
       setSelectedAssetIds((current) => remainingSelectedAssetIds(current, result));
@@ -866,12 +959,20 @@ export function LibraryWorkspace({
   return (
     <section className="library-workspace library-workspace--library">
       <header className="library-workspace__header">
-        <p>{labels.libraryEyebrow}</p>
-        <h1 tabIndex={-1}>{labels.libraryTitle}</h1>
-        <span>{labels.librarySubtitle}</span>
+        <div>
+          <p>{labels.libraryEyebrow}</p>
+          <h1 tabIndex={-1}>{labels.libraryTitle}</h1>
+        </div>
       </header>
 
       <div className="library-workspace__tools">
+        <section className="library-locations" aria-label={labels.locations}>
+          <label><span>{labels.locations}</span><select value={filters.folderId ?? ""} onChange={(event) => selectFolder(event.currentTarget.value || undefined)}>
+            <option value="">{labels.allFolders}</option>
+            {locations.filter((location) => !location.isDefault && location.folderId !== undefined).map((location) => <option key={location.id} value={location.folderId}>{location.name} · {location.assetCount}</option>)}
+          </select></label>
+          <button type="button" disabled={actionBusy} onClick={() => void addLocation()}>{labels.addLocation}</button>
+        </section>
         <nav className="library-folders" aria-label={labels.folders}>
           <button
             type="button"
@@ -913,7 +1014,10 @@ export function LibraryWorkspace({
       </div>
 
       <div className="library-workspace__summary">
-        <span>{labels.page} {page.index + 1}</span>
+        <div className="library-workspace__counts">
+          {total === undefined ? null : <span>{labels.total} {total}</span>}
+          <span>{labels.selectedCount} {selectedAssetIds.length}</span>
+        </div>
         <button
           type="button"
           disabled={currentPageIds.length === 0}
@@ -927,8 +1031,40 @@ export function LibraryWorkspace({
         >
           {allCurrentPageSelected ? labels.clearPage : labels.selectPage}
         </button>
-        <span>{labels.selectedCount} {selectedAssetIds.length}</span>
-        {total === undefined ? null : <span>{labels.total} {total}</span>}
+        <select aria-label={labels.moveTo} value={destinationLocationId} onChange={(event) => setDestinationLocationId(event.currentTarget.value)}>
+          <option value="">{labels.moveTo}</option>
+          {locations.filter((location) => !location.isDefault).map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
+        </select>
+        <button type="button" disabled={actionBusy || selectedAssetIds.length === 0 || destinationLocationId === ""} onClick={() => void moveSelected()}>{labels.moveSelected}</button>
+        <button type="button" className="library-workspace__delete" disabled={actionBusy || selectedAssetIds.length === 0} onClick={() => void deleteSelected()}>{labels.deleteSelected}</button>
+        <nav className="library-pagination library-pagination--compact" aria-label={`${labels.page} ${page.index + 1}`}>
+          <button
+            type="button"
+            aria-label={labels.previous}
+            title={labels.previous}
+            disabled={page.index === 0 || searchState.status === "loading"}
+            onClick={() => setPage((current) => retreatLibraryPage(current))}
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <span>{String(page.index + 1).padStart(2, "0")}</span>
+          <button
+            type="button"
+            aria-label={labels.next}
+            title={labels.next}
+            disabled={searchState.status !== "ready" || searchState.nextCursor === undefined}
+            onClick={() =>
+              setPage((current) =>
+                advanceLibraryPage(
+                  current,
+                  searchState.status === "ready" ? searchState.nextCursor : undefined
+                )
+              )
+            }
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+        </nav>
       </div>
 
       {searchState.status === "loading" ? (
@@ -967,36 +1103,14 @@ export function LibraryWorkspace({
                     : current.filter((assetId) => assetId !== item.assetId)
                 )
               }
+              editingName={editingAssetId === item.assetId}
+              onStartRename={() => setEditingAssetId(item.assetId)}
+              onRename={(name) => void renameAsset(item.assetId, name)}
               onOpen={() => setSelectedAssetId(item.assetId)}
             />
           ))}
         </div>
       )}
-
-      <nav className="library-pagination" aria-label={`${labels.page} ${page.index + 1}`}>
-        <button
-          type="button"
-          disabled={page.index === 0 || searchState.status === "loading"}
-          onClick={() => setPage((current) => retreatLibraryPage(current))}
-        >
-          {labels.previous}
-        </button>
-        <span>{String(page.index + 1).padStart(2, "0")}</span>
-        <button
-          type="button"
-          disabled={searchState.status !== "ready" || searchState.nextCursor === undefined}
-          onClick={() =>
-            setPage((current) =>
-              advanceLibraryPage(
-                current,
-                searchState.status === "ready" ? searchState.nextCursor : undefined
-              )
-            )
-          }
-        >
-          {labels.next}
-        </button>
-      </nav>
 
       <DetailDrawer
         gateway={gateway}

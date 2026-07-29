@@ -111,6 +111,7 @@ function probeInput(input: {
   readonly capability?: ProviderCapability;
   readonly transport?: CapabilityProbeInput["transport"];
   readonly requestShape?: string;
+  readonly requestedSize?: string;
 }): CapabilityProbeInput {
   return capabilityProbeInputSchema.parse({
     providerId: input.providerId,
@@ -118,6 +119,7 @@ function probeInput(input: {
     capability: input.capability ?? "single-image-input",
     transport: input.transport ?? "single-endpoint-json",
     requestShape: input.requestShape ?? PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+    ...(input.requestedSize === undefined ? {} : { requestedSize: input.requestedSize }),
     confirmBillableProbe: true
   });
 }
@@ -662,6 +664,175 @@ describe("exact confirmed capability probes", () => {
           transport: pair.transport,
           requestShape: pair.requestShape
         }
+      }
+    });
+  });
+
+  it("verifies a requested custom size from a provider image URL", async () => {
+    const { owner } = mockProbeOwner();
+    const requestedSize = "320x240";
+    const image = pngBase64({ width: 320, height: 240 });
+    const fetchImpl = vi.fn<typeof fetch>(async (input, init) => {
+      if (String(input).startsWith("https://relay.example/")) {
+        const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+        expect(body["size"]).toBe(requestedSize);
+        return new Response(JSON.stringify({ data: [{ url: "https://cdn.example/probe.png" }] }), {
+          status: 200,
+          headers: { "content-type": "application/json" }
+        });
+      }
+      if (String(input) === "https://cdn.example/probe.png") {
+        return new Response(Buffer.from(image, "base64"), {
+          status: 200,
+          headers: { "content-type": "image/png" }
+        });
+      }
+      throw new Error(`Unexpected probe request: ${String(input)}`);
+    });
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "custom-size",
+      transport: "single-endpoint-json",
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText,
+      requestedSize
+    }), { fetch: fetchImpl, now: () => now });
+
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(result).toMatchObject({
+      status: "completed",
+      record: {
+        capability: "custom-size",
+        state: "supported",
+        limits: { supportedSizes: [requestedSize] }
+      }
+    });
+  });
+
+  it("verifies common nested image_url response shapes", async () => {
+    const { owner } = mockProbeOwner();
+    const image = pngBase64({ width: 320, height: 240 });
+    const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+      if (String(input).startsWith("https://relay.example/")) {
+        return new Response(JSON.stringify({ result: { images: [{ image_url: "https://cdn.example/probe.png" }] } }), {
+          status: 200,
+          headers: { "content-type": "application/json" }
+        });
+      }
+      return new Response(Buffer.from(image, "base64"), {
+        status: 200,
+        headers: { "content-type": "image/png" }
+      });
+    });
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "custom-size",
+      transport: "single-endpoint-json",
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText,
+      requestedSize: "320x240"
+    }), { fetch: fetchImpl, now: () => now });
+
+    expect(result.record).toMatchObject({ state: "supported", limits: { supportedSizes: ["320x240"] } });
+  });
+
+  it("verifies an OpenAI-compatible data URL returned in the url field", async () => {
+    const { owner } = mockProbeOwner();
+    const png = pngBase64({ width: 320, height: 240 });
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "custom-size",
+      transport: "single-endpoint-json",
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText,
+      requestedSize: "320x240"
+    }), {
+      fetch: async () => new Response(JSON.stringify({
+        created: 1,
+        data: [{ url: `data:image/png;base64,${png}`, width: 320, height: 240 }]
+      }), { status: 200, headers: { "content-type": "application/json" } }),
+      now: () => now
+    });
+
+    expect(result.record).toMatchObject({ state: "supported", limits: { supportedSizes: ["320x240"] } });
+  });
+
+  it("reads WebP dimensions from an OpenAI-compatible data URL", async () => {
+    const { owner } = mockProbeOwner();
+    const webp = Buffer.from([
+      ...Buffer.from("RIFF"), 22, 0, 0, 0, ...Buffer.from("WEBPVP8X"),
+      10, 0, 0, 0, 0, 0, 0, 0,
+      63, 1, 0, 239, 0, 0
+    ]).toString("base64");
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "custom-size",
+      transport: "single-endpoint-json",
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText,
+      requestedSize: "320x240"
+    }), {
+      fetch: async () => new Response(JSON.stringify({
+        data: [{ url: `data:image/webp;base64,${webp}` }]
+      }), { status: 200, headers: { "content-type": "application/json" } }),
+      now: () => now
+    });
+
+    expect(result.record).toMatchObject({ state: "supported", limits: { supportedSizes: ["320x240"] } });
+  });
+
+  it("allows only the accepted custom size when the provider test image cannot be read", async () => {
+    const { owner } = mockProbeOwner();
+    const requestedSize = "320x240";
+    const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+      if (String(input).startsWith("https://relay.example/")) {
+        return new Response(JSON.stringify({ data: [{ url: "https://cdn.example/probe.png" }] }), {
+          status: 200,
+          headers: { "content-type": "application/json" }
+        });
+      }
+      if (String(input) === "https://cdn.example/probe.png") {
+        return new Response("expired", { status: 403, headers: { "content-type": "text/plain" } });
+      }
+      throw new Error(`Unexpected probe request: ${String(input)}`);
+    });
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "custom-size",
+      transport: "single-endpoint-json",
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText,
+      requestedSize
+    }), { fetch: fetchImpl, now: () => now });
+
+    expect(result).toMatchObject({
+      status: "completed",
+      record: {
+        capability: "custom-size",
+        state: "degraded",
+        limits: { supportedSizes: [requestedSize] }
+      }
+    });
+    expect(result.record.degradedReason).toContain("accepted the requested size");
+  });
+
+  it("reports a precise safe reason when a successful response has no recognizable image", async () => {
+    const { owner } = mockProbeOwner();
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "custom-size",
+      transport: "single-endpoint-json",
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointText,
+      requestedSize: "320x240"
+    }), {
+      fetch: async () => new Response(JSON.stringify({ data: [{ revised_prompt: "synthetic" }] }), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      }),
+      now: () => now
+    });
+
+    expect(result).toMatchObject({
+      status: "failed",
+      error: {
+        code: "invalid_response",
+        safeMessage: "The provider accepted the request but did not return a recognizable image output for pixel verification (response object(data);data=array;data0=object(revised_prompt)).",
+        details: { reason: "capability-specific-proof-missing" }
       }
     });
   });

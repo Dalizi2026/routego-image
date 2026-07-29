@@ -37,11 +37,14 @@ import {
   reorderFoldersResultSchema,
   routegoBatchInputSchema,
   routegoBatchResultSchema,
+  routegoEditInputSchema,
   routegoGenerateInputSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
   routegoOpenStudioInputSchema,
   routegoOpenStudioResultSchema,
+  routegoPrepareRegenerationInputSchema,
+  routegoPrepareRegenerationResultSchema,
   routegoSearchLibraryInputSchema,
   routegoSearchLibraryResultSchema,
   routegoStatusInputSchema,
@@ -106,11 +109,14 @@ import {
   type ReorderFoldersResult,
   type RoutegoBatchInput,
   type RoutegoBatchResult,
+  type RoutegoEditInput,
   type RoutegoGenerateInput,
   type RoutegoManageLibraryInput,
   type RoutegoManageLibraryResult,
   type RoutegoOpenStudioInput,
   type RoutegoOpenStudioResult,
+  type RoutegoPrepareRegenerationInput,
+  type RoutegoPrepareRegenerationResult,
   type RoutegoOperation,
   type RoutegoSearchLibraryInput,
   type RoutegoSearchLibraryResult,
@@ -1233,6 +1239,50 @@ export class MockRoutegoService implements LocalRoutegoService {
       return invalidOutput<ImageOperationResult>();
     }
     return this.#imageResult(fixture, request, this.#requestId("generate", request));
+  }
+
+  async edit(input: RoutegoEditInput): Promise<ImageOperationResult> {
+    const request = routegoEditInputSchema.parse(input);
+    const fixture = this.#fixture("edit");
+    if (fixture === "invalid-output") {
+      return invalidOutput<ImageOperationResult>();
+    }
+    return this.#imageResult(fixture, request, this.#requestId("edit", request));
+  }
+
+  async prepareRegeneration(
+    input: RoutegoPrepareRegenerationInput
+  ): Promise<RoutegoPrepareRegenerationResult> {
+    const parsed = routegoPrepareRegenerationInputSchema.parse(input);
+    const fixture = this.#fixture("prepareRegeneration");
+    if (fixture === "invalid-output") {
+      return invalidOutput<RoutegoPrepareRegenerationResult>();
+    }
+    if (fixture === "failure") {
+      throw this.#error("not_found", "The synthetic regeneration source was not found.");
+    }
+    const sourceRecordId = parsed.recordId ?? deterministicId("mock-regeneration-record", parsed);
+    return routegoPrepareRegenerationResultSchema.parse({
+      schemaVersion: 1,
+      recipe: {
+        schemaVersion: 1,
+        kind: "generate",
+        sourceRecordId,
+        prompt: "Synthetic regenerated image",
+        referenceIds: [],
+        size: "auto",
+        aspectRatio: "auto",
+        quality: "auto",
+        format: "png",
+        count: 1,
+        partialImages: 0,
+        transparentMode: "off",
+        moderation: "auto",
+        saveToLibrary: true
+      },
+      providerRequestCount: 0,
+      markUnchanged: true
+    });
   }
 
   async batch(input: RoutegoBatchInput): Promise<RoutegoBatchResult> {

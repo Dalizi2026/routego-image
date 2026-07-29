@@ -22,12 +22,12 @@ export interface ImageFileMetadata {
   readonly hasAlpha: boolean;
 }
 
-export type PreparedImageKind = "reference";
+export type PreparedImageKind = "target" | "reference";
 
 export interface PreparedImageInput extends ImageFileMetadata {
   readonly slot: number;
   readonly kind: PreparedImageKind;
-  readonly role: ImageOperationRequest["references"][number]["role"];
+  readonly role: ImageOperationRequest["references"][number]["role"] | "target";
   readonly sourceIndex: number;
   readonly path: string;
   readonly fileName: string;
@@ -102,12 +102,12 @@ export interface ProviderRequestPreparationContext extends ProviderRoutingContex
 export interface EffectiveProviderControls {
   readonly n: number;
   readonly size: string;
-  readonly quality?: Exclude<ImageOperationRequest["quality"], "auto">;
-  readonly outputFormat?: Exclude<ImageOperationRequest["format"], "png">;
+  readonly quality: ImageOperationRequest["quality"];
+  readonly outputFormat: ImageOperationRequest["format"];
   readonly outputCompression?: number;
   readonly partialImages?: number;
   readonly nativeTransparency: boolean;
-  readonly moderation?: "low";
+  readonly moderation: ImageOperationRequest["moderation"];
   readonly stream: boolean;
 }
 
@@ -135,7 +135,15 @@ export interface ProviderJsonSubmission {
   readonly body: ProviderJsonObject;
 }
 
-export type ProviderSubmission = ProviderJsonSubmission;
+export interface ProviderMultipartSubmission {
+  readonly bodyType: "multipart";
+  readonly method: "POST";
+  readonly endpoint: string;
+  readonly headers: Readonly<Record<string, string>>;
+  readonly body: FormData;
+}
+
+export type ProviderSubmission = ProviderJsonSubmission | ProviderMultipartSubmission;
 
 export interface PreparedProviderRequest {
   readonly route: SelectedProviderRoute;

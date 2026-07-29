@@ -9,7 +9,9 @@ import {
 import { routegoServiceErrorSchema } from "./errors";
 import {
   aspectRatioSchema,
+  editInvariantsSchema,
   imageFormatSchema,
+  imageOperationKindSchema,
   imageQualitySchema,
   imageSizeSchema,
   moderationSchema,
@@ -125,9 +127,8 @@ export const libraryTargetParameterSchema = z
 
 export const libraryOutputDirectoryModeSchema = z.enum(["default", "custom"]);
 
-export const libraryOperationParametersSchema = z
+const libraryOperationParameterBaseSchema = z
   .object({
-    kind: z.literal("generate"),
     prompt: z.string().trim().min(1).max(32_000),
     references: z.array(libraryParameterImageSchema).max(5).default([]),
     size: imageSizeSchema,
@@ -141,6 +142,34 @@ export const libraryOperationParametersSchema = z
     moderation: moderationSchema,
     outputDirectoryMode: libraryOutputDirectoryModeSchema,
     saveToLibrary: z.boolean()
+  })
+  .strict();
+
+export const libraryGenerateOperationParametersSchema = libraryOperationParameterBaseSchema
+  .extend({ kind: z.literal("generate") })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.compression !== undefined && value.format === "png") {
+      context.addIssue({
+        code: "custom",
+        path: ["compression"],
+        message: "Compression percentage applies only to JPEG or WebP output"
+      });
+    }
+    if (value.transparentMode !== "off" && value.format !== "png") {
+      context.addIssue({
+        code: "custom",
+        path: ["format"],
+        message: "Transparent output requires PNG"
+      });
+    }
+  });
+
+export const libraryEditOperationParametersSchema = libraryOperationParameterBaseSchema
+  .extend({
+    kind: z.literal("edit"),
+    target: libraryTargetParameterSchema,
+    invariants: editInvariantsSchema
   })
   .strict()
   .superRefine((value, context) => {
@@ -160,8 +189,14 @@ export const libraryOperationParametersSchema = z
     }
   });
 
+export const libraryOperationParametersSchema = z.discriminatedUnion("kind", [
+  libraryGenerateOperationParametersSchema,
+  libraryEditOperationParametersSchema
+]);
+
 export const libraryAssetRelationshipRoleSchema = z.enum([
   "source",
+  "target",
   "reference",
   "output",
   "transparent-original"
@@ -204,6 +239,16 @@ export const libraryAssetAllowedActionSchema = z.enum([
   "copy-generation-info"
 ]);
 
+export const libraryLocationDescriptorSchema = z
+  .object({
+    id: identifierSchema,
+    name: z.string().trim().min(1).max(200),
+    folderId: identifierSchema.optional(),
+    assetCount: z.number().int().min(0),
+    isDefault: z.boolean()
+  })
+  .strict();
+
 export const libraryAssetFolderMembershipSchema = z
   .object({
     folderId: identifierSchema,
@@ -216,9 +261,10 @@ export const libraryAssetFolderMembershipSchema = z
 export const libraryAssetDetailSchema = z
   .object({
     id: identifierSchema,
+    displayName: z.string().trim().min(1).max(200).optional(),
     prompt: z.string().max(32_000),
     model: z.string().trim().min(1).max(200),
-    kind: z.literal("generate"),
+    kind: z.enum(["generate", "edit"]),
     status: libraryAssetStatusSchema,
     currentMark: z.boolean().default(false),
     primaryArtifactId: identifierSchema,
@@ -468,10 +514,11 @@ export const studioLibrarySearchInputSchema = routegoSearchLibraryInputSchema;
 export const studioLibrarySearchItemSchema = z
   .object({
     assetId: identifierSchema,
+    displayName: z.string().trim().min(1).max(200).optional(),
     artifactId: identifierSchema,
     prompt: z.string().max(32_000),
     model: z.string().trim().min(1).max(200),
-    kind: z.literal("generate"),
+    kind: imageOperationKindSchema,
     mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]),
     width: z.number().int().min(1).max(65_535),
     height: z.number().int().min(1).max(65_535),

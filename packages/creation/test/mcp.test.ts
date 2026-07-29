@@ -177,6 +177,7 @@ function service(overrides: Record<string, unknown>): RoutegoService {
   return {
     status: unavailable,
     generate: unavailable,
+    edit: unavailable,
     prepareRegeneration: unavailable,
     batch: unavailable,
     searchLibrary: unavailable,
@@ -247,7 +248,7 @@ describe("dependency-free JSON-RPC framing", () => {
 });
 
 describe("MCP lifecycle, exact tools, and schema dispatch", () => {
-  it("requires initialization and lists exactly the seven frozen tools with derived schemas", async () => {
+  it("requires initialization and lists exactly the eight tools with derived schemas", async () => {
     const server = createRoutegoMcpServer({
       service: service({ generate: async (input: unknown) => imageResult(input) })
     });
@@ -262,7 +263,7 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     expect(value.tools.map((tool) => tool.name)).toEqual(
       routegoOperationNames.map((operation) => routegoOperationDefinitions[operation].toolName)
     );
-    expect(value.tools).toHaveLength(7);
+    expect(value.tools).toHaveLength(8);
     for (const tool of value.tools) {
       expect(tool.inputSchema).toMatchObject({ type: "object" });
       const variants = tool.inputSchema["oneOf"];
@@ -307,11 +308,10 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
       })
     );
     expect(generate).toHaveBeenCalledTimes(1);
-    expect(generate.mock.calls[0]?.[0]).toMatchObject({
-      prompt: "中文 MCP prompt",
-      count: 1,
-      quality: "auto"
-    });
+    expect(generate.mock.calls[0]?.[0]).toMatchObject({ prompt: "中文 MCP prompt" });
+    expect(generate.mock.calls[0]?.[0]).not.toHaveProperty("size");
+    expect(generate.mock.calls[0]?.[0]).not.toHaveProperty("aspectRatio");
+    expect(generate.mock.calls[0]?.[0]).not.toHaveProperty("count");
     const toolResult = resultValue(response) as McpToolResult;
     expect(toolResult.isError).toBeUndefined();
     expect(toolResult.content).toHaveLength(2);
@@ -531,7 +531,7 @@ describe("MCP lifecycle, exact tools, and schema dispatch", () => {
     const pathArtifact = items[0]!.result.finalArtifacts[0]!;
     const pathlessArtifact = items[1]!.result.finalArtifacts[0]!;
     expect(batch).toHaveBeenCalledTimes(1);
-    expect(pathArtifact["path"]).toBe("/synthetic/output/batch.png");
+    expect(pathArtifact["path"]).toBe("[REDACTED_PATH]");
     expect(pathlessArtifact).not.toHaveProperty("path");
     expect(pathArtifact).not.toHaveProperty("display");
     expect(pathlessArtifact).not.toHaveProperty("display");

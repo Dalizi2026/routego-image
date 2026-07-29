@@ -10,6 +10,11 @@ import {
 } from "./types";
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+const SUPPORTED_RASTER_MIME_TYPES = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/webp"
+]);
 
 export interface ProviderImageDownloadOptions {
   readonly fetch: typeof fetch;
@@ -103,6 +108,33 @@ function responseMime(response: Response): string | undefined {
   return header?.split(";", 1)[0]?.trim().toLowerCase();
 }
 
+interface PreparedDownloadUrl {
+  readonly url: string;
+  readonly cleartextFallback?: string;
+}
+
+function prepareRemoteCleartextUrl(resourceUrl: string): PreparedDownloadUrl {
+  let resource: URL;
+  try {
+    resource = new URL(resourceUrl);
+  } catch {
+    return { url: resourceUrl };
+  }
+  if (
+    resource.protocol !== "http:" ||
+    resource.username !== "" ||
+    resource.password !== "" ||
+    resource.hostname === "127.0.0.1" ||
+    resource.hostname === "[::1]" ||
+    resource.hostname === "::1"
+  ) {
+    return { url: resourceUrl };
+  }
+  const cleartextFallback = resource.href;
+  resource.protocol = "https:";
+  return { url: resource.href, cleartextFallback };
+}
+
 export async function downloadProviderImage(
   resourceUrl: string,
   options: ProviderImageDownloadOptions
@@ -123,7 +155,9 @@ export async function downloadProviderImage(
     controller.abort(new Error("download-timeout"));
   }, timeoutMs);
 
-  let currentUrl = resourceUrl;
+  let preparedUrl = prepareRemoteCleartextUrl(resourceUrl);
+  let currentUrl = preparedUrl.url;
+  let cleartextFallback = preparedUrl.cleartextFallback;
   let previousUrl: string | undefined;
   let redirectCount = 0;
   try {
@@ -142,12 +176,20 @@ export async function downloadProviderImage(
         ...(options.explicitSameOriginAuthorization === undefined
           ? {}
           : { explicitSameOriginAuthorization: options.explicitSameOriginAuthorization }),
+        ...(cleartextFallback !== undefined && currentUrl === cleartextFallback
+          ? { allowCleartextWithoutAuthorization: true }
+          : {}),
         ...(previousUrl === undefined ? {} : { redirectFromUrl: previousUrl })
       });
       if (!decision.allowed) {
         throwDownload(decision.reason, "The provider image URL was rejected by download policy.");
       }
-      const headers = new Headers({ accept: "image/png, image/jpeg, image/webp" });
+      // Result URLs may be served by an image gateway that performs content
+      // negotiation. Requesting only selected raster formats can cause such a
+      // gateway to return a resized preview instead of the generated original.
+      // Match an ordinary programmatic fetch and validate the returned bytes
+      // ourselves below, rather than influencing the provider's rendition.
+      const headers = new Headers({ accept: "*/*" });
       if (decision.forwardAuthorization && options.authorization !== undefined) {
         headers.set("authorization", options.authorization);
       }
@@ -161,6 +203,15 @@ export async function downloadProviderImage(
           signal: controller.signal
         });
       } catch {
+        if (
+          !timedOut &&
+          !controller.signal.aborted &&
+          cleartextFallback !== undefined &&
+          currentUrl !== cleartextFallback
+        ) {
+          currentUrl = cleartextFallback;
+          continue;
+        }
         throwDownload(
           timedOut ? "timeout" : controller.signal.aborted ? "cancelled" : "network-failure",
           timedOut
@@ -187,7 +238,9 @@ export async function downloadProviderImage(
           throwDownload("invalid-url", "The provider image redirect target is invalid.");
         }
         previousUrl = currentUrl;
-        currentUrl = nextUrl;
+        preparedUrl = prepareRemoteCleartextUrl(nextUrl);
+        currentUrl = preparedUrl.url;
+        cleartextFallback = preparedUrl.cleartextFallback;
         redirectCount += 1;
         continue;
       }
@@ -200,6 +253,21 @@ export async function downloadProviderImage(
       try {
         bytes = await readBoundedResponseBytes(response, maximumBytes, controller.signal);
       } catch (error) {
+        // Some legacy image relays advertise an HTTP result URL while their
+        // HTTPS front door returns a body that Node cannot decode. The original
+        // URL is a single, unauthenticated retrieval fallback, not a provider
+        // request replay. Policy errors such as byte limits must still stop.
+        if (
+          !(error instanceof ProviderDownloadException) &&
+          cleartextFallback !== undefined &&
+          currentUrl !== cleartextFallback &&
+          !timedOut &&
+          !controller.signal.aborted
+        ) {
+          await response.body?.cancel().catch(() => undefined);
+          currentUrl = cleartextFallback;
+          continue;
+        }
         if (error instanceof ProviderDownloadException) throw error;
         throwDownload(
           timedOut ? "timeout" : controller.signal.aborted ? "cancelled" : "body-read-failed",
@@ -223,7 +291,11 @@ export async function downloadProviderImage(
       if (
         declaredMime !== undefined &&
         declaredMime !== "application/octet-stream" &&
-        declaredMime !== metadata.mimeType
+        declaredMime !== metadata.mimeType &&
+        !(
+          SUPPORTED_RASTER_MIME_TYPES.has(declaredMime) &&
+          SUPPORTED_RASTER_MIME_TYPES.has(metadata.mimeType)
+        )
       ) {
         throwDownload("mime-mismatch", "The downloaded image MIME does not match its bytes.");
       }

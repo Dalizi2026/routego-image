@@ -122,7 +122,8 @@ describe("Routego Image plugin package", () => {
     expect(packagedSkill).toContain("不要为这条基础路径要求能力探测");
     expect(packagedSkill).toContain("Do not add optional quality, size, aspect-ratio");
     expect(packagedSkill).toContain("除非用户明确提出，否则不要自动加入质量、尺寸、宽高比");
-    expect(packagedSkill).toContain("For edits, references, masks, and other capability-dependent operations");
+    expect(packagedSkill).toContain("A user explicitly authorizing one direct edit may establish compatibility");
+    expect(packagedSkill).toContain("`routego_edit`");
 
     const logo = await readPng(firstPackage, "assets/logo.png");
     const composerIcon = await readPng(firstPackage, "assets/composer-icon.png");

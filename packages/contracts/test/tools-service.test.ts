@@ -23,11 +23,12 @@ import {
 } from "../src/index";
 import { createGenerateRequest, createSuccessResult, TEST_TIMESTAMP } from "./fixtures";
 
-describe("seven public tool contracts", () => {
-  it("freezes all seven MCP names and loopback HTTP mappings to shared schemas", () => {
+describe("public tool contracts", () => {
+  it("freezes all MCP names and loopback HTTP mappings to shared schemas", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
+      "edit",
       "prepareRegeneration",
       "batch",
       "searchLibrary",
@@ -37,17 +38,14 @@ describe("seven public tool contracts", () => {
     expect(Object.values(routegoOperationDefinitions).map((item) => item.toolName)).toEqual([
       "routego_status",
       "routego_generate",
+      "routego_edit",
       "routego_prepare_regeneration",
       "routego_batch",
       "routego_search_library",
       "routego_manage_library",
       "routego_open_studio"
     ]);
-    expect(routegoOperationNames).toHaveLength(7);
-    expect(routegoOperationNames).not.toContain("edit");
-    expect(
-      Object.values(routegoOperationDefinitions).map((item) => item.toolName)
-    ).not.toContain("routego_edit");
+    expect(routegoOperationNames).toHaveLength(8);
 
     for (const operation of routegoOperationNames) {
       const definition = routegoOperationDefinitions[operation];
@@ -144,15 +142,30 @@ describe("seven public tool contracts", () => {
     ).toBe(false);
   });
 
-  it("rejects removed edit tool input and accepts read-only prepare_regeneration recipes", () => {
+  it("validates direct edit inputs and accepts read-only prepare_regeneration recipes", () => {
+    const edit = routegoEditInputSchema.parse({
+      kind: "edit",
+      prompt: "Replace the jacket with a red dress",
+      targetImage: { path: "/tmp/target.png" },
+      references: [{ path: "/tmp/style.png", role: "style" }],
+      invariants: { preserve: ["identity", "pose"] }
+    });
+    expect(edit.kind).toBe("edit");
+    expect(edit.references).toHaveLength(1);
     expect(
       routegoEditInputSchema.safeParse({
         kind: "edit",
         prompt: "should fail",
-        target: { path: "/tmp/target.png" }
+        targetImage: { path: "/tmp/target.png" },
+        invariants: {}
       }).success
     ).toBe(false);
     expect(routegoEditInputSchema.safeParse({ kind: "edit" }).success).toBe(false);
+    expect(
+      routegoBatchInputSchema.safeParse({
+        tasks: [{ id: "edit-not-batchable", operation: edit }]
+      }).success
+    ).toBe(false);
 
     expect(routegoPrepareRegenerationInputSchema.parse({})).toEqual({
       schemaVersion: 1
@@ -318,6 +331,12 @@ describe("seven public tool contracts", () => {
       providerRequestCount: 0,
       markUnchanged: true
     });
+    const edit = routegoEditInputSchema.parse({
+      kind: "edit",
+      prompt: "Change the clothing only",
+      targetImage: { path: "/tmp/target.png" },
+      invariants: { preserve: ["identity"] }
+    });
     const fixtures = {
       status: {
         input: routegoStatusInputSchema.parse({}),
@@ -350,6 +369,11 @@ describe("seven public tool contracts", () => {
         })
       },
       generate: { input: generate, output: imageOperationResultSchema.parse(imageResult) },
+      edit: { input: edit, output: imageOperationResultSchema.parse({
+        ...imageResult,
+        requestedParams: edit,
+        effectiveParams: edit
+      }) },
       prepareRegeneration: { input: prepareInput, output: prepareOutput },
       batch: { input: batchRawInput, output: batchResult },
       searchLibrary: {

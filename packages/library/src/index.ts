@@ -25,6 +25,7 @@ export * from "./gallery/resources";
 export * from "./gallery/read-service";
 export * from "./gallery/mutations";
 export * from "./gallery/service";
+export * from "./gallery/locations";
 export * from "./gallery/resolver";
 export * from "./zip/crc32";
 export * from "./zip/codec";

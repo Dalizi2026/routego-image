@@ -39,6 +39,7 @@ import {
   reserveUploadResourceResultSchema,
   routegoBatchInputSchema,
   routegoBatchResultSchema,
+  routegoEditInputSchema,
   routegoGenerateInputSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
@@ -107,6 +108,7 @@ import {
   type ReserveUploadResourceResult,
   type RoutegoBatchInput,
   type RoutegoBatchResult,
+  type RoutegoEditInput,
   type RoutegoGenerateInput,
   type RoutegoManageLibraryInput,
   type RoutegoManageLibraryResult,
@@ -145,6 +147,10 @@ import {
   type PreparedImageInput
 } from "@routego-image/creation";
 import {
+  fingerprintProviderEndpoint,
+  selectProviderRoute
+} from "@routego-image/foundation";
+import {
   LibraryError,
   type ResolvedStableImageResource,
   type RoutegoLibraryService
@@ -168,6 +174,7 @@ import {
   type MaterializedImageOutput,
   type OutputMaterializationTransaction
 } from "../image/materialize";
+import { normalizeProviderRasterOutput } from "../image/resize";
 import {
   buildDurableInputGraph,
   type DurableInputGraphPlan,
@@ -274,8 +281,8 @@ interface PreparedPublicOperation {
 }
 
 interface PublicInputDescriptor {
-  readonly key: `reference:${number}`;
-  readonly role: "reference";
+  readonly key: StudioPhysicalInputKey;
+  readonly role: "target" | "reference";
   readonly order: number;
   readonly path: string;
   readonly prepared: PreparedImageInput;
@@ -437,12 +444,25 @@ function outputContractError(
     }
   }
   if (violations.length === 0) return undefined;
+  const actualOutputs = result.finalArtifacts.map((artifact) => ({
+    ...(artifact.width === undefined ? {} : { width: artifact.width }),
+    ...(artifact.height === undefined ? {} : { height: artifact.height }),
+    ...(artifact.mimeType === undefined ? {} : { mimeType: artifact.mimeType })
+  }));
+  const observedExecution = {
+    ...(result.execution.transport === undefined ? {} : { transport: result.execution.transport }),
+    providerRequestCount: result.execution.providerRequestCount
+  };
   return new ProviderIntegrationError(createProviderServiceError({
     code: "invalid_response",
     stage: "complete",
     safeMessage: "The provider output does not match the requested size, aspect ratio, format, or count.",
     mayHaveBilled: result.execution.mayHaveBilled,
-    details: { mismatches: [...new Set(violations)] }
+    details: {
+      mismatches: [...new Set(violations)],
+      ...(actualOutputs.length === 0 ? {} : { actualOutputs }),
+      observedExecution
+    }
   }));
 }
 
@@ -632,7 +652,7 @@ function descriptorResource(
   return {
     source: "upload",
     uploadResourceId,
-    purpose: "reference",
+    purpose: descriptor.role,
     path: descriptor.path,
     mimeType: descriptor.prepared.mimeType,
     byteLength: descriptor.prepared.byteLength,
@@ -653,7 +673,17 @@ function publicRequestWithIds(
     ...reference,
     id: byKey.get(`reference:${index}`)?.artifactId
   }));
-  return imageOperationRequestSchema.parse({ ...request, references });
+  if (request.kind !== "edit") {
+    return imageOperationRequestSchema.parse({ ...request, references });
+  }
+  return imageOperationRequestSchema.parse({
+    ...request,
+    targetImage: {
+      ...request.targetImage,
+      id: byKey.get("target")?.artifactId
+    },
+    references
+  });
 }
 
 function outputArtifactWithBytes(
@@ -663,6 +693,7 @@ function outputArtifactWithBytes(
 ): ImageOperationResult["finalArtifacts"][number] {
   return {
     ...artifact,
+    mimeType: output.mimeType,
     byteLength: output.byteLength,
     width: output.width,
     height: output.height,
@@ -947,8 +978,22 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     const prepared = await prepareImageInputs(request);
     const descriptors: PublicInputDescriptor[] = [];
     let order = 0;
+    if (request.kind === "edit") {
+      const target = prepared.images.find((item) => item.kind === "target");
+      if (target === undefined) throw new Error("The prepared target image is missing.");
+      descriptors.push({
+        key: "target",
+        role: "target",
+        order: order++,
+        path: target.path,
+        prepared: target,
+        ...(request.targetImage.id === undefined ? {} : { id: request.targetImage.id }),
+        ...(request.targetImage.label === undefined ? {} : { label: request.targetImage.label })
+      });
+    }
+    const preparedReferences = prepared.images.filter((item) => item.kind === "reference");
     request.references.forEach((reference, index) => {
-      const item = prepared.images[index];
+      const item = preparedReferences[index];
       if (item === undefined) throw new Error("The prepared reference image is missing.");
       descriptors.push({ key: `reference:${index}`, role: "reference", order: order++, path: item.path, prepared: item, ...(reference.id === undefined ? {} : { id: reference.id }), referenceRole: reference.role, ...(reference.label === undefined ? {} : { label: reference.label }) });
     });
@@ -1013,6 +1058,61 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       signal: context.signal,
       ...(context.onEvent === undefined ? {} : { onEvent: context.onEvent })
     });
+  }
+
+  async #persistSuccessfulDirectEditCapabilities(
+    request: ImageOperationRequest,
+    provider: ProviderSnapshot,
+    creation: ImageOperationResult
+  ): Promise<void> {
+    if (request.kind !== "edit" || creation.status !== "succeeded" || provider.context === undefined) {
+      return;
+    }
+    const decision = selectProviderRoute(provider.context, request);
+    if (!decision.selected) return;
+
+    const capabilities = decision.requiredCapabilities.filter((capability) =>
+      capability === "target-edit" ||
+      capability === "single-image-input" ||
+      capability === "multi-image-input" ||
+      capability === "data-url-input" ||
+      capability === "multipart-input"
+    );
+    if (capabilities.length === 0) return;
+
+    const observedAt = this.#now().toISOString();
+    const evidence = {
+      source: "successful-request" as const,
+      observedAt,
+      summary: "A user-authorized direct image edit completed on this exact provider route.",
+      requestShape: decision.requestShape
+    };
+    const persisted = await Promise.allSettled(capabilities.map(async (capability) => {
+      const result = capabilityProbeResultSchema.parse({
+        schemaVersion: 1,
+        providerId: provider.context!.providerId,
+        model: provider.context!.model,
+        status: "completed",
+        mayHaveBilled: creation.execution.mayHaveBilled,
+        record: {
+          capability,
+          scope: {
+            providerId: provider.context!.providerId,
+            model: provider.context!.model,
+            endpointFingerprint: fingerprintProviderEndpoint(decision.endpoint),
+            transport: decision.transport,
+            requestShape: decision.requestShape
+          },
+          state: "supported",
+          evidence: [evidence],
+          verifiedAt: observedAt
+        }
+      });
+      await this.#options.library.settingsStore.persistCapabilityProbe(result);
+    }));
+    // Persistence is advisory post-success evidence. It must not turn a completed
+    // provider edit into a false failure when local configuration storage is busy.
+    void persisted;
   }
 
   async #materialize(
@@ -1097,6 +1197,58 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     };
   }
 
+  async #normalizeOutputDimensions(
+    request: ImageOperationRequest,
+    result: ImageOperationResult,
+    materialization: MaterializationBatchResult,
+    transaction: OutputMaterializationTransaction
+  ): Promise<{ readonly result: ImageOperationResult; readonly materialization: MaterializationBatchResult }> {
+    if (
+      result.status !== "succeeded" ||
+      (request.format !== "png" && request.format !== "jpeg") ||
+      request.size === "auto"
+    ) {
+      return { result, materialization };
+    }
+    const match = /^(\d+)x(\d+)$/u.exec(request.size);
+    if (match === null) return { result, materialization };
+    const targetWidth = Number(match[1]);
+    const targetHeight = Number(match[2]);
+    const replacements = new Map<string, MaterializedImageOutput>();
+    for (const output of materialization.outputs.filter((candidate) => candidate.phase === "final")) {
+      try {
+        const replacement = await normalizeProviderRasterOutput({
+          transaction,
+          output,
+          targetWidth,
+          targetHeight,
+          targetMimeType: request.format === "png" ? "image/png" : "image/jpeg"
+        });
+        if (replacement !== undefined && replacement.path !== output.path) {
+          replacements.set(output.artifactId, replacement);
+        }
+      } catch {
+        // The strict output contract below reports any format or dimension that
+        // could not be normalized within the bounded raster policy.
+      }
+    }
+    if (replacements.size === 0) return { result, materialization };
+    const finalArtifacts = await Promise.all(result.finalArtifacts.map(async (artifact) => {
+      const replacement = replacements.get(artifact.id);
+      if (replacement === undefined) return artifact;
+      return outputArtifactWithBytes(
+        artifact,
+        replacement,
+        await transaction.readValidatedBytes(replacement)
+      );
+    }));
+    const normalizedResult = imageOperationResultSchema.parse({ ...result, finalArtifacts });
+    return {
+      result: normalizedResult,
+      materialization: combineMaterialization(transaction, normalizedResult, materialization.failures)
+    };
+  }
+
   async #postprocessNativeTransparency(
     result: ImageOperationResult,
     materialization: MaterializationBatchResult,
@@ -1167,14 +1319,21 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
   async #executePublic(
     input: ImageOperationRequest,
     signal?: AbortSignal,
-    providerSnapshot?: ProviderSnapshot
+    providerSnapshot?: ProviderSnapshot,
+    allowUnverifiedDirectEdit = false
   ): Promise<ImageOperationResult> {
     const requestId = this.#id("request");
     const controller = new AbortController();
     const forwardAbort = () => controller.abort(signal?.reason ?? "operation-cancelled");
     if (signal?.aborted) forwardAbort();
     else signal?.addEventListener("abort", forwardAbort, { once: true });
-    const promise = this.#executePublicInner(requestId, input, controller.signal, providerSnapshot);
+    const promise = this.#executePublicInner(
+      requestId,
+      input,
+      controller.signal,
+      providerSnapshot,
+      allowUnverifiedDirectEdit
+    );
     this.#active.set(requestId, { controller, promise });
     this.#activePromises.add(promise);
     try {
@@ -1190,7 +1349,8 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     requestId: string,
     input: ImageOperationRequest,
     signal: AbortSignal,
-    providerSnapshot?: ProviderSnapshot
+    providerSnapshot?: ProviderSnapshot,
+    allowUnverifiedDirectEdit = false
   ): Promise<ImageOperationResult> {
     let transaction: OutputMaterializationTransaction | undefined;
     let creationInvoked = false;
@@ -1206,7 +1366,13 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         ...(this.#options.maximumImageBytes === undefined ? {} : { maximumImageBytes: this.#options.maximumImageBytes })
       });
       const staged = await stagePreparedPublicOperationSources(prepared, { transaction });
-      const provider = providerSnapshot ?? await this.#provider(requestId, signal);
+      const selectedProvider = providerSnapshot ?? await this.#provider(requestId, signal);
+      const provider = allowUnverifiedDirectEdit && selectedProvider.context !== undefined
+        ? freezeProviderSnapshot({
+            ...selectedProvider,
+            context: { ...selectedProvider.context, allowUnverifiedDirectEdit: true }
+          })
+        : selectedProvider;
       creationInvoked = true;
       const raw = await this.#executeCreation(staged.request, {
         requestId,
@@ -1223,10 +1389,23 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         }));
       }
       const creation = parsedCreation.data;
-      const outputMismatch = outputContractError(staged.request, creation);
-      if (outputMismatch !== undefined) throw outputMismatch;
+      await this.#persistSuccessfulDirectEditCapabilities(staged.request, provider, creation);
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
-      const processed = await this.#postprocess(staged.request, creation, materialized, transaction, signal);
+      const normalized = await this.#normalizeOutputDimensions(
+        staged.request,
+        creation,
+        materialized,
+        transaction
+      );
+      const outputMismatch = outputContractError(staged.request, normalized.result);
+      if (outputMismatch !== undefined) throw outputMismatch;
+      const processed = await this.#postprocess(
+        staged.request,
+        normalized.result,
+        normalized.materialization,
+        transaction,
+        signal
+      );
       return imageOperationResultSchema.parse(await finalizePublicOperationResult({
         graph: staged.graph,
         creationResult: processed.result,
@@ -1254,6 +1433,22 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     if (this.#status !== "ready") return failureResult(parsed, this.#id("request"), this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt"));
     try {
       return await this.#executePublic(resolvePublicGenerationRequest(input, await this.#publicDefaults()));
+    } catch (error) {
+      return failureResult(parsed, this.#id("request"), errorFromUnknown(error, "config_corrupt"));
+    }
+  }
+
+  async edit(input: RoutegoEditInput): Promise<ImageOperationResult> {
+    const parsed = routegoEditInputSchema.parse(input);
+    if (this.#status !== "ready") {
+      return failureResult(
+        parsed,
+        this.#id("request"),
+        this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt")
+      );
+    }
+    try {
+      return await this.#executePublic(parsed, undefined, undefined, true);
     } catch (error) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error, "config_corrupt"));
     }
@@ -1459,10 +1654,22 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         }));
       }
       const creation = parsedCreation.data;
-      const outputMismatch = outputContractError(staged.creationRequest, creation);
-      if (outputMismatch !== undefined) throw outputMismatch;
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
-      const processed = await this.#postprocess(staged.creationRequest, creation, materialized, transaction, signal);
+      const normalized = await this.#normalizeOutputDimensions(
+        staged.creationRequest,
+        creation,
+        materialized,
+        transaction
+      );
+      const outputMismatch = outputContractError(staged.creationRequest, normalized.result);
+      if (outputMismatch !== undefined) throw outputMismatch;
+      const processed = await this.#postprocess(
+        staged.creationRequest,
+        normalized.result,
+        normalized.materialization,
+        transaction,
+        signal
+      );
       const final = await finalizeStudioOperationResult({
         prepared: { ...staged, studioRequest: prepared.studioRequest },
         creationResult: processed.result,

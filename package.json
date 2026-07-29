@@ -17,7 +17,7 @@
     "typecheck": "tsc --project tsconfig.tooling.json --noEmit && pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "test:browser": "playwright test",
-    "verify:plugin": "node scripts/verify-plugin-package.mjs"
+    "verify:plugin": "node scripts/verify-plugin-package.mjs .routego-plugin-build/routego-image"
   },
   "devDependencies": {
     "@playwright/test": "1.61.1",

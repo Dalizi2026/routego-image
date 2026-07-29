@@ -7,6 +7,7 @@ import {
   timestampSchema
 } from "./common";
 import { routegoServiceErrorSchema } from "./errors";
+import { imageSizeSchema } from "./image";
 import {
   providerCapabilityRecordSchema,
   providerCapabilitySchema,
@@ -267,6 +268,7 @@ export const capabilityProbeInputSchema = z
     capability: providerCapabilitySchema,
     transport: providerTransportSchema,
     requestShape: z.string().trim().min(1).max(160),
+    requestedSize: imageSizeSchema.optional(),
     confirmBillableProbe: z.literal(true)
   })
   .strict();

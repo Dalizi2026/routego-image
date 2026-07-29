@@ -174,10 +174,11 @@ async function seedAsset(
 }
 
 describe("@routego-image/library service composition", () => {
-  it("exports the complete Library-owned API surface and preserves the seven public operations", () => {
+  it("exports the complete Library-owned API surface and preserves the eight public operations", () => {
     expect(routegoOperationNames).toEqual([
       "status",
       "generate",
+      "edit",
       "prepareRegeneration",
       "batch",
       "searchLibrary",

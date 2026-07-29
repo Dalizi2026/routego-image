@@ -195,7 +195,7 @@ function extensionForMime(mimeType: LibraryImageMimeType): string {
   return ".webp";
 }
 
-function parseGenerationParameters(value: LibraryOperationParameters): LibraryOperationParameters {
+function parseOperationParameters(value: LibraryOperationParameters): LibraryOperationParameters {
   const { action: _action, imageIds: _imageIds, fileIds: _fileIds, ...parameters } = value as
     LibraryOperationParameters & {
       readonly action?: unknown;
@@ -838,14 +838,8 @@ export class LibraryAssetStore {
       );
     }
     const assetId = input.assetId === undefined ? this.#newId("asset") : identifierSchema.parse(input.assetId);
-    const requestedParams = parseGenerationParameters(input.requestedParams);
-    const effectiveParams = parseGenerationParameters(input.effectiveParams);
-    if (requestedParams.kind !== "generate" || effectiveParams.kind !== "generate") {
-      throw new LibraryError(
-        "invalid_input",
-        "Library ingestion accepts generation records only; legacy edits require confirmed migration cleanup."
-      );
-    }
+    const requestedParams = parseOperationParameters(input.requestedParams);
+    const effectiveParams = parseOperationParameters(input.effectiveParams);
     const execution = operationExecutionMetadataSchema.parse(input.execution);
     const relationships = (input.relationships ?? []).map((item) =>
       libraryAssetRelationshipSchema.parse(item)
@@ -1083,7 +1077,7 @@ export class LibraryAssetStore {
         id: asset.assetId,
         prompt: asset.prompt,
         model: asset.model,
-        kind: "generate",
+        kind: asset.requestedParams.kind,
         status: asset.status,
         primaryArtifactId: asset.primaryArtifactId,
         createdAt: asset.createdAt,
