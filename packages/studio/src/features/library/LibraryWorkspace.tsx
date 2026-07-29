@@ -125,7 +125,7 @@ const copy = {
     selectPage: "选择当前页",
     clearPage: "取消当前页选择",
     selectedCount: "已选择"
-    ,locations: "图库目录"
+    ,locations: "资源库位置"
     ,addLocation: "选择文件夹"
     ,add: "添加"
     ,moveSelected: "移动所选图片"
@@ -139,6 +139,10 @@ const copy = {
     ,workInfo: "作品信息与提示词"
     ,technicalInfo: "技术详情"
     ,comparisonInfo: "编辑前后对比"
+    ,currentFolder: "当前文件夹："
+    ,time: "生成时间"
+    ,allTime: "全部时间"
+    ,customTimeRange: "自定义时间范围"
   },
   en: {
     libraryEyebrow: "ARCHIVE / 02",
@@ -213,6 +217,10 @@ const copy = {
     ,workInfo: "Artwork and prompt"
     ,technicalInfo: "Technical details"
     ,comparisonInfo: "Before / after comparison"
+    ,currentFolder: "Current folder:"
+    ,time: "Created"
+    ,allTime: "All time"
+    ,customTimeRange: "Custom time range"
   }
 } as const;
 
@@ -258,9 +266,23 @@ function relationLabel(role: string, language: "zh" | "en"): string {
   return labels[role as keyof typeof labels] ?? role;
 }
 
+function assetStatusLabel(status: string, language: "zh" | "en"): string {
+  if (language === "en") return status;
+  const labels: Record<string, string> = {
+    queued: "排队中",
+    running: "处理中",
+    succeeded: "已完成",
+    partial: "部分完成",
+    failed: "失败",
+    deleted: "已删除"
+  };
+  return labels[status] ?? status;
+}
+
 function FilterPanel({
   filters,
   labels,
+  language,
   errors,
   onChange,
   onSubmit,
@@ -268,6 +290,7 @@ function FilterPanel({
 }: {
   readonly filters: LibraryFilters;
   readonly labels: Labels;
+  readonly language: "zh" | "en";
   readonly errors: Readonly<Record<string, string>>;
   readonly onChange: (filters: LibraryFilters) => void;
   readonly onSubmit: () => void;
@@ -284,6 +307,9 @@ function FilterPanel({
     event.preventDefault();
     onSubmit();
   };
+  const presetSize = filters.sizes.length === 1 ? filters.sizes[0] ?? "" : "";
+  const presetStatus = filters.statuses.length === 1 ? filters.statuses[0] ?? "" : "";
+  const hasCustomTimeRange = filters.from !== "" || filters.to !== "";
   return (
     <form className="library-filters" onSubmit={submit}>
       <div className="library-filters__grid library-filters__grid--quick">
@@ -324,6 +350,38 @@ function FilterPanel({
           <button type="submit">{labels.apply}</button>
           <button type="button" onClick={onReset}>{labels.reset}</button>
         </div>
+      </div>
+      <div className="library-filters__grid library-filters__grid--reference">
+        <label>
+          <span>{labels.time}</span>
+          <select
+            value={hasCustomTimeRange ? "custom" : "all"}
+            onChange={(event) => {
+              if (event.target.value === "all") onChange({ ...filters, from: "", to: "" });
+            }}
+          >
+            <option value="all">{labels.allTime}</option>
+            {hasCustomTimeRange ? <option value="custom">{labels.customTimeRange}</option> : null}
+          </select>
+        </label>
+        <label>
+          <span>{labels.models}</span>
+          <input value={filters.models} placeholder={labels.modelsPlaceholder} onChange={(event) => onChange({ ...filters, models: event.target.value })} />
+        </label>
+        <label>
+          <span>{labels.sizes}</span>
+          <select value={presetSize} onChange={(event) => onChange({ ...filters, sizes: event.target.value === "" ? [] : [event.target.value as (typeof sizeOptions)[number]] })}>
+            <option value="">{language === "zh" ? "全部" : "All"}</option>
+            {sizeOptions.map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>{labels.statuses}</span>
+          <select value={presetStatus} onChange={(event) => onChange({ ...filters, statuses: event.target.value === "" ? [] : [event.target.value as (typeof statusOptions)[number]] })}>
+            <option value="">{language === "zh" ? "全部" : "All"}</option>
+            {statusOptions.map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </label>
       </div>
       <details className="library-filters__advanced">
         <summary>{labels.advanced}{activeAdvancedCount > 0 ? ` · ${activeAdvancedCount} ${labels.activeFilters}` : ""}</summary>
@@ -389,7 +447,7 @@ export function GalleryCard({
             <ProtectedImage gateway={gateway} descriptor={item.thumbnail} alt={item.prompt} />
           )}
           <span className={`library-card__status library-card__status--${item.status}`}>
-            {item.status}
+            {assetStatusLabel(item.status, language)}
           </span>
           <span className="library-card__frame">{item.width} × {item.height}</span>
         </div>
@@ -956,6 +1014,11 @@ export function LibraryWorkspace({
   const total = searchState.status === "ready" || searchState.status === "empty"
     ? searchState.total
     : undefined;
+  const currentFolderName = filters.folderId === undefined
+    ? labels.allFolders
+    : folderState.status === "ready"
+      ? folderState.folders.find((folder) => folder.id === filters.folderId)?.name ?? labels.allFolders
+      : labels.allFolders;
   return (
     <section className="library-workspace library-workspace--library">
       <header className="library-workspace__header">
@@ -972,6 +1035,7 @@ export function LibraryWorkspace({
             {locations.filter((location) => !location.isDefault && location.folderId !== undefined).map((location) => <option key={location.id} value={location.folderId}>{location.name} · {location.assetCount}</option>)}
           </select></label>
           <button type="button" disabled={actionBusy} onClick={() => void addLocation()}>{labels.addLocation}</button>
+          <p className="library-locations__current"><span>{labels.currentFolder}</span><strong>{currentFolderName}</strong></p>
         </section>
         <nav className="library-folders" aria-label={labels.folders}>
           <button
@@ -1006,6 +1070,7 @@ export function LibraryWorkspace({
         <FilterPanel
           filters={filters}
           labels={labels}
+          language={language}
           errors={filterErrors}
           onChange={setFilters}
           onSubmit={applyFilters}

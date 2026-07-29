@@ -929,3 +929,43 @@
   .provider-switch__model { display: none; }
   .language-toggle { display: none; }
 }
+
+/* Reference-size sidebar frame (1122 × 1402): the Library owns the page grid,
+ * so the shell leaves it the same 34px outer gutter as the approved reference. */
+.studio-shell--sidebar {
+  grid-template-rows: 100px minmax(0, 1fr) 108px;
+}
+
+.studio-shell--sidebar .studio-header {
+  padding-inline: 34px;
+}
+
+.studio-shell--sidebar .studio-header__identity p::after {
+  font-size: 1.86rem;
+  letter-spacing: -0.07em;
+}
+
+.studio-shell--sidebar .studio-workspace__primary {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 34px 132px;
+}
+
+.studio-shell--sidebar .studio-nav,
+.studio-shell--sidebar .studio-nav__item {
+  height: 108px;
+  min-height: 108px;
+}
+
+.studio-shell--sidebar .studio-nav__item {
+  padding-top: 14px;
+}
+
+@media (max-width: 720px) {
+  .studio-shell--sidebar { grid-template-rows: 78px minmax(0, 1fr) 82px; }
+  .studio-shell--sidebar .studio-header { padding-inline: 16px; }
+  .studio-shell--sidebar .studio-workspace__primary { padding: 16px 16px 98px; }
+  .studio-shell--sidebar .studio-nav,
+  .studio-shell--sidebar .studio-nav__item { height: 82px; min-height: 82px; }
+}

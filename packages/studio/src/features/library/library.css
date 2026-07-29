@@ -1426,3 +1426,252 @@
   .library-detail__panel > header { padding: 14px; }
   .library-detail__content { padding: 12px; }
 }
+
+/* The Library follows the approved reference grid exactly at sidebar width.
+ * Every visible value below is still backed by the existing Library state. */
+.studio-shell--sidebar .library-workspace--library {
+  gap: 16px;
+}
+
+.studio-shell--sidebar .library-workspace__tools {
+  gap: 10px;
+  margin: 0;
+}
+
+.studio-shell--sidebar .library-locations {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 48px 46px;
+  gap: 12px 14px;
+  min-height: 144px;
+  padding: 14px 20px;
+  border-radius: 9px;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.025), transparent 43%), rgba(17, 19, 18, 0.93);
+}
+
+.studio-shell--sidebar .library-locations label {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.studio-shell--sidebar .library-locations label > span {
+  color: var(--paper-100);
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.studio-shell--sidebar .library-locations select,
+.studio-shell--sidebar .library-locations button {
+  min-height: 48px;
+}
+
+.studio-shell--sidebar .library-locations button {
+  min-width: 148px;
+  padding-inline: 18px;
+  align-self: center;
+  border-color: color-mix(in srgb, var(--amber-300) 75%, var(--line-strong));
+  color: var(--amber-300);
+  background: rgba(184, 245, 44, 0.035);
+}
+
+.studio-shell--sidebar .library-locations__current {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 14px;
+  min-width: 0;
+  margin: 0 -20px;
+  padding: 12px 20px 0;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: var(--paper-300);
+  font-size: 0.86rem;
+}
+
+.studio-shell--sidebar .library-locations__current strong {
+  overflow: hidden;
+  color: var(--amber-300);
+  font-size: 0.92rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.studio-shell--sidebar .library-folders {
+  min-height: 64px;
+  padding: 8px 20px;
+  border-radius: 9px;
+  background: rgba(18, 20, 19, 0.92);
+}
+
+.studio-shell--sidebar .library-folders > button {
+  min-height: 46px;
+  padding-inline: 14px;
+  font-size: 0.9rem;
+}
+
+.studio-shell--sidebar .library-filters {
+  gap: 14px;
+  padding: 18px 20px 14px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.025), transparent 52%), rgba(18, 20, 19, 0.94);
+}
+
+.studio-shell--sidebar .library-filters__grid--quick {
+  grid-template-columns: minmax(240px, 1.25fr) minmax(160px, .9fr) minmax(110px, .52fr) auto;
+  gap: 12px;
+}
+
+.studio-shell--sidebar .library-filters__grid--reference {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.studio-shell--sidebar .library-filters__grid--reference label {
+  display: grid;
+  gap: 7px;
+}
+
+.studio-shell--sidebar .library-filters__grid--reference input,
+.studio-shell--sidebar .library-filters__grid--reference select {
+  min-height: 46px;
+}
+
+.studio-shell--sidebar .library-filters__actions {
+  gap: 10px;
+}
+
+.studio-shell--sidebar .library-filters__actions button {
+  min-width: 106px;
+  min-height: 46px;
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.studio-shell--sidebar .library-filters__advanced {
+  margin-top: 0;
+}
+
+.studio-shell--sidebar .library-filters__advanced > summary {
+  padding: 12px 0 0;
+  color: var(--paper-300);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.studio-shell--sidebar .library-workspace__summary {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) auto minmax(180px, .9fr) auto auto;
+  gap: 12px;
+  min-height: 62px;
+  margin: 0;
+  padding: 10px 20px;
+  border-radius: 9px;
+  background: rgba(16, 18, 17, 0.94);
+}
+
+.studio-shell--sidebar .library-workspace__counts {
+  gap: 18px;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.studio-shell--sidebar .library-workspace__summary > button,
+.studio-shell--sidebar .library-workspace__summary > select {
+  min-height: 42px;
+  padding-inline: 13px;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.studio-shell--sidebar .library-pagination--compact {
+  justify-self: end;
+  gap: 12px;
+}
+
+.studio-shell--sidebar .library-gallery {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.studio-shell--sidebar .library-card {
+  border-radius: 9px;
+}
+
+.studio-shell--sidebar .library-card__image {
+  aspect-ratio: 1.52 / 1;
+}
+
+.studio-shell--sidebar .library-card__status {
+  top: 8px;
+  left: 8px;
+  padding: 5px 7px;
+  font-size: 0.62rem;
+}
+
+.studio-shell--sidebar .library-card__selection {
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+}
+
+.studio-shell--sidebar .library-card__frame {
+  right: 8px;
+  bottom: 8px;
+  padding: 4px 7px;
+  font-size: 0.6rem;
+}
+
+.studio-shell--sidebar .library-card__meta {
+  min-height: 70px;
+  padding: 10px 12px;
+  align-items: end;
+}
+
+.studio-shell--sidebar .library-card__meta span,
+.studio-shell--sidebar .library-card__meta time {
+  font-size: 0.72rem;
+}
+
+@media (max-width: 820px) {
+  .studio-shell--sidebar .library-locations label,
+  .studio-shell--sidebar .library-filters__grid--reference,
+  .studio-shell--sidebar .library-workspace__summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .studio-shell--sidebar .library-locations__current { grid-column: 1 / -1; }
+}
+
+@media (max-width: 560px) {
+  .studio-shell--sidebar .library-locations {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    min-height: 0;
+  }
+
+  .studio-shell--sidebar .library-locations label,
+  .studio-shell--sidebar .library-filters__grid--quick,
+  .studio-shell--sidebar .library-filters__grid--reference,
+  .studio-shell--sidebar .library-workspace__summary {
+    grid-template-columns: 1fr;
+  }
+
+  .studio-shell--sidebar .library-locations button { width: 100%; }
+  .studio-shell--sidebar .library-locations__current { grid-column: 1; }
+  .studio-shell--sidebar .library-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
