@@ -651,5 +651,5 @@
 .studio-shell[data-theme="light"] .control-grid input,
 .studio-shell[data-theme="light"] .control-grid select,
 .studio-shell[data-theme="light"] .control-grid textarea {
-  background-color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.88);
 }

@@ -1893,6 +1893,22 @@
   background-color: rgba(255, 255, 255, 0.92);
 }
 
+.studio-shell[data-theme="light"] .library-locations select,
+.studio-shell[data-theme="light"] .library-filters input,
+.studio-shell[data-theme="light"] .library-filters select,
+.studio-shell[data-theme="light"] .library-workspace__summary select,
+.studio-shell[data-theme="light"] .library-workspace__summary button,
+.studio-shell[data-theme="light"] .library-pagination button {
+  color: var(--paper-100);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.studio-shell[data-theme="light"] .library-filters__actions button:first-child,
+.studio-shell[data-theme="light"] .library-pagination__page[aria-current="page"] {
+  color: var(--ink-950);
+  background: var(--amber-400);
+}
+
 .studio-shell[data-theme="light"] .library-card__selection:has(input:checked),
 .studio-shell[data-theme="light"] .library-pagination__page[aria-current="page"] {
   background: var(--amber-400);
