@@ -1126,34 +1126,6 @@ export function LibraryWorkspace({
         </select>
         <button type="button" disabled={actionBusy || selectedAssetIds.length === 0 || destinationLocationId === ""} onClick={() => void moveSelected()}>{labels.moveSelected}</button>
         <button type="button" className="library-workspace__delete" disabled={actionBusy || selectedAssetIds.length === 0} onClick={() => void deleteSelected()}>{labels.deleteSelected}</button>
-        <nav className="library-pagination library-pagination--compact" aria-label={`${labels.page} ${page.index + 1}`}>
-          <button
-            type="button"
-            aria-label={labels.previous}
-            title={labels.previous}
-            disabled={page.index === 0 || searchState.status === "loading"}
-            onClick={() => setPage((current) => retreatLibraryPage(current))}
-          >
-            <span aria-hidden="true">←</span>
-          </button>
-          <span>{String(page.index + 1).padStart(2, "0")}</span>
-          <button
-            type="button"
-            aria-label={labels.next}
-            title={labels.next}
-            disabled={searchState.status !== "ready" || searchState.nextCursor === undefined}
-            onClick={() =>
-              setPage((current) =>
-                advanceLibraryPage(
-                  current,
-                  searchState.status === "ready" ? searchState.nextCursor : undefined
-                )
-              )
-            }
-          >
-            <span aria-hidden="true">→</span>
-          </button>
-        </nav>
       </div>
 
       {searchState.status === "loading" ? (
@@ -1175,30 +1147,55 @@ export function LibraryWorkspace({
           <p>{labels.emptyBody}</p>
         </AsyncStatePanel>
       ) : (
-        <div className="library-gallery" aria-live="polite">
-          {items.map((item) => (
-            <GalleryCard
-              key={item.assetId}
-              gateway={gateway}
-              item={item}
-              labels={labels}
-              language={language}
-              detailSelected={selectedAssetId === item.assetId}
-              checked={selectedAssetIds.includes(item.assetId)}
-              onCheckedChange={(checked) =>
-                setSelectedAssetIds((current) =>
-                  checked
-                    ? [...new Set([...current, item.assetId])]
-                    : current.filter((assetId) => assetId !== item.assetId)
-                )
-              }
-              editingName={editingAssetId === item.assetId}
-              onStartRename={() => setEditingAssetId(item.assetId)}
-              onRename={(name) => void renameAsset(item.assetId, name)}
-              onOpen={() => setSelectedAssetId(item.assetId)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="library-gallery" aria-live="polite">
+            {items.map((item) => (
+              <GalleryCard
+                key={item.assetId}
+                gateway={gateway}
+                item={item}
+                labels={labels}
+                language={language}
+                detailSelected={selectedAssetId === item.assetId}
+                checked={selectedAssetIds.includes(item.assetId)}
+                onCheckedChange={(checked) =>
+                  setSelectedAssetIds((current) =>
+                    checked
+                      ? [...new Set([...current, item.assetId])]
+                      : current.filter((assetId) => assetId !== item.assetId)
+                  )
+                }
+                editingName={editingAssetId === item.assetId}
+                onStartRename={() => setEditingAssetId(item.assetId)}
+                onRename={(name) => void renameAsset(item.assetId, name)}
+                onOpen={() => setSelectedAssetId(item.assetId)}
+              />
+            ))}
+          </div>
+          <nav className="library-pagination" aria-label={`${labels.page} ${page.index + 1}`}>
+          <button
+            type="button"
+            aria-label={labels.previous}
+            title={labels.previous}
+            disabled={page.index === 0}
+            onClick={() => setPage((current) => retreatLibraryPage(current))}
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <span>{String(page.index + 1).padStart(2, "0")}</span>
+          <button
+            type="button"
+            aria-label={labels.next}
+            title={labels.next}
+            disabled={searchState.nextCursor === undefined}
+            onClick={() =>
+              setPage((current) => advanceLibraryPage(current, searchState.nextCursor))
+            }
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+          </nav>
+        </>
       )}
 
       <DetailDrawer
