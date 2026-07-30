@@ -7,6 +7,7 @@ import {
   createLibraryFilters,
   currentLibraryCursor,
   initialLibraryPage,
+  paginationPageNumbers,
   retreatLibraryPage,
   type LibraryFilters
 } from "../src/features/library";
@@ -92,5 +93,10 @@ describe("Studio Library path-free query and cursor state", () => {
       cursors: [undefined, "cursor-2", "cursor-3b"],
       index: 2
     });
+  });
+
+  it("renders a real compact page range without inventing extra pages", () => {
+    expect(paginationPageNumbers(1, 2)).toEqual([1, 2]);
+    expect(paginationPageNumbers(4, 42)).toEqual([1, "ellipsis", 3, 4, 5, "ellipsis", 42]);
   });
 });

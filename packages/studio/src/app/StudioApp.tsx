@@ -201,19 +201,14 @@ export function HeaderProviderSelector({
   readonly onSettingsChange: (settings: ReadSettingsResult) => void;
 }) {
   const { language, t } = useI18n();
-  const activeProvider = settings.profiles.find(
-    (profile) => profile.id === settings.activeProviderId && profile.isActive
-  );
   const [switching, setSwitching] = useState(false);
   const copy =
     language === "zh"
       ? {
-          label: "服务商",
-          noModel: "未配置模型"
+          label: "服务商"
         }
       : {
-          label: "Provider",
-          noModel: "No model configured"
+          label: "Provider"
         };
 
   return (
@@ -237,7 +232,6 @@ export function HeaderProviderSelector({
       >
         {settings.profiles.length === 0 ? <option value="">{t("status.unconfigured")}</option> : settings.profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}
       </select>
-      <span className="provider-switch__model">{switching ? "…" : settings.defaults.model ?? activeProvider?.defaultModel ?? copy.noModel}</span>
     </div>
   );
 }
@@ -256,6 +250,7 @@ function StudioWorkspace({
   readonly routeContent?: Partial<Record<StudioRoute, ReactNode>>;
 }) {
   const { language, t, toggleLanguage } = useI18n();
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const firstRunSession = useRef(initialStudioRouteForSettings(settings) === "settings").current;
   const [state, dispatch] = useReducer(studioAppReducer, {
     ...initialStudioAppState,
@@ -298,6 +293,7 @@ function StudioWorkspace({
     <div
       className={`studio-shell studio-shell--sidebar${firstRunSetupVisible ? " studio-shell--setup" : ""}`}
       data-language={language}
+      data-theme={theme}
     >
       <a className="skip-link" href="#studio-workspace">
         {t("app.skip")}
@@ -321,13 +317,22 @@ function StudioWorkspace({
             onSettingsChange={onSettingsChange}
           />
           <button
+            className="theme-toggle"
+            type="button"
+            aria-label={language === "zh" ? (theme === "dark" ? "切换为白天模式" : "切换为黑夜模式") : (theme === "dark" ? "Switch to light mode" : "Switch to dark mode")}
+            onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")}
+          >
+            <span className="theme-toggle__badge" aria-hidden="true">{theme === "dark" ? "☀" : "◐"}</span>
+            <span className="theme-toggle__copy">{language === "zh" ? (theme === "dark" ? "白天" : "黑夜") : (theme === "dark" ? "Light" : "Dark")}</span>
+          </button>
+          <button
             className="language-toggle"
             type="button"
             aria-label={t("app.language")}
             onClick={toggleLanguage}
           >
-            <span>{language === "zh" ? "中" : "EN"}</span>
-            {t("app.languageAction")}
+            <span className="language-toggle__badge">{language === "zh" ? "中" : "EN"}</span>
+            <span className="language-toggle__copy">{t("app.languageAction")}</span>
           </button>
         </div>
       </header>

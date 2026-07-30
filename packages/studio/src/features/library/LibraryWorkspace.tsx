@@ -41,6 +41,7 @@ import {
   currentLibraryCursor,
   initialLibraryPage,
   LibraryQueryError,
+  paginationPageNumbers,
   retreatLibraryPage
 } from "./query";
 import { remainingSelectedAssetIds } from "./mutations";
@@ -125,6 +126,7 @@ const copy = {
     selectItem: "选择图库项目",
     selectPage: "选择当前页",
     clearPage: "取消当前页选择",
+    cancelSelection: "取消选择",
     selectedCount: "已选择"
     ,locations: "资源库位置"
     ,addLocation: "选择文件夹"
@@ -207,6 +209,7 @@ const copy = {
     selectItem: "Select Library item",
     selectPage: "Select current page",
     clearPage: "Clear current-page selection",
+    cancelSelection: "Cancel selection",
     selectedCount: "Selected"
     ,locations: "Library directories"
     ,addLocation: "Choose folder"
@@ -426,6 +429,7 @@ export function GalleryCard({
   language,
   detailSelected,
   checked,
+  selectionMode,
   onCheckedChange,
   editingName = false,
   onStartRename = () => undefined,
@@ -438,6 +442,7 @@ export function GalleryCard({
   readonly language: "zh" | "en";
   readonly detailSelected: boolean;
   readonly checked: boolean;
+  readonly selectionMode: boolean;
   readonly onCheckedChange: (checked: boolean) => void;
   readonly editingName?: boolean;
   readonly onStartRename?: () => void;
@@ -458,8 +463,8 @@ export function GalleryCard({
       <button
         className="library-card__open"
         type="button"
-        aria-label={`${labels.openDetail}: ${item.prompt}`}
-        onClick={onOpen}
+        aria-label={`${selectionMode ? labels.selectItem : labels.openDetail}: ${item.prompt}`}
+        onClick={() => selectionMode ? onCheckedChange(!checked) : onOpen()}
       >
         <div className="library-card__image">
           {item.thumbnail === undefined ? (
@@ -712,6 +717,7 @@ export function LibraryWorkspace({
   const [detailRevision, setDetailRevision] = useState(0);
   const [selectedAssetId, setSelectedAssetId] = useState<string | undefined>();
   const [selectedAssetIds, setSelectedAssetIds] = useState<readonly string[]>([]);
+  const [pageBusy, setPageBusy] = useState(false);
   const [detailState, setDetailState] = useState<AssetDetailState>({ status: "idle" });
   const [relationshipResources, setRelationshipResources] = useState<
     readonly RelationshipResourceState[]
@@ -886,6 +892,29 @@ export function LibraryWorkspace({
     setPage(initialLibraryPage());
   }, []);
 
+  const selectPage = useCallback(async (targetIndex: number) => {
+    if (targetIndex < 0 || targetIndex === page.index || pageBusy) return;
+    setPageBusy(true);
+    try {
+      let cursors = [...page.cursors];
+      while (cursors.length <= targetIndex) {
+        const result = await gateway.invoke(
+          "searchStudioLibrary",
+          buildLibrarySearchInput(appliedFilters, libraryView, cursors[cursors.length - 1])
+        );
+        if (result.nextCursor === undefined) break;
+        cursors = [...cursors, result.nextCursor];
+      }
+      if (cursors[targetIndex] !== undefined || targetIndex === 0) {
+        setPage({ cursors, index: targetIndex });
+      }
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : labels.searchFailure);
+    } finally {
+      setPageBusy(false);
+    }
+  }, [appliedFilters, gateway, labels.searchFailure, libraryView, page, pageBusy]);
+
   const selectFolder = useCallback(
     (folderId: string | undefined) => {
       const next = { ...filters, folderId };
@@ -1037,6 +1066,9 @@ export function LibraryWorkspace({
   const total = searchState.status === "ready" || searchState.status === "empty"
     ? searchState.total
     : undefined;
+  const totalPages = total === undefined ? page.index + (searchState.status === "ready" && searchState.nextCursor !== undefined ? 2 : 1) : Math.max(1, Math.ceil(total / appliedFilters.limit));
+  const pageNumbers = paginationPageNumbers(page.index + 1, totalPages);
+  const selectionMode = selectedAssetIds.length > 0;
   const currentFolderName = filters.folderId === undefined
     ? labels.allFolders
     : folderState.status === "ready"
@@ -1109,6 +1141,14 @@ export function LibraryWorkspace({
         </div>
         <button
           type="button"
+          className="library-workspace__clear-selection"
+          disabled={!selectionMode}
+          onClick={() => setSelectedAssetIds([])}
+        >
+          {labels.cancelSelection}
+        </button>
+        <button
+          type="button"
           disabled={currentPageIds.length === 0}
           onClick={() =>
             setSelectedAssetIds((current) =>
@@ -1158,6 +1198,7 @@ export function LibraryWorkspace({
                 language={language}
                 detailSelected={selectedAssetId === item.assetId}
                 checked={selectedAssetIds.includes(item.assetId)}
+                selectionMode={selectionMode}
                 onCheckedChange={(checked) =>
                   setSelectedAssetIds((current) =>
                     checked
@@ -1174,6 +1215,7 @@ export function LibraryWorkspace({
           </div>
           <nav className="library-pagination" aria-label={`${labels.page} ${page.index + 1}`}>
           <button
+            className="library-pagination__arrow"
             type="button"
             aria-label={labels.previous}
             title={labels.previous}
@@ -1182,8 +1224,22 @@ export function LibraryWorkspace({
           >
             <span aria-hidden="true">←</span>
           </button>
-          <span>{String(page.index + 1).padStart(2, "0")}</span>
+          {pageNumbers.map((entry, index) => entry === "ellipsis" ? (
+            <span key={`${entry}-${index}`} className="library-pagination__ellipsis" aria-hidden="true">…</span>
+          ) : (
+            <button
+              key={entry}
+              type="button"
+              className="library-pagination__page"
+              aria-current={entry === page.index + 1 ? "page" : undefined}
+              disabled={pageBusy || entry === page.index + 1}
+              onClick={() => void selectPage(entry - 1)}
+            >
+              {entry}
+            </button>
+          ))}
           <button
+            className="library-pagination__arrow"
             type="button"
             aria-label={labels.next}
             title={labels.next}

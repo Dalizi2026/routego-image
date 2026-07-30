@@ -105,6 +105,6 @@ describe("accessible Studio shell markup", () => {
     expect(markup).toContain('aria-label="服务商"');
     expect(markup).not.toContain("前往设置");
     expect(markup).toContain("Synthetic provider A");
-    expect(markup).toContain("image-1");
+    expect(markup).not.toContain("image-1");
   });
 });

@@ -114,3 +114,14 @@ export function retreatLibraryPage(state: LibraryPageState): LibraryPageState {
 export function currentLibraryCursor(state: LibraryPageState): string | undefined {
   return state.cursors[state.index];
 }
+
+/** A compact, deterministic page range for cursor-backed searches. */
+export function paginationPageNumbers(currentPage: number, totalPages: number): readonly (number | "ellipsis")[] {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1);
+  const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+  const numbers = [...pages].filter((page) => page >= 1 && page <= totalPages).sort((left, right) => left - right);
+  return numbers.flatMap((page, index) => {
+    const previous = numbers[index - 1];
+    return previous !== undefined && page - previous > 1 ? ["ellipsis", page] : [page];
+  });
+}

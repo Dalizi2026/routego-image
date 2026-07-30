@@ -641,3 +641,15 @@
   }
 
 }
+
+/* Light mode keeps the workbench structure intact and replaces dark surfaces only. */
+.studio-shell[data-theme="light"] .creation-workbench,
+.studio-shell[data-theme="light"] .creation-controls,
+.studio-shell[data-theme="light"] .creation-result,
+.studio-shell[data-theme="light"] .batch-editor,
+.studio-shell[data-theme="light"] .creation-prompt,
+.studio-shell[data-theme="light"] .control-grid input,
+.studio-shell[data-theme="light"] .control-grid select,
+.studio-shell[data-theme="light"] .control-grid textarea {
+  background-color: rgba(255, 255, 255, 0.88);
+}

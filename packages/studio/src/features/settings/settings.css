@@ -1374,3 +1374,20 @@
     grid-column: auto;
   }
 }
+
+/* Light mode shares every measurement with the dark theme; only surfaces change. */
+.studio-shell[data-theme="light"] .generation-defaults,
+.studio-shell[data-theme="light"] .capability-probe,
+.studio-shell[data-theme="light"] .provider-manager,
+.studio-shell[data-theme="light"] .provider-manager__summary,
+.studio-shell[data-theme="light"] .provider-manager__form {
+  background-color: rgba(255, 255, 255, 0.84);
+}
+
+.studio-shell[data-theme="light"] .generation-defaults__identity div,
+.studio-shell[data-theme="light"] .generation-defaults__grid select,
+.studio-shell[data-theme="light"] .generation-defaults__custom-size input,
+.studio-shell[data-theme="light"] .provider-manager input,
+.studio-shell[data-theme="light"] .provider-manager select {
+  background-color: rgba(255, 255, 255, 0.92);
+}

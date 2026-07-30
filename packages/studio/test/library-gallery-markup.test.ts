@@ -36,6 +36,7 @@ describe("sidebar-first Library gallery markup", () => {
         language: "en",
         detailSelected: false,
         checked: false,
+        selectionMode: false,
         onCheckedChange: () => undefined,
         onOpen: () => undefined
       })
