@@ -11,6 +11,7 @@ import type {
   BrowserResourceDescriptor,
   ExecuteLibraryMutationResult,
   LibraryAssetDetail,
+  ProviderProfileDescriptor,
   RoutegoManageLibraryResult,
   StudioLibrarySearchItem
 } from "@routego-image/contracts";
@@ -73,8 +74,8 @@ const copy = {
     filterTitle: "检索暗袋",
     query: "提示词检索",
     queryPlaceholder: "搜索提示词内容",
-    models: "模型",
-    modelsPlaceholder: "多个模型用逗号分隔",
+    provider: "服务商",
+    allProviders: "全部服务商",
     from: "开始日期",
     to: "结束日期",
     kinds: "任务类型",
@@ -142,6 +143,10 @@ const copy = {
     ,currentFolder: "当前文件夹："
     ,time: "生成时间"
     ,allTime: "全部时间"
+    ,today: "今天"
+    ,last24Hours: "24 小时内"
+    ,last7Days: "一周内"
+    ,last30Days: "30 天内"
     ,customTimeRange: "自定义时间范围"
   },
   en: {
@@ -151,8 +156,8 @@ const copy = {
     filterTitle: "Archive search sleeve",
     query: "Prompt query",
     queryPlaceholder: "Search prompt text",
-    models: "Models",
-    modelsPlaceholder: "Separate multiple models with commas",
+    provider: "Provider",
+    allProviders: "All providers",
     from: "From date",
     to: "To date",
     kinds: "Operation kind",
@@ -220,6 +225,10 @@ const copy = {
     ,currentFolder: "Current folder:"
     ,time: "Created"
     ,allTime: "All time"
+    ,today: "Today"
+    ,last24Hours: "Last 24 hours"
+    ,last7Days: "Last 7 days"
+    ,last30Days: "Last 30 days"
     ,customTimeRange: "Custom time range"
   }
 } as const;
@@ -283,6 +292,7 @@ function FilterPanel({
   filters,
   labels,
   language,
+  providers,
   errors,
   onChange,
   onSubmit,
@@ -291,13 +301,14 @@ function FilterPanel({
   readonly filters: LibraryFilters;
   readonly labels: Labels;
   readonly language: "zh" | "en";
+  readonly providers: readonly ProviderProfileDescriptor[];
   readonly errors: Readonly<Record<string, string>>;
   readonly onChange: (filters: LibraryFilters) => void;
   readonly onSubmit: () => void;
   readonly onReset: () => void;
 }) {
   const activeAdvancedCount = [
-    filters.models.trim() !== "",
+    filters.providerId !== "",
     filters.from !== "",
     filters.to !== "",
     filters.sizes.length > 0,
@@ -309,7 +320,6 @@ function FilterPanel({
   };
   const presetSize = filters.sizes.length === 1 ? filters.sizes[0] ?? "" : "";
   const presetStatus = filters.statuses.length === 1 ? filters.statuses[0] ?? "" : "";
-  const hasCustomTimeRange = filters.from !== "" || filters.to !== "";
   return (
     <form className="library-filters" onSubmit={submit}>
       <div className="library-filters__grid library-filters__grid--quick">
@@ -341,7 +351,7 @@ function FilterPanel({
             value={filters.limit}
             onChange={(event) => onChange({ ...filters, limit: Number(event.target.value) })}
           >
-            {[20, 30, 40, 50].map((value) => (
+            {[24, 30, 48, 60].map((value) => (
               <option key={value} value={value}>{value}</option>
             ))}
           </select>
@@ -355,18 +365,30 @@ function FilterPanel({
         <label>
           <span>{labels.time}</span>
           <select
-            value={hasCustomTimeRange ? "custom" : "all"}
+            value={filters.timeRange}
             onChange={(event) => {
-              if (event.target.value === "all") onChange({ ...filters, from: "", to: "" });
+              const timeRange = event.target.value as LibraryFilters["timeRange"];
+              onChange({
+                ...filters,
+                timeRange,
+                ...(timeRange === "custom" ? {} : { from: "", to: "" })
+              });
             }}
           >
             <option value="all">{labels.allTime}</option>
-            {hasCustomTimeRange ? <option value="custom">{labels.customTimeRange}</option> : null}
+            <option value="today">{labels.today}</option>
+            <option value="last-24-hours">{labels.last24Hours}</option>
+            <option value="last-7-days">{labels.last7Days}</option>
+            <option value="last-30-days">{labels.last30Days}</option>
+            <option value="custom">{labels.customTimeRange}</option>
           </select>
         </label>
         <label>
-          <span>{labels.models}</span>
-          <input value={filters.models} placeholder={labels.modelsPlaceholder} onChange={(event) => onChange({ ...filters, models: event.target.value })} />
+          <span>{labels.provider}</span>
+          <select value={filters.providerId} onChange={(event) => onChange({ ...filters, providerId: event.target.value })}>
+            <option value="">{labels.allProviders}</option>
+            {providers.map((provider) => <option key={provider.id} value={provider.id}>{provider.name}</option>)}
+          </select>
         </label>
         <label>
           <span>{labels.sizes}</span>
@@ -386,9 +408,8 @@ function FilterPanel({
       <details className="library-filters__advanced">
         <summary>{labels.advanced}{activeAdvancedCount > 0 ? ` · ${activeAdvancedCount} ${labels.activeFilters}` : ""}</summary>
         <div className="library-filters__grid">
-          <label><span>{labels.models}</span><input value={filters.models} placeholder={labels.modelsPlaceholder} onChange={(event) => onChange({ ...filters, models: event.target.value })} /></label>
-          <label><span>{labels.from}</span><input type="date" value={filters.from} onChange={(event) => onChange({ ...filters, from: event.target.value })} />{errors["from"] ? <small role="alert">{errors["from"]}</small> : null}</label>
-          <label><span>{labels.to}</span><input type="date" value={filters.to} onChange={(event) => onChange({ ...filters, to: event.target.value })} />{errors["to"] ? <small role="alert">{errors["to"]}</small> : null}</label>
+          <label><span>{labels.from}</span><input type="date" value={filters.from} onChange={(event) => onChange({ ...filters, timeRange: "custom", from: event.target.value })} />{errors["from"] ? <small role="alert">{errors["from"]}</small> : null}</label>
+          <label><span>{labels.to}</span><input type="date" value={filters.to} onChange={(event) => onChange({ ...filters, timeRange: "custom", to: event.target.value })} />{errors["to"] ? <small role="alert">{errors["to"]}</small> : null}</label>
         </div>
         <fieldset><legend>{labels.kinds}</legend>{kindOptions.map((value) => <label key={value}><input type="checkbox" checked={filters.kinds.includes(value)} onChange={() => onChange({ ...filters, kinds: toggleValue(filters.kinds, value) })} />{value}</label>)}</fieldset>
         <fieldset><legend>{labels.sizes}</legend>{sizeOptions.map((value) => <label key={value}><input type="checkbox" checked={filters.sizes.includes(value)} onChange={() => onChange({ ...filters, sizes: toggleValue(filters.sizes, value) })} />{value}</label>)}</fieldset>
@@ -667,10 +688,12 @@ function DetailDrawer({
 
 export function LibraryWorkspace({
   gateway,
-  view
+  view,
+  providers
 }: {
   readonly gateway: StudioGateway;
   readonly view: LibraryView;
+  readonly providers: readonly ProviderProfileDescriptor[];
   readonly onCreationHandoff?: (handoff: LibraryCreationHandoff) => void;
 }) {
   void view;
@@ -1071,6 +1094,7 @@ export function LibraryWorkspace({
           filters={filters}
           labels={labels}
           language={language}
+          providers={providers}
           errors={filterErrors}
           onChange={setFilters}
           onSubmit={applyFilters}

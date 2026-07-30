@@ -18,26 +18,16 @@ export function createLibraryFilters(view: LibraryView): LibraryFilters {
   void view;
   return {
     query: "",
-    models: "",
+    providerId: "",
+    timeRange: "all",
     from: "",
     to: "",
     kinds: ["generate", "edit"],
     sizes: [],
     statuses: [],
     sort: "created-desc",
-    limit: 20
+    limit: 24
   };
-}
-
-export function parseLibraryList(value: string): readonly string[] {
-  return [
-    ...new Set(
-      value
-        .split(/[\n,]/u)
-        .map((item) => item.trim())
-        .filter(Boolean)
-    )
-  ];
 }
 
 function dateBoundary(value: string, end: boolean): string | undefined {
@@ -51,14 +41,32 @@ function dateBoundary(value: string, end: boolean): string | undefined {
   return parsed.toISOString();
 }
 
+function presetBoundaries(timeRange: LibraryFilters["timeRange"]):
+  | { readonly from?: string; readonly to?: string }
+  | undefined {
+  if (timeRange === "all" || timeRange === "custom") return undefined;
+  const now = new Date();
+  if (timeRange === "today") {
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    return { from: start.toISOString(), to: now.toISOString() };
+  }
+  const hours = timeRange === "last-24-hours" ? 24 : timeRange === "last-7-days" ? 24 * 7 : 24 * 30;
+  return {
+    from: new Date(now.valueOf() - hours * 60 * 60 * 1000).toISOString(),
+    to: now.toISOString()
+  };
+}
+
 export function buildLibrarySearchInput(
   filters: LibraryFilters,
   view: LibraryView,
   cursor?: string
 ): StudioLibrarySearchInput {
   void view;
-  const from = dateBoundary(filters.from, false);
-  const to = dateBoundary(filters.to, true);
+  const preset = presetBoundaries(filters.timeRange);
+  const from = preset?.from ?? dateBoundary(filters.from, false);
+  const to = preset?.to ?? dateBoundary(filters.to, true);
   if (from !== undefined && to !== undefined && Date.parse(from) > Date.parse(to)) {
     throw new LibraryQueryError("图库日期范围无效。", {
       from: "开始日期不能晚于结束日期。"
@@ -69,7 +77,8 @@ export function buildLibrarySearchInput(
   );
   return {
     ...(filters.query.trim() === "" ? {} : { query: filters.query.trim() }),
-    models: [...parseLibraryList(filters.models)],
+    models: [],
+    providerIds: filters.providerId === "" ? [] : [filters.providerId],
     ...(from === undefined ? {} : { from }),
     ...(to === undefined ? {} : { to }),
     kinds: [...filters.kinds],

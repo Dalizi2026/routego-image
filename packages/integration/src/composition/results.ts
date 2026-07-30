@@ -127,6 +127,7 @@ export interface FinalizeStudioOperationResultInput {
   readonly materialization: MaterializationBatchResult;
   readonly transaction: OutputMaterializationTransaction;
   readonly model: string;
+  readonly providerId?: string;
   readonly idFactory: ResultGraphIdFactory;
   readonly library: StudioResultLibraryOwner;
   readonly resources: StudioResultResourceProjector;
@@ -139,6 +140,7 @@ export interface FinalizePublicOperationResultInput {
   readonly materialization: MaterializationBatchResult;
   readonly transaction: OutputMaterializationTransaction;
   readonly model: string;
+  readonly providerId?: string;
   readonly idFactory: ResultGraphIdFactory;
   readonly library: StudioResultLibraryOwner;
   readonly outputDestination?: PublicOutputDestinationPlan;
@@ -772,6 +774,7 @@ async function persistOperation(
   graph: DurableInputGraphPlan,
   library: StudioResultLibraryOwner,
   model: string,
+  providerId: string | undefined,
   idFactory: ResultGraphIdFactory,
   now: () => Date
 ): Promise<SavedOperationProjection | undefined> {
@@ -816,6 +819,7 @@ async function persistOperation(
     primaryArtifactId: (finalOutputs.at(-1) ?? outputs.at(-1))!.artifactId,
     prompt: context.result.requestedParams.prompt,
     model: model.trim(),
+    ...(providerId === undefined ? {} : { providerId }),
     status,
     requestedParams: operationParameters(context.result.requestedParams, graph),
     effectiveParams: operationParameters(context.result.effectiveParams, graph),
@@ -1038,6 +1042,7 @@ export async function finalizeStudioOperationResult(
           input.prepared.graph,
           input.library,
           input.model,
+          input.providerId,
           input.idFactory,
           now
         );
@@ -1284,6 +1289,7 @@ export async function finalizePublicOperationResult(
           input.graph,
           input.library,
           input.model,
+          input.providerId,
           input.idFactory,
           now
         );

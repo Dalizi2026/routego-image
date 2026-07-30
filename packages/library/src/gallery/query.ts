@@ -269,6 +269,7 @@ function matches(input: ParsedSearchInput, item: LibraryQueryItem): boolean {
     return false;
   }
   if (input.models.length > 0 && !input.models.includes(asset.model)) return false;
+  if (input.providerIds.length > 0 && !input.providerIds.includes(asset.providerId ?? "")) return false;
   if (input.from !== undefined && Date.parse(asset.createdAt) < Date.parse(input.from)) return false;
   if (input.to !== undefined && Date.parse(asset.createdAt) > Date.parse(input.to)) return false;
   if (input.kinds.length > 0 && !input.kinds.includes(asset.kind)) return false;

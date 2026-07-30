@@ -1412,6 +1412,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         materialization: processed.materialization,
         transaction,
         model: provider.model,
+        ...(provider.context === undefined ? {} : { providerId: provider.context.providerId }),
         idFactory: resultIdFactory(this.#id.bind(this)),
         library: this.#options.library,
         ...(plan === undefined ? {} : { outputDestination: plan })
@@ -1676,6 +1677,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         materialization: processed.materialization,
         transaction,
         model: provider.model,
+        ...(provider.context === undefined ? {} : { providerId: provider.context.providerId }),
         idFactory: resultIdFactory(this.#id.bind(this)),
         library: this.#options.library,
         resources: projector,

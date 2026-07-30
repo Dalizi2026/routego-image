@@ -53,7 +53,7 @@ describe("accessible Studio shell markup", () => {
     expect(loading).toContain('aria-busy="true"');
   });
 
-  it("renders truthful read-only provider state with a settings action", () => {
+  it("renders the provider selector without duplicating the bottom-nav settings action", () => {
     const markup = renderToStaticMarkup(
       createElement(
         I18nProvider,
@@ -98,13 +98,12 @@ describe("accessible Studio shell markup", () => {
             outputDirectory: { configured: false }
           },
           gateway: { invoke: async () => { throw new Error("not invoked during markup rendering"); } } as never,
-          onSettingsChange: () => undefined,
-          onOpenSettings: () => undefined
+          onSettingsChange: () => undefined
         })
       )
     );
     expect(markup).toContain('aria-label="服务商"');
-    expect(markup).toContain("前往设置");
+    expect(markup).not.toContain("前往设置");
     expect(markup).toContain("Synthetic provider A");
     expect(markup).toContain("image-1");
   });

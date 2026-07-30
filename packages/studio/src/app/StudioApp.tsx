@@ -194,13 +194,11 @@ function RouteOverview({ route }: { readonly route: StudioRoute }) {
 export function HeaderProviderSelector({
   settings,
   gateway,
-  onSettingsChange,
-  onOpenSettings
+  onSettingsChange
 }: {
   readonly settings: ReadSettingsResult;
   readonly gateway: StudioGateway;
   readonly onSettingsChange: (settings: ReadSettingsResult) => void;
-  readonly onOpenSettings: () => void;
 }) {
   const { language, t } = useI18n();
   const activeProvider = settings.profiles.find(
@@ -211,12 +209,10 @@ export function HeaderProviderSelector({
     language === "zh"
       ? {
           label: "服务商",
-          settings: "前往设置",
           noModel: "未配置模型"
         }
       : {
           label: "Provider",
-          settings: "Settings",
           noModel: "No model configured"
         };
 
@@ -242,7 +238,6 @@ export function HeaderProviderSelector({
         {settings.profiles.length === 0 ? <option value="">{t("status.unconfigured")}</option> : settings.profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}
       </select>
       <span className="provider-switch__model">{switching ? "…" : settings.defaults.model ?? activeProvider?.defaultModel ?? copy.noModel}</span>
-      <button className="provider-switch__settings" type="button" onClick={onOpenSettings}>{copy.settings}</button>
     </div>
   );
 }
@@ -277,6 +272,7 @@ function StudioWorkspace({
         <LibraryWorkspace
           gateway={gateway}
           view="library"
+          providers={settings.profiles}
         />
       ),
     settings:
@@ -323,7 +319,6 @@ function StudioWorkspace({
             settings={settings}
             gateway={gateway}
             onSettingsChange={onSettingsChange}
-            onOpenSettings={() => dispatch({ type: "navigate", route: "settings" })}
           />
           <button
             className="language-toggle"

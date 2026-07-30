@@ -118,6 +118,7 @@ async function createGallery() {
       primaryArtifactId: "artifact-a",
       prompt: promptA,
       model: "model-one",
+      providerId: "provider-a",
       requestedParams: generateParameters(promptA, "1024x1024"),
       effectiveParams: generateParameters(promptA, "1024x1024"),
       execution,
@@ -138,6 +139,7 @@ async function createGallery() {
       primaryArtifactId: "artifact-b",
       prompt: promptB,
       model: "model-two",
+      providerId: "provider-b",
       status: "partial",
       requestedParams: generateParameters(promptB, "1536x1024"),
       effectiveParams: generateParameters(promptB, "1536x1024"),
@@ -220,6 +222,7 @@ describe("Library public and Studio query projections", () => {
     const filters = await Promise.all([
       service.searchStudioLibrary({ query: "ASTRONAUT" }),
       service.searchStudioLibrary({ models: ["model-two"] }),
+      service.searchStudioLibrary({ providerIds: ["provider-a"] }),
       service.searchStudioLibrary({ from: "2026-07-18T03:30:00.000Z" }),
       service.searchStudioLibrary({ to: "2026-07-18T03:30:00.000Z" }),
       service.searchStudioLibrary({ kinds: ["generate"] }),
@@ -233,6 +236,7 @@ describe("Library public and Studio query projections", () => {
     expect(filters.map((result) => result.items.map((item) => item.assetId))).toEqual([
       ["asset-a"],
       ["asset-b"],
+      ["asset-a"],
       ["asset-b"],
       ["asset-a", "asset-c"],
       ["asset-b", "asset-a", "asset-c"],

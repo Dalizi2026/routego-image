@@ -90,6 +90,7 @@ export interface IngestLibraryAssetInput {
   readonly primaryArtifactId?: string;
   readonly prompt: string;
   readonly model: string;
+  readonly providerId?: string;
   readonly status?: Exclude<LibraryAssetStatus, "deleted">;
   readonly requestedParams: LibraryOperationParameters;
   readonly effectiveParams: LibraryOperationParameters;
@@ -148,6 +149,7 @@ interface PreparedAssetIngestion {
   readonly primaryArtifactId: string;
   readonly prompt: string;
   readonly model: string;
+  readonly providerId?: string;
   readonly status: Exclude<LibraryAssetStatus, "deleted">;
   readonly requestedParams: LibraryOperationParameters;
   readonly effectiveParams: LibraryOperationParameters;
@@ -838,6 +840,7 @@ export class LibraryAssetStore {
       );
     }
     const assetId = input.assetId === undefined ? this.#newId("asset") : identifierSchema.parse(input.assetId);
+    const providerId = input.providerId === undefined ? undefined : identifierSchema.parse(input.providerId);
     const requestedParams = parseOperationParameters(input.requestedParams);
     const effectiveParams = parseOperationParameters(input.effectiveParams);
     const execution = operationExecutionMetadataSchema.parse(input.execution);
@@ -954,6 +957,7 @@ export class LibraryAssetStore {
       primaryArtifactId,
       prompt: input.prompt,
       model: input.model.trim(),
+      ...(providerId === undefined ? {} : { providerId }),
       status,
       requestedParams,
       effectiveParams,
@@ -1077,6 +1081,7 @@ export class LibraryAssetStore {
         id: asset.assetId,
         prompt: asset.prompt,
         model: asset.model,
+        ...(asset.providerId === undefined ? {} : { providerId: asset.providerId }),
         kind: asset.requestedParams.kind,
         status: asset.status,
         primaryArtifactId: asset.primaryArtifactId,

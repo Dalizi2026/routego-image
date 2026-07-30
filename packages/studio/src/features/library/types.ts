@@ -11,7 +11,14 @@ export type LibraryAssetRelationship = LibraryAssetDetail["relationships"][numbe
 
 export interface LibraryFilters {
   readonly query: string;
-  readonly models: string;
+  readonly providerId: string;
+  readonly timeRange:
+    | "all"
+    | "today"
+    | "last-24-hours"
+    | "last-7-days"
+    | "last-30-days"
+    | "custom";
   readonly from: string;
   readonly to: string;
   readonly kinds: readonly ("generate" | "edit")[];

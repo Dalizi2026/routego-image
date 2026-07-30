@@ -59,6 +59,8 @@ export interface StoredLibraryAsset {
   readonly displayName?: string;
   readonly prompt: string;
   readonly model: string;
+  /** The saved provider profile that produced this asset, when available. */
+  readonly providerId?: string;
   readonly kind: "generate" | "edit";
   readonly status: LibraryAssetStatus;
   readonly primaryArtifactId: string;
@@ -286,6 +288,7 @@ function parseAsset(value: unknown): StoredLibraryAsset {
       "displayName",
       "prompt",
       "model",
+      "providerId",
       "kind",
       "status",
       "primaryArtifactId",
@@ -314,6 +317,9 @@ function parseAsset(value: unknown): StoredLibraryAsset {
   if (typeof record["model"] !== "string" || record["model"].trim() === "" || record["model"].length > 200) {
     throw new LibraryError("config_corrupt", "Library asset model is invalid.");
   }
+  const providerId = record["providerId"] === undefined
+    ? undefined
+    : parseId(record["providerId"], "Library asset provider identity");
   let status: LibraryAssetStatus;
   let requestedParams: LibraryOperationParameters;
   let effectiveParams: LibraryOperationParameters;
@@ -416,6 +422,7 @@ function parseAsset(value: unknown): StoredLibraryAsset {
     ...(displayName === undefined ? {} : { displayName: displayName.trim() }),
     prompt: record["prompt"],
     model: record["model"].trim(),
+    ...(providerId === undefined ? {} : { providerId }),
     kind: requestedParams.kind,
     status,
     primaryArtifactId,

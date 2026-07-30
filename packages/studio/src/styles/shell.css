@@ -816,7 +816,13 @@
   border-radius: var(--radius-small);
   color: var(--paper-100);
   background: rgba(255, 255, 255, 0.025);
+  color-scheme: dark;
   font-weight: 700;
+}
+
+.provider-switch select option {
+  color: var(--paper-100);
+  background: var(--ink-900);
 }
 
 .provider-switch__model {
@@ -924,10 +930,9 @@
   .studio-header { padding: 0 12px; }
   .studio-header__identity p::after { font-size: 1.28rem; }
   .provider-switch { max-width: 48vw; }
-  .provider-switch__settings { display: none; }
   .provider-switch { grid-template-columns: minmax(0, 1fr); }
   .provider-switch__model { display: none; }
-  .language-toggle { display: none; }
+  .language-toggle { display: flex; }
 }
 
 /* Reference-size sidebar frame (1122 × 1402): the Library owns the page grid,
@@ -1020,5 +1025,38 @@
 
   .studio-shell--sidebar .studio-nav__label {
     font-size: 0.67rem;
+  }
+}
+
+/* The sidebar header keeps the provider choice and language action at every
+ * supported width.  Settings now belongs solely to the persistent bottom nav. */
+.studio-shell--sidebar .provider-switch {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.studio-shell--sidebar .provider-switch select {
+  color-scheme: dark;
+}
+
+@media (max-width: 620px) {
+  .studio-shell--sidebar .studio-header {
+    gap: 8px;
+    padding-inline: 10px;
+  }
+
+  .studio-shell--sidebar .studio-header__controls {
+    flex: 1;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .studio-shell--sidebar .provider-switch {
+    flex: 1 1 auto;
+    max-width: calc(100vw - 166px);
+  }
+
+  .studio-shell--sidebar .language-toggle {
+    display: flex;
+    flex: 0 0 auto;
   }
 }

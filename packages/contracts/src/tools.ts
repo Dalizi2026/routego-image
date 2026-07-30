@@ -292,6 +292,7 @@ export const routegoSearchLibraryInputSchema = z
   .object({
     query: z.string().trim().max(2_000).optional(),
     models: z.array(z.string().trim().min(1).max(200)).max(100).default([]),
+    providerIds: z.array(identifierSchema).max(100).default([]),
     from: timestampSchema.optional(),
     to: timestampSchema.optional(),
     kinds: z.array(imageOperationKindSchema).max(2).default([]),

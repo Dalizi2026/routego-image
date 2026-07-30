@@ -16,7 +16,7 @@ describe("Studio Library path-free query and cursor state", () => {
     const filters: LibraryFilters = {
       ...createLibraryFilters("library"),
       query: "  neon portrait  ",
-      models: "model-b, model-a\nmodel-b",
+      providerId: "provider-a",
       from: "2026-07-01",
       to: "2026-07-18",
       kinds: ["generate", "edit"],
@@ -31,7 +31,8 @@ describe("Studio Library path-free query and cursor state", () => {
 
     expect(input).toEqual({
       query: "neon portrait",
-      models: ["model-b", "model-a"],
+      models: [],
+      providerIds: ["provider-a"],
       from: "2026-07-01T00:00:00.000Z",
       to: "2026-07-18T23:59:59.999Z",
       kinds: ["generate", "edit"],
@@ -65,6 +66,16 @@ describe("Studio Library path-free query and cursor state", () => {
         "library"
       )
     ).toThrow(LibraryQueryError);
+  });
+
+  it("turns the relative time controls into exact timestamp boundaries", () => {
+    const input = buildLibrarySearchInput(
+      { ...createLibraryFilters("library"), timeRange: "last-24-hours" },
+      "library"
+    );
+    expect(input.from).toBeDefined();
+    expect(input.to).toBeDefined();
+    expect(Date.parse(input.to!) - Date.parse(input.from!)).toBe(24 * 60 * 60 * 1000);
   });
 
   it("tracks forward and backward cursors without replaying an abandoned forward branch", () => {
