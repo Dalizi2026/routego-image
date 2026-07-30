@@ -969,3 +969,56 @@
   .studio-shell--sidebar .studio-nav,
   .studio-shell--sidebar .studio-nav__item { height: 82px; min-height: 82px; }
 }
+
+/* Codex renders its side panel at a high device scale.  Keep the actual
+ * effective-width layout compact instead of treating it like a desktop page. */
+@media (max-width: 820px) {
+  .studio-shell--sidebar {
+    grid-template-rows: 64px minmax(0, 1fr) 64px;
+  }
+
+  .studio-shell--sidebar .studio-header {
+    padding-inline: 18px;
+  }
+
+  .studio-shell--sidebar .studio-header__identity p::after {
+    font-size: 1.25rem;
+  }
+
+  .studio-shell--sidebar .provider-switch {
+    max-width: 48vw;
+  }
+
+  .studio-shell--sidebar .provider-switch select,
+  .studio-shell--sidebar .provider-switch__settings,
+  .studio-shell--sidebar .language-toggle {
+    min-height: 32px;
+  }
+
+  .studio-shell--sidebar .language-toggle span {
+    width: 26px;
+    height: 26px;
+  }
+
+  .studio-shell--sidebar .studio-workspace__primary {
+    padding: 0 18px 76px;
+  }
+
+  .studio-shell--sidebar .studio-nav,
+  .studio-shell--sidebar .studio-nav__item {
+    height: 64px;
+    min-height: 64px;
+  }
+
+  .studio-shell--sidebar .studio-nav__item {
+    padding: 5px 4px;
+  }
+
+  .studio-shell--sidebar .studio-nav__item::before {
+    font-size: 0.8rem;
+  }
+
+  .studio-shell--sidebar .studio-nav__label {
+    font-size: 0.67rem;
+  }
+}

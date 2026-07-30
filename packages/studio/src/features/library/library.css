@@ -1675,3 +1675,141 @@
   .studio-shell--sidebar .library-locations__current { grid-column: 1; }
   .studio-shell--sidebar .library-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+@media (min-width: 561px) and (max-width: 820px) {
+  .studio-shell--sidebar .library-workspace--library { gap: 8px; }
+
+  .studio-shell--sidebar .library-workspace__tools { gap: 6px; }
+
+  .studio-shell--sidebar .library-locations {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 32px 30px;
+    gap: 7px 8px;
+    min-height: 80px;
+    padding: 8px 10px;
+    border-radius: 6px;
+  }
+
+  .studio-shell--sidebar .library-locations label {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .studio-shell--sidebar .library-locations label > span,
+  .studio-shell--sidebar .library-locations__current {
+    font-size: 0.67rem;
+  }
+
+  .studio-shell--sidebar .library-locations select,
+  .studio-shell--sidebar .library-locations button {
+    min-height: 32px;
+  }
+
+  .studio-shell--sidebar .library-locations button {
+    min-width: 82px;
+    padding-inline: 8px;
+    font-size: 0.72rem;
+  }
+
+  .studio-shell--sidebar .library-locations__current {
+    gap: 8px;
+    margin: 0 -10px;
+    padding: 7px 10px 0;
+  }
+
+  .studio-shell--sidebar .library-locations__current strong { font-size: 0.7rem; }
+
+  .studio-shell--sidebar .library-folders {
+    min-height: 44px;
+    padding: 5px 10px;
+    border-radius: 6px;
+  }
+
+  .studio-shell--sidebar .library-folders > button {
+    min-height: 32px;
+    padding-inline: 8px;
+    font-size: 0.7rem;
+  }
+
+  .studio-shell--sidebar .library-filters {
+    gap: 8px;
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  .studio-shell--sidebar .library-filters__grid--quick {
+    grid-template-columns: minmax(0, 1.22fr) minmax(0, .88fr) minmax(62px, .54fr) minmax(104px, .8fr);
+    gap: 6px;
+  }
+
+  .studio-shell--sidebar .library-filters__grid--reference {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .studio-shell--sidebar .library-filters__grid label > span,
+  .studio-shell--sidebar .library-filters legend {
+    font-size: 0.54rem;
+  }
+
+  .studio-shell--sidebar .library-filters input,
+  .studio-shell--sidebar .library-filters select,
+  .studio-shell--sidebar .library-filters__grid--reference input,
+  .studio-shell--sidebar .library-filters__grid--reference select {
+    min-height: 32px;
+    padding-inline: 7px;
+    font-size: 0.68rem;
+  }
+
+  .studio-shell--sidebar .library-filters__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .studio-shell--sidebar .library-filters__actions button {
+    min-width: 0;
+    min-height: 32px;
+    padding-inline: 4px;
+    font-size: 0.65rem;
+  }
+
+  .studio-shell--sidebar .library-filters__advanced > summary {
+    padding-top: 5px;
+    font-size: 0.65rem;
+  }
+
+  .studio-shell--sidebar .library-workspace__summary {
+    grid-template-columns: minmax(0, 1fr) 62px 108px 76px 76px;
+    gap: 6px;
+    min-height: 42px;
+    padding: 5px 10px;
+    border-radius: 6px;
+  }
+
+  .studio-shell--sidebar .library-workspace__counts {
+    gap: 8px;
+    font-size: 0.62rem;
+  }
+
+  .studio-shell--sidebar .library-workspace__summary > button,
+  .studio-shell--sidebar .library-workspace__summary > select {
+    min-height: 32px;
+    padding-inline: 6px;
+    font-size: 0.62rem;
+  }
+
+  .studio-shell--sidebar .library-pagination--compact {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  .studio-shell--sidebar .library-gallery { gap: 8px; }
+  .studio-shell--sidebar .library-card { border-radius: 6px; }
+  .studio-shell--sidebar .library-card__status { top: 5px; left: 5px; padding: 3px 5px; font-size: 0.52rem; }
+  .studio-shell--sidebar .library-card__selection { top: 5px; right: 5px; width: 25px; height: 25px; }
+  .studio-shell--sidebar .library-card__frame { right: 5px; bottom: 5px; padding: 2px 4px; font-size: 0.48rem; }
+  .studio-shell--sidebar .library-card__meta { min-height: 38px; padding: 5px 7px; }
+  .studio-shell--sidebar .library-card__meta span,
+  .studio-shell--sidebar .library-card__meta time { font-size: 0.58rem; }
+}
