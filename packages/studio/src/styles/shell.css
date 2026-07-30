@@ -1109,6 +1109,25 @@
   color-scheme: light;
 }
 
+@media (min-width: 621px) {
+  .studio-shell--sidebar .studio-header {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    justify-content: initial;
+  }
+
+  .studio-shell--sidebar .studio-header__controls {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .studio-shell--sidebar .provider-switch {
+    width: clamp(160px, 30vw, 360px);
+    min-width: 0;
+  }
+}
+
 @media (max-width: 620px) {
   .studio-shell--sidebar .studio-header {
     gap: 8px;
