@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "name": "routego-image",
+  "version": "1.0.0+codex.contextual-onboarding-model-sync-ui-20260801",
+  "node": ">=20.19.0",
+  "files": [
+    {
+      "path": ".codex-plugin/plugin.json",
+      "bytes": 1478,
+      "sha256": "3fb9a79a48eeeef99bfd93765d42e5668642f299c2f954afc4d2b54978e71177"
+    },
+    {
+      "path": "assets/composer-icon.png",
+      "bytes": 8201,
+      "sha256": "0924eb335c7b4e1c301d700b2e50d6d3dc5c575e31120946c566c0fdf13775ff"
+    },
+    {
+      "path": "assets/logo.png",
+      "bytes": 92793,
+      "sha256": "4f3a3a9b53f04258d0dcb784c7a005d6023bd8f30f2392ce471887ff6ffc4cec"
+    },
+    {
+      "path": "licenses/gpt_image_playground-MIT.txt",
+      "bytes": 1066,
+      "sha256": "e5d6bb44052f9a560528bef0e49d4bbf246837c3286f879996ee42ab17bb341d"
+    },
+    {
+      "path": "licenses/onnxruntime-web-MIT.txt",
+      "bytes": 1074,
+      "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+    },
+    {
+      "path": "licenses/pngjs-MIT.txt",
+      "bytes": 1150,
+      "sha256": "be75ef59c5cf59715588a17a82dff7dd3e83c4dba3c458676bb9311e05fbedc5"
+    },
+    {
+      "path": "licenses/u2netp-Apache-2.0.txt",
+      "bytes": 9944,
+      "sha256": "44ad51c5f588276b85d65f599087034c3a3c957f67cb8f7de92bb9b58cad9bb3"
+    },
+    {
+      "path": "resources/background-removal/ort-wasm-simd-threaded.jsep.wasm",
+      "bytes": 21663894,
+      "sha256": "185b0861a6cd6cbdfb057289338090436483cc59e10a7bc83bd167b15531a51b"
+    },
+    {
+      "path": "resources/background-removal/ort-wasm-simd-threaded.wasm",
+      "bytes": 11246032,
+      "sha256": "207d02be4591c156b0a98f024f3d58005b5b04c92274d759fb390338c63559ea"
+    },
+    {
+      "path": "resources/background-removal/u2netp.onnx",
+      "bytes": 4574861,
+      "sha256": "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8"
+    },
+    {
+      "path": "runtime/index.js",
+      "bytes": 1619526,
+      "sha256": "3d745c9a33b43374d6d1ad57749f0e9f3f56ecf27091e315d5a3e6ef2ccc3a44"
+    },
+    {
+      "path": "runtime/resource-manifest.json",
+      "bytes": 1414,
+      "sha256": "5c5a58201d52dc6c2a72ee197204e972c5d81714b252e4eb14efb5f369750392"
+    },
+    {
+      "path": "runtime/studio-assets.json",
+      "bytes": 312,
+      "sha256": "6f740c38e0880bd345a25a241929c61006b725e1cab6178f4bb024924c2865f3"
+    },
+    {
+      "path": "runtime/studio/assets/index-3nZibFNq.js",
+      "bytes": 438893,
+      "sha256": "1f7e95956dbb8c75641290efdf0a876986f0f6d55cd1b0e95a9602d19ff55587"
+    },
+    {
+      "path": "runtime/studio/assets/index-C1msOYkR.css",
+      "bytes": 120006,
+      "sha256": "f75144297b7e77d1c444ae9db1595fcc6bb6a8870c49917470551289f8bb019a"
+    },
+    {
+      "path": "scripts/start-routego-image.mjs",
+      "bytes": 2298,
+      "sha256": "af7b2c669c1a486035b0125414a11d9139c0b1a67dbef47bf99f354c3f51b626"
+    },
+    {
+      "path": "skills/routego-image/SKILL.md",
+      "bytes": 11495,
+      "sha256": "6d45ab40bff21e812f431ab05e6e23a31353cf72786d4b3f698062e7ad7157d0"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 3058,
+      "sha256": "76591d50883171317276060556278cd31eced11d4e66f3d5cc05bee126351b39"
+    }
+  ]
+}

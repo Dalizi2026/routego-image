@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "rootDirectory": "runtime/studio",
+  "entryModuleRoute": "/assets/index-3nZibFNq.js",
+  "styleRoutes": [
+    "/assets/index-C1msOYkR.css"
+  ],
+  "assets": {
+    "/assets/index-3nZibFNq.js": "assets/index-3nZibFNq.js",
+    "/assets/index-C1msOYkR.css": "assets/index-C1msOYkR.css"
+  }
+}

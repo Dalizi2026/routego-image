@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "offlineOnly": true,
+  "resources": [
+    {
+      "id": "u2netp-model",
+      "path": "u2netp.onnx",
+      "bytes": 4574861,
+      "sha256": "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8",
+      "version": "u2netp",
+      "license": "Apache-2.0",
+      "source": "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx"
+    },
+    {
+      "id": "onnxruntime-web-simd-threaded-jsep",
+      "path": "ort-wasm-simd-threaded.jsep.wasm",
+      "bytes": 21663894,
+      "sha256": "185b0861a6cd6cbdfb057289338090436483cc59e10a7bc83bd167b15531a51b",
+      "version": "1.20.1",
+      "license": "MIT",
+      "source": "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz"
+    },
+    {
+      "id": "onnxruntime-web-simd-threaded",
+      "path": "ort-wasm-simd-threaded.wasm",
+      "bytes": 11246032,
+      "sha256": "207d02be4591c156b0a98f024f3d58005b5b04c92274d759fb390338c63559ea",
+      "version": "1.20.1",
+      "license": "MIT",
+      "source": "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz"
+    }
+  ],
+  "licenses": [
+    "licenses/u2netp-Apache-2.0.txt",
+    "licenses/onnxruntime-web-MIT.txt"
+  ],
+  "onnxruntimeWeb": {
+    "version": "1.20.1",
+    "archiveSha256": "0a38facf0672dfaaeaf352e8a9f44533732b60b4af93b9dd507fe7c2d2be437b",
+    "archiveSha1": "71dc4495bb75cdd56a9dc981cf27723a599189f7"
+  }
+}
