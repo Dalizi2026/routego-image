@@ -1,0 +1,20 @@
+{
+  "name": "routego-image",
+  "interface": {
+    "displayName": "Routego Image v1.0"
+  },
+  "plugins": [
+    {
+      "name": "routego-image",
+      "source": {
+        "source": "local",
+        "path": "./plugins/routego-image"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
