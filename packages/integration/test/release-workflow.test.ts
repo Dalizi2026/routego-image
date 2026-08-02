@@ -4,16 +4,28 @@ import path from "node:path";
 
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 
-// @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { buildPluginPackage } from "../../../scripts/build-plugin-package.mjs";
-// @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { verifyPluginPackage } from "../../../scripts/verify-plugin-package.mjs";
-// @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { assertEvidenceSafe, atomicSwitchDryRun, buildPluginCreatorUpdatePlan, cleanupOwnedReleaseRoot, createOwnedReleaseRoot, normalizeCachebuster, prepareReleaseStage, validateReleaseApproval } from "../../../scripts/stage-routego-release.mjs";
-// @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { restoreArchivedPluginDryRun, simulateReleaseWithRollback } from "../../../scripts/rollback-routego-release.mjs";
-
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
+const scriptRoot = new URL("../../../scripts/", import.meta.url);
+// Keep Node-owned release scripts out of Vite's Windows source transformer.
+const { buildPluginPackage } = await import(
+  /* @vite-ignore */ new URL("build-plugin-package.mjs", scriptRoot).href
+);
+const { verifyPluginPackage } = await import(
+  /* @vite-ignore */ new URL("verify-plugin-package.mjs", scriptRoot).href
+);
+const {
+  assertEvidenceSafe,
+  atomicSwitchDryRun,
+  buildPluginCreatorUpdatePlan,
+  cleanupOwnedReleaseRoot,
+  createOwnedReleaseRoot,
+  normalizeCachebuster,
+  prepareReleaseStage,
+  validateReleaseApproval
+} = await import(/* @vite-ignore */ new URL("stage-routego-release.mjs", scriptRoot).href);
+const { restoreArchivedPluginDryRun, simulateReleaseWithRollback } = await import(
+  /* @vite-ignore */ new URL("rollback-routego-release.mjs", scriptRoot).href
+);
 
 describe.sequential("task 8.1 offline release and rollback workflow", () => {
   let suiteRoot: string;

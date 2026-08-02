@@ -9,13 +9,16 @@ import { promisify } from "node:util";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-// @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { buildPluginPackage } from "../../../scripts/build-plugin-package.mjs";
-// @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { comparePluginPackages, verifyPluginPackage } from "../../../scripts/verify-plugin-package.mjs";
-
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
 const execFileAsync = promisify(execFile);
+const scriptRoot = new URL("../../../scripts/", import.meta.url);
+// Keep Node-owned release scripts out of Vite's Windows source transformer.
+const { buildPluginPackage } = await import(
+  /* @vite-ignore */ new URL("build-plugin-package.mjs", scriptRoot).href
+);
+const { comparePluginPackages, verifyPluginPackage } = await import(
+  /* @vite-ignore */ new URL("verify-plugin-package.mjs", scriptRoot).href
+);
 
 interface ArtifactManifest {
   version: string;

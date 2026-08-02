@@ -13,3 +13,10 @@ Use the Routego Image for Windows tools for local image generation, editing, Lib
 - Open Studio for provider configuration; do not ask the user to paste secrets into chat.
 
 The Windows edition keeps its configuration, temporary runtime state, and diagnostics separate from the Mac edition. Its image workflow and public tools match Routego Image.
+
+Available tools / 可用工具：
+
+- `routego_status`、`routego_open_studio`：查看状态或打开 Studio。
+- `routego_generate`、`routego_edit`、`routego_batch`：生成、编辑和独立批处理图片。
+- `routego_search_library`、`routego_manage_library`：检索和管理本地图像库。
+- `routego_prepare_regeneration`：安全准备一次可追溯的重新生成。

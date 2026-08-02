@@ -14,12 +14,15 @@ import path from "node:path";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-// @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { buildPluginPackage } from "../../../scripts/build-plugin-package.mjs";
-// @ts-expect-error Task-owned Node ESM scripts intentionally ship without declaration artifacts.
-import { INSTALLED_PACKAGE_ARGUMENT_PREFIX, cleanupOwnedTemporaryRoot, runPluginInstallSmoke } from "../../../scripts/smoke-plugin-install.mjs";
-
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, "../../..");
+const scriptRoot = new URL("../../../scripts/", import.meta.url);
+// Keep Node-owned release scripts out of Vite's Windows source transformer.
+const { buildPluginPackage } = await import(
+  /* @vite-ignore */ new URL("build-plugin-package.mjs", scriptRoot).href
+);
+const { INSTALLED_PACKAGE_ARGUMENT_PREFIX, cleanupOwnedTemporaryRoot, runPluginInstallSmoke } = await import(
+  /* @vite-ignore */ new URL("smoke-plugin-install.mjs", scriptRoot).href
+);
 const EXPECTED_TOOLS = [
   "routego_batch",
   "routego_edit",
