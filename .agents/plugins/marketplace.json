@@ -1,7 +1,7 @@
 {
   "name": "routego-image",
   "interface": {
-    "displayName": "Routego Image v1.0"
+    "displayName": "Routego Image v1.0.5"
   },
   "plugins": [
     {

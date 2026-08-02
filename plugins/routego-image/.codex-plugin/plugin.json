@@ -1,6 +1,6 @@
 {
   "name": "routego-image",
-  "version": "1.0.0+codex.contextual-onboarding-model-sync-ui-20260801",
+  "version": "1.0.5+codex.20260802",
   "description": "Create, edit, organize, and review images with the local Routego Image runtime.",
   "author": {
     "name": "Routego Image"
@@ -16,7 +16,7 @@
     }
   },
   "interface": {
-    "displayName": "Routego Image v1.0",
+    "displayName": "Routego Image v1.0.5",
     "shortDescription": "\u672c\u5730\u56fe\u7247\u751f\u6210\u3001\u7f16\u8f91\u3001\u56fe\u5e93\u4e0e Studio \u5de5\u4f5c\u6d41\u3002\nLocal image creation, editing, Library, and Studio workflows.",
     "longDescription": "\u751f\u6210\u548c\u7f16\u8f91\u56fe\u7247\u3001\u8fd0\u884c\u72ec\u7acb\u6279\u6b21\u3001\u7ba1\u7406\u56fe\u5e93\u5e76\u7ee7\u7eed\u5728\u672c\u5730 Studio \u5de5\u4f5c\u3002\nGenerate and edit images, run independent batches, manage the Library, and continue in the local Studio.",
     "developerName": "Routego Image",

@@ -1,16 +1,17 @@
 import { createRequire } from 'node:module';
 import os, { homedir } from 'os';
-import path13, { resolve, extname, join, isAbsolute, relative, sep } from 'path';
-import { randomUUID, createHash, randomBytes, timingSafeEqual } from 'crypto';
-import { mkdir, realpath, readdir, rm, lstat, stat, mkdtemp, unlink, readFile, open, access, link, copyFile, chmod, rename } from 'fs/promises';
+import path18, { resolve, extname, join, isAbsolute, relative, sep } from 'path';
+import { createHash, randomUUID, randomBytes, timingSafeEqual } from 'crypto';
+import { lstat, realpath, readFile, mkdir, readdir, rm, stat, mkdtemp, unlink, open, access, link, copyFile, chmod, rename } from 'fs/promises';
 import { promisify, TextDecoder as TextDecoder$1, isDeepStrictEqual } from 'util';
 import { execFile } from 'child_process';
 import { createReadStream } from 'fs';
 import { deflateRawSync, inflateRawSync, inflateSync } from 'zlib';
 import { parentPort, Worker } from 'worker_threads';
+import { createRequire as createRequire$1 } from 'module';
+import { fileURLToPath } from 'url';
 import { createServer } from 'http';
 import { AsyncLocalStorage } from 'async_hooks';
-import { fileURLToPath } from 'url';
 
 const require$1 = createRequire(import.meta.url);
 var __create = Object.create;
@@ -1666,7 +1667,7 @@ var require_sync_inflate = __commonJS({
       if (typeof asyncCb === "function") {
         return zlib.Inflate._processChunk.call(this, chunk, flushFlag, asyncCb);
       }
-      let self = this;
+      let self2 = this;
       let availInBefore = chunk && chunk.length;
       let availOutBefore = this._chunkSize - this._offset;
       let leftToInflate = this._maxLength;
@@ -1678,14 +1679,14 @@ var require_sync_inflate = __commonJS({
         error51 = err;
       });
       function handleChunk(availInAfter, availOutAfter) {
-        if (self._hadError) {
+        if (self2._hadError) {
           return;
         }
         let have = availOutBefore - availOutAfter;
         assert2(have >= 0, "have should not go down");
         if (have > 0) {
-          let out = self._buffer.slice(self._offset, self._offset + have);
-          self._offset += have;
+          let out = self2._buffer.slice(self2._offset, self2._offset + have);
+          self2._offset += have;
           if (out.length > leftToInflate) {
             out = out.slice(0, leftToInflate);
           }
@@ -1696,10 +1697,10 @@ var require_sync_inflate = __commonJS({
             return false;
           }
         }
-        if (availOutAfter === 0 || self._offset >= self._chunkSize) {
-          availOutBefore = self._chunkSize;
-          self._offset = 0;
-          self._buffer = Buffer.allocUnsafe(self._chunkSize);
+        if (availOutAfter === 0 || self2._offset >= self2._chunkSize) {
+          availOutBefore = self2._chunkSize;
+          self2._offset = 0;
+          self2._buffer = Buffer.allocUnsafe(self2._chunkSize);
         }
         if (availOutAfter === 0) {
           inOff += availInBefore - availInAfter;
@@ -3263,7 +3264,7 @@ var require_decoder = __commonJS({
         while (length > 0 && !codeLengths[length - 1])
           length--;
         code.push({ children: [], index: 0 });
-        var p = code[0], q;
+        var p = code[0], q2;
         for (i = 0; i < length; i++) {
           for (j = 0; j < codeLengths[i]; j++) {
             p = code.pop();
@@ -3276,16 +3277,16 @@ var require_decoder = __commonJS({
             p.index++;
             code.push(p);
             while (code.length <= i) {
-              code.push(q = { children: [], index: 0 });
-              p.children[p.index] = q.children;
-              p = q;
+              code.push(q2 = { children: [], index: 0 });
+              p.children[p.index] = q2.children;
+              p = q2;
             }
             k++;
           }
           if (i + 1 < length) {
-            code.push(q = { children: [], index: 0 });
-            p.children[p.index] = q.children;
-            p = q;
+            code.push(q2 = { children: [], index: 0 });
+            p.children[p.index] = q2.children;
+            p = q2;
           }
         }
         return code[0].children;
@@ -3484,7 +3485,7 @@ var require_decoder = __commonJS({
           mcuExpected = mcusPerLine * frame.mcusPerColumn;
         }
         if (!resetInterval) resetInterval = mcuExpected;
-        var h, v;
+        var h2, v;
         while (mcu < mcuExpected) {
           for (i = 0; i < componentsLength; i++)
             components[i].pred = 0;
@@ -3499,10 +3500,10 @@ var require_decoder = __commonJS({
             for (n = 0; n < resetInterval; n++) {
               for (i = 0; i < componentsLength; i++) {
                 component = components[i];
-                h = component.h;
+                h2 = component.h;
                 v = component.v;
                 for (j = 0; j < v; j++) {
-                  for (k = 0; k < h; k++) {
+                  for (k = 0; k < h2; k++) {
                     decodeMcu(component, decodeFn, mcu, j, k);
                   }
                 }
@@ -3683,9 +3684,9 @@ var require_decoder = __commonJS({
         return a < 0 ? 0 : a > 255 ? 255 : a;
       }
       constructor.prototype = {
-        load: function load(path24) {
+        load: function load(path25) {
           var xhr = new XMLHttpRequest();
-          xhr.open("GET", path24, true);
+          xhr.open("GET", path25, true);
           xhr.responseType = "arraybuffer";
           xhr.onload = (function() {
             var data = new Uint8Array(xhr.response || xhr.mozResponseArrayBuffer);
@@ -3875,15 +3876,15 @@ var require_decoder = __commonJS({
                 var componentsCount = data[offset++], componentId;
                 for (i = 0; i < componentsCount; i++) {
                   componentId = data[offset];
-                  var h = data[offset + 1] >> 4;
+                  var h2 = data[offset + 1] >> 4;
                   var v = data[offset + 1] & 15;
                   var qId = data[offset + 2];
-                  if (h <= 0 || v <= 0) {
+                  if (h2 <= 0 || v <= 0) {
                     throw new Error("Invalid sampling factor, expected values above 0");
                   }
                   frame.componentsOrder.push(componentId);
                   frame.components[componentId] = {
-                    h,
+                    h: h2,
                     v,
                     quantizationIdx: qId
                   };
@@ -3998,7 +3999,7 @@ var require_decoder = __commonJS({
           var component1Line, component2Line, component3Line, component4Line;
           var x, y;
           var offset = 0;
-          var Y, Cb, Cr, K, C, M, Ye, R, G, B;
+          var Y2, Cb, Cr, K, C, M, Ye2, R, G, B;
           var colorTransform;
           var dataLength = width * height * this.components.length;
           requestMemoryAllocation(dataLength);
@@ -4009,8 +4010,8 @@ var require_decoder = __commonJS({
               for (y = 0; y < height; y++) {
                 component1Line = component1.lines[0 | y * component1.scaleY * scaleY];
                 for (x = 0; x < width; x++) {
-                  Y = component1Line[0 | x * component1.scaleX * scaleX];
-                  data[offset++] = Y;
+                  Y2 = component1Line[0 | x * component1.scaleX * scaleX];
+                  data[offset++] = Y2;
                 }
               }
               break;
@@ -4021,10 +4022,10 @@ var require_decoder = __commonJS({
                 component1Line = component1.lines[0 | y * component1.scaleY * scaleY];
                 component2Line = component2.lines[0 | y * component2.scaleY * scaleY];
                 for (x = 0; x < width; x++) {
-                  Y = component1Line[0 | x * component1.scaleX * scaleX];
-                  data[offset++] = Y;
-                  Y = component2Line[0 | x * component2.scaleX * scaleX];
-                  data[offset++] = Y;
+                  Y2 = component1Line[0 | x * component1.scaleX * scaleX];
+                  data[offset++] = Y2;
+                  Y2 = component2Line[0 | x * component2.scaleX * scaleX];
+                  data[offset++] = Y2;
                 }
               }
               break;
@@ -4047,12 +4048,12 @@ var require_decoder = __commonJS({
                     G = component2Line[0 | x * component2.scaleX * scaleX];
                     B = component3Line[0 | x * component3.scaleX * scaleX];
                   } else {
-                    Y = component1Line[0 | x * component1.scaleX * scaleX];
+                    Y2 = component1Line[0 | x * component1.scaleX * scaleX];
                     Cb = component2Line[0 | x * component2.scaleX * scaleX];
                     Cr = component3Line[0 | x * component3.scaleX * scaleX];
-                    R = clampTo8bit(Y + 1.402 * (Cr - 128));
-                    G = clampTo8bit(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
-                    B = clampTo8bit(Y + 1.772 * (Cb - 128));
+                    R = clampTo8bit(Y2 + 1.402 * (Cr - 128));
+                    G = clampTo8bit(Y2 - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
+                    B = clampTo8bit(Y2 + 1.772 * (Cb - 128));
                   }
                   data[offset++] = R;
                   data[offset++] = G;
@@ -4081,20 +4082,20 @@ var require_decoder = __commonJS({
                   if (!colorTransform) {
                     C = component1Line[0 | x * component1.scaleX * scaleX];
                     M = component2Line[0 | x * component2.scaleX * scaleX];
-                    Ye = component3Line[0 | x * component3.scaleX * scaleX];
+                    Ye2 = component3Line[0 | x * component3.scaleX * scaleX];
                     K = component4Line[0 | x * component4.scaleX * scaleX];
                   } else {
-                    Y = component1Line[0 | x * component1.scaleX * scaleX];
+                    Y2 = component1Line[0 | x * component1.scaleX * scaleX];
                     Cb = component2Line[0 | x * component2.scaleX * scaleX];
                     Cr = component3Line[0 | x * component3.scaleX * scaleX];
                     K = component4Line[0 | x * component4.scaleX * scaleX];
-                    C = 255 - clampTo8bit(Y + 1.402 * (Cr - 128));
-                    M = 255 - clampTo8bit(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
-                    Ye = 255 - clampTo8bit(Y + 1.772 * (Cb - 128));
+                    C = 255 - clampTo8bit(Y2 + 1.402 * (Cr - 128));
+                    M = 255 - clampTo8bit(Y2 - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
+                    Ye2 = 255 - clampTo8bit(Y2 + 1.772 * (Cb - 128));
                   }
                   data[offset++] = 255 - C;
                   data[offset++] = 255 - M;
-                  data[offset++] = 255 - Ye;
+                  data[offset++] = 255 - Ye2;
                   data[offset++] = 255 - K;
                 }
               }
@@ -4109,15 +4110,15 @@ var require_decoder = __commonJS({
           var imageDataArray = imageData.data;
           var data = this.getData(width, height);
           var i = 0, j = 0, x, y;
-          var Y, K, C, M, R, G, B;
+          var Y2, K, C, M, R, G, B;
           switch (this.components.length) {
             case 1:
               for (y = 0; y < height; y++) {
                 for (x = 0; x < width; x++) {
-                  Y = data[i++];
-                  imageDataArray[j++] = Y;
-                  imageDataArray[j++] = Y;
-                  imageDataArray[j++] = Y;
+                  Y2 = data[i++];
+                  imageDataArray[j++] = Y2;
+                  imageDataArray[j++] = Y2;
+                  imageDataArray[j++] = Y2;
                   if (formatAsRGBA) {
                     imageDataArray[j++] = 255;
                   }
@@ -4144,11 +4145,11 @@ var require_decoder = __commonJS({
                 for (x = 0; x < width; x++) {
                   C = data[i++];
                   M = data[i++];
-                  Y = data[i++];
+                  Y2 = data[i++];
                   K = data[i++];
                   R = 255 - clampTo8bit(C * (1 - K / 255) + K);
                   G = 255 - clampTo8bit(M * (1 - K / 255) + K);
-                  B = 255 - clampTo8bit(Y * (1 - K / 255) + K);
+                  B = 255 - clampTo8bit(Y2 * (1 - K / 255) + K);
                   imageDataArray[j++] = R;
                   imageDataArray[j++] = G;
                   imageDataArray[j++] = B;
@@ -5013,10 +5014,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path24) {
-  if (!path24)
+function getElementAtPath(obj, path25) {
+  if (!path25)
     return obj;
-  return path24.reduce((acc, key) => acc?.[key], obj);
+  return path25.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -5056,8 +5057,8 @@ var allowsEval = /* @__PURE__ */ cached(() => {
     return false;
   }
   try {
-    const F = Function;
-    new F("");
+    const F2 = Function;
+    new F2("");
     return true;
   } catch (_) {
     return false;
@@ -5425,11 +5426,11 @@ function explicitlyAborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path24, issues) {
+function prefixIssues(path25, issues) {
   return issues.map((iss) => {
     var _a3;
     (_a3 = iss).path ?? (_a3.path = []);
-    iss.path.unshift(path24);
+    iss.path.unshift(path25);
     return iss;
   });
 }
@@ -5576,16 +5577,16 @@ function flattenError(error51, mapper = (issue2) => issue2.message) {
 }
 function formatError(error51, mapper = (issue2) => issue2.message) {
   const fieldErrors = { _errors: [] };
-  const processError2 = (error52, path24 = []) => {
+  const processError2 = (error52, path25 = []) => {
     for (const issue2 of error52.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError2({ issues }, [...path24, ...issue2.path]));
+        issue2.errors.map((issues) => processError2({ issues }, [...path25, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError2({ issues: issue2.issues }, [...path24, ...issue2.path]);
+        processError2({ issues: issue2.issues }, [...path25, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError2({ issues: issue2.issues }, [...path24, ...issue2.path]);
+        processError2({ issues: issue2.issues }, [...path25, ...issue2.path]);
       } else {
-        const fullpath = [...path24, ...issue2.path];
+        const fullpath = [...path25, ...issue2.path];
         if (fullpath.length === 0) {
           fieldErrors._errors.push(mapper(issue2));
         } else {
@@ -5612,17 +5613,17 @@ function formatError(error51, mapper = (issue2) => issue2.message) {
 }
 function treeifyError(error51, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
-  const processError2 = (error52, path24 = []) => {
+  const processError2 = (error52, path25 = []) => {
     var _a3, _b;
     for (const issue2 of error52.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError2({ issues }, [...path24, ...issue2.path]));
+        issue2.errors.map((issues) => processError2({ issues }, [...path25, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError2({ issues: issue2.issues }, [...path24, ...issue2.path]);
+        processError2({ issues: issue2.issues }, [...path25, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError2({ issues: issue2.issues }, [...path24, ...issue2.path]);
+        processError2({ issues: issue2.issues }, [...path25, ...issue2.path]);
       } else {
-        const fullpath = [...path24, ...issue2.path];
+        const fullpath = [...path25, ...issue2.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue2));
           continue;
@@ -5654,8 +5655,8 @@ function treeifyError(error51, mapper = (issue2) => issue2.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path24 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path24) {
+  const path25 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path25) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -5841,10 +5842,10 @@ var nanoid = /^[a-zA-Z0-9_-]{21}$/;
 var duration = /^P(?:(\d+W)|(?!.*W)(?=\d|T\d)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+([.,]\d+)?S)?)?)$/;
 var extendedDuration = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
 var guid = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/;
-var uuid = (version2) => {
-  if (!version2)
+var uuid = (version3) => {
+  if (!version3)
     return /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/;
-  return new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${version2}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`);
+  return new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${version3}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`);
 };
 var uuid4 = /* @__PURE__ */ uuid(4);
 var uuid6 = /* @__PURE__ */ uuid(6);
@@ -6504,11 +6505,11 @@ var Doc = class {
     }
   }
   compile() {
-    const F = Function;
+    const F2 = Function;
     const args = this?.args;
     const content = this?.content ?? [``];
     const lines = [...content.map((x) => `  ${x}`)];
-    return new F(...args, lines.join("\n"));
+    return new F2(...args, lines.join("\n"));
   }
 };
 
@@ -8527,9 +8528,9 @@ var $ZodFunction = /* @__PURE__ */ $constructor("$ZodFunction", (inst, def) => {
     return payload;
   };
   inst.input = (...args) => {
-    const F = inst.constructor;
+    const F2 = inst.constructor;
     if (Array.isArray(args[0])) {
-      return new F({
+      return new F2({
         type: "function",
         input: new $ZodTuple({
           type: "tuple",
@@ -8539,15 +8540,15 @@ var $ZodFunction = /* @__PURE__ */ $constructor("$ZodFunction", (inst, def) => {
         output: inst._def.output
       });
     }
-    return new F({
+    return new F2({
       type: "function",
       input: args[0],
       output: inst._def.output
     });
   };
   inst.output = (output) => {
-    const F = inst.constructor;
-    return new F({
+    const F2 = inst.constructor;
+    return new F2({
       type: "function",
       input: inst._def.input,
       output
@@ -18342,13 +18343,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path24 = ref.slice(1).split("/").filter(Boolean);
-  if (path24.length === 0) {
+  const path25 = ref.slice(1).split("/").filter(Boolean);
+  if (path25.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path24[0] === defsKey) {
-    const key = path24[1];
+  if (path25[0] === defsKey) {
+    const key = path25[1];
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -18715,10 +18716,10 @@ function fromJSONSchema(schema, params) {
   } catch {
     throw new Error("fromJSONSchema input is not valid JSON (possibly cyclic); use $defs/$ref for recursive schemas");
   }
-  const version2 = detectVersion(normalized3, params?.defaultTarget);
+  const version3 = detectVersion(normalized3, params?.defaultTarget);
   const defs = normalized3.$defs || normalized3.definitions || {};
   const ctx = {
-    version: version2,
+    version: version3,
     defs,
     refs: /* @__PURE__ */ new Map(),
     processing: /* @__PURE__ */ new Set(),
@@ -19326,7 +19327,7 @@ var routegoEditInputSchema = imageOperationRequestSchema.refine(
 );
 var routegoPrepareRegenerationInputSchema = external_exports.object({
   schemaVersion: routegoSchemaVersionSchema.default(1),
-  recordId: identifierSchema.optional()
+  recordId: identifierSchema
 }).strict();
 var generationRecipeSchema = external_exports.object({
   schemaVersion: routegoSchemaVersionSchema.default(1),
@@ -19777,7 +19778,6 @@ var libraryAssetAllowedActionSchema = external_exports.enum([
   "remove-folders",
   "export-zip",
   "download",
-  "mark",
   "copy-generation-info"
 ]);
 external_exports.object({
@@ -19800,7 +19800,6 @@ var libraryAssetDetailSchema = external_exports.object({
   model: external_exports.string().trim().min(1).max(200),
   kind: external_exports.enum(["generate", "edit"]),
   status: libraryAssetStatusSchema,
-  currentMark: external_exports.boolean().default(false),
   primaryArtifactId: identifierSchema,
   mimeType: external_exports.enum(["image/png", "image/jpeg", "image/webp"]),
   width: external_exports.number().int().min(1).max(65535),
@@ -20021,7 +20020,6 @@ var studioLibrarySearchItemSchema = external_exports.object({
   status: external_exports.enum(["queued", "running", "succeeded", "partial", "failed"]),
   folderIds: external_exports.array(identifierSchema).max(100),
   createdAt: timestampSchema,
-  currentMark: external_exports.boolean().default(false),
   thumbnail: browserResourceDescriptorSchema.optional()
 }).strict().superRefine((value, context) => {
   if (value.thumbnail && !value.thumbnail.mimeType.startsWith("image/")) {
@@ -20059,8 +20057,7 @@ var libraryMutationActionSchema = external_exports.enum([
   "assign-folders",
   "remove-folders",
   "export-zip",
-  "import-zip",
-  "mark"
+  "import-zip"
 ]);
 var assetFolderMutationSchema = (action) => external_exports.object({
   action: external_exports.literal(action),
@@ -20071,10 +20068,6 @@ var assetMutationSchema = (action) => external_exports.object({
   action: external_exports.literal(action),
   assetIds: uniqueIdentifiersSchema(1, 200)
 }).strict();
-var markMutationSchema = external_exports.object({
-  action: external_exports.literal("mark"),
-  assetIds: uniqueIdentifiersSchema(1, 1)
-}).strict();
 var libraryMutationRequestSchema = external_exports.discriminatedUnion("action", [
   assetFolderMutationSchema("assign-folders"),
   assetFolderMutationSchema("remove-folders"),
@@ -20082,8 +20075,7 @@ var libraryMutationRequestSchema = external_exports.discriminatedUnion("action",
   external_exports.object({
     action: external_exports.literal("import-zip"),
     uploadResourceId: identifierSchema
-  }).strict(),
-  markMutationSchema
+  }).strict()
 ]);
 var libraryMutationConfirmationSchema = external_exports.enum([
   "zip-export",
@@ -20247,50 +20239,6 @@ var executeLibraryMutationResultSchema = external_exports.object({
   }
 });
 var sha256FingerprintSchema = external_exports.string().regex(/^[a-f0-9]{64}$/u, "Migration fingerprint must be a lowercase SHA-256 hex digest");
-var markLibraryAssetInputSchema = external_exports.object({
-  schemaVersion: routegoSchemaVersionSchema.default(1),
-  recordId: identifierSchema
-}).strict();
-var markLibraryAssetResultSchema = external_exports.object({
-  schemaVersion: routegoSchemaVersionSchema,
-  status: external_exports.enum(["succeeded", "failed"]),
-  recordId: identifierSchema,
-  currentMarkRecordId: identifierSchema.optional(),
-  markCleared: external_exports.boolean(),
-  providerRequestCount: external_exports.literal(0),
-  error: routegoServiceErrorSchema.optional()
-}).strict().superRefine((value, context) => {
-  if (value.status === "succeeded") {
-    if (value.error) {
-      context.addIssue({
-        code: "custom",
-        path: ["error"],
-        message: "Successful mark results cannot include an error"
-      });
-    }
-    if (value.markCleared && value.currentMarkRecordId !== void 0) {
-      context.addIssue({
-        code: "custom",
-        path: ["currentMarkRecordId"],
-        message: "Cleared mark results cannot keep a current mark identity"
-      });
-    }
-    if (!value.markCleared && value.currentMarkRecordId !== value.recordId) {
-      context.addIssue({
-        code: "custom",
-        path: ["currentMarkRecordId"],
-        message: "Successful mark must set the current mark to the requested record"
-      });
-    }
-  }
-  if (value.status === "failed" && !value.error) {
-    context.addIssue({
-      code: "custom",
-      path: ["error"],
-      message: "Failed mark results require a structured error"
-    });
-  }
-});
 var copyGenerationInfoInputSchema = external_exports.object({
   schemaVersion: routegoSchemaVersionSchema.default(1),
   recordId: identifierSchema
@@ -20663,8 +20611,25 @@ var capabilityProbeInputSchema = external_exports.object({
   transport: providerTransportSchema,
   requestShape: external_exports.string().trim().min(1).max(160),
   requestedSize: imageSizeSchema.optional(),
+  requestedQuality: imageQualitySchema.exclude(["auto"]).optional(),
   confirmBillableProbe: external_exports.literal(true)
-}).strict();
+}).strict().superRefine((value, context) => {
+  const isQualityProbe = value.capability === "quality-control";
+  if (isQualityProbe && value.requestedQuality === void 0) {
+    context.addIssue({
+      code: "custom",
+      path: ["requestedQuality"],
+      message: "Quality-control probes require one explicit non-auto quality."
+    });
+  }
+  if (!isQualityProbe && value.requestedQuality !== void 0) {
+    context.addIssue({
+      code: "custom",
+      path: ["requestedQuality"],
+      message: "Requested quality is only valid for quality-control probes."
+    });
+  }
+});
 var capabilityProbeResultSchema = external_exports.object({
   schemaVersion: routegoSchemaVersionSchema,
   providerId: identifierSchema,
@@ -21520,10 +21485,20 @@ function mergeLimits(current, observed) {
     ...current?.supportedSizes ?? [],
     ...observed.supportedSizes ?? []
   ];
+  const supportedQualities = [
+    ...current?.supportedQualities ?? [],
+    ...observed.supportedQualities ?? []
+  ];
+  const supportedFormats = [
+    ...current?.supportedFormats ?? [],
+    ...observed.supportedFormats ?? []
+  ];
   return {
     ...current,
     ...observed,
-    ...supportedSizes.length === 0 ? {} : { supportedSizes: [...new Set(supportedSizes)] }
+    ...supportedSizes.length === 0 ? {} : { supportedSizes: [...new Set(supportedSizes)] },
+    ...supportedQualities.length === 0 ? {} : { supportedQualities: [...new Set(supportedQualities)] },
+    ...supportedFormats.length === 0 ? {} : { supportedFormats: [...new Set(supportedFormats)] }
   };
 }
 function createUnknownCapabilityRecord(capability, scope, evidence2 = []) {
@@ -21732,7 +21707,8 @@ function isProviderDrivenControl(capability) {
 function transparencyFor(context, request, candidate) {
   if (request.transparentMode !== "native") return "none";
   const record2 = findCapabilityRecord(context, candidate, "native-transparency");
-  return record2?.state === "supported" ? "native" : "local-fallback";
+  if (record2?.state === "supported") return "native";
+  return "local-fallback";
 }
 function tierACapabilities(request, imageInputs) {
   const required2 = imageInputs === 0 ? ["text-generation"] : [imageInputs === 1 ? "single-image-input" : "multi-image-input", "data-url-input"];
@@ -21915,6 +21891,9 @@ function selectFromCandidates(context, request, candidates) {
         continue;
       }
       if (request.kind === "edit" && context.allowUnverifiedDirectEdit === true && (record2 === void 0 || record2.state === "unknown")) {
+        continue;
+      }
+      if (request.kind === "generate" && candidate.imageInputCount > 0 && context.allowUnverifiedDirectReferenceGeneration === true && (record2 === void 0 || record2.state === "unknown")) {
         continue;
       }
       if (record2 === void 0 || record2.state === "unknown" || record2.state === "unsupported") {
@@ -22165,7 +22144,7 @@ function createLoopbackCorsHeaders(origin) {
   };
 }
 function pathImplementation(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function normalizedForComparison(value, platform) {
   const implementation3 = pathImplementation(platform);
@@ -22596,8 +22575,8 @@ function detectImageMetadata(bytes) {
   }
   return metadata;
 }
-function extensionMime(path24) {
-  switch (extname(path24).toLowerCase()) {
+function extensionMime(path25) {
+  switch (extname(path25).toLowerCase()) {
     case ".png":
       return "image/png";
     case ".jpg":
@@ -22612,10 +22591,10 @@ function extensionMime(path24) {
 function safeExtension(mimeType) {
   return mimeType === "image/png" ? "png" : mimeType === "image/jpeg" ? "jpg" : "webp";
 }
-async function readValidatedImage(path24, maxBytes) {
+async function readValidatedImage(path25, maxBytes) {
   let fileStats;
   try {
-    fileStats = await stat(path24);
+    fileStats = await stat(path25);
   } catch {
     throw new ProviderPreparationError(
       "invalid-file",
@@ -22639,7 +22618,7 @@ async function readValidatedImage(path24, maxBytes) {
   }
   let bytes;
   try {
-    bytes = await readFile(path24);
+    bytes = await readFile(path25);
   } catch {
     throw new ProviderPreparationError(
       "invalid-file",
@@ -22654,7 +22633,7 @@ async function readValidatedImage(path24, maxBytes) {
     });
   }
   const metadata = detectImageMetadata(bytes);
-  const declaredMime = extensionMime(path24);
+  const declaredMime = extensionMime(path25);
   if (declaredMime !== void 0 && declaredMime !== metadata.mimeType) {
     throw new ProviderPreparationError(
       "unsupported-image",
@@ -23033,9 +23012,9 @@ async function downloadProviderImage(resourceUrl, options) {
         );
       }
       if (REDIRECT_STATUSES.has(response.status)) {
-        const location = response.headers.get("location");
+        const location2 = response.headers.get("location");
         await response.body?.cancel();
-        if (location === null) {
+        if (location2 === null) {
           throwDownload("redirect-without-location", "The provider image redirect is missing a target.");
         }
         if (redirectCount >= maximumRedirects) {
@@ -23043,7 +23022,7 @@ async function downloadProviderImage(resourceUrl, options) {
         }
         let nextUrl;
         try {
-          nextUrl = new URL(location, currentUrl).href;
+          nextUrl = new URL(location2, currentUrl).href;
         } catch {
           throwDownload("invalid-url", "The provider image redirect target is invalid.");
         }
@@ -24138,7 +24117,12 @@ function providerContextFor(dependencies, request) {
   );
 }
 async function prepareSelectedRoute(provider, request, route) {
-  const providerRequest = route.transparency === "local-fallback" ? imageOperationRequestSchema.parse({ ...request, transparentMode: "off" }) : request;
+  const providerRequest = route.transparency === "local-fallback" ? imageOperationRequestSchema.parse({ ...request, transparentMode: "off" }) : request.transparentMode === "chromakey" || request.transparentMode === "auto" ? imageOperationRequestSchema.parse({
+    ...request,
+    prompt: `${request.prompt}
+
+For deterministic chromakey removal, render every non-subject pixel as one perfectly flat opaque RGB(0,255,0) background. Do not use gradients, texture, shadows, reflections, checkerboards, or any other green elements.`
+  }) : request;
   const prepared = await prepareProviderRequest(provider, providerRequest);
   return prepared.prepared ? prepared.value : prepared.error;
 }
@@ -25422,7 +25406,7 @@ var RoutegoMcpServer = class {
       return jsonRpcSuccess(requestId(request), {
         protocolVersion: ROUTEGO_MCP_PROTOCOL_VERSION,
         capabilities: { tools: {} },
-        serverInfo: { name: "routego-image", version: "1.0.0" }
+        serverInfo: { name: "routego-image", version: "1.0.5" }
       });
     }
     if (request.method === "notifications/initialized") return void 0;
@@ -25759,7 +25743,7 @@ function capabilityRecordKey(record2) {
 }
 var defaultPathIdentityFileSystem = { lstat, realpath };
 function implementation(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function normalizePathIdentity(value, platform) {
   const pathApi7 = implementation(platform);
@@ -25836,7 +25820,7 @@ async function createExclusiveFile(options) {
   const baseName = sanitizeBaseName(options.requestedBaseName);
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const suffix = attempt === 1 ? "" : `-${attempt}`;
-    const candidate = path13.join(options.directory, `${baseName}${suffix}${extension}`);
+    const candidate = path18.join(options.directory, `${baseName}${suffix}${extension}`);
     try {
       const handle = await open(candidate, "wx", options.mode ?? 384);
       return { path: candidate, handle };
@@ -25855,7 +25839,7 @@ async function createExclusiveFile(options) {
 // ../library/src/config/output-directory.ts
 var defaultFileSystem = { lstat: lstat, mkdir: mkdir, realpath: realpath, open: open, unlink };
 function implementation2(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function normalized2(value, platform) {
   return normalizePathIdentity(value, platform);
@@ -26096,9 +26080,9 @@ async function parseFile(filePath, parse3) {
   }
 }
 async function writeJsonAtomicInternal(filePath, value, options) {
-  const directory = path13.dirname(filePath);
+  const directory = path18.dirname(filePath);
   const token = randomUUID();
-  const temporary = path13.join(directory, `.${path13.basename(filePath)}.${token}.tmp`);
+  const temporary = path18.join(directory, `.${path18.basename(filePath)}.${token}.tmp`);
   const backup = `${filePath}.bak`;
   const backupTemporary = `${backup}.${token}.tmp`;
   await mkdir(directory, { recursive: true });
@@ -26143,8 +26127,8 @@ async function cleanupAtomicJsonTemporaryFiles(filePath, options = {}) {
     throw new LibraryError("invalid_input", "The atomic cleanup age is invalid.");
   }
   const now = options.now ?? Date.now;
-  const directory = path13.dirname(filePath);
-  const baseName = path13.basename(filePath);
+  const directory = path18.dirname(filePath);
+  const baseName = path18.basename(filePath);
   const prefixes = [`.${baseName}.`, `${baseName}.bak.`];
   let names;
   try {
@@ -26156,7 +26140,7 @@ async function cleanupAtomicJsonTemporaryFiles(filePath, options = {}) {
   const removed = [];
   for (const name of names.sort()) {
     if (!name.endsWith(".tmp") || !prefixes.some((prefix) => name.startsWith(prefix))) continue;
-    const candidate = path13.join(directory, name);
+    const candidate = path18.join(directory, name);
     try {
       const candidateStat = await stat(candidate);
       if (!candidateStat.isFile() || now() - candidateStat.mtimeMs < olderThanMs) continue;
@@ -26273,7 +26257,7 @@ async function acquireFileLock(lockPath, resource, options = {}) {
   }
   const started = now();
   const token = randomUUID();
-  await mkdir(path13.dirname(lockPath), { recursive: true });
+  await mkdir(path18.dirname(lockPath), { recursive: true });
   let attempt = 0;
   while (now() - started <= timeoutMs) {
     const metadata = {
@@ -26387,13 +26371,13 @@ function transactionJournalPath(root, id) {
   }
   return resolveApprovedPath({
     root,
-    candidate: path13.join(".transactions", `${id}.json`),
+    candidate: path18.join(".transactions", `${id}.json`),
     operation: "create"
   });
 }
 async function writeTransactionJournal(root, journal) {
   const validated = parseFileTransactionJournal(journal);
-  await mkdir(path13.dirname(transactionJournalPath(root, journal.id)), { recursive: true });
+  await mkdir(path18.dirname(transactionJournalPath(root, journal.id)), { recursive: true });
   await writeJsonAtomic(transactionJournalPath(root, journal.id), validated);
 }
 async function markTransactionJournalCommitted(root, journal) {
@@ -26417,7 +26401,7 @@ async function listTransactionJournals(root) {
   const journals = [];
   for (const name of names.filter((item) => item.endsWith(".json")).sort()) {
     journals.push(
-      await readJsonRecovering(path13.join(directory, name), parseFileTransactionJournal)
+      await readJsonRecovering(path18.join(directory, name), parseFileTransactionJournal)
     );
   }
   return journals;
@@ -26465,7 +26449,7 @@ async function ensurePrivateDirectory(directory, platform = process.platform) {
 }
 async function restrictFileToCurrentUser(options) {
   const platform = options.platform ?? process.platform;
-  const implementation3 = platform === "win32" ? path13.win32 : path13.posix;
+  const implementation3 = platform === "win32" ? path18.win32 : path18.posix;
   if (options.filePath.includes("\0") || !implementation3.isAbsolute(options.filePath)) {
     throw new LibraryError("path_unsafe", "Credential permission enforcement requires an absolute path.");
   }
@@ -26487,7 +26471,7 @@ async function restrictFileToCurrentUser(options) {
   try {
     const identity = await runner("whoami.exe", ["/user", "/fo", "csv", "/nh"]);
     const parsedIdentity = parseWindowsIdentity(identity.stdout);
-    const resolved = path13.win32.resolve(options.filePath);
+    const resolved = path18.win32.resolve(options.filePath);
     await runner("icacls.exe", [
       resolved,
       "/inheritance:r",
@@ -26509,7 +26493,7 @@ async function restrictFileToCurrentUser(options) {
 // ../library/src/config/store.ts
 var CONFIG_SECRET_TRANSACTION_KIND = "library-config-secret-mutation";
 function selectedPathApi(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function createConfigStoragePaths(options = {}) {
   const platform = options.platform ?? process.platform;
@@ -27538,7 +27522,7 @@ var DEFAULT_IMAGE_UPLOAD_MAX_BYTES = 52428800;
 var DEFAULT_ZIP_UPLOAD_MAX_BYTES = 536870912;
 var DEFAULT_UPLOAD_EXPIRY_MS = 5 * 60 * 1e3;
 function pathApi(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function createUploadStoragePaths(options = {}) {
   const platform = options.platform ?? process.platform;
@@ -28713,19 +28697,11 @@ function parseVersionedImageLibraryIndex(value, schemaVersion) {
     }
   }
   {
-    const currentMarkRecordId = record2["currentMarkRecordId"] === void 0 ? void 0 : parseId(record2["currentMarkRecordId"], "Current mark record identity");
-    if (currentMarkRecordId !== void 0) {
-      const marked = assets.find((asset) => asset.id === currentMarkRecordId);
-      if (!marked || marked.kind !== "generate") {
-        throw new LibraryError("config_corrupt", "The current mark must reference an active generation record.");
-      }
-    }
     return {
       revision: record2["revision"],
       blobs,
       assets,
-      folders,
-      ...currentMarkRecordId === void 0 ? {} : { currentMarkRecordId }
+      folders
     };
   }
 }
@@ -28736,8 +28712,7 @@ function parseImageLibraryIndex(value) {
     revision: parsed.revision,
     blobs: parsed.blobs,
     assets: parsed.assets,
-    folders: parsed.folders,
-    ...parsed.currentMarkRecordId === void 0 ? {} : { currentMarkRecordId: parsed.currentMarkRecordId }
+    folders: parsed.folders
   };
 }
 function parseLegacyRelationship(value) {
@@ -28863,7 +28838,7 @@ function referencedBlobPaths(index) {
 var IMAGE_LIBRARY_BLOB_TRANSACTION_KIND = "image-library-blob-v1";
 var IMAGE_LIBRARY_LEGACY_UPGRADE_TRANSACTION_KIND = "image-library-v1-upgrade";
 function pathApi2(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function createImageLibraryStoragePaths(options = {}) {
   const platform = options.platform ?? process.platform;
@@ -28986,7 +28961,7 @@ var ImageLibraryIndexStore = class {
     await Promise.all([
       mkdir(this.#paths.root, { recursive: true, mode: 448 }),
       mkdir(this.#paths.blobs, { recursive: true, mode: 448 }),
-      mkdir(path13.dirname(this.#paths.indexLock), { recursive: true, mode: 448 }),
+      mkdir(path18.dirname(this.#paths.indexLock), { recursive: true, mode: 448 }),
       mkdir(this.#paths.transactions, { recursive: true, mode: 448 }),
       mkdir(this.#paths.transactionFiles, { recursive: true, mode: 448 })
     ]);
@@ -29046,14 +29021,12 @@ var ImageLibraryIndexStore = class {
           if (committed) {
             throw new LibraryError("conflict", "The Image Library transaction is already committed.");
           }
-          const currentMarkRecordId = Object.hasOwn(next, "currentMarkRecordId") ? next.currentMarkRecordId : index.currentMarkRecordId;
           const validated = parseImageLibraryIndex({
             schemaVersion: 2,
             revision: index.revision + 1,
             blobs: next.blobs,
             assets: next.assets,
-            folders: next.folders,
-            ...currentMarkRecordId === void 0 ? {} : { currentMarkRecordId }
+            folders: next.folders
           });
           if (this.#hooks.beforeIndexCommit) await this.#hooks.beforeIndexCommit(validated);
           await writeJsonAtomic(this.#paths.index, validated);
@@ -29147,7 +29120,7 @@ function platformKind(platform) {
   return platform === "win32" ? "win32" : "posix";
 }
 function pathApi3(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function isContained2(root, candidate, platform) {
   return isPathIdentityContained(root, candidate, platformKind(platform));
@@ -30556,7 +30529,7 @@ function platformKind2(platform) {
   return platform === "win32" ? "win32" : "posix";
 }
 function pathApi4(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function isContained3(root, candidate, platform) {
   const selectedPath = pathApi4(platform);
@@ -30825,7 +30798,7 @@ function allowedActions(asset) {
   const actions = [];
   actions.push("assign-folders");
   if (asset.folderIds.length > 0) actions.push("remove-folders");
-  actions.push("mark", "copy-generation-info");
+  actions.push("copy-generation-info");
   actions.push("export-zip", "download");
   return actions;
 }
@@ -30854,7 +30827,6 @@ function detailFromIndex(index, asset) {
     requestedParams: asset.requestedParams,
     effectiveParams: asset.effectiveParams,
     execution: asset.execution,
-    currentMark: index.currentMarkRecordId === asset.id,
     ...asset.error === void 0 ? {} : { error: pathFreeStoredError(asset.error) },
     renditions: [...asset.renditions].sort(
       (left, right) => left.createdAt.localeCompare(right.createdAt) || left.artifactId.localeCompare(right.artifactId)
@@ -30982,11 +30954,7 @@ var LibraryReadService = class {
   async prepareRegeneration(input) {
     const parsed = routegoPrepareRegenerationInputSchema.parse(input);
     const index = await this.#indexStore.read();
-    const recordId = parsed.recordId ?? index.currentMarkRecordId;
-    if (recordId === void 0) {
-      throw new LibraryError("not_found", "No generation record is currently marked.");
-    }
-    const prepared = prepareSafeGeneration(index, recordId);
+    const prepared = prepareSafeGeneration(index, parsed.recordId);
     return routegoPrepareRegenerationResultSchema.parse({
       schemaVersion: 1,
       recipe: prepared.recipe,
@@ -31097,7 +31065,7 @@ function allowedActions2(asset) {
   const actions = [];
   actions.push("assign-folders");
   if (asset.folderIds.length > 0) actions.push("remove-folders");
-  actions.push("export-zip", "download", "mark", "copy-generation-info");
+  actions.push("export-zip", "download", "copy-generation-info");
   return actions;
 }
 function libraryMutationError(code, safeMessage3) {
@@ -31225,11 +31193,6 @@ var LibraryMutationStore = class {
         );
       } else if ((mutation.action === "assign-folders" || mutation.action === "remove-folders") && !foldersValid) {
         error51 = !foldersValid ? libraryMutationError("not_found", "A selected active Library folder does not exist.") : void 0;
-      } else if (mutation.action === "mark" && asset.kind !== "generate") {
-        error51 = libraryMutationError(
-          "conflict",
-          "Only an active generation record can be marked."
-        );
       }
       if (error51) errors.set(targetId, error51);
       return {
@@ -31325,16 +31288,6 @@ var LibraryMutationStore = class {
           );
           continue;
         }
-        if (action === "mark" && asset.kind !== "generate") {
-          items.set(
-            targetId,
-            failedItem(
-              targetId,
-              libraryMutationError("conflict", "The Library mutation target is no longer eligible.")
-            )
-          );
-          continue;
-        }
         candidates.push(targetId);
       }
       await this.#commitMutation(context, action, candidates, folderIds, items, now);
@@ -31352,19 +31305,6 @@ var LibraryMutationStore = class {
     });
   }
   async #commitMutation(context, action, candidates, folderIds, items, now) {
-    if (action === "mark") {
-      const recordId = candidates[0];
-      if (recordId === void 0) return;
-      const currentMarkRecordId = context.index.currentMarkRecordId === recordId ? void 0 : recordId;
-      await context.commit({
-        blobs: context.index.blobs,
-        assets: context.index.assets,
-        folders: context.index.folders,
-        currentMarkRecordId
-      });
-      items.set(recordId, successItem(recordId));
-      return;
-    }
     const selected = new Set(candidates);
     const folderOrder = new Map(
       [...context.index.folders].sort((left, right) => left.order - right.order || left.id.localeCompare(right.id)).map((folder, order) => [folder.id, order])
@@ -31566,7 +31506,7 @@ function parseDocument(value) {
   const sources = record2["sources"].map((value2) => {
     if (value2 === null || typeof value2 !== "object" || Array.isArray(value2)) throw new LibraryError("config_corrupt", "A Library source is invalid.");
     const item = value2;
-    if (typeof item["assetId"] !== "string" || !identifierSchema.safeParse(item["assetId"]).success || typeof item["locationId"] !== "string" || !identifierSchema.safeParse(item["locationId"]).success || typeof item["relativePath"] !== "string" || item["relativePath"].length < 1 || item["relativePath"].includes("\0") || path13.isAbsolute(item["relativePath"]) || item["relativePath"].split(/[\\/]/u).includes("..")) throw new LibraryError("config_corrupt", "A Library source is invalid.");
+    if (typeof item["assetId"] !== "string" || !identifierSchema.safeParse(item["assetId"]).success || typeof item["locationId"] !== "string" || !identifierSchema.safeParse(item["locationId"]).success || typeof item["relativePath"] !== "string" || item["relativePath"].length < 1 || item["relativePath"].includes("\0") || path18.isAbsolute(item["relativePath"]) || item["relativePath"].split(/[\\/]/u).includes("..")) throw new LibraryError("config_corrupt", "A Library source is invalid.");
     return { assetId: item["assetId"], locationId: item["locationId"], relativePath: item["relativePath"] };
   });
   if (new Set(locations.map((item) => item.id)).size !== locations.length || new Set(sources.map((item) => item.assetId)).size !== sources.length) {
@@ -31634,7 +31574,7 @@ var LibraryLocationStore = class {
     const found = [];
     const visit = async (directory) => {
       for (const entry of await readdir(directory, { withFileTypes: true })) {
-        const absolute = path13.join(directory, entry.name);
+        const absolute = path18.join(directory, entry.name);
         if (entry.isSymbolicLink()) continue;
         if (entry.isDirectory()) {
           await visit(absolute);
@@ -31650,11 +31590,11 @@ var LibraryLocationStore = class {
     const [document2, index] = await Promise.all([this.#read(), this.#indexStore.read()]);
     return [
       { id: "default-library", name: "\u9ED8\u8BA4\u56FE\u5E93", assetCount: index.assets.length, isDefault: true },
-      ...document2.locations.map((location) => ({
-        id: location.id,
-        name: location.name,
-        folderId: location.folderId,
-        assetCount: index.assets.filter((asset) => asset.folderIds.includes(location.folderId)).length,
+      ...document2.locations.map((location2) => ({
+        id: location2.id,
+        name: location2.name,
+        folderId: location2.folderId,
+        assetCount: index.assets.filter((asset) => asset.folderIds.includes(location2.folderId)).length,
         isDefault: false
       }))
     ];
@@ -31662,19 +31602,19 @@ var LibraryLocationStore = class {
   async add(locationPath, requestedName) {
     const root = await this.#safeLocationPath(locationPath);
     const document2 = await this.#read();
-    if (document2.locations.some((location2) => location2.path === root)) {
+    if (document2.locations.some((location3) => location3.path === root)) {
       throw new LibraryError("conflict", "This Library directory has already been added.");
     }
-    const name = (requestedName?.trim() || path13.basename(root)).slice(0, 200);
+    const name = (requestedName?.trim() || path18.basename(root)).slice(0, 200);
     const folder = await this.#folders.createFolder(name);
     const timestamp6 = nowIso(this.#now);
-    const location = { id: `location-${randomUUID()}`, name, path: root, folderId: folder.id, createdAt: timestamp6, updatedAt: timestamp6 };
+    const location2 = { id: `location-${randomUUID()}`, name, path: root, folderId: folder.id, createdAt: timestamp6, updatedAt: timestamp6 };
     const existing = new Set(document2.sources.map((source) => `${source.locationId}:${source.relativePath}`));
     const sources = [...document2.sources];
     for (const absolute of await this.#files(root)) {
-      const relativePath = path13.relative(root, absolute);
-      if (existing.has(`${location.id}:${relativePath}`)) continue;
-      const displayName2 = path13.basename(absolute, path13.extname(absolute));
+      const relativePath = path18.relative(root, absolute);
+      if (existing.has(`${location2.id}:${relativePath}`)) continue;
+      const displayName2 = path18.basename(absolute, path18.extname(absolute));
       const prompt = `\u5DF2\u4ECE\u672C\u5730\u56FE\u5E93\u5BFC\u5165\uFF1A${displayName2}`;
       try {
         const result = await this.#assets.ingestAsset({
@@ -31686,16 +31626,16 @@ var LibraryLocationStore = class {
           renditions: [{ phase: "final", sourceRoot: root, sourceRelativePath: relativePath, requestedBaseName: sanitizeBaseName(displayName2) }],
           folderIds: [folder.id]
         });
-        sources.push({ assetId: result.asset.id, locationId: location.id, relativePath });
+        sources.push({ assetId: result.asset.id, locationId: location2.id, relativePath });
       } catch {
       }
     }
-    await this.#write({ schemaVersion: 1, locations: [...document2.locations, location], sources });
+    await this.#write({ schemaVersion: 1, locations: [...document2.locations, location2], sources });
     return await this.descriptors();
   }
   async move(assetIds, destinationLocationId) {
     const document2 = await this.#read();
-    const target = document2.locations.find((location) => location.id === destinationLocationId);
+    const target = document2.locations.find((location2) => location2.id === destinationLocationId);
     if (!target) throw new LibraryError("not_found", "The destination Library directory does not exist.");
     const targetRoot = await this.#safeLocationPath(target.path);
     const index = await this.#indexStore.read();
@@ -31705,12 +31645,12 @@ var LibraryLocationStore = class {
       const asset = index.assets.find((item) => item.id === assetId);
       if (!asset) continue;
       const copied = await this.#assets.copyArtifactToProject({ assetId, projectRoot: targetRoot, requestedBaseName: asset.displayName ?? asset.model });
-      const relativePath = path13.basename(copied.fileName);
+      const relativePath = path18.basename(copied.fileName);
       const existingSource = nextSources.find((source) => source.assetId === assetId);
       if (existingSource) {
-        const previous = document2.locations.find((location) => location.id === existingSource.locationId);
+        const previous = document2.locations.find((location2) => location2.id === existingSource.locationId);
         if (previous) {
-          const previousPath = path13.resolve(previous.path, existingSource.relativePath);
+          const previousPath = path18.resolve(previous.path, existingSource.relativePath);
           if (isPathIdentityContained(previous.path, previousPath, process.platform === "win32" ? "win32" : "posix")) {
             const metadata = await lstat(previousPath).catch(() => void 0);
             if (metadata?.isFile() && !metadata.isSymbolicLink()) await unlink(previousPath);
@@ -31723,7 +31663,7 @@ var LibraryLocationStore = class {
     }
     if (moved.length > 0) {
       await this.#indexStore.runExclusive(async ({ index: index2, commit }) => {
-        const locationFolderIds = new Set(document2.locations.map((location) => location.folderId));
+        const locationFolderIds = new Set(document2.locations.map((location2) => location2.folderId));
         await commit({
           blobs: index2.blobs,
           folders: index2.folders,
@@ -31747,10 +31687,10 @@ var LibraryLocationStore = class {
     const blocked = new Set(index.assets.filter((asset) => asset.relationships.some((relationship) => ids.includes(relationship.relatedAssetId) && !ids.includes(asset.id))).flatMap((asset) => asset.relationships.map((relationship) => relationship.relatedAssetId)));
     const deletable = ids.filter((id) => index.assets.some((asset) => asset.id === id) && !blocked.has(id));
     for (const source of document2.sources.filter((source2) => deletable.includes(source2.assetId))) {
-      const location = document2.locations.find((item) => item.id === source.locationId);
-      if (!location) continue;
-      const candidate = path13.resolve(location.path, source.relativePath);
-      if (!isPathIdentityContained(location.path, candidate, process.platform === "win32" ? "win32" : "posix")) continue;
+      const location2 = document2.locations.find((item) => item.id === source.locationId);
+      if (!location2) continue;
+      const candidate = path18.resolve(location2.path, source.relativePath);
+      if (!isPathIdentityContained(location2.path, candidate, process.platform === "win32" ? "win32" : "posix")) continue;
       const metadata = await lstat(candidate).catch(() => void 0);
       if (metadata?.isFile() && !metadata.isSymbolicLink()) await unlink(candidate);
     }
@@ -31760,7 +31700,7 @@ var LibraryLocationStore = class {
       const referenced = new Set(remaining.flatMap((asset) => asset.renditions.map((rendition) => rendition.blobSha256)));
       const blobs = current.blobs.filter((blob) => referenced.has(blob.sha256));
       orphanPaths = current.blobs.filter((blob) => !referenced.has(blob.sha256)).map((blob) => blob.relativePath);
-      await commit({ blobs, assets: remaining, folders: current.folders, ...current.currentMarkRecordId !== void 0 && !deletable.includes(current.currentMarkRecordId) ? { currentMarkRecordId: current.currentMarkRecordId } : { currentMarkRecordId: void 0 } });
+      await commit({ blobs, assets: remaining, folders: current.folders });
     });
     for (const relativePath of orphanPaths) {
       const candidate = resolveApprovedPath({ root: this.#indexStore.paths.root, candidate: relativePath, operation: "delete" });
@@ -32363,7 +32303,7 @@ async function publishZipArchive(entries, options) {
     let finalPath;
     for (let attempt = 1; attempt <= maxNameAttempts; attempt += 1) {
       const suffix = attempt === 1 ? "" : `-${attempt}`;
-      const candidate = path13.join(options.directory, `${baseName}${suffix}.zip`);
+      const candidate = path18.join(options.directory, `${baseName}${suffix}.zip`);
       if (options.hooks?.beforePublish) await options.hooks.beforePublish(temporary.path, candidate);
       try {
         await link(temporary.path, candidate);
@@ -32381,7 +32321,7 @@ async function publishZipArchive(entries, options) {
     await syncDirectoryBestEffort(options.directory);
     return {
       path: finalPath,
-      fileName: path13.basename(finalPath),
+      fileName: path18.basename(finalPath),
       byteLength: bytes.byteLength,
       entryCount: entries.length
     };
@@ -32698,7 +32638,7 @@ function platformKind3(platform) {
   return platform === "win32" ? "win32" : "posix";
 }
 function pathApi5(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function safeNow(now) {
   const value = now();
@@ -33636,7 +33576,7 @@ function platformKind4(platform) {
   return platform === "win32" ? "win32" : "posix";
 }
 function pathApi6(platform) {
-  return platform === "win32" ? path13.win32 : path13.posix;
+  return platform === "win32" ? path18.win32 : path18.posix;
 }
 function normalizedPath(value, platform) {
   return normalizePathIdentity(value, platformKind4(platform));
@@ -34653,7 +34593,7 @@ var OutputMaterializationTransaction = class {
   #filePath(artifact, mimeType, source, suffix = "") {
     const identity = createHash("sha256").update(artifact.id, "utf8").digest("hex").slice(0, 20);
     const extra = suffix.length === 0 ? "" : `-${suffix}`;
-    return path13.join(
+    return path18.join(
       this.#directory,
       `${source}-${artifact.phase}-${artifact.slot}-${identity}${extra}.${extensionFor(mimeType)}`
     );
@@ -34802,8 +34742,8 @@ var OutputMaterializationTransaction = class {
     this.#closing = true;
     const cleanupPromise = (async () => {
       await this.#waitForIdle();
-      const relative2 = path13.relative(this.#stagingRoot, this.#directory);
-      if (relative2.length === 0 || path13.isAbsolute(relative2) || relative2 === ".." || relative2.startsWith(`..${path13.sep}`)) {
+      const relative2 = path18.relative(this.#stagingRoot, this.#directory);
+      if (relative2.length === 0 || path18.isAbsolute(relative2) || relative2 === ".." || relative2.startsWith(`..${path18.sep}`)) {
         throw new ImageMaterializationError(
           "transaction-ownership",
           "The request staging directory is outside the approved staging root."
@@ -34843,7 +34783,7 @@ async function createOutputMaterializationTransaction(options) {
     );
   }
   const requestFingerprint2 = createHash("sha256").update(options.requestId, "utf8").digest("hex").slice(0, 20);
-  const directory = await mkdtemp(path13.join(stagingRoot, `request-${requestFingerprint2}-`));
+  const directory = await mkdtemp(path18.join(stagingRoot, `request-${requestFingerprint2}-`));
   return new OutputMaterializationTransaction({
     stagingRoot,
     directory,
@@ -34903,6 +34843,34 @@ function validateOptions(input) {
 }
 function isKeyPixel(red, green, blue, keyColor, tolerance) {
   return Math.abs(red - keyColor.red) <= tolerance && Math.abs(green - keyColor.green) <= tolerance && Math.abs(blue - keyColor.blue) <= tolerance;
+}
+function isGeneratedGreenScreenPixel(red, green, blue, keyColor) {
+  if (keyColor.green < 224 || keyColor.red > 32 || keyColor.blue > 32) return false;
+  return green >= 160 && green - Math.max(red, blue) >= 42;
+}
+function removeGreenScreenSpill(decoded) {
+  const { width, height, data } = decoded;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const offset = (y * width + x) * 4;
+      if (data[offset + 3] !== 255) continue;
+      let touchesTransparency = false;
+      for (let neighborY = Math.max(0, y - 1); neighborY <= Math.min(height - 1, y + 1) && !touchesTransparency; neighborY += 1) {
+        for (let neighborX = Math.max(0, x - 1); neighborX <= Math.min(width - 1, x + 1); neighborX += 1) {
+          if (data[(neighborY * width + neighborX) * 4 + 3] === 0) {
+            touchesTransparency = true;
+            break;
+          }
+        }
+      }
+      if (!touchesTransparency) continue;
+      const red = data[offset];
+      const green = data[offset + 1];
+      const blue = data[offset + 2];
+      const neutral = Math.max(red, blue);
+      if (green > neutral + 3) data[offset + 1] = neutral;
+    }
+  }
 }
 function refusal(output, reason, requestedMode) {
   const warning = reason === "non-png" ? {
@@ -34968,7 +34936,7 @@ async function applyPngChromakey(input) {
       const green = decoded.data[offset + 1];
       const blue = decoded.data[offset + 2];
       const alpha = decoded.data[offset + 3];
-      if (red !== void 0 && green !== void 0 && blue !== void 0 && alpha !== void 0 && alpha > 0 && isKeyPixel(red, green, blue, keyColor, tolerance)) {
+      if (red !== void 0 && green !== void 0 && blue !== void 0 && alpha !== void 0 && alpha > 0 && (isKeyPixel(red, green, blue, keyColor, tolerance) || isGeneratedGreenScreenPixel(red, green, blue, keyColor))) {
         decoded.data[offset + 3] = 0;
         removedPixels += 1;
       } else if (alpha !== void 0 && alpha > 0) {
@@ -34981,6 +34949,7 @@ async function applyPngChromakey(input) {
     if (remainingVisiblePixels === 0) {
       return refusal(input.output, "key-dominates-image", input.requestedMode);
     }
+    removeGreenScreenSpill(decoded);
     const encoded = import_pngjs.PNG.sync.write(decoded, {
       colorType: 6,
       inputColorType: 6,
@@ -35044,8 +35013,1970 @@ async function applyPngChromakey(input) {
 // src/runtime/background-removal.ts
 var import_pngjs3 = __toESM(require_png());
 
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/backend-impl.js
+var backends = /* @__PURE__ */ new Map();
+var backendsSortedByPriority = [];
+var registerBackend = (name, backend, priority) => {
+  if (backend && typeof backend.init === "function" && typeof backend.createInferenceSessionHandler === "function") {
+    const currentBackend = backends.get(name);
+    if (currentBackend === void 0) {
+      backends.set(name, { backend, priority });
+    } else if (currentBackend.priority > priority) {
+      return;
+    } else if (currentBackend.priority === priority) {
+      if (currentBackend.backend !== backend) {
+        throw new Error(`cannot register backend "${name}" using priority ${priority}`);
+      }
+    }
+    {
+      const i = backendsSortedByPriority.indexOf(name);
+      if (i !== -1) {
+        backendsSortedByPriority.splice(i, 1);
+      }
+      for (let i2 = 0; i2 < backendsSortedByPriority.length; i2++) {
+        if (backends.get(backendsSortedByPriority[i2]).priority <= priority) {
+          backendsSortedByPriority.splice(i2, 0, name);
+          return;
+        }
+      }
+      backendsSortedByPriority.push(name);
+    }
+    return;
+  }
+  throw new TypeError("not a valid backend");
+};
+var tryResolveAndInitializeBackend = async (backendName) => {
+  const backendInfo = backends.get(backendName);
+  if (!backendInfo) {
+    return "backend not found.";
+  }
+  if (backendInfo.initialized) {
+    return backendInfo.backend;
+  } else if (backendInfo.aborted) {
+    return backendInfo.error;
+  } else {
+    const isInitializing = !!backendInfo.initPromise;
+    try {
+      if (!isInitializing) {
+        backendInfo.initPromise = backendInfo.backend.init(backendName);
+      }
+      await backendInfo.initPromise;
+      backendInfo.initialized = true;
+      return backendInfo.backend;
+    } catch (e) {
+      if (!isInitializing) {
+        backendInfo.error = `${e}`;
+        backendInfo.aborted = true;
+      }
+      return backendInfo.error;
+    } finally {
+      delete backendInfo.initPromise;
+    }
+  }
+};
+var resolveBackendAndExecutionProviders = async (options) => {
+  const eps = options.executionProviders || [];
+  const backendHints = eps.map((i) => typeof i === "string" ? i : i.name);
+  const backendNames = backendHints.length === 0 ? backendsSortedByPriority : backendHints;
+  let backend;
+  const errors = [];
+  const availableBackendNames = /* @__PURE__ */ new Set();
+  for (const backendName of backendNames) {
+    const resolveResult = await tryResolveAndInitializeBackend(backendName);
+    if (typeof resolveResult === "string") {
+      errors.push({ name: backendName, err: resolveResult });
+    } else {
+      if (!backend) {
+        backend = resolveResult;
+      }
+      if (backend === resolveResult) {
+        availableBackendNames.add(backendName);
+      }
+    }
+  }
+  if (!backend) {
+    throw new Error(`no available backend found. ERR: ${errors.map((e) => `[${e.name}] ${e.err}`).join(", ")}`);
+  }
+  for (const { name, err } of errors) {
+    if (backendHints.includes(name)) {
+      console.warn(`removing requested execution provider "${name}" from session options because it is not available: ${err}`);
+    }
+  }
+  const filteredEps = eps.filter((i) => availableBackendNames.has(typeof i === "string" ? i : i.name));
+  return [
+    backend,
+    new Proxy(options, {
+      get: (target, prop) => {
+        if (prop === "executionProviders") {
+          return filteredEps;
+        }
+        return Reflect.get(target, prop);
+      }
+    })
+  ];
+};
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/version.js
+var version2 = "1.20.1";
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/env-impl.js
+var logLevelValue = "warning";
+var env = {
+  wasm: {},
+  webgl: {},
+  webgpu: {},
+  versions: { common: version2 },
+  set logLevel(value) {
+    if (value === void 0) {
+      return;
+    }
+    if (typeof value !== "string" || ["verbose", "info", "warning", "error", "fatal"].indexOf(value) === -1) {
+      throw new Error(`Unsupported logging level: ${value}`);
+    }
+    logLevelValue = value;
+  },
+  get logLevel() {
+    return logLevelValue;
+  }
+};
+Object.defineProperty(env, "logLevel", { enumerable: true });
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/env.js
+var env2 = env;
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/tensor-conversion-impl.js
+var tensorToDataURL = (tensor, options) => {
+  const canvas = typeof document !== "undefined" ? document.createElement("canvas") : new OffscreenCanvas(1, 1);
+  canvas.width = tensor.dims[3];
+  canvas.height = tensor.dims[2];
+  const pixels2DContext = canvas.getContext("2d");
+  if (pixels2DContext != null) {
+    let width;
+    let height;
+    if (options?.tensorLayout !== void 0 && options.tensorLayout === "NHWC") {
+      width = tensor.dims[2];
+      height = tensor.dims[3];
+    } else {
+      width = tensor.dims[3];
+      height = tensor.dims[2];
+    }
+    const inputformat = options?.format !== void 0 ? options.format : "RGB";
+    const norm = options?.norm;
+    let normMean;
+    let normBias;
+    if (norm === void 0 || norm.mean === void 0) {
+      normMean = [255, 255, 255, 255];
+    } else {
+      if (typeof norm.mean === "number") {
+        normMean = [norm.mean, norm.mean, norm.mean, norm.mean];
+      } else {
+        normMean = [norm.mean[0], norm.mean[1], norm.mean[2], 0];
+        if (norm.mean[3] !== void 0) {
+          normMean[3] = norm.mean[3];
+        }
+      }
+    }
+    if (norm === void 0 || norm.bias === void 0) {
+      normBias = [0, 0, 0, 0];
+    } else {
+      if (typeof norm.bias === "number") {
+        normBias = [norm.bias, norm.bias, norm.bias, norm.bias];
+      } else {
+        normBias = [norm.bias[0], norm.bias[1], norm.bias[2], 0];
+        if (norm.bias[3] !== void 0) {
+          normBias[3] = norm.bias[3];
+        }
+      }
+    }
+    const stride = height * width;
+    let rTensorPointer = 0, gTensorPointer = stride, bTensorPointer = stride * 2, aTensorPointer = -1;
+    if (inputformat === "RGBA") {
+      rTensorPointer = 0;
+      gTensorPointer = stride;
+      bTensorPointer = stride * 2;
+      aTensorPointer = stride * 3;
+    } else if (inputformat === "RGB") {
+      rTensorPointer = 0;
+      gTensorPointer = stride;
+      bTensorPointer = stride * 2;
+    } else if (inputformat === "RBG") {
+      rTensorPointer = 0;
+      bTensorPointer = stride;
+      gTensorPointer = stride * 2;
+    }
+    for (let i = 0; i < height; i++) {
+      for (let j = 0; j < width; j++) {
+        const R = (tensor.data[rTensorPointer++] - normBias[0]) * normMean[0];
+        const G = (tensor.data[gTensorPointer++] - normBias[1]) * normMean[1];
+        const B = (tensor.data[bTensorPointer++] - normBias[2]) * normMean[2];
+        const A = aTensorPointer === -1 ? 255 : (tensor.data[aTensorPointer++] - normBias[3]) * normMean[3];
+        pixels2DContext.fillStyle = "rgba(" + R + "," + G + "," + B + "," + A + ")";
+        pixels2DContext.fillRect(j, i, 1, 1);
+      }
+    }
+    if ("toDataURL" in canvas) {
+      return canvas.toDataURL();
+    } else {
+      throw new Error("toDataURL is not supported");
+    }
+  } else {
+    throw new Error("Can not access image data");
+  }
+};
+var tensorToImageData = (tensor, options) => {
+  const pixels2DContext = typeof document !== "undefined" ? document.createElement("canvas").getContext("2d") : new OffscreenCanvas(1, 1).getContext("2d");
+  let image;
+  if (pixels2DContext != null) {
+    let width;
+    let height;
+    let channels;
+    if (options?.tensorLayout !== void 0 && options.tensorLayout === "NHWC") {
+      width = tensor.dims[2];
+      height = tensor.dims[1];
+      channels = tensor.dims[3];
+    } else {
+      width = tensor.dims[3];
+      height = tensor.dims[2];
+      channels = tensor.dims[1];
+    }
+    const inputformat = options !== void 0 ? options.format !== void 0 ? options.format : "RGB" : "RGB";
+    const norm = options?.norm;
+    let normMean;
+    let normBias;
+    if (norm === void 0 || norm.mean === void 0) {
+      normMean = [255, 255, 255, 255];
+    } else {
+      if (typeof norm.mean === "number") {
+        normMean = [norm.mean, norm.mean, norm.mean, norm.mean];
+      } else {
+        normMean = [norm.mean[0], norm.mean[1], norm.mean[2], 255];
+        if (norm.mean[3] !== void 0) {
+          normMean[3] = norm.mean[3];
+        }
+      }
+    }
+    if (norm === void 0 || norm.bias === void 0) {
+      normBias = [0, 0, 0, 0];
+    } else {
+      if (typeof norm.bias === "number") {
+        normBias = [norm.bias, norm.bias, norm.bias, norm.bias];
+      } else {
+        normBias = [norm.bias[0], norm.bias[1], norm.bias[2], 0];
+        if (norm.bias[3] !== void 0) {
+          normBias[3] = norm.bias[3];
+        }
+      }
+    }
+    const stride = height * width;
+    if (options !== void 0) {
+      if (options.format !== void 0 && channels === 4 && options.format !== "RGBA" || channels === 3 && options.format !== "RGB" && options.format !== "BGR") {
+        throw new Error("Tensor format doesn't match input tensor dims");
+      }
+    }
+    const step = 4;
+    let rImagePointer = 0, gImagePointer = 1, bImagePointer = 2, aImagePointer = 3;
+    let rTensorPointer = 0, gTensorPointer = stride, bTensorPointer = stride * 2, aTensorPointer = -1;
+    if (inputformat === "RGBA") {
+      rTensorPointer = 0;
+      gTensorPointer = stride;
+      bTensorPointer = stride * 2;
+      aTensorPointer = stride * 3;
+    } else if (inputformat === "RGB") {
+      rTensorPointer = 0;
+      gTensorPointer = stride;
+      bTensorPointer = stride * 2;
+    } else if (inputformat === "RBG") {
+      rTensorPointer = 0;
+      bTensorPointer = stride;
+      gTensorPointer = stride * 2;
+    }
+    image = pixels2DContext.createImageData(width, height);
+    for (let i = 0; i < height * width; rImagePointer += step, gImagePointer += step, bImagePointer += step, aImagePointer += step, i++) {
+      image.data[rImagePointer] = (tensor.data[rTensorPointer++] - normBias[0]) * normMean[0];
+      image.data[gImagePointer] = (tensor.data[gTensorPointer++] - normBias[1]) * normMean[1];
+      image.data[bImagePointer] = (tensor.data[bTensorPointer++] - normBias[2]) * normMean[2];
+      image.data[aImagePointer] = aTensorPointer === -1 ? 255 : (tensor.data[aTensorPointer++] - normBias[3]) * normMean[3];
+    }
+  } else {
+    throw new Error("Can not access image data");
+  }
+  return image;
+};
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/tensor-factory-impl.js
+var bufferToTensor = (buffer, options) => {
+  if (buffer === void 0) {
+    throw new Error("Image buffer must be defined");
+  }
+  if (options.height === void 0 || options.width === void 0) {
+    throw new Error("Image height and width must be defined");
+  }
+  if (options.tensorLayout === "NHWC") {
+    throw new Error("NHWC Tensor layout is not supported yet");
+  }
+  const { height, width } = options;
+  const norm = options.norm ?? { mean: 255, bias: 0 };
+  let normMean;
+  let normBias;
+  if (typeof norm.mean === "number") {
+    normMean = [norm.mean, norm.mean, norm.mean, norm.mean];
+  } else {
+    normMean = [norm.mean[0], norm.mean[1], norm.mean[2], norm.mean[3] ?? 255];
+  }
+  if (typeof norm.bias === "number") {
+    normBias = [norm.bias, norm.bias, norm.bias, norm.bias];
+  } else {
+    normBias = [norm.bias[0], norm.bias[1], norm.bias[2], norm.bias[3] ?? 0];
+  }
+  const inputformat = options.format !== void 0 ? options.format : "RGBA";
+  const outputformat = options.tensorFormat !== void 0 ? options.tensorFormat !== void 0 ? options.tensorFormat : "RGB" : "RGB";
+  const stride = height * width;
+  const float32Data = outputformat === "RGBA" ? new Float32Array(stride * 4) : new Float32Array(stride * 3);
+  let step = 4, rImagePointer = 0, gImagePointer = 1, bImagePointer = 2, aImagePointer = 3;
+  let rTensorPointer = 0, gTensorPointer = stride, bTensorPointer = stride * 2, aTensorPointer = -1;
+  if (inputformat === "RGB") {
+    step = 3;
+    rImagePointer = 0;
+    gImagePointer = 1;
+    bImagePointer = 2;
+    aImagePointer = -1;
+  }
+  if (outputformat === "RGBA") {
+    aTensorPointer = stride * 3;
+  } else if (outputformat === "RBG") {
+    rTensorPointer = 0;
+    bTensorPointer = stride;
+    gTensorPointer = stride * 2;
+  } else if (outputformat === "BGR") {
+    bTensorPointer = 0;
+    gTensorPointer = stride;
+    rTensorPointer = stride * 2;
+  }
+  for (let i = 0; i < stride; i++, rImagePointer += step, bImagePointer += step, gImagePointer += step, aImagePointer += step) {
+    float32Data[rTensorPointer++] = (buffer[rImagePointer] + normBias[0]) / normMean[0];
+    float32Data[gTensorPointer++] = (buffer[gImagePointer] + normBias[1]) / normMean[1];
+    float32Data[bTensorPointer++] = (buffer[bImagePointer] + normBias[2]) / normMean[2];
+    if (aTensorPointer !== -1 && aImagePointer !== -1) {
+      float32Data[aTensorPointer++] = (buffer[aImagePointer] + normBias[3]) / normMean[3];
+    }
+  }
+  const outputTensor = outputformat === "RGBA" ? new Tensor("float32", float32Data, [1, 4, height, width]) : new Tensor("float32", float32Data, [1, 3, height, width]);
+  return outputTensor;
+};
+var tensorFromImage = async (image, options) => {
+  const isHTMLImageEle = typeof HTMLImageElement !== "undefined" && image instanceof HTMLImageElement;
+  const isImageDataEle = typeof ImageData !== "undefined" && image instanceof ImageData;
+  const isImageBitmap = typeof ImageBitmap !== "undefined" && image instanceof ImageBitmap;
+  const isString = typeof image === "string";
+  let data;
+  let bufferToTensorOptions = options ?? {};
+  const createCanvas = () => {
+    if (typeof document !== "undefined") {
+      return document.createElement("canvas");
+    } else if (typeof OffscreenCanvas !== "undefined") {
+      return new OffscreenCanvas(1, 1);
+    } else {
+      throw new Error("Canvas is not supported");
+    }
+  };
+  const createCanvasContext = (canvas) => {
+    if (typeof HTMLCanvasElement !== "undefined" && canvas instanceof HTMLCanvasElement) {
+      return canvas.getContext("2d");
+    } else if (canvas instanceof OffscreenCanvas) {
+      return canvas.getContext("2d");
+    } else {
+      return null;
+    }
+  };
+  if (isHTMLImageEle) {
+    const canvas = createCanvas();
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const pixels2DContext = createCanvasContext(canvas);
+    if (pixels2DContext != null) {
+      let height = image.height;
+      let width = image.width;
+      if (options !== void 0 && options.resizedHeight !== void 0 && options.resizedWidth !== void 0) {
+        height = options.resizedHeight;
+        width = options.resizedWidth;
+      }
+      if (options !== void 0) {
+        bufferToTensorOptions = options;
+        if (options.tensorFormat !== void 0) {
+          throw new Error("Image input config format must be RGBA for HTMLImageElement");
+        } else {
+          bufferToTensorOptions.tensorFormat = "RGBA";
+        }
+        bufferToTensorOptions.height = height;
+        bufferToTensorOptions.width = width;
+      } else {
+        bufferToTensorOptions.tensorFormat = "RGBA";
+        bufferToTensorOptions.height = height;
+        bufferToTensorOptions.width = width;
+      }
+      pixels2DContext.drawImage(image, 0, 0);
+      data = pixels2DContext.getImageData(0, 0, width, height).data;
+    } else {
+      throw new Error("Can not access image data");
+    }
+  } else if (isImageDataEle) {
+    let height;
+    let width;
+    if (options !== void 0 && options.resizedWidth !== void 0 && options.resizedHeight !== void 0) {
+      height = options.resizedHeight;
+      width = options.resizedWidth;
+    } else {
+      height = image.height;
+      width = image.width;
+    }
+    if (options !== void 0) {
+      bufferToTensorOptions = options;
+    }
+    bufferToTensorOptions.format = "RGBA";
+    bufferToTensorOptions.height = height;
+    bufferToTensorOptions.width = width;
+    if (options !== void 0) {
+      const tempCanvas = createCanvas();
+      tempCanvas.width = width;
+      tempCanvas.height = height;
+      const pixels2DContext = createCanvasContext(tempCanvas);
+      if (pixels2DContext != null) {
+        pixels2DContext.putImageData(image, 0, 0);
+        data = pixels2DContext.getImageData(0, 0, width, height).data;
+      } else {
+        throw new Error("Can not access image data");
+      }
+    } else {
+      data = image.data;
+    }
+  } else if (isImageBitmap) {
+    if (options === void 0) {
+      throw new Error("Please provide image config with format for Imagebitmap");
+    }
+    const canvas = createCanvas();
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const pixels2DContext = createCanvasContext(canvas);
+    if (pixels2DContext != null) {
+      const height = image.height;
+      const width = image.width;
+      pixels2DContext.drawImage(image, 0, 0, width, height);
+      data = pixels2DContext.getImageData(0, 0, width, height).data;
+      bufferToTensorOptions.height = height;
+      bufferToTensorOptions.width = width;
+      return bufferToTensor(data, bufferToTensorOptions);
+    } else {
+      throw new Error("Can not access image data");
+    }
+  } else if (isString) {
+    return new Promise((resolve2, reject) => {
+      const canvas = createCanvas();
+      const context = createCanvasContext(canvas);
+      if (!image || !context) {
+        return reject();
+      }
+      const newImage = new Image();
+      newImage.crossOrigin = "Anonymous";
+      newImage.src = image;
+      newImage.onload = () => {
+        canvas.width = newImage.width;
+        canvas.height = newImage.height;
+        context.drawImage(newImage, 0, 0, canvas.width, canvas.height);
+        const img = context.getImageData(0, 0, canvas.width, canvas.height);
+        bufferToTensorOptions.height = canvas.height;
+        bufferToTensorOptions.width = canvas.width;
+        resolve2(bufferToTensor(img.data, bufferToTensorOptions));
+      };
+    });
+  } else {
+    throw new Error("Input data provided is not supported - aborted tensor creation");
+  }
+  if (data !== void 0) {
+    return bufferToTensor(data, bufferToTensorOptions);
+  } else {
+    throw new Error("Input data provided is not supported - aborted tensor creation");
+  }
+};
+var tensorFromTexture = (texture, options) => {
+  const { width, height, download, dispose } = options;
+  const dims = [1, height, width, 4];
+  return new Tensor({ location: "texture", type: "float32", texture, dims, download, dispose });
+};
+var tensorFromGpuBuffer = (gpuBuffer, options) => {
+  const { dataType, dims, download, dispose } = options;
+  return new Tensor({ location: "gpu-buffer", type: dataType ?? "float32", gpuBuffer, dims, download, dispose });
+};
+var tensorFromMLTensor = (mlTensor, options) => {
+  const { dataType, dims, download, dispose } = options;
+  return new Tensor({ location: "ml-tensor", type: dataType ?? "float32", mlTensor, dims, download, dispose });
+};
+var tensorFromPinnedBuffer = (type, buffer, dims) => new Tensor({ location: "cpu-pinned", type, data: buffer, dims: dims ?? [buffer.length] });
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/tensor-impl-type-mapping.js
+var NUMERIC_TENSOR_TYPE_TO_TYPEDARRAY_MAP = /* @__PURE__ */ new Map([
+  ["float32", Float32Array],
+  ["uint8", Uint8Array],
+  ["int8", Int8Array],
+  ["uint16", Uint16Array],
+  ["int16", Int16Array],
+  ["int32", Int32Array],
+  ["bool", Uint8Array],
+  ["float64", Float64Array],
+  ["uint32", Uint32Array],
+  ["int4", Uint8Array],
+  ["uint4", Uint8Array]
+]);
+var NUMERIC_TENSOR_TYPEDARRAY_TO_TYPE_MAP = /* @__PURE__ */ new Map([
+  [Float32Array, "float32"],
+  [Uint8Array, "uint8"],
+  [Int8Array, "int8"],
+  [Uint16Array, "uint16"],
+  [Int16Array, "int16"],
+  [Int32Array, "int32"],
+  [Float64Array, "float64"],
+  [Uint32Array, "uint32"]
+]);
+var isTypedArrayChecked = false;
+var checkTypedArray = () => {
+  if (!isTypedArrayChecked) {
+    isTypedArrayChecked = true;
+    const isBigInt64ArrayAvailable = typeof BigInt64Array !== "undefined" && BigInt64Array.from;
+    const isBigUint64ArrayAvailable = typeof BigUint64Array !== "undefined" && BigUint64Array.from;
+    const isFloat16ArrayAvailable = typeof Float16Array !== "undefined" && Float16Array.from;
+    if (isBigInt64ArrayAvailable) {
+      NUMERIC_TENSOR_TYPE_TO_TYPEDARRAY_MAP.set("int64", BigInt64Array);
+      NUMERIC_TENSOR_TYPEDARRAY_TO_TYPE_MAP.set(BigInt64Array, "int64");
+    }
+    if (isBigUint64ArrayAvailable) {
+      NUMERIC_TENSOR_TYPE_TO_TYPEDARRAY_MAP.set("uint64", BigUint64Array);
+      NUMERIC_TENSOR_TYPEDARRAY_TO_TYPE_MAP.set(BigUint64Array, "uint64");
+    }
+    if (isFloat16ArrayAvailable) {
+      NUMERIC_TENSOR_TYPE_TO_TYPEDARRAY_MAP.set("float16", Float16Array);
+      NUMERIC_TENSOR_TYPEDARRAY_TO_TYPE_MAP.set(Float16Array, "float16");
+    } else {
+      NUMERIC_TENSOR_TYPE_TO_TYPEDARRAY_MAP.set("float16", Uint16Array);
+    }
+  }
+};
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/tensor-utils-impl.js
+var calculateSize = (dims) => {
+  let size = 1;
+  for (let i = 0; i < dims.length; i++) {
+    const dim = dims[i];
+    if (typeof dim !== "number" || !Number.isSafeInteger(dim)) {
+      throw new TypeError(`dims[${i}] must be an integer, got: ${dim}`);
+    }
+    if (dim < 0) {
+      throw new RangeError(`dims[${i}] must be a non-negative integer, got: ${dim}`);
+    }
+    size *= dim;
+  }
+  return size;
+};
+var tensorReshape = (tensor, dims) => {
+  switch (tensor.location) {
+    case "cpu":
+      return new Tensor(tensor.type, tensor.data, dims);
+    case "cpu-pinned":
+      return new Tensor({
+        location: "cpu-pinned",
+        data: tensor.data,
+        type: tensor.type,
+        dims
+      });
+    case "texture":
+      return new Tensor({
+        location: "texture",
+        texture: tensor.texture,
+        type: tensor.type,
+        dims
+      });
+    case "gpu-buffer":
+      return new Tensor({
+        location: "gpu-buffer",
+        gpuBuffer: tensor.gpuBuffer,
+        type: tensor.type,
+        dims
+      });
+    case "ml-tensor":
+      return new Tensor({
+        location: "ml-tensor",
+        mlTensor: tensor.mlTensor,
+        type: tensor.type,
+        dims
+      });
+    default:
+      throw new Error(`tensorReshape: tensor location ${tensor.location} is not supported`);
+  }
+};
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/tensor-impl.js
+var Tensor = class {
+  /**
+   * implementation.
+   */
+  constructor(arg0, arg1, arg2) {
+    checkTypedArray();
+    let type;
+    let dims;
+    if (typeof arg0 === "object" && "location" in arg0) {
+      this.dataLocation = arg0.location;
+      type = arg0.type;
+      dims = arg0.dims;
+      switch (arg0.location) {
+        case "cpu-pinned": {
+          const expectedTypedArrayConstructor = NUMERIC_TENSOR_TYPE_TO_TYPEDARRAY_MAP.get(type);
+          if (!expectedTypedArrayConstructor) {
+            throw new TypeError(`unsupported type "${type}" to create tensor from pinned buffer`);
+          }
+          if (!(arg0.data instanceof expectedTypedArrayConstructor)) {
+            throw new TypeError(`buffer should be of type ${expectedTypedArrayConstructor.name}`);
+          }
+          this.cpuData = arg0.data;
+          break;
+        }
+        case "texture": {
+          if (type !== "float32") {
+            throw new TypeError(`unsupported type "${type}" to create tensor from texture`);
+          }
+          this.gpuTextureData = arg0.texture;
+          this.downloader = arg0.download;
+          this.disposer = arg0.dispose;
+          break;
+        }
+        case "gpu-buffer": {
+          if (type !== "float32" && type !== "float16" && type !== "int32" && type !== "int64" && type !== "uint32" && type !== "uint8" && type !== "bool" && type !== "uint4" && type !== "int4") {
+            throw new TypeError(`unsupported type "${type}" to create tensor from gpu buffer`);
+          }
+          this.gpuBufferData = arg0.gpuBuffer;
+          this.downloader = arg0.download;
+          this.disposer = arg0.dispose;
+          break;
+        }
+        case "ml-tensor": {
+          if (type !== "float32" && type !== "float16" && type !== "int32" && type !== "int64" && type !== "uint32" && type !== "uint64" && type !== "int8" && type !== "uint8" && type !== "bool") {
+            throw new TypeError(`unsupported type "${type}" to create tensor from MLTensor`);
+          }
+          this.mlTensorData = arg0.mlTensor;
+          this.downloader = arg0.download;
+          this.disposer = arg0.dispose;
+          break;
+        }
+        default:
+          throw new Error(`Tensor constructor: unsupported location '${this.dataLocation}'`);
+      }
+    } else {
+      let data;
+      let maybeDims;
+      if (typeof arg0 === "string") {
+        type = arg0;
+        maybeDims = arg2;
+        if (arg0 === "string") {
+          if (!Array.isArray(arg1)) {
+            throw new TypeError("A string tensor's data must be a string array.");
+          }
+          data = arg1;
+        } else {
+          const typedArrayConstructor = NUMERIC_TENSOR_TYPE_TO_TYPEDARRAY_MAP.get(arg0);
+          if (typedArrayConstructor === void 0) {
+            throw new TypeError(`Unsupported tensor type: ${arg0}.`);
+          }
+          if (Array.isArray(arg1)) {
+            if (arg0 === "float16" && typedArrayConstructor === Uint16Array || arg0 === "uint4" || arg0 === "int4") {
+              throw new TypeError(`Creating a ${arg0} tensor from number array is not supported. Please use ${typedArrayConstructor.name} as data.`);
+            } else if (arg0 === "uint64" || arg0 === "int64") {
+              data = typedArrayConstructor.from(arg1, BigInt);
+            } else {
+              data = typedArrayConstructor.from(arg1);
+            }
+          } else if (arg1 instanceof typedArrayConstructor) {
+            data = arg1;
+          } else if (arg1 instanceof Uint8ClampedArray) {
+            if (arg0 === "uint8") {
+              data = Uint8Array.from(arg1);
+            } else {
+              throw new TypeError(`A Uint8ClampedArray tensor's data must be type of uint8`);
+            }
+          } else {
+            throw new TypeError(`A ${type} tensor's data must be type of ${typedArrayConstructor}`);
+          }
+        }
+      } else {
+        maybeDims = arg1;
+        if (Array.isArray(arg0)) {
+          if (arg0.length === 0) {
+            throw new TypeError("Tensor type cannot be inferred from an empty array.");
+          }
+          const firstElementType = typeof arg0[0];
+          if (firstElementType === "string") {
+            type = "string";
+            data = arg0;
+          } else if (firstElementType === "boolean") {
+            type = "bool";
+            data = Uint8Array.from(arg0);
+          } else {
+            throw new TypeError(`Invalid element type of data array: ${firstElementType}.`);
+          }
+        } else if (arg0 instanceof Uint8ClampedArray) {
+          type = "uint8";
+          data = Uint8Array.from(arg0);
+        } else {
+          const mappedType = NUMERIC_TENSOR_TYPEDARRAY_TO_TYPE_MAP.get(arg0.constructor);
+          if (mappedType === void 0) {
+            throw new TypeError(`Unsupported type for tensor data: ${arg0.constructor}.`);
+          }
+          type = mappedType;
+          data = arg0;
+        }
+      }
+      if (maybeDims === void 0) {
+        maybeDims = [data.length];
+      } else if (!Array.isArray(maybeDims)) {
+        throw new TypeError("A tensor's dims must be a number array");
+      }
+      dims = maybeDims;
+      this.cpuData = data;
+      this.dataLocation = "cpu";
+    }
+    const size = calculateSize(dims);
+    if (this.cpuData && size !== this.cpuData.length) {
+      if ((type === "uint4" || type === "int4") && Math.ceil(size / 2) === this.cpuData.length) ; else {
+        throw new Error(`Tensor's size(${size}) does not match data length(${this.cpuData.length}).`);
+      }
+    }
+    this.type = type;
+    this.dims = dims;
+    this.size = size;
+  }
+  // #endregion
+  // #region factory
+  static async fromImage(image, options) {
+    return tensorFromImage(image, options);
+  }
+  static fromTexture(texture, options) {
+    return tensorFromTexture(texture, options);
+  }
+  static fromGpuBuffer(gpuBuffer, options) {
+    return tensorFromGpuBuffer(gpuBuffer, options);
+  }
+  static fromMLTensor(mlTensor, options) {
+    return tensorFromMLTensor(mlTensor, options);
+  }
+  static fromPinnedBuffer(type, buffer, dims) {
+    return tensorFromPinnedBuffer(type, buffer, dims);
+  }
+  // #endregion
+  // #region conversions
+  toDataURL(options) {
+    return tensorToDataURL(this, options);
+  }
+  toImageData(options) {
+    return tensorToImageData(this, options);
+  }
+  // #endregion
+  // #region properties
+  get data() {
+    this.ensureValid();
+    if (!this.cpuData) {
+      throw new Error("The data is not on CPU. Use `getData()` to download GPU data to CPU, or use `texture` or `gpuBuffer` property to access the GPU data directly.");
+    }
+    return this.cpuData;
+  }
+  get location() {
+    return this.dataLocation;
+  }
+  get texture() {
+    this.ensureValid();
+    if (!this.gpuTextureData) {
+      throw new Error("The data is not stored as a WebGL texture.");
+    }
+    return this.gpuTextureData;
+  }
+  get gpuBuffer() {
+    this.ensureValid();
+    if (!this.gpuBufferData) {
+      throw new Error("The data is not stored as a WebGPU buffer.");
+    }
+    return this.gpuBufferData;
+  }
+  get mlTensor() {
+    this.ensureValid();
+    if (!this.mlTensorData) {
+      throw new Error("The data is not stored as a WebNN MLTensor.");
+    }
+    return this.mlTensorData;
+  }
+  // #endregion
+  // #region methods
+  async getData(releaseData) {
+    this.ensureValid();
+    switch (this.dataLocation) {
+      case "cpu":
+      case "cpu-pinned":
+        return this.data;
+      case "texture":
+      case "gpu-buffer":
+      case "ml-tensor": {
+        if (!this.downloader) {
+          throw new Error("The current tensor is not created with a specified data downloader.");
+        }
+        if (this.isDownloading) {
+          throw new Error("The current tensor is being downloaded.");
+        }
+        try {
+          this.isDownloading = true;
+          const data = await this.downloader();
+          this.downloader = void 0;
+          this.dataLocation = "cpu";
+          this.cpuData = data;
+          if (releaseData && this.disposer) {
+            this.disposer();
+            this.disposer = void 0;
+          }
+          return data;
+        } finally {
+          this.isDownloading = false;
+        }
+      }
+      default:
+        throw new Error(`cannot get data from location: ${this.dataLocation}`);
+    }
+  }
+  dispose() {
+    if (this.isDownloading) {
+      throw new Error("The current tensor is being downloaded.");
+    }
+    if (this.disposer) {
+      this.disposer();
+      this.disposer = void 0;
+    }
+    this.cpuData = void 0;
+    this.gpuTextureData = void 0;
+    this.gpuBufferData = void 0;
+    this.mlTensorData = void 0;
+    this.downloader = void 0;
+    this.isDownloading = void 0;
+    this.dataLocation = "none";
+  }
+  // #endregion
+  // #region tensor utilities
+  ensureValid() {
+    if (this.dataLocation === "none") {
+      throw new Error("The tensor is disposed.");
+    }
+  }
+  reshape(dims) {
+    this.ensureValid();
+    if (this.downloader || this.disposer) {
+      throw new Error("Cannot reshape a tensor that owns GPU resource.");
+    }
+    return tensorReshape(this, dims);
+  }
+};
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/tensor.js
+var Tensor2 = Tensor;
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/trace.js
+var TRACE = (deviceType, label) => {
+  if (typeof env.trace === "undefined" ? !env.wasm.trace : !env.trace) {
+    return;
+  }
+  console.timeStamp(`${deviceType}::ORT::${label}`);
+};
+var TRACE_FUNC = (msg, extraMsg) => {
+  const stack = new Error().stack?.split(/\r\n|\r|\n/g) || [];
+  let hasTraceFunc = false;
+  for (let i = 0; i < stack.length; i++) {
+    if (hasTraceFunc && !stack[i].includes("TRACE_FUNC")) {
+      let label = `FUNC_${msg}::${stack[i].trim().split(" ")[1]}`;
+      TRACE("CPU", label);
+      return;
+    }
+    if (stack[i].includes("TRACE_FUNC")) {
+      hasTraceFunc = true;
+    }
+  }
+};
+var TRACE_FUNC_BEGIN = (extraMsg) => {
+  if (typeof env.trace === "undefined" ? !env.wasm.trace : !env.trace) {
+    return;
+  }
+  TRACE_FUNC("BEGIN");
+};
+var TRACE_FUNC_END = (extraMsg) => {
+  if (typeof env.trace === "undefined" ? !env.wasm.trace : !env.trace) {
+    return;
+  }
+  TRACE_FUNC("END");
+};
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/inference-session-impl.js
+var InferenceSession = class _InferenceSession {
+  constructor(handler) {
+    this.handler = handler;
+  }
+  async run(feeds, arg1, arg2) {
+    TRACE_FUNC_BEGIN();
+    const fetches = {};
+    let options = {};
+    if (typeof feeds !== "object" || feeds === null || feeds instanceof Tensor2 || Array.isArray(feeds)) {
+      throw new TypeError("'feeds' must be an object that use input names as keys and OnnxValue as corresponding values.");
+    }
+    let isFetchesEmpty = true;
+    if (typeof arg1 === "object") {
+      if (arg1 === null) {
+        throw new TypeError("Unexpected argument[1]: cannot be null.");
+      }
+      if (arg1 instanceof Tensor2) {
+        throw new TypeError("'fetches' cannot be a Tensor");
+      }
+      if (Array.isArray(arg1)) {
+        if (arg1.length === 0) {
+          throw new TypeError("'fetches' cannot be an empty array.");
+        }
+        isFetchesEmpty = false;
+        for (const name of arg1) {
+          if (typeof name !== "string") {
+            throw new TypeError("'fetches' must be a string array or an object.");
+          }
+          if (this.outputNames.indexOf(name) === -1) {
+            throw new RangeError(`'fetches' contains invalid output name: ${name}.`);
+          }
+          fetches[name] = null;
+        }
+        if (typeof arg2 === "object" && arg2 !== null) {
+          options = arg2;
+        } else if (typeof arg2 !== "undefined") {
+          throw new TypeError("'options' must be an object.");
+        }
+      } else {
+        let isFetches = false;
+        const arg1Keys = Object.getOwnPropertyNames(arg1);
+        for (const name of this.outputNames) {
+          if (arg1Keys.indexOf(name) !== -1) {
+            const v = arg1[name];
+            if (v === null || v instanceof Tensor2) {
+              isFetches = true;
+              isFetchesEmpty = false;
+              fetches[name] = v;
+            }
+          }
+        }
+        if (isFetches) {
+          if (typeof arg2 === "object" && arg2 !== null) {
+            options = arg2;
+          } else if (typeof arg2 !== "undefined") {
+            throw new TypeError("'options' must be an object.");
+          }
+        } else {
+          options = arg1;
+        }
+      }
+    } else if (typeof arg1 !== "undefined") {
+      throw new TypeError("Unexpected argument[1]: must be 'fetches' or 'options'.");
+    }
+    for (const name of this.inputNames) {
+      if (typeof feeds[name] === "undefined") {
+        throw new Error(`input '${name}' is missing in 'feeds'.`);
+      }
+    }
+    if (isFetchesEmpty) {
+      for (const name of this.outputNames) {
+        fetches[name] = null;
+      }
+    }
+    const results = await this.handler.run(feeds, fetches, options);
+    const returnValue = {};
+    for (const key in results) {
+      if (Object.hasOwnProperty.call(results, key)) {
+        const result = results[key];
+        if (result instanceof Tensor2) {
+          returnValue[key] = result;
+        } else {
+          returnValue[key] = new Tensor2(result.type, result.data, result.dims);
+        }
+      }
+    }
+    TRACE_FUNC_END();
+    return returnValue;
+  }
+  async release() {
+    return this.handler.dispose();
+  }
+  static async create(arg0, arg1, arg2, arg3) {
+    TRACE_FUNC_BEGIN();
+    let filePathOrUint8Array;
+    let options = {};
+    if (typeof arg0 === "string") {
+      filePathOrUint8Array = arg0;
+      if (typeof arg1 === "object" && arg1 !== null) {
+        options = arg1;
+      } else if (typeof arg1 !== "undefined") {
+        throw new TypeError("'options' must be an object.");
+      }
+    } else if (arg0 instanceof Uint8Array) {
+      filePathOrUint8Array = arg0;
+      if (typeof arg1 === "object" && arg1 !== null) {
+        options = arg1;
+      } else if (typeof arg1 !== "undefined") {
+        throw new TypeError("'options' must be an object.");
+      }
+    } else if (arg0 instanceof ArrayBuffer || typeof SharedArrayBuffer !== "undefined" && arg0 instanceof SharedArrayBuffer) {
+      const buffer = arg0;
+      let byteOffset = 0;
+      let byteLength = arg0.byteLength;
+      if (typeof arg1 === "object" && arg1 !== null) {
+        options = arg1;
+      } else if (typeof arg1 === "number") {
+        byteOffset = arg1;
+        if (!Number.isSafeInteger(byteOffset)) {
+          throw new RangeError("'byteOffset' must be an integer.");
+        }
+        if (byteOffset < 0 || byteOffset >= buffer.byteLength) {
+          throw new RangeError(`'byteOffset' is out of range [0, ${buffer.byteLength}).`);
+        }
+        byteLength = arg0.byteLength - byteOffset;
+        if (typeof arg2 === "number") {
+          byteLength = arg2;
+          if (!Number.isSafeInteger(byteLength)) {
+            throw new RangeError("'byteLength' must be an integer.");
+          }
+          if (byteLength <= 0 || byteOffset + byteLength > buffer.byteLength) {
+            throw new RangeError(`'byteLength' is out of range (0, ${buffer.byteLength - byteOffset}].`);
+          }
+          if (typeof arg3 === "object" && arg3 !== null) {
+            options = arg3;
+          } else if (typeof arg3 !== "undefined") {
+            throw new TypeError("'options' must be an object.");
+          }
+        } else if (typeof arg2 !== "undefined") {
+          throw new TypeError("'byteLength' must be a number.");
+        }
+      } else if (typeof arg1 !== "undefined") {
+        throw new TypeError("'options' must be an object.");
+      }
+      filePathOrUint8Array = new Uint8Array(buffer, byteOffset, byteLength);
+    } else {
+      throw new TypeError("Unexpected argument[0]: must be 'path' or 'buffer'.");
+    }
+    const [backend, optionsWithValidatedEPs] = await resolveBackendAndExecutionProviders(options);
+    const handler = await backend.createInferenceSessionHandler(filePathOrUint8Array, optionsWithValidatedEPs);
+    TRACE_FUNC_END();
+    return new _InferenceSession(handler);
+  }
+  startProfiling() {
+    this.handler.startProfiling();
+  }
+  endProfiling() {
+    this.handler.endProfiling();
+  }
+  get inputNames() {
+    return this.handler.inputNames;
+  }
+  get outputNames() {
+    return this.handler.outputNames;
+  }
+};
+
+// ../../node_modules/.pnpm/onnxruntime-common@1.20.1/node_modules/onnxruntime-common/dist/esm/inference-session.js
+var InferenceSession2 = InferenceSession;
+
+// ../../node_modules/.pnpm/onnxruntime-web@1.20.1/node_modules/onnxruntime-web/dist/ort.node.min.mjs
+var require2 = createRequire$1(import.meta.url);
+var ce = Object.defineProperty;
+var dt = Object.getOwnPropertyDescriptor;
+var pt = Object.getOwnPropertyNames;
+var mt = Object.prototype.hasOwnProperty;
+var le = ((e) => typeof require2 < "u" ? require2 : typeof Proxy < "u" ? new Proxy(e, { get: (t, n) => (typeof require2 < "u" ? require2 : t)[n] }) : e)(function(e) {
+  if (typeof require2 < "u") return require2.apply(this, arguments);
+  throw Error('Dynamic require of "' + e + '" is not supported');
+});
+var L = (e, t) => () => (e && (t = e(e = 0)), t);
+var gt = (e, t) => {
+  for (var n in t) ce(e, n, { get: t[n], enumerable: true });
+};
+var yt = (e, t, n, s) => {
+  if (t && typeof t == "object" || typeof t == "function") for (let r of pt(t)) !mt.call(e, r) && r !== n && ce(e, r, { get: () => t[r], enumerable: !(s = dt(t, r)) || s.enumerable });
+  return e;
+};
+var bt = (e) => yt(ce({}, "__esModule", { value: true }), e);
+var U;
+var te = L(() => {
+  U = !!(typeof process < "u" && process.versions && process.versions.node);
+});
+var F;
+var wt;
+var ht;
+var St;
+var Et;
+var Ot;
+var vt;
+var xe;
+var re = L(() => {
+  te();
+  F = U ? void 0 : import.meta.url ?? (typeof document < "u" ? document.currentScript?.src : typeof self < "u" ? self.location?.href : void 0), wt = U || typeof location > "u" ? void 0 : location.origin, ht = (e, t) => {
+    try {
+      let n = t ?? F;
+      return (n ? new URL(e, n) : new URL(e)).origin === wt;
+    } catch {
+      return false;
+    }
+  }, St = (e, t) => {
+    let n = t ?? F;
+    try {
+      return (n ? new URL(e, n) : new URL(e)).href;
+    } catch {
+      return;
+    }
+  }, Et = (e, t) => `${t ?? "./"}${e}`, Ot = async (e) => {
+    let n = await (await fetch(e, { credentials: "same-origin" })).blob();
+    return URL.createObjectURL(n);
+  }, vt = async (e) => (await import(
+    /*webpackIgnore:true*/
+    e
+  )).default, xe = async (e, t, n) => {
+    {
+      let s = "ort-wasm-simd-threaded.mjs", r = e ?? St(s, t), a = !U && n && r && !ht(r, t), o = a ? await Ot(r) : r ?? Et(s, t);
+      return [a ? o : void 0, await vt(o)];
+    }
+  };
+});
+var fe;
+var de;
+var ne;
+var Ae;
+var Tt;
+var xt;
+var Pe;
+var S;
+var $ = L(() => {
+  re();
+  de = false, ne = false, Ae = false, Tt = () => {
+    if (typeof SharedArrayBuffer > "u") return false;
+    try {
+      return typeof MessageChannel < "u" && new MessageChannel().port1.postMessage(new SharedArrayBuffer(1)), WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 4, 1, 96, 0, 0, 3, 2, 1, 0, 5, 4, 1, 3, 1, 1, 10, 11, 1, 9, 0, 65, 0, 254, 16, 2, 0, 26, 11]));
+    } catch {
+      return false;
+    }
+  }, xt = () => {
+    try {
+      return WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 4, 1, 96, 0, 0, 3, 2, 1, 0, 10, 30, 1, 28, 0, 65, 0, 253, 15, 253, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 253, 186, 1, 26, 11]));
+    } catch {
+      return false;
+    }
+  }, Pe = async (e) => {
+    if (de) return Promise.resolve();
+    if (ne) throw new Error("multiple calls to 'initializeWebAssembly()' detected.");
+    if (Ae) throw new Error("previous call to 'initializeWebAssembly()' failed.");
+    ne = true;
+    let t = e.initTimeout, n = e.numThreads;
+    if (!xt()) throw new Error("WebAssembly SIMD is not supported in the current environment.");
+    let s = Tt();
+    n > 1 && !s && (typeof self < "u" && !self.crossOriginIsolated && console.warn("env.wasm.numThreads is set to " + n + ", but this will not work unless you enable crossOriginIsolated mode. See https://web.dev/cross-origin-isolation-guide/ for more info."), console.warn("WebAssembly multi-threading is not supported in the current environment. Falling back to single-threading."), e.numThreads = n = 1);
+    let r = e.wasmPaths, a = typeof r == "string" ? r : void 0, o = r?.mjs, u = o?.href ?? o, c = r?.wasm, d = c?.href ?? c, y = e.wasmBinary, [l, i] = await xe(u, a, n > 1), b = false, f = [];
+    if (t > 0 && f.push(new Promise((p) => {
+      setTimeout(() => {
+        b = true, p();
+      }, t);
+    })), f.push(new Promise((p, T) => {
+      let k = { numThreads: n };
+      y ? k.wasmBinary = y : (d || a) && (k.locateFile = (m, w) => d ?? (a ?? w) + m), i(k).then((m) => {
+        ne = false, de = true, fe = m, p(), l && URL.revokeObjectURL(l);
+      }, (m) => {
+        ne = false, Ae = true, T(m);
+      });
+    })), await Promise.race(f), b) throw new Error(`WebAssembly backend initializing failed due to timeout: ${t}ms`);
+  }, S = () => {
+    if (de && fe) return fe;
+    throw new Error("WebAssembly is not initialized yet.");
+  };
+});
+var E;
+var q;
+var h;
+var oe = L(() => {
+  $();
+  E = (e, t) => {
+    let n = S(), s = n.lengthBytesUTF8(e) + 1, r = n._malloc(s);
+    return n.stringToUTF8(e, r, s), t.push(r), r;
+  }, q = (e, t, n, s) => {
+    if (typeof e == "object" && e !== null) {
+      if (n.has(e)) throw new Error("Circular reference in options");
+      n.add(e);
+    }
+    Object.entries(e).forEach(([r, a]) => {
+      let o = t ? t + r : r;
+      if (typeof a == "object") q(a, o + ".", n, s);
+      else if (typeof a == "string" || typeof a == "number") s(o, a.toString());
+      else if (typeof a == "boolean") s(o, a ? "1" : "0");
+      else throw new Error(`Can't handle extra config type: ${typeof a}`);
+    });
+  }, h = (e) => {
+    let t = S(), n = t.stackSave();
+    try {
+      let s = t.stackAlloc(8);
+      t._OrtGetLastError(s, s + 4);
+      let r = t.HEAP32[s / 4], a = t.HEAPU32[s / 4 + 1], o = a ? t.UTF8ToString(a) : "";
+      throw new Error(`${e} ERROR_CODE: ${r}, ERROR_MESSAGE: ${o}`);
+    } finally {
+      t.stackRestore(n);
+    }
+  };
+});
+var Ie;
+var Le = L(() => {
+  $();
+  oe();
+  Ie = (e) => {
+    let t = S(), n = 0, s = [], r = e || {};
+    try {
+      if (e?.logSeverityLevel === void 0) r.logSeverityLevel = 2;
+      else if (typeof e.logSeverityLevel != "number" || !Number.isInteger(e.logSeverityLevel) || e.logSeverityLevel < 0 || e.logSeverityLevel > 4) throw new Error(`log serverity level is not valid: ${e.logSeverityLevel}`);
+      if (e?.logVerbosityLevel === void 0) r.logVerbosityLevel = 0;
+      else if (typeof e.logVerbosityLevel != "number" || !Number.isInteger(e.logVerbosityLevel)) throw new Error(`log verbosity level is not valid: ${e.logVerbosityLevel}`);
+      e?.terminate === void 0 && (r.terminate = false);
+      let a = 0;
+      return e?.tag !== void 0 && (a = E(e.tag, s)), n = t._OrtCreateRunOptions(r.logSeverityLevel, r.logVerbosityLevel, !!r.terminate, a), n === 0 && h("Can't create run options."), e?.extra !== void 0 && q(e.extra, "", /* @__PURE__ */ new WeakSet(), (o, u) => {
+        let c = E(o, s), d = E(u, s);
+        t._OrtAddRunConfigEntry(n, c, d) !== 0 && h(`Can't set a run config entry: ${o} - ${u}.`);
+      }), [n, s];
+    } catch (a) {
+      throw n !== 0 && t._OrtReleaseRunOptions(n), s.forEach((o) => t._free(o)), a;
+    }
+  };
+});
+var At;
+var Pt;
+var It;
+var Lt;
+var Ce;
+var ke = L(() => {
+  $();
+  oe();
+  At = (e) => {
+    switch (e) {
+      case "disabled":
+        return 0;
+      case "basic":
+        return 1;
+      case "extended":
+        return 2;
+      case "all":
+        return 99;
+      default:
+        throw new Error(`unsupported graph optimization level: ${e}`);
+    }
+  }, Pt = (e) => {
+    switch (e) {
+      case "sequential":
+        return 0;
+      case "parallel":
+        return 1;
+      default:
+        throw new Error(`unsupported execution mode: ${e}`);
+    }
+  }, It = (e) => {
+    e.extra || (e.extra = {}), e.extra.session || (e.extra.session = {});
+    let t = e.extra.session;
+    t.use_ort_model_bytes_directly || (t.use_ort_model_bytes_directly = "1"), e.executionProviders && e.executionProviders.some((n) => (typeof n == "string" ? n : n.name) === "webgpu") && (e.enableMemPattern = false);
+  }, Lt = (e, t, n) => {
+    for (let s of t) {
+      let r = typeof s == "string" ? s : s.name;
+      switch (r) {
+        case "webnn":
+          if (r = "WEBNN", typeof s != "string") {
+            let u = s?.deviceType;
+            if (u) {
+              let c = E("deviceType", n), d = E(u, n);
+              S()._OrtAddSessionConfigEntry(e, c, d) !== 0 && h(`Can't set a session config entry: 'deviceType' - ${u}.`);
+            }
+          }
+          break;
+        case "webgpu":
+          if (r = "JS", typeof s != "string") {
+            let o = s;
+            if (o?.preferredLayout) {
+              if (o.preferredLayout !== "NCHW" && o.preferredLayout !== "NHWC") throw new Error(`preferredLayout must be either 'NCHW' or 'NHWC': ${o.preferredLayout}`);
+              let u = E("preferredLayout", n), c = E(o.preferredLayout, n);
+              S()._OrtAddSessionConfigEntry(e, u, c) !== 0 && h(`Can't set a session config entry: 'preferredLayout' - ${o.preferredLayout}.`);
+            }
+          }
+          break;
+        case "wasm":
+        case "cpu":
+          continue;
+        default:
+          throw new Error(`not supported execution provider: ${r}`);
+      }
+      let a = E(r, n);
+      S()._OrtAppendExecutionProvider(e, a) !== 0 && h(`Can't append execution provider: ${r}.`);
+    }
+  }, Ce = (e) => {
+    let t = S(), n = 0, s = [], r = e || {};
+    It(r);
+    try {
+      let a = At(r.graphOptimizationLevel ?? "all"), o = Pt(r.executionMode ?? "sequential"), u = typeof r.logId == "string" ? E(r.logId, s) : 0, c = r.logSeverityLevel ?? 2;
+      if (!Number.isInteger(c) || c < 0 || c > 4) throw new Error(`log serverity level is not valid: ${c}`);
+      let d = r.logVerbosityLevel ?? 0;
+      if (!Number.isInteger(d) || d < 0 || d > 4) throw new Error(`log verbosity level is not valid: ${d}`);
+      let y = typeof r.optimizedModelFilePath == "string" ? E(r.optimizedModelFilePath, s) : 0;
+      if (n = t._OrtCreateSessionOptions(a, !!r.enableCpuMemArena, !!r.enableMemPattern, o, !!r.enableProfiling, 0, u, c, d, y), n === 0 && h("Can't create session options."), r.executionProviders && Lt(n, r.executionProviders, s), r.enableGraphCapture !== void 0) {
+        if (typeof r.enableGraphCapture != "boolean") throw new Error(`enableGraphCapture must be a boolean value: ${r.enableGraphCapture}`);
+        let l = E("enableGraphCapture", s), i = E(r.enableGraphCapture.toString(), s);
+        t._OrtAddSessionConfigEntry(n, l, i) !== 0 && h(`Can't set a session config entry: 'enableGraphCapture' - ${r.enableGraphCapture}.`);
+      }
+      if (r.freeDimensionOverrides) for (let [l, i] of Object.entries(r.freeDimensionOverrides)) {
+        if (typeof l != "string") throw new Error(`free dimension override name must be a string: ${l}`);
+        if (typeof i != "number" || !Number.isInteger(i) || i < 0) throw new Error(`free dimension override value must be a non-negative integer: ${i}`);
+        let b = E(l, s);
+        t._OrtAddFreeDimensionOverride(n, b, i) !== 0 && h(`Can't set a free dimension override: ${l} - ${i}.`);
+      }
+      return r.extra !== void 0 && q(r.extra, "", /* @__PURE__ */ new WeakSet(), (l, i) => {
+        let b = E(l, s), f = E(i, s);
+        t._OrtAddSessionConfigEntry(n, b, f) !== 0 && h(`Can't set a session config entry: ${l} - ${i}.`);
+      }), [n, s];
+    } catch (a) {
+      throw n !== 0 && t._OrtReleaseSessionOptions(n), s.forEach((o) => t._free(o)), a;
+    }
+  };
+});
+var V;
+var Be;
+var J;
+var Ue;
+var _e;
+var se;
+var ae;
+var Me;
+var pe = L(() => {
+  V = (e) => {
+    switch (e) {
+      case "int8":
+        return 3;
+      case "uint8":
+        return 2;
+      case "bool":
+        return 9;
+      case "int16":
+        return 5;
+      case "uint16":
+        return 4;
+      case "int32":
+        return 6;
+      case "uint32":
+        return 12;
+      case "float16":
+        return 10;
+      case "float32":
+        return 1;
+      case "float64":
+        return 11;
+      case "string":
+        return 8;
+      case "int64":
+        return 7;
+      case "uint64":
+        return 13;
+      case "int4":
+        return 22;
+      case "uint4":
+        return 21;
+      default:
+        throw new Error(`unsupported data type: ${e}`);
+    }
+  }, Be = (e) => {
+    switch (e) {
+      case 3:
+        return "int8";
+      case 2:
+        return "uint8";
+      case 9:
+        return "bool";
+      case 5:
+        return "int16";
+      case 4:
+        return "uint16";
+      case 6:
+        return "int32";
+      case 12:
+        return "uint32";
+      case 10:
+        return "float16";
+      case 1:
+        return "float32";
+      case 11:
+        return "float64";
+      case 8:
+        return "string";
+      case 7:
+        return "int64";
+      case 13:
+        return "uint64";
+      case 22:
+        return "int4";
+      case 21:
+        return "uint4";
+      default:
+        throw new Error(`unsupported data type: ${e}`);
+    }
+  }, J = (e, t) => {
+    let n = [-1, 4, 1, 1, 2, 2, 4, 8, -1, 1, 2, 8, 4, 8, -1, -1, -1, -1, -1, -1, -1, 0.5, 0.5][e], s = typeof t == "number" ? t : t.reduce((r, a) => r * a, 1);
+    return n > 0 ? Math.ceil(s * n) : void 0;
+  }, Ue = (e) => {
+    switch (e) {
+      case "float16":
+        return typeof Float16Array < "u" && Float16Array.from ? Float16Array : Uint16Array;
+      case "float32":
+        return Float32Array;
+      case "uint8":
+        return Uint8Array;
+      case "int8":
+        return Int8Array;
+      case "uint16":
+        return Uint16Array;
+      case "int16":
+        return Int16Array;
+      case "int32":
+        return Int32Array;
+      case "bool":
+        return Uint8Array;
+      case "float64":
+        return Float64Array;
+      case "uint32":
+        return Uint32Array;
+      case "int64":
+        return BigInt64Array;
+      case "uint64":
+        return BigUint64Array;
+      default:
+        throw new Error(`unsupported type: ${e}`);
+    }
+  }, _e = (e) => {
+    switch (e) {
+      case "verbose":
+        return 0;
+      case "info":
+        return 1;
+      case "warning":
+        return 2;
+      case "error":
+        return 3;
+      case "fatal":
+        return 4;
+      default:
+        throw new Error(`unsupported logging level: ${e}`);
+    }
+  }, se = (e) => e === "float32" || e === "float16" || e === "int32" || e === "int64" || e === "uint32" || e === "uint8" || e === "bool" || e === "uint4" || e === "int4", ae = (e) => e === "float32" || e === "float16" || e === "int32" || e === "int64" || e === "uint32" || e === "uint64" || e === "int8" || e === "uint8" || e === "bool", Me = (e) => {
+    switch (e) {
+      case "none":
+        return 0;
+      case "cpu":
+        return 1;
+      case "cpu-pinned":
+        return 2;
+      case "texture":
+        return 3;
+      case "gpu-buffer":
+        return 4;
+      case "ml-tensor":
+        return 5;
+      default:
+        throw new Error(`unsupported data location: ${e}`);
+    }
+  };
+});
+var Y;
+var me = L(() => {
+  te();
+  Y = async (e) => {
+    if (typeof e == "string") if (U) try {
+      let { readFile: t } = le("node:fs/promises");
+      return new Uint8Array(await t(e));
+    } catch (t) {
+      if (t.code === "ERR_FS_FILE_TOO_LARGE") {
+        let { createReadStream: n } = le("node:fs"), s = n(e), r = [];
+        for await (let a of s) r.push(a);
+        return new Uint8Array(Buffer.concat(r));
+      }
+      throw t;
+    }
+    else {
+      let t = await fetch(e);
+      if (!t.ok) throw new Error(`failed to load external data file: ${e}`);
+      let n = t.headers.get("Content-Length"), s = n ? parseInt(n, 10) : 0;
+      if (s < 1073741824) return new Uint8Array(await t.arrayBuffer());
+      {
+        if (!t.body) throw new Error(`failed to load external data file: ${e}, no response body.`);
+        let r = t.body.getReader(), a;
+        try {
+          a = new ArrayBuffer(s);
+        } catch (u) {
+          if (u instanceof RangeError) {
+            let c = Math.ceil(s / 65536);
+            a = new WebAssembly.Memory({ initial: c, maximum: c }).buffer;
+          } else throw u;
+        }
+        let o = 0;
+        for (; ; ) {
+          let { done: u, value: c } = await r.read();
+          if (u) break;
+          let d = c.byteLength;
+          new Uint8Array(a, o, d).set(c), o += d;
+        }
+        return new Uint8Array(a, 0, s);
+      }
+    }
+    else return e instanceof Blob ? new Uint8Array(await e.arrayBuffer()) : e instanceof Uint8Array ? e : new Uint8Array(e);
+  };
+});
+var Ct;
+var De;
+var Fe;
+var H;
+var kt;
+var ge;
+var Re;
+var Ne;
+var We;
+var $e;
+var He;
+var je = L(() => {
+  Le();
+  ke();
+  pe();
+  $();
+  oe();
+  me();
+  Ct = (e, t) => {
+    S()._OrtInit(e, t) !== 0 && h("Can't initialize onnxruntime.");
+  }, De = async (e) => {
+    Ct(e.wasm.numThreads, _e(e.logLevel));
+  }, Fe = async (e, t) => {
+  }, H = /* @__PURE__ */ new Map(), kt = (e) => {
+    let t = S(), n = t.stackSave();
+    try {
+      let s = t.stackAlloc(8);
+      return t._OrtGetInputOutputCount(e, s, s + 4) !== 0 && h("Can't get session input/output count."), [t.HEAP32[s / 4], t.HEAP32[s / 4 + 1]];
+    } finally {
+      t.stackRestore(n);
+    }
+  }, ge = (e) => {
+    let t = S(), n = t._malloc(e.byteLength);
+    if (n === 0) throw new Error(`Can't create a session. failed to allocate a buffer of size ${e.byteLength}.`);
+    return t.HEAPU8.set(e, n), [n, e.byteLength];
+  }, Re = async (e, t) => {
+    let n, s, r = S();
+    Array.isArray(e) ? [n, s] = e : e.buffer === r.HEAPU8.buffer ? [n, s] = [e.byteOffset, e.byteLength] : [n, s] = ge(e);
+    let a = 0, o = 0, c = [], d = [], y = [];
+    try {
+      if ([o, c] = Ce(t), t?.externalData && r.mountExternalData) {
+        let m = [];
+        for (let w of t.externalData) {
+          let P = typeof w == "string" ? w : w.path;
+          m.push(Y(typeof w == "string" ? w : w.data).then((_) => {
+            r.mountExternalData(P, _);
+          }));
+        }
+        await Promise.all(m);
+      }
+      for (let m of t?.executionProviders ?? []) if ((typeof m == "string" ? m : m.name) === "webnn") {
+        if (r.shouldTransferToMLTensor = false, r.currentContext) throw new Error("WebNN execution provider is already set.");
+        if (typeof m != "string") {
+          let P = m, _ = P?.context, j = P?.gpuDevice, X = P?.deviceType, z2 = P?.numThreads, K = P?.powerPreference;
+          _ ? r.currentContext = _ : j ? r.currentContext = await navigator.ml.createContext(j) : r.currentContext = await navigator.ml.createContext({ deviceType: X, numThreads: z2, powerPreference: K });
+        } else r.currentContext = await navigator.ml.createContext();
+        break;
+      }
+      a = await r._OrtCreateSession(n, s, o), a === 0 && h("Can't create a session."), r.currentContext && (r.jsepRegisterMLContext(a, r.currentContext), r.currentContext = void 0, r.shouldTransferToMLTensor = true);
+      let [l, i] = kt(a), b = !!t?.enableGraphCapture, f = [], p = [], T = [];
+      for (let m = 0; m < l; m++) {
+        let w = r._OrtGetInputName(a, m);
+        w === 0 && h("Can't get an input name."), d.push(w), f.push(r.UTF8ToString(w));
+      }
+      for (let m = 0; m < i; m++) {
+        let w = r._OrtGetOutputName(a, m);
+        w === 0 && h("Can't get an output name."), y.push(w);
+        let P = r.UTF8ToString(w);
+        p.push(P);
+      }
+      let k = null;
+      return H.set(a, [a, d, y, k, b, false]), [a, f, p];
+    } catch (l) {
+      throw d.forEach((i) => r._OrtFree(i)), y.forEach((i) => r._OrtFree(i)), a !== 0 && r._OrtReleaseSession(a), l;
+    } finally {
+      r._free(n), o !== 0 && r._OrtReleaseSessionOptions(o), c.forEach((l) => r._free(l)), r.unmountExternalData?.();
+    }
+  }, Ne = (e) => {
+    let t = S(), n = H.get(e);
+    if (!n) throw new Error(`cannot release session. invalid session id: ${e}`);
+    let [s, r, a, o, u] = n;
+    o && (u && t._OrtClearBoundOutputs(o.handle), t._OrtReleaseBinding(o.handle)), t.jsepOnReleaseSession?.(e), r.forEach((c) => t._OrtFree(c)), a.forEach((c) => t._OrtFree(c)), t._OrtReleaseSession(s), H.delete(e);
+  }, We = (e, t, n, s, r, a = false) => {
+    if (!e) {
+      t.push(0);
+      return;
+    }
+    let o = S(), u = e[0], c = e[1], d = e[3], y, l;
+    if (u === "string" && (d === "gpu-buffer" || d === "ml-tensor")) throw new Error("String tensor is not supported on GPU.");
+    if (a && d !== "gpu-buffer") throw new Error(`External buffer must be provided for input/output index ${r} when enableGraphCapture is true.`);
+    if (d === "gpu-buffer") {
+      let f = e[2].gpuBuffer;
+      l = J(V(u), c);
+      let p = o.jsepRegisterBuffer;
+      if (!p) throw new Error('Tensor location "gpu-buffer" is not supported without using WebGPU.');
+      y = p(s, r, f, l);
+    } else if (d === "ml-tensor") {
+      let f = e[2].mlTensor;
+      l = J(V(u), c);
+      let p = o.jsepRegisterMLTensor;
+      if (!p) throw new Error('Tensor location "ml-tensor" is not supported without using WebNN.');
+      y = p(f, V(u), c);
+    } else {
+      let f = e[2];
+      if (Array.isArray(f)) {
+        l = 4 * f.length, y = o._malloc(l), n.push(y);
+        let p = y / 4;
+        for (let T = 0; T < f.length; T++) {
+          if (typeof f[T] != "string") throw new TypeError(`tensor data at index ${T} is not a string`);
+          o.HEAPU32[p++] = E(f[T], n);
+        }
+      } else l = f.byteLength, y = o._malloc(l), n.push(y), o.HEAPU8.set(new Uint8Array(f.buffer, f.byteOffset, l), y);
+    }
+    let i = o.stackSave(), b = o.stackAlloc(4 * c.length);
+    try {
+      let f = b / 4;
+      c.forEach((T) => o.HEAP32[f++] = T);
+      let p = o._OrtCreateTensor(V(u), y, l, b, c.length, Me(d));
+      p === 0 && h(`Can't create tensor for input/output. session=${s}, index=${r}.`), t.push(p);
+    } finally {
+      o.stackRestore(i);
+    }
+  }, $e = async (e, t, n, s, r, a) => {
+    let o = S(), u = H.get(e);
+    if (!u) throw new Error(`cannot run inference. invalid session id: ${e}`);
+    let c = u[0], d = u[1], y = u[2], l = u[3], i = u[4]; u[5]; let f = t.length, p = s.length, T = 0, k = [], m = [], w = [], P = [], _ = o.stackSave(), j = o.stackAlloc(f * 4), X = o.stackAlloc(f * 4), z2 = o.stackAlloc(p * 4), K = o.stackAlloc(p * 4);
+    try {
+      o.jsepOnRunStart?.(c), [T, k] = Ie(a);
+      for (let g = 0; g < f; g++) We(n[g], m, P, e, t[g], i);
+      for (let g = 0; g < p; g++) We(r[g], w, P, e, f + s[g], i);
+      let C = j / 4, it = X / 4, ut = z2 / 4, ct = K / 4;
+      for (let g = 0; g < f; g++) o.HEAPU32[C++] = m[g], o.HEAPU32[it++] = d[t[g]];
+      for (let g = 0; g < p; g++) o.HEAPU32[ut++] = w[g], o.HEAPU32[ct++] = y[s[g]];
+      let Se;
+      Se = await o._OrtRun(c, X, j, f, K, p, z2, T), Se !== 0 && h("failed to call OrtRun().");
+      let R = [];
+      for (let g = 0; g < p; g++) {
+        let N = o.HEAPU32[z2 / 4 + g];
+        if (N === w[g]) {
+          R.push(r[g]);
+          continue;
+        }
+        let Ee = o.stackSave(), M = o.stackAlloc(4 * 4), G = false, O, I = 0;
+        try {
+          o._OrtGetTensorData(N, M, M + 4, M + 8, M + 12) !== 0 && h(`Can't access output tensor data on index ${g}.`);
+          let Q = M / 4, Z = o.HEAPU32[Q++];
+          I = o.HEAPU32[Q++];
+          let Oe = o.HEAPU32[Q++], lt = o.HEAPU32[Q++], W = [];
+          for (let v = 0; v < lt; v++) W.push(o.HEAPU32[Oe / 4 + v]);
+          o._OrtFree(Oe);
+          let D = W.reduce((v, A) => v * A, 1);
+          O = Be(Z);
+          let ee = l?.outputPreferredLocations[s[g]];
+          if (O === "string") {
+            if (ee === "gpu-buffer" || ee === "ml-tensor") throw new Error("String tensor is not supported on GPU.");
+            let v = [], A = I / 4;
+            for (let B = 0; B < D; B++) {
+              let ve = o.HEAPU32[A++], ft = B === D - 1 ? void 0 : o.HEAPU32[A] - ve;
+              v.push(o.UTF8ToString(ve, ft));
+            }
+            R.push([O, W, v, "cpu"]);
+          } else if (ee === "gpu-buffer" && D > 0) {
+            let v = o.jsepGetBuffer;
+            if (!v) throw new Error('preferredLocation "gpu-buffer" is not supported without using WebGPU.');
+            let A = v(I), B = J(Z, D);
+            if (B === void 0 || !se(O)) throw new Error(`Unsupported data type: ${O}`);
+            G = true, R.push([O, W, { gpuBuffer: A, download: o.jsepCreateDownloader(A, B, O), dispose: () => {
+              o._OrtReleaseTensor(N);
+            } }, "gpu-buffer"]);
+          } else if (ee === "ml-tensor" && D > 0) {
+            let v = o.jsepEnsureTensor;
+            if (!v) throw new Error('preferredLocation "ml-tensor" is not supported without using WebNN.');
+            if (J(Z, D) === void 0 || !ae(O)) throw new Error(`Unsupported data type: ${O}`);
+            let B = await v(I, Z, W, false);
+            G = true, R.push([O, W, { mlTensor: B, download: o.jsepCreateMLTensorDownloader(I, O), dispose: () => {
+              o.jsepReleaseTensorId(I), o._OrtReleaseTensor(N);
+            } }, "ml-tensor"]);
+          } else {
+            let v = Ue(O), A = new v(D);
+            new Uint8Array(A.buffer, A.byteOffset, A.byteLength).set(o.HEAPU8.subarray(I, I + A.byteLength)), R.push([O, W, A, "cpu"]);
+          }
+        } finally {
+          o.stackRestore(Ee), O === "string" && I && o._free(I), G || o._OrtReleaseTensor(N);
+        }
+      }
+      return l && !i && (o._OrtClearBoundOutputs(l.handle), H.set(e, [c, d, y, l, i, false])), R;
+    } finally {
+      o.stackRestore(_), m.forEach((C) => o._OrtReleaseTensor(C)), w.forEach((C) => o._OrtReleaseTensor(C)), P.forEach((C) => o._free(C)), T !== 0 && o._OrtReleaseRunOptions(T), k.forEach((C) => o._free(C));
+    }
+  }, He = (e) => {
+    let t = S(), n = H.get(e);
+    if (!n) throw new Error("invalid session id");
+    let s = n[0], r = t._OrtEndProfiling(s);
+    r === 0 && h("Can't get an profile file name."), t._OrtFree(r);
+  };
+});
+var ye;
+var ze;
+var Ge;
+var qe;
+var Ve;
+var Je;
+var Ye;
+var Xe;
+var Ke;
+var Qe;
+var we = L(() => {
+  je();
+  $();
+  re();
+  ye = false, ze = false, Ge = false, qe = async () => {
+    if (!ze) {
+      if (ye) throw new Error("multiple calls to 'initWasm()' detected.");
+      if (Ge) throw new Error("previous call to 'initWasm()' failed.");
+      ye = true;
+      try {
+        await Pe(env2.wasm), await De(env2), ze = true;
+      } catch (e) {
+        throw Ge = true, e;
+      } finally {
+        ye = false;
+      }
+    }
+  }, Ve = async (e) => {
+    await Fe(env2, e);
+  }, Je = async (e) => ge(e), Ye = async (e, t) => Re(e, t), Xe = async (e) => {
+    Ne(e);
+  }, Ke = async (e, t, n, s, r, a) => $e(e, t, n, s, r, a), Qe = async (e) => {
+    He(e);
+  };
+});
+var tt;
+var Ut;
+var ie;
+var rt = L(() => {
+  we();
+  pe();
+  te();
+  me();
+  tt = (e, t) => {
+    switch (e.location) {
+      case "cpu":
+        return [e.type, e.dims, e.data, "cpu"];
+      case "gpu-buffer":
+        return [e.type, e.dims, { gpuBuffer: e.gpuBuffer }, "gpu-buffer"];
+      case "ml-tensor":
+        return [e.type, e.dims, { mlTensor: e.mlTensor }, "ml-tensor"];
+      default:
+        throw new Error(`invalid data location: ${e.location} for ${t()}`);
+    }
+  }, Ut = (e) => {
+    switch (e[3]) {
+      case "cpu":
+        return new Tensor2(e[0], e[2], e[1]);
+      case "gpu-buffer": {
+        let t = e[0];
+        if (!se(t)) throw new Error(`not supported data type: ${t} for deserializing GPU tensor`);
+        let { gpuBuffer: n, download: s, dispose: r } = e[2];
+        return Tensor2.fromGpuBuffer(n, { dataType: t, dims: e[1], download: s, dispose: r });
+      }
+      case "ml-tensor": {
+        let t = e[0];
+        if (!ae(t)) throw new Error(`not supported data type: ${t} for deserializing MLTensor tensor`);
+        let { mlTensor: n, download: s, dispose: r } = e[2];
+        return Tensor2.fromMLTensor(n, { dataType: t, dims: e[1], download: s, dispose: r });
+      }
+      default:
+        throw new Error(`invalid data location: ${e[3]}`);
+    }
+  }, ie = class {
+    async fetchModelAndCopyToWasmMemory(t) {
+      return Je(await Y(t));
+    }
+    async loadModel(t, n) {
+      TRACE_FUNC_BEGIN();
+      let s;
+      typeof t == "string" ? U ? s = await Y(t) : s = await this.fetchModelAndCopyToWasmMemory(t) : s = t, [this.sessionId, this.inputNames, this.outputNames] = await Ye(s, n), TRACE_FUNC_END();
+    }
+    async dispose() {
+      return Xe(this.sessionId);
+    }
+    async run(t, n, s) {
+      TRACE_FUNC_BEGIN();
+      let r = [], a = [];
+      Object.entries(t).forEach((i) => {
+        let b = i[0], f = i[1], p = this.inputNames.indexOf(b);
+        if (p === -1) throw new Error(`invalid input '${b}'`);
+        r.push(f), a.push(p);
+      });
+      let o = [], u = [];
+      Object.entries(n).forEach((i) => {
+        let b = i[0], f = i[1], p = this.outputNames.indexOf(b);
+        if (p === -1) throw new Error(`invalid output '${b}'`);
+        o.push(f), u.push(p);
+      });
+      let c = r.map((i, b) => tt(i, () => `input "${this.inputNames[a[b]]}"`)), d = o.map((i, b) => i ? tt(i, () => `output "${this.outputNames[u[b]]}"`) : null), y = await Ke(this.sessionId, a, c, u, d, s), l = {};
+      for (let i = 0; i < y.length; i++) l[this.outputNames[u[i]]] = o[i] ?? Ut(y[i]);
+      return TRACE_FUNC_END(), l;
+    }
+    startProfiling() {
+    }
+    endProfiling() {
+      Qe(this.sessionId);
+    }
+  };
+});
+var ot = {};
+gt(ot, { OnnxruntimeWebAssemblyBackend: () => ue, initializeFlags: () => nt, wasmBackend: () => _t });
+var nt;
+var ue;
+var _t;
+var st = L(() => {
+  we();
+  rt();
+  re();
+  nt = () => {
+    if ((typeof env2.wasm.initTimeout != "number" || env2.wasm.initTimeout < 0) && (env2.wasm.initTimeout = 0), env2.wasm.simd === false && console.warn('Deprecated property "env.wasm.simd" is set to false. non-SIMD build is no longer provided, and this setting will be ignored.'), typeof env2.wasm.proxy != "boolean" && (env2.wasm.proxy = false), typeof env2.wasm.trace != "boolean" && (env2.wasm.trace = false), typeof env2.wasm.numThreads != "number" || !Number.isInteger(env2.wasm.numThreads) || env2.wasm.numThreads <= 0) if (typeof self < "u" && !self.crossOriginIsolated) env2.wasm.numThreads = 1;
+    else {
+      let e = typeof navigator > "u" ? le("node:os").cpus().length : navigator.hardwareConcurrency;
+      env2.wasm.numThreads = Math.min(4, Math.ceil((e || 1) / 2));
+    }
+    env2.wasm.wasmPaths === void 0 && F && F.indexOf("blob:") !== 0 && (env2.wasm.wasmPaths = F.substring(0, F.lastIndexOf("/") + 1));
+  }, ue = class {
+    async init(t) {
+      nt(), await qe(), await Ve(t);
+    }
+    async createInferenceSessionHandler(t, n) {
+      let s = new ie();
+      return await s.loadModel(t, n), Promise.resolve(s);
+    }
+  }, _t = new ue();
+});
+var Te = "1.20.1";
+{
+  let e = (st(), bt(ot)).wasmBackend;
+  registerBackend("cpu", e, 10), registerBackend("wasm", e, 10);
+}
+Object.defineProperty(env2.versions, "web", { value: Te, enumerable: true });
+
 // src/runtime/background-removal-worker.ts
 var import_pngjs2 = __toESM(require_png());
+var OfflineBackgroundRemovalResourceError = class extends Error {
+  name = "OfflineBackgroundRemovalResourceError";
+};
+var MODULE_DIRECTORY = path18.dirname(fileURLToPath(import.meta.url));
+var REQUIRED_RESOURCE_IDS = /* @__PURE__ */ new Set([
+  "u2netp-model",
+  "onnxruntime-web-simd-threaded-jsep",
+  "onnxruntime-web-simd-threaded",
+  "onnxruntime-web-simd-threaded-loader"
+]);
+function failure(message) {
+  return new OfflineBackgroundRemovalResourceError(`Offline background-removal resource verification failed: ${message}`);
+}
+function isSafeFileName(value) {
+  return typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(value);
+}
+function isResource(value) {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+  const candidate = value;
+  return typeof candidate["id"] === "string" && isSafeFileName(candidate["path"]) && Number.isSafeInteger(candidate["bytes"]) && candidate["bytes"] > 0 && typeof candidate["sha256"] === "string" && /^[a-f0-9]{64}$/u.test(candidate["sha256"]) && typeof candidate["version"] === "string" && candidate["version"].length > 0 && (candidate["license"] === "Apache-2.0" || candidate["license"] === "MIT") && typeof candidate["source"] === "string" && /^https:\/\//u.test(candidate["source"]);
+}
+function parseManifest(value) {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) throw failure("the manifest is not an object");
+  const candidate = value;
+  if (candidate["schemaVersion"] !== 1 || candidate["offlineOnly"] !== true || !Array.isArray(candidate["resources"]) || candidate["resources"].length !== REQUIRED_RESOURCE_IDS.size || !candidate["resources"].every(isResource)) {
+    throw failure("the manifest has an invalid shape");
+  }
+  const ids = new Set(candidate["resources"].map((resource) => resource.id));
+  if (ids.size !== REQUIRED_RESOURCE_IDS.size || [...REQUIRED_RESOURCE_IDS].some((id) => !ids.has(id))) {
+    throw failure("the manifest does not declare the required resources");
+  }
+  const names = new Set(candidate["resources"].map((resource) => resource.path));
+  if (names.size !== candidate["resources"].length) throw failure("the manifest declares duplicate resource paths");
+  return candidate;
+}
+async function defaultResourceDirectory() {
+  const candidates = [
+    path18.resolve(MODULE_DIRECTORY, "../../resources/background-removal"),
+    path18.resolve(MODULE_DIRECTORY, "../resources/background-removal")
+  ];
+  for (const candidate of candidates) {
+    try {
+      const metadata = await lstat(candidate);
+      if (!metadata.isSymbolicLink() && metadata.isDirectory()) return candidate;
+    } catch (error51) {
+      if (error51.code !== "ENOENT") throw error51;
+    }
+  }
+  throw failure("the packaged resource directory is missing");
+}
+async function defaultManifestPath() {
+  const candidates = [
+    path18.join(MODULE_DIRECTORY, "resource-manifest.json"),
+    path18.resolve(MODULE_DIRECTORY, "../src/runtime/resource-manifest.json")
+  ];
+  for (const candidate of candidates) {
+    try {
+      const metadata = await lstat(candidate);
+      if (!metadata.isSymbolicLink() && metadata.isFile()) return candidate;
+    } catch (error51) {
+      if (error51.code !== "ENOENT") throw error51;
+    }
+  }
+  throw failure("the resource manifest is missing");
+}
+async function readRegularFile(file2) {
+  const metadata = await lstat(file2).catch((error51) => {
+    if (error51.code === "ENOENT") throw failure(`a required resource is missing: ${path18.basename(file2)}`);
+    throw error51;
+  });
+  if (!metadata.isFile() || metadata.isSymbolicLink()) throw failure(`a required resource is not a regular file: ${path18.basename(file2)}`);
+  return readFile(file2);
+}
+async function verifyBackgroundRemovalResources(options = {}) {
+  const manifestPath = path18.resolve(options.manifestPath ?? await defaultManifestPath());
+  const manifestBytes = await readRegularFile(manifestPath);
+  let manifest;
+  try {
+    manifest = parseManifest(JSON.parse(manifestBytes.toString("utf8")));
+  } catch (error51) {
+    if (error51 instanceof OfflineBackgroundRemovalResourceError) throw error51;
+    throw failure("the manifest is not valid JSON");
+  }
+  const requestedDirectory = options.resourceDirectory ?? await defaultResourceDirectory();
+  const directoryMetadata = await lstat(requestedDirectory).catch((error51) => {
+    if (error51.code === "ENOENT") throw failure("the packaged resource directory is missing");
+    throw error51;
+  });
+  if (!directoryMetadata.isDirectory() || directoryMetadata.isSymbolicLink()) throw failure("the resource directory is not a real directory");
+  const resourceDirectory = await realpath(requestedDirectory);
+  const resolved = /* @__PURE__ */ new Map();
+  for (const resource of manifest.resources) {
+    const resourcePath = path18.resolve(resourceDirectory, resource.path);
+    if (path18.dirname(resourcePath) !== resourceDirectory) throw failure(`a resource path escapes its directory: ${resource.id}`);
+    const bytes = await readRegularFile(resourcePath);
+    if (bytes.byteLength !== resource.bytes || createHash("sha256").update(bytes).digest("hex") !== resource.sha256) {
+      throw failure(`integrity mismatch: ${resource.id}`);
+    }
+    resolved.set(resource.id, resourcePath);
+  }
+  return { manifestPath, resourceDirectory, resources: resolved };
+}
+
+// src/runtime/background-removal-worker.ts
 var WORKER_MAX_WIDTH = 4096;
 var WORKER_MAX_HEIGHT = 4096;
 var WORKER_MAX_PIXELS = 4 * 1024 * 1024;
@@ -35054,7 +36985,11 @@ var WORKER_MAX_OUTPUT_BYTES = 16 * 1024 * 1024;
 var MIN_MASK_COVERAGE = 0.02;
 var MAX_MASK_COVERAGE = 0.98;
 var PNG_SIGNATURE3 = Uint8Array.of(137, 80, 78, 71, 13, 10, 26, 10);
-function failure(code, message) {
+var U2NET_INPUT_SIZE = 320;
+var U2NET_MEAN = [0.485, 0.456, 0.406];
+var U2NET_STANDARD_DEVIATION = [0.229, 0.224, 0.225];
+var u2netSession;
+function failure2(code, message) {
   return { type: "failure", code, message };
 }
 function isPngSignature(bytes) {
@@ -35062,7 +36997,7 @@ function isPngSignature(bytes) {
 }
 function boundedPngDimensions(bytes) {
   if (bytes.byteLength < 33 || !isPngSignature(bytes) || new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(8) !== 13 || new TextDecoder().decode(bytes.subarray(12, 16)) !== "IHDR") {
-    return failure("invalid-input", "The local background-removal input is not a valid PNG header.");
+    return failure2("invalid-input", "The local background-removal input is not a valid PNG header.");
   }
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const width = view.getUint32(16);
@@ -35070,28 +37005,28 @@ function boundedPngDimensions(bytes) {
   const bitDepth = bytes[24];
   const colorType = bytes[25];
   if (width < 1 || height < 1 || width > WORKER_MAX_WIDTH || height > WORKER_MAX_HEIGHT || bitDepth !== 8 || !(/* @__PURE__ */ new Set([0, 2, 3, 4, 6])).has(colorType ?? -1) || bytes[26] !== 0 || bytes[27] !== 0 || bytes[28] !== 0) {
-    return failure("invalid-input", "The local background-removal PNG header exceeds the safe profile.");
+    return failure2("invalid-input", "The local background-removal PNG header exceeds the safe profile.");
   }
   const pixels = width * height;
   if (!Number.isSafeInteger(pixels) || pixels > WORKER_MAX_PIXELS) {
-    return failure("invalid-input", "The local background-removal image dimensions exceed the safe limit.");
+    return failure2("invalid-input", "The local background-removal image dimensions exceed the safe limit.");
   }
   return { width, height };
 }
 function boundedPng(bytes, maxInputBytes) {
   if (bytes.byteLength === 0 || bytes.byteLength > maxInputBytes || bytes.byteLength > WORKER_MAX_INPUT_BYTES) {
-    return failure("input-too-large", "The local background-removal input exceeds the byte limit.");
+    return failure2("input-too-large", "The local background-removal input exceeds the byte limit.");
   }
-  if (!isPngSignature(bytes)) return failure("invalid-input", "Local background removal requires a PNG input.");
+  if (!isPngSignature(bytes)) return failure2("invalid-input", "Local background removal requires a PNG input.");
   const dimensions = boundedPngDimensions(bytes);
   if ("type" in dimensions) return dimensions;
   let decoded;
   try {
     decoded = import_pngjs2.PNG.sync.read(Buffer.from(bytes));
   } catch {
-    return failure("invalid-input", "The local background-removal PNG could not be decoded.");
+    return failure2("invalid-input", "The local background-removal PNG could not be decoded.");
   }
-  if (decoded.width !== dimensions.width || decoded.height !== dimensions.height) return failure("invalid-input", "The PNG dimensions changed during decoding.");
+  if (decoded.width !== dimensions.width || decoded.height !== dimensions.height) return failure2("invalid-input", "The PNG dimensions changed during decoding.");
   return { width: decoded.width, height: decoded.height, rgba: new Uint8Array(decoded.data) };
 }
 function qualityFailure(message) {
@@ -35192,11 +37127,91 @@ function validateOpaqueSource(rgba, width, height) {
   }
   return void 0;
 }
-function preprocessRgba(rgba) {
-  if (rgba.byteLength % 4 !== 0) throw new TypeError("RGBA input must contain complete pixels.");
-  const normalized3 = new Float32Array(rgba.byteLength);
-  for (let index = 0; index < rgba.byteLength; index += 1) normalized3[index] = rgba[index] / 255;
-  return normalized3;
+function clampByte(value) {
+  return Math.max(0, Math.min(255, Math.round(value)));
+}
+function bilinearSample(values, width, height, x, y, channels, channel) {
+  const x0 = Math.max(0, Math.min(width - 1, Math.floor(x)));
+  const y0 = Math.max(0, Math.min(height - 1, Math.floor(y)));
+  const x1 = Math.min(width - 1, x0 + 1);
+  const y1 = Math.min(height - 1, y0 + 1);
+  const tx = x - x0;
+  const ty = y - y0;
+  const a = values[(y0 * width + x0) * channels + channel];
+  const b = values[(y0 * width + x1) * channels + channel];
+  const c = values[(y1 * width + x0) * channels + channel];
+  const d = values[(y1 * width + x1) * channels + channel];
+  return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+}
+function createU2netInput(rgba, width, height) {
+  const pixels = U2NET_INPUT_SIZE * U2NET_INPUT_SIZE;
+  const input = new Float32Array(3 * pixels);
+  for (let y = 0; y < U2NET_INPUT_SIZE; y += 1) {
+    const sourceY = (y + 0.5) * height / U2NET_INPUT_SIZE - 0.5;
+    for (let x = 0; x < U2NET_INPUT_SIZE; x += 1) {
+      const sourceX = (x + 0.5) * width / U2NET_INPUT_SIZE - 0.5;
+      const destination = y * U2NET_INPUT_SIZE + x;
+      for (let channel = 0; channel < 3; channel += 1) {
+        const normalized3 = bilinearSample(rgba, width, height, sourceX, sourceY, 4, channel) / 255;
+        input[channel * pixels + destination] = (normalized3 - U2NET_MEAN[channel]) / U2NET_STANDARD_DEVIATION[channel];
+      }
+    }
+  }
+  return input;
+}
+function resizeU2netMask(mask, outputWidth, outputHeight) {
+  if (mask.length !== U2NET_INPUT_SIZE * U2NET_INPUT_SIZE) {
+    throw new TypeError("The U\xB2-Net output mask has an unexpected shape.");
+  }
+  let minimum = Number.POSITIVE_INFINITY;
+  let maximum = Number.NEGATIVE_INFINITY;
+  for (const value of mask) {
+    if (!Number.isFinite(value)) throw new TypeError("The U\xB2-Net output mask contains a non-finite value.");
+    minimum = Math.min(minimum, value);
+    maximum = Math.max(maximum, value);
+  }
+  if (!(maximum > minimum)) throw new TypeError("The U\xB2-Net output mask has no usable contrast.");
+  const normalized3 = new Float32Array(mask.length);
+  const scale = 1 / (maximum - minimum);
+  for (let index = 0; index < mask.length; index += 1) normalized3[index] = (mask[index] - minimum) * scale;
+  const output = new Uint8Array(outputWidth * outputHeight);
+  for (let y = 0; y < outputHeight; y += 1) {
+    const sourceY = (y + 0.5) * U2NET_INPUT_SIZE / outputHeight - 0.5;
+    for (let x = 0; x < outputWidth; x += 1) {
+      const sourceX = (x + 0.5) * U2NET_INPUT_SIZE / outputWidth - 0.5;
+      output[y * outputWidth + x] = clampByte(
+        bilinearSample(normalized3, U2NET_INPUT_SIZE, U2NET_INPUT_SIZE, sourceX, sourceY, 1, 0) * 255
+      );
+    }
+  }
+  return output;
+}
+async function loadU2netSession() {
+  const verified = await verifyBackgroundRemovalResources();
+  const modelPath = verified.resources.get("u2netp-model");
+  const loaderPath = verified.resources.get("onnxruntime-web-simd-threaded-loader");
+  if (modelPath === void 0 || loaderPath === void 0) {
+    throw new Error("The packaged U\xB2-Netp inference resources are incomplete.");
+  }
+  env2.wasm.wasmPaths = `${path18.dirname(loaderPath)}${path18.sep}`;
+  env2.wasm.numThreads = 1;
+  env2.wasm.proxy = false;
+  return await InferenceSession2.create(modelPath, { executionProviders: ["wasm"] });
+}
+async function inferU2netMask(rgba, width, height) {
+  u2netSession ??= loadU2netSession();
+  const session = await u2netSession;
+  const inputName = session.inputNames[0];
+  const outputName = session.outputNames[0];
+  if (inputName === void 0 || outputName === void 0) throw new Error("The packaged U\xB2-Netp model has an invalid input or output contract.");
+  const output = await session.run({
+    [inputName]: new Tensor2("float32", createU2netInput(rgba, width, height), [1, 3, U2NET_INPUT_SIZE, U2NET_INPUT_SIZE])
+  });
+  const tensor = output[outputName];
+  if (tensor === void 0 || tensor.type !== "float32" || !(tensor.data instanceof Float32Array)) {
+    throw new Error("The packaged U\xB2-Netp model returned an invalid alpha mask.");
+  }
+  return resizeU2netMask(tensor.data, width, height);
 }
 function compositeMask(rgba, width, height, mask, maxOutputBytes = WORKER_MAX_OUTPUT_BYTES) {
   const pixels = width * height;
@@ -35221,19 +37236,24 @@ async function processBackgroundRemovalRequest(request) {
   if ("type" in bounded) return bounded;
   const { width, height, rgba } = bounded;
   const sourceFailure = validateOpaqueSource(rgba, width, height);
-  if (sourceFailure) return failure(sourceFailure.code, sourceFailure.message);
-  preprocessRgba(rgba);
-  if (request.mask === void 0) {
-    return failure("inference-unavailable", "The local inference backend is not available in this runtime.");
+  if (sourceFailure) return failure2(sourceFailure.code, sourceFailure.message);
+  let inferredMask;
+  try {
+    inferredMask = request.mask ?? await inferU2netMask(rgba, width, height);
+  } catch (error51) {
+    return failure2(
+      "inference-unavailable",
+      error51 instanceof Error ? `The local U\xB2-Netp inference backend is unavailable: ${error51.message}` : "The local U\xB2-Netp inference backend is unavailable."
+    );
   }
-  const validatedMask = validateMaskQuality(request.mask, width, height);
-  if ("code" in validatedMask) return failure(validatedMask.code, validatedMask.message);
+  const validatedMask = validateMaskQuality(inferredMask, width, height);
+  if ("code" in validatedMask) return failure2(validatedMask.code, validatedMask.message);
   try {
     const bytes = compositeMask(rgba, width, height, validatedMask, request.maxOutputBytes);
     return { type: "success", bytes, width, height };
   } catch (error51) {
     const code = error51 instanceof RangeError ? "output-too-large" : error51 instanceof TypeError ? "quality-gate-failed" : "worker-failed";
-    return failure(code, error51 instanceof Error ? error51.message : "Local background removal failed.");
+    return failure2(code, error51 instanceof Error ? error51.message : "Local background removal failed.");
   }
 }
 if (parentPort !== null) {
@@ -35242,7 +37262,7 @@ if (parentPort !== null) {
     try {
       response = await processBackgroundRemovalRequest(request);
     } catch {
-      response = failure("worker-failed", "Local background removal failed.");
+      response = failure2("worker-failed", "Local background removal failed.");
     }
     parentPort.postMessage(response);
   });
@@ -35354,6 +37374,9 @@ var BackgroundRemovalQueue = class {
     if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 12e4) {
       return resultFailure("failed", item.bytes, { code: "worker-failed", message: "The local background-removal timeout is invalid." }, parsed.width, parsed.height);
     }
+    if (item.options.workerFactory === void 0) {
+      return await this.#runLocally(item, parsed, timeoutMs);
+    }
     let worker;
     try {
       worker = item.options.workerFactory?.() ?? defaultWorkerFactory();
@@ -35413,6 +37436,57 @@ var BackgroundRemovalQueue = class {
         ...item.options.mask === void 0 ? {} : { mask: item.options.mask }
       });
     });
+  }
+  async #runLocally(item, parsed, timeoutMs) {
+    if (item.options.signal?.aborted) {
+      return resultFailure("cancelled", item.bytes, { code: "cancelled", message: "Local background removal was cancelled." }, parsed.width, parsed.height);
+    }
+    let timer;
+    const timeout = new Promise((resolve2) => {
+      timer = setTimeout(() => resolve2({
+        type: "failure",
+        code: "timeout",
+        message: "Local background removal exceeded its deadline."
+      }), timeoutMs);
+    });
+    const cancelled = new Promise((resolve2) => {
+      item.options.signal?.addEventListener("abort", () => resolve2({
+        type: "failure",
+        code: "cancelled",
+        message: "Local background removal was cancelled."
+      }), { once: true });
+    });
+    let response;
+    try {
+      response = await Promise.race([
+        processBackgroundRemovalRequest({
+          type: "process",
+          bytes: item.bytes,
+          ...item.options.maxInputBytes === void 0 ? {} : { maxInputBytes: item.options.maxInputBytes },
+          ...item.options.maxOutputBytes === void 0 ? {} : { maxOutputBytes: item.options.maxOutputBytes },
+          ...item.options.mask === void 0 ? {} : { mask: item.options.mask }
+        }),
+        timeout,
+        cancelled
+      ]);
+    } catch {
+      return resultFailure("failed", item.bytes, { code: "worker-failed", message: "The local background-removal runtime failed." }, parsed.width, parsed.height);
+    } finally {
+      if (timer !== void 0) clearTimeout(timer);
+    }
+    if (response.type === "failure") {
+      const code = response.code;
+      return resultFailure(code === "cancelled" ? "cancelled" : "failed", item.bytes, { code, message: response.message }, parsed.width, parsed.height);
+    }
+    if (!(response.bytes instanceof Uint8Array) || response.width !== parsed.width || response.height !== parsed.height) {
+      return resultFailure("failed", item.bytes, { code: "quality-gate-failed", message: "The local background-removal runtime returned mismatched output dimensions." }, parsed.width, parsed.height);
+    }
+    if (response.bytes.byteLength > (item.options.maxOutputBytes ?? BACKGROUND_REMOVAL_MAX_OUTPUT_BYTES)) {
+      return resultFailure("failed", item.bytes, { code: "output-too-large", message: "The local background-removal output exceeds the byte limit." }, parsed.width, parsed.height);
+    }
+    const outputQuality = inspectPngAlpha(response.bytes, parsed.width, parsed.height);
+    if ("code" in outputQuality) return resultFailure("failed", item.bytes, outputQuality, parsed.width, parsed.height);
+    return { status: "succeeded", originalBytes: new Uint8Array(item.bytes), transparentBytes: new Uint8Array(response.bytes), width: response.width, height: response.height };
   }
 };
 var defaultQueue = new BackgroundRemovalQueue();
@@ -35721,8 +37795,8 @@ function buildDurableInputGraph(inputs, options) {
     const sourceRendition = upload ? Object.freeze({
       artifactId,
       phase: "source",
-      sourceRoot: path13.dirname(input.resource.path),
-      sourceRelativePath: path13.basename(input.resource.path),
+      sourceRoot: path18.dirname(input.resource.path),
+      sourceRelativePath: path18.basename(input.resource.path),
       requestedBaseName: `${input.role}-${input.order}`,
       expected: Object.freeze({
         mimeType: input.resource.mimeType,
@@ -36054,7 +38128,7 @@ var EphemeralImageResourceRegistry = class {
     }
     const resourceId = this.#allocateResourceId();
     const fileIdentity = createHash("sha256").update(resourceId, "utf8").digest("hex").slice(0, 24);
-    const resourcePath = path13.join(
+    const resourcePath = path18.join(
       this.#directory,
       `resource-${fileIdentity}.${extensionFor2(validated.mimeType)}`
     );
@@ -36292,8 +38366,8 @@ var EphemeralImageResourceRegistry = class {
     for (const resourceId of [...this.#resources.keys()]) {
       if (await this.#revokeRecord(resourceId)) removed += 1;
     }
-    const relative2 = path13.relative(this.#root, this.#directory);
-    if (relative2.length === 0 || path13.isAbsolute(relative2) || relative2 === ".." || relative2.startsWith(`..${path13.sep}`)) {
+    const relative2 = path18.relative(this.#root, this.#directory);
+    if (relative2.length === 0 || path18.isAbsolute(relative2) || relative2 === ".." || relative2.startsWith(`..${path18.sep}`)) {
       throw new EphemeralImageResourceError(
         "storage-failed",
         "The ephemeral resource directory is outside the approved root."
@@ -36315,7 +38389,7 @@ async function createEphemeralImageResourceRegistry(options) {
       "The ephemeral resource root is not a directory."
     );
   }
-  const directory = await mkdtemp(path13.join(root, "ephemeral-images-"));
+  const directory = await mkdtemp(path18.join(root, "ephemeral-images-"));
   return new EphemeralImageResourceRegistry({
     root,
     directory,
@@ -36356,11 +38430,11 @@ function deepFreeze2(value) {
   return value;
 }
 function normalizePathForComparison(value) {
-  const normalized3 = path13.normalize(path13.resolve(value));
+  const normalized3 = path18.normalize(path18.resolve(value));
   return process.platform === "win32" ? normalized3.toLocaleLowerCase("en-US") : normalized3;
 }
 async function verifyApprovedDirectory(directory) {
-  if (typeof directory !== "string" || directory.length < 1 || directory.length > 32767 || directory.includes("\0") || !path13.isAbsolute(directory)) {
+  if (typeof directory !== "string" || directory.length < 1 || directory.length > 32767 || directory.includes("\0") || !path18.isAbsolute(directory)) {
     throw new ResultCompositionError(
       "output-directory-unsafe",
       "The approved output directory is invalid."
@@ -36535,7 +38609,7 @@ async function stagePreparedPublicOperationSources(prepared, options) {
       }
       const bytes = await readVerifiedSource(item.path, item);
       const stagedName = stagedSourceName(item);
-      const stagedPath = path13.join(options.transaction.directory, stagedName);
+      const stagedPath = path18.join(options.transaction.directory, stagedName);
       await writeExclusive3(stagedPath, bytes);
       const sourceRendition = Object.freeze({
         ...item.sourceRendition,
@@ -36821,8 +38895,8 @@ async function persistOperation(context, graph, library, model, providerId, idFa
     ...outputs.map((output) => ({
       artifactId: output.artifactId,
       phase: output.phase,
-      sourceRoot: path13.dirname(output.path),
-      sourceRelativePath: path13.basename(output.path),
+      sourceRoot: path18.dirname(output.path),
+      sourceRelativePath: path18.basename(output.path),
       requestedBaseName: `${output.phase}-${output.slot}`,
       expected: {
         mimeType: output.mimeType,
@@ -37137,7 +39211,7 @@ async function writePublicOutput(output, transaction, directory, requestId2) {
   const base = `routego-${output.phase}-${output.slot}-${identity}`;
   for (let attempt = 1; attempt <= 1e4; attempt += 1) {
     const suffix = attempt === 1 ? "" : `-${attempt}`;
-    const candidate = path13.join(directory, `${base}${suffix}.${extensionFor3(output.mimeType)}`);
+    const candidate = path18.join(directory, `${base}${suffix}.${extensionFor3(output.mimeType)}`);
     let handle;
     try {
       handle = await open(candidate, "wx", 384);
@@ -37919,6 +39993,7 @@ var CAPABILITY_PROBE_DEFINITIONS = [
     const transport = requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointText ? "single-endpoint-json" : "openai-images";
     return [
       { transport, requestShape, capability: "text-generation", responseProof: "images-output" },
+      { transport, requestShape, capability: "quality-control", responseProof: "images-quality-control" },
       { transport, requestShape, capability: "native-variants", responseProof: "images-two-outputs" },
       { transport, requestShape, capability: "custom-size", responseProof: "images-custom-size" },
       { transport, requestShape, capability: "output-format", responseProof: "images-jpeg-output" },
@@ -37970,7 +40045,7 @@ var CAPABILITY_PROBE_DEFINITIONS = [
 CAPABILITY_PROBE_DEFINITIONS.map(({ responseProof: _responseProof, ...pair }) => pair);
 function safeTimeout2(value) {
   const timeout = value ?? DEFAULT_CAPABILITY_PROBE_TIMEOUT_MS;
-  if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 3e5) {
+  if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 6e5) {
     throw new ProviderIntegrationError(
       createProviderServiceError({
         code: "invalid_input",
@@ -38029,6 +40104,7 @@ function jsonProbeBody(input) {
   const controls = {
     ...input.capability === "native-variants" ? { n: 2 } : {},
     ...input.capability === "custom-size" ? { size: customProbeSize(input).value } : {},
+    ...input.capability === "quality-control" ? { quality: input.requestedQuality } : {},
     ...input.capability === "output-format" ? { output_format: "jpeg" } : {},
     ...input.capability === "native-transparency" ? { background: "transparent" } : {}
   };
@@ -38375,6 +40451,7 @@ function responseProvesCapability(outputs, proof, expectedSize) {
   if (outputs === void 0) return false;
   switch (proof) {
     case "images-output":
+    case "images-quality-control":
     case "responses-completed-output":
       return outputs.length >= 1;
     case "images-two-outputs":
@@ -38685,6 +40762,7 @@ async function probeProviderCapability(owner, input, options = {}) {
     return capabilityProbeResultSchema.parse({ ...transient, record: record3 });
   }
   const customSizeLimits = parsed.capability === "custom-size" ? { supportedSizes: [expectedSize.value] } : void 0;
+  const qualityLimits = parsed.capability === "quality-control" && parsed.requestedQuality !== void 0 ? { supportedQualities: [parsed.requestedQuality] } : void 0;
   const observation = finalOutcome.outcome === "supported" ? {
     outcome: "supported",
     evidence: evidence({
@@ -38695,7 +40773,7 @@ async function probeProviderCapability(owner, input, options = {}) {
       ...shape === void 0 ? {} : { responseShape: shape },
       ...status === void 0 ? {} : { httpStatus: status }
     }),
-    ...customSizeLimits === void 0 ? {} : { limits: customSizeLimits }
+    ...customSizeLimits === void 0 && qualityLimits === void 0 ? {} : { limits: { ...customSizeLimits, ...qualityLimits } }
   } : finalOutcome.outcome === "unsupported" ? {
     outcome: "unsupported",
     evidence: evidence({
@@ -38718,7 +40796,7 @@ async function probeProviderCapability(owner, input, options = {}) {
       ...shape === void 0 ? {} : { responseShape: shape },
       ...status === void 0 ? {} : { httpStatus: status }
     }),
-    ...customSizeLimits === void 0 ? {} : { limits: customSizeLimits }
+    ...customSizeLimits === void 0 && qualityLimits === void 0 ? {} : { limits: { ...customSizeLimits, ...qualityLimits } }
   };
   const record2 = transitionCapability(current, observation);
   const result = capabilityProbeResultSchema.parse({
@@ -38746,7 +40824,19 @@ async function probeProviderCapability(owner, input, options = {}) {
 }
 
 // src/composition/service.ts
+var DEFAULT_CHROMAKEY_POLICY = {
+  contentClass: "simple",
+  keyColor: { red: 0, green: 255, blue: 0 },
+  // Image generators commonly vary a requested #00FF00 background by a few
+  // dozen RGB values. The chromakey implementation also verifies green
+  // dominance, so this remains limited to deliberate green-screen jobs.
+  tolerance: 64
+};
+function defaultChromakeyPolicy(request) {
+  return request.transparentMode === "chromakey" ? DEFAULT_CHROMAKEY_POLICY : request.transparentMode === "auto" ? { ...DEFAULT_CHROMAKEY_POLICY, autoEligible: true } : void 0;
+}
 var FIXED_BATCH_CONCURRENCY = 2;
+var CODEX_MCP_SYNC_WAIT_MS = 3e5;
 function freezeSnapshot(value) {
   if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
     for (const child of Object.values(value)) freezeSnapshot(child);
@@ -38834,8 +40924,8 @@ var PUBLIC_DEFAULT_CONTROL_KEYS = [
 function hasOwn(input, key) {
   return input !== null && typeof input === "object" && Object.hasOwn(input, key);
 }
-function resolvePublicGenerationRequest(input, defaults) {
-  const parsed = routegoGenerateInputSchema.parse(input);
+function resolvePublicImageRequest(input, defaults) {
+  const parsed = imageOperationRequestSchema.parse(input);
   const resolved = { ...parsed };
   for (const key of PUBLIC_DEFAULT_CONTROL_KEYS) {
     if (!hasOwn(input, key)) resolved[key] = defaults[key];
@@ -38877,7 +40967,7 @@ function outputContractError(request, result) {
 function defaultHealth(status) {
   return routegoServiceHealthSchema.parse({
     status,
-    version: "1.0.0",
+    version: "1.0.5",
     nodeVersion: process.version,
     uptimeSeconds: 0,
     mcpAvailable: false,
@@ -38962,6 +41052,27 @@ function failureResult(request, requestId2, error51, status = error51.code === "
     error: error51
   });
 }
+function queuedResult(request, requestId2) {
+  return imageOperationResultSchema.parse({
+    schemaVersion: 1,
+    requestId: requestId2,
+    status: "queued",
+    requestedParams: request,
+    effectiveParams: request,
+    execution: {
+      attemptCount: 0,
+      providerRequestCount: 0,
+      receivedAnyOutput: false,
+      mayHaveBilled: false,
+      degradedContinuation: false,
+      providerImageIds: []
+    },
+    finalArtifacts: [],
+    partialArtifacts: [],
+    failedSlots: [],
+    relationships: []
+  });
+}
 function studioError2(error51, partialArtifacts2 = []) {
   return studioServiceErrorSchema.parse({
     code: error51.code,
@@ -39007,10 +41118,10 @@ function resultIdFactory(makeId) {
   return (kind, order, attempt) => makeId(kind, order, attempt);
 }
 function normalizedPath2(value) {
-  return path13.normalize(value).replaceAll("\\", "/").toLowerCase();
+  return path18.normalize(value).replaceAll("\\", "/").toLowerCase();
 }
 function resourceMatchesPrepared(resource, prepared, requestedPath) {
-  return path13.isAbsolute(resource.path) && normalizedPath2(resource.path) === normalizedPath2(requestedPath) && resource.mimeType === prepared.mimeType && resource.byteLength === prepared.byteLength && resource.width === prepared.width && resource.height === prepared.height;
+  return path18.isAbsolute(resource.path) && normalizedPath2(resource.path) === normalizedPath2(requestedPath) && resource.mimeType === prepared.mimeType && resource.byteLength === prepared.byteLength && resource.width === prepared.width && resource.height === prepared.height;
 }
 function descriptorResource(descriptor2, resource, makeId, now) {
   if (resource !== void 0) {
@@ -39132,7 +41243,7 @@ var ProductionLocalRoutegoService = class {
     const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
     await Promise.all(entries.map(async (entry) => {
       if (!entry.name.startsWith("request-") || !entry.isDirectory()) return;
-      const candidate = path13.join(root, entry.name);
+      const candidate = path18.join(root, entry.name);
       const resolved = await realpath(candidate).catch(() => void 0);
       if (resolved === void 0 || !normalizedPath2(resolved).startsWith(`${normalizedPath2(root)}/`)) return;
       await rm(resolved, { recursive: true, force: true });
@@ -39216,8 +41327,10 @@ var ProductionLocalRoutegoService = class {
   }
   async probeCapabilities(input) {
     const parsed = capabilityProbeInputSchema.parse(input);
+    const settings = await this.#options.library.readSettings({});
     const options = {
       ...this.#options.capabilityProbeOptions ?? {},
+      ...this.#options.capabilityProbeOptions?.timeoutMs === void 0 ? { timeoutMs: settings.defaults.responseTimeoutMs ?? 3e5 } : {},
       ...this.#options.fetch === void 0 ? {} : { fetch: this.#options.fetch }
     };
     return capabilityProbeResultSchema.parse(await probeProviderCapability(this.#options.library.settingsStore, parsed, options));
@@ -39358,21 +41471,23 @@ var ProductionLocalRoutegoService = class {
       ...context.onEvent === void 0 ? {} : { onEvent: context.onEvent }
     });
   }
-  async #persistSuccessfulDirectEditCapabilities(request, provider, creation) {
-    if (request.kind !== "edit" || creation.status !== "succeeded" || provider.context === void 0) {
+  async #persistSuccessfulDirectImageCapabilities(request, provider, creation) {
+    const isDirectReferenceGeneration = request.kind === "generate" && request.references.length > 0;
+    if (request.kind !== "edit" && !isDirectReferenceGeneration || creation.status !== "succeeded" || provider.context === void 0) {
       return;
     }
-    const decision = selectProviderRoute(provider.context, request);
+    const context = isDirectReferenceGeneration ? { ...provider.context, allowUnverifiedDirectReferenceGeneration: true } : { ...provider.context, allowUnverifiedDirectEdit: true };
+    const decision = selectProviderRoute(context, request);
     if (!decision.selected) return;
     const capabilities = decision.requiredCapabilities.filter(
-      (capability) => capability === "target-edit" || capability === "single-image-input" || capability === "multi-image-input" || capability === "data-url-input" || capability === "multipart-input"
+      (capability) => request.kind === "edit" && capability === "target-edit" || capability === "single-image-input" || capability === "multi-image-input" || capability === "data-url-input" || capability === "multipart-input"
     );
     if (capabilities.length === 0) return;
     const observedAt = this.#now().toISOString();
     const evidence2 = {
       source: "successful-request",
       observedAt,
-      summary: "A user-authorized direct image edit completed on this exact provider route.",
+      summary: isDirectReferenceGeneration ? "A user-requested direct reference-image generation completed on this exact provider route." : "A user-authorized direct image edit completed on this exact provider route.",
       requestShape: decision.requestShape
     };
     await Promise.allSettled(capabilities.map(async (capability) => {
@@ -39423,7 +41538,7 @@ var ProductionLocalRoutegoService = class {
     const issues = [];
     const replacements = /* @__PURE__ */ new Map();
     for (const output of materialization.outputs.filter((candidate) => candidate.phase === "final")) {
-      const policy = this.#options.chromakeyPolicy?.(request, output);
+      const policy = this.#options.chromakeyPolicy?.(request, output) ?? defaultChromakeyPolicy(request);
       if (policy === void 0) {
         issues.push("Transparency processing requires an explicit approved chromakey policy.");
         continue;
@@ -39537,6 +41652,9 @@ var ProductionLocalRoutegoService = class {
           output.artifactId,
           await transaction.stageReplacement(output, processed.transparentBytes, "image/png")
         );
+        issues.push(
+          "The provider did not return verified native alpha; the local transparent fallback requires visual review."
+        );
       } catch {
         issues.push("The transparent rendition failed bounded output validation; the provider original remains available.");
       }
@@ -39589,6 +41707,35 @@ var ProductionLocalRoutegoService = class {
       signal?.removeEventListener("abort", forwardAbort);
     }
   }
+  /**
+   * Starts a long-running public operation without tying it to the lifecycle
+   * of the MCP request that submitted it. `close()` still owns cancellation
+   * and waits for this promise, so no work is orphaned during shutdown.
+   */
+  #queuePublic(input, providerSnapshot, allowUnverifiedDirectEdit = false) {
+    const requestId2 = this.#id("request");
+    const controller = new AbortController();
+    const promise2 = this.#executePublicInner(
+      requestId2,
+      input,
+      controller.signal,
+      providerSnapshot,
+      allowUnverifiedDirectEdit
+    );
+    this.#active.set(requestId2, { controller, promise: promise2 });
+    this.#activePromises.add(promise2);
+    void promise2.then(
+      () => {
+        this.#active.delete(requestId2);
+        this.#activePromises.delete(promise2);
+      },
+      () => {
+        this.#active.delete(requestId2);
+        this.#activePromises.delete(promise2);
+      }
+    );
+    return queuedResult(input, requestId2);
+  }
   async #executePublicInner(requestId2, input, signal, providerSnapshot, allowUnverifiedDirectEdit = false) {
     let transaction;
     let creationInvoked = false;
@@ -39605,9 +41752,15 @@ var ProductionLocalRoutegoService = class {
       });
       const staged = await stagePreparedPublicOperationSources(prepared, { transaction });
       const selectedProvider = providerSnapshot ?? await this.#provider(requestId2, signal);
-      const provider = allowUnverifiedDirectEdit && selectedProvider.context !== void 0 ? freezeProviderSnapshot({
+      const isDirectReferenceGeneration = input.kind === "generate" && input.references.length > 0;
+      const allowUnverifiedImageInput = allowUnverifiedDirectEdit || isDirectReferenceGeneration;
+      const provider = allowUnverifiedImageInput && selectedProvider.context !== void 0 ? freezeProviderSnapshot({
         ...selectedProvider,
-        context: { ...selectedProvider.context, allowUnverifiedDirectEdit: true }
+        context: {
+          ...selectedProvider.context,
+          ...allowUnverifiedDirectEdit ? { allowUnverifiedDirectEdit: true } : {},
+          ...isDirectReferenceGeneration ? { allowUnverifiedDirectReferenceGeneration: true } : {}
+        }
       }) : selectedProvider;
       creationInvoked = true;
       const raw = await this.#executeCreation(staged.request, {
@@ -39625,7 +41778,7 @@ var ProductionLocalRoutegoService = class {
         }));
       }
       const creation = parsedCreation.data;
-      await this.#persistSuccessfulDirectEditCapabilities(staged.request, provider, creation);
+      await this.#persistSuccessfulDirectImageCapabilities(staged.request, provider, creation);
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
       const normalized3 = await this.#normalizeOutputDimensions(
         staged.request,
@@ -39668,7 +41821,9 @@ var ProductionLocalRoutegoService = class {
     const parsed = routegoGenerateInputSchema.parse(input);
     if (this.#status !== "ready") return failureResult(parsed, this.#id("request"), this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt"));
     try {
-      return await this.#executePublic(resolvePublicGenerationRequest(input, await this.#publicDefaults()));
+      const defaults = await this.#publicDefaults();
+      const request = resolvePublicImageRequest(input, defaults);
+      return defaults.responseTimeoutMs !== void 0 && defaults.responseTimeoutMs > CODEX_MCP_SYNC_WAIT_MS ? this.#queuePublic(request) : await this.#executePublic(request);
     } catch (error51) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error51, "config_corrupt"));
     }
@@ -39683,7 +41838,9 @@ var ProductionLocalRoutegoService = class {
       );
     }
     try {
-      return await this.#executePublic(parsed, void 0, void 0, true);
+      const defaults = await this.#publicDefaults();
+      const request = resolvePublicImageRequest(input, defaults);
+      return defaults.responseTimeoutMs !== void 0 && defaults.responseTimeoutMs > CODEX_MCP_SYNC_WAIT_MS ? this.#queuePublic(request, void 0, true) : await this.#executePublic(request, void 0, void 0, true);
     } catch (error51) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error51, "config_corrupt"));
     }
@@ -39710,7 +41867,7 @@ var ProductionLocalRoutegoService = class {
     }
     const tasks = parsed.tasks.map((task, index) => Object.freeze({
       id: task.id,
-      operation: freezeSnapshot(resolvePublicGenerationRequest(input.tasks[index].operation, defaults))
+      operation: freezeSnapshot(resolvePublicImageRequest(input.tasks[index].operation, defaults))
     }));
     let provider;
     try {
@@ -41195,11 +43352,11 @@ async function selectNativeLibraryDirectory() {
 var UPLOAD_CONTENT_ROUTE_PATTERN = /^\/api\/v1\/uploads\/([A-Za-z0-9][A-Za-z0-9._:-]*)\/content$/u;
 var LIBRARY_RESOURCE_ROUTE_PATTERN = /^\/api\/v1\/library\/resources\/([A-Za-z0-9][A-Za-z0-9._:-]*)$/u;
 var EPHEMERAL_RESOURCE_ROUTE_PATTERN = /^\/api\/v1\/resources\/([A-Za-z0-9][A-Za-z0-9._:-]*)$/u;
-var LIBRARY_MARK_ROUTE = "/api/v1/library/mark";
 var LIBRARY_COPY_INFORMATION_ROUTE = "/api/v1/library/copy-generation-info";
 var LIBRARY_SELECT_DIRECTORY_ROUTE = "/api/v1/library/select-directory";
 var REMOVED_LIBRARY_ROUTE_PATHS = /* @__PURE__ */ new Set([
   "/api/v1/edit",
+  "/api/v1/library/mark",
   "/api/v1/library/trash",
   "/api/v1/library/delete",
   "/api/v1/library/restore",
@@ -41420,39 +43577,12 @@ async function boundedJsonBody(request) {
     throw new RuntimeRouteError(400, "invalid_request", "The Library JSON body is invalid.");
   }
 }
-function parseMarkInput(value) {
-  try {
-    return markLibraryAssetInputSchema.parse(value);
-  } catch {
-    throw new RuntimeRouteError(400, "invalid_request", "The Library mark request is invalid.");
-  }
-}
 function parseCopyInput(value) {
   try {
     return copyGenerationInfoInputSchema.parse(value);
   } catch {
     throw new RuntimeRouteError(400, "invalid_request", "The Library copy request is invalid.");
   }
-}
-function markFailure(recordId, value) {
-  const error51 = routegoServiceErrorSchema.safeParse(value);
-  return markLibraryAssetResultSchema.parse({
-    schemaVersion: 1,
-    status: "failed",
-    recordId,
-    markCleared: false,
-    providerRequestCount: 0,
-    error: error51.success ? error51.data : {
-      code: "internal_contract",
-      category: "internal",
-      stage: "persist",
-      safeMessage: "The Library mark could not be confirmed.",
-      retryDisposition: "never",
-      partialArtifacts: [],
-      receivedAnyOutput: false,
-      mayHaveBilled: false
-    }
-  });
 }
 function validIdentifier(value) {
   try {
@@ -41597,11 +43727,10 @@ function createIntegrationRuntimeRoutes(options) {
     const libraryMatch = LIBRARY_RESOURCE_ROUTE_PATTERN.exec(request.url.pathname);
     const ephemeralMatch = EPHEMERAL_RESOURCE_ROUTE_PATTERN.exec(request.url.pathname);
     const isStream = request.url.pathname === STUDIO_CREATION_STREAM_PATH;
-    const isLibraryMark = request.url.pathname === LIBRARY_MARK_ROUTE;
     const isLibraryCopy = request.url.pathname === LIBRARY_COPY_INFORMATION_ROUTE;
     const isLibraryDirectorySelection = request.url.pathname === LIBRARY_SELECT_DIRECTORY_ROUTE;
     const isRemovedLibraryRoute = REMOVED_LIBRARY_ROUTE_PATHS.has(request.url.pathname);
-    if (uploadMatch === null && libraryMatch === null && ephemeralMatch === null && !isStream && !isLibraryMark && !isLibraryCopy && !isLibraryDirectorySelection && !isRemovedLibraryRoute) {
+    if (uploadMatch === null && libraryMatch === null && ephemeralMatch === null && !isStream && !isLibraryCopy && !isLibraryDirectorySelection && !isRemovedLibraryRoute) {
       return void 0;
     }
     if (request.url.search !== "") {
@@ -41609,7 +43738,7 @@ function createIntegrationRuntimeRoutes(options) {
     }
     if (extensionContext.preflight) {
       if (isStream) return await streamRoute(request, extensionContext);
-      const expectedMethod = uploadMatch !== null ? "PUT" : isLibraryMark || isLibraryCopy || isLibraryDirectorySelection ? "POST" : "GET";
+      const expectedMethod = uploadMatch !== null ? "PUT" : isLibraryCopy || isLibraryDirectorySelection ? "POST" : "GET";
       if (header5(request, "access-control-request-method")?.trim().toUpperCase() !== expectedMethod) {
         return errorResponse(new RuntimeRouteError(405, "invalid_request", "The protected route preflight method is invalid."));
       }
@@ -41627,43 +43756,6 @@ function createIntegrationRuntimeRoutes(options) {
     try {
       if (isRemovedLibraryRoute) {
         throw new RuntimeRouteError(404, "not_found", "The Library route was not found.");
-      }
-      if (isLibraryMark) {
-        if (request.method.toUpperCase() !== "POST") {
-          throw new RuntimeRouteError(405, "invalid_request", "The Library mark route accepts POST only.");
-        }
-        const input = parseMarkInput(await boundedJsonBody(request));
-        const preflight = await options.library.preflightLibraryMutation({
-          schemaVersion: 1,
-          mutation: { action: "mark", assetIds: [input.recordId] }
-        });
-        if (preflight.status !== "ready") {
-          return jsonResponse2(409, markFailure(input.recordId, preflight.error ?? preflight.items[0]?.error));
-        }
-        const execution = await options.library.executeLibraryMutation({
-          schemaVersion: 1,
-          preflightId: preflight.preflightId,
-          action: "mark",
-          confirmations: []
-        });
-        if (execution.status !== "succeeded") {
-          return jsonResponse2(409, markFailure(
-            input.recordId,
-            execution.error ?? execution.items[0]?.error
-          ));
-        }
-        const detail = await options.library.getAssetDetail({ schemaVersion: 1, assetId: input.recordId });
-        if (detail.asset === void 0) {
-          return jsonResponse2(500, markFailure(input.recordId, void 0));
-        }
-        return jsonResponse2(200, markLibraryAssetResultSchema.parse({
-          schemaVersion: 1,
-          status: "succeeded",
-          recordId: input.recordId,
-          ...detail.asset.currentMark ? { currentMarkRecordId: input.recordId } : {},
-          markCleared: !detail.asset.currentMark,
-          providerRequestCount: 0
-        }));
       }
       if (isLibraryCopy) {
         if (request.method.toUpperCase() !== "POST") {
@@ -41760,7 +43852,7 @@ function createIntegrationRuntimeRoutes(options) {
         body: resourceBody(validated, request.signal, resourceChunkBytes)
       };
     } catch (error51) {
-      return errorResponse(error51 instanceof RuntimeRouteError ? error51 : isLibraryMark || isLibraryCopy || isLibraryDirectorySelection ? safeLibraryRouteError(error51) : safeRouteError(error51, true));
+      return errorResponse(error51 instanceof RuntimeRouteError ? error51 : isLibraryCopy || isLibraryDirectorySelection ? safeLibraryRouteError(error51) : safeRouteError(error51, true));
     }
   };
 }
@@ -41770,6 +43862,13 @@ var DEFAULT_SHUTDOWN_TIMEOUT_MS = 1e4;
 var REDACTED_LOCAL_PATH2 = "[REDACTED_PATH]";
 var IMAGE_DATA_URL_PATTERN2 = /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*(?:;base64)?,(?:(?:%[0-9a-f]{2})|[a-z0-9+/_~.!$&*=@?:-])*/giu;
 var LONG_BASE64_TOKEN_PATTERN2 = /(^|[^A-Za-z0-9+/_=-])([A-Za-z0-9+/_-]{64,}={0,2})(?=$|[^A-Za-z0-9+/_=-])/gu;
+function resolveProductionStagingRoot(runtimeRoot, configuredStagingRoot, processId = process.pid) {
+  if (configuredStagingRoot !== void 0) return path18.resolve(configuredStagingRoot);
+  if (!Number.isSafeInteger(processId) || processId < 1) {
+    throw new TypeError("The Routego Image runtime process identifier is invalid.");
+  }
+  return path18.resolve(runtimeRoot, "staging", `process-${processId}`);
+}
 var RoutegoMcpProcessShutdownError = class extends Error {
   code;
   constructor(code, message, options) {
@@ -42056,14 +44155,14 @@ async function createProductionRoutegoMcpProcess(options) {
   const error51 = processError(options.error);
   const signalSource = processSignals(options.signalSource);
   const diagnose = createDiagnosticReporter(error51, options.logger);
-  const selectedHome = path13.resolve(options.homeDirectory ?? homedir());
-  const runtimeRoot = path13.resolve(
-    options.runtimeRoot ?? path13.join(selectedHome, ".codex", "routego-image", "runtime")
+  const selectedHome = path18.resolve(options.homeDirectory ?? homedir());
+  const runtimeRoot = path18.resolve(
+    options.runtimeRoot ?? path18.join(selectedHome, ".codex", "routego-image", "runtime")
   );
-  const stagingRoot = path13.resolve(options.stagingRoot ?? path13.join(runtimeRoot, "staging"));
+  const stagingRoot = resolveProductionStagingRoot(runtimeRoot, options.stagingRoot);
   const library = options.library ?? createRoutegoLibraryService({ homeDirectory: selectedHome });
   const ownsEphemeralResources = options.ephemeralResources === void 0;
-  const ephemeralResources = options.ephemeralResources ?? await createEphemeralImageResourceRegistry({ root: path13.join(runtimeRoot, "ephemeral") });
+  const ephemeralResources = options.ephemeralResources ?? await createEphemeralImageResourceRegistry({ root: path18.join(runtimeRoot, "ephemeral") });
   try {
     const staticAssets = await loadStudioStaticAssets(options.staticAssets);
     const sessionContext = new StudioRequestSessionContext();
@@ -42106,7 +44205,7 @@ async function createProductionRoutegoMcpProcess(options) {
       openStudio: async (request) => await lifecycle.openStudio(request),
       serviceHealth: () => ({
         status: "ready",
-        version: "1.0.0",
+        version: "1.0.5",
         nodeVersion: process.version,
         uptimeSeconds: 0,
         mcpAvailable: true,
@@ -42142,94 +44241,17 @@ async function runRoutegoImageCli(options) {
   const runtime = await createProductionRoutegoMcpProcess(options);
   await runtime.run();
 }
-var OfflineBackgroundRemovalResourceError = class extends Error {
-  name = "OfflineBackgroundRemovalResourceError";
-};
-var MODULE_DIRECTORY = path13.dirname(fileURLToPath(import.meta.url));
-var REQUIRED_RESOURCE_IDS = /* @__PURE__ */ new Set([
-  "u2netp-model",
-  "onnxruntime-web-simd-threaded-jsep",
-  "onnxruntime-web-simd-threaded"
-]);
-function failure2(message) {
-  return new OfflineBackgroundRemovalResourceError(`Offline background-removal resource verification failed: ${message}`);
-}
-function isSafeFileName(value) {
-  return typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(value);
-}
-function isResource(value) {
-  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
-  const candidate = value;
-  return typeof candidate["id"] === "string" && isSafeFileName(candidate["path"]) && Number.isSafeInteger(candidate["bytes"]) && candidate["bytes"] > 0 && typeof candidate["sha256"] === "string" && /^[a-f0-9]{64}$/u.test(candidate["sha256"]) && typeof candidate["version"] === "string" && candidate["version"].length > 0 && (candidate["license"] === "Apache-2.0" || candidate["license"] === "MIT") && typeof candidate["source"] === "string" && /^https:\/\//u.test(candidate["source"]);
-}
-function parseManifest(value) {
-  if (value === null || typeof value !== "object" || Array.isArray(value)) throw failure2("the manifest is not an object");
-  const candidate = value;
-  if (candidate["schemaVersion"] !== 1 || candidate["offlineOnly"] !== true || !Array.isArray(candidate["resources"]) || candidate["resources"].length !== REQUIRED_RESOURCE_IDS.size || !candidate["resources"].every(isResource)) {
-    throw failure2("the manifest has an invalid shape");
-  }
-  const ids = new Set(candidate["resources"].map((resource) => resource.id));
-  if (ids.size !== REQUIRED_RESOURCE_IDS.size || [...REQUIRED_RESOURCE_IDS].some((id) => !ids.has(id))) {
-    throw failure2("the manifest does not declare the required resources");
-  }
-  const names = new Set(candidate["resources"].map((resource) => resource.path));
-  if (names.size !== candidate["resources"].length) throw failure2("the manifest declares duplicate resource paths");
-  return candidate;
-}
-async function defaultResourceDirectory() {
-  const candidates = [
-    path13.resolve(MODULE_DIRECTORY, "../../resources/background-removal"),
-    path13.resolve(MODULE_DIRECTORY, "../resources/background-removal")
-  ];
-  for (const candidate of candidates) {
-    try {
-      const metadata = await lstat(candidate);
-      if (!metadata.isSymbolicLink() && metadata.isDirectory()) return candidate;
-    } catch (error51) {
-      if (error51.code !== "ENOENT") throw error51;
-    }
-  }
-  throw failure2("the packaged resource directory is missing");
-}
-async function readRegularFile(file2) {
-  const metadata = await lstat(file2).catch((error51) => {
-    if (error51.code === "ENOENT") throw failure2(`a required resource is missing: ${path13.basename(file2)}`);
-    throw error51;
-  });
-  if (!metadata.isFile() || metadata.isSymbolicLink()) throw failure2(`a required resource is not a regular file: ${path13.basename(file2)}`);
-  return readFile(file2);
-}
-async function verifyBackgroundRemovalResources(options = {}) {
-  const manifestPath = path13.resolve(options.manifestPath ?? path13.join(MODULE_DIRECTORY, "resource-manifest.json"));
-  const manifestBytes = await readRegularFile(manifestPath);
-  let manifest;
-  try {
-    manifest = parseManifest(JSON.parse(manifestBytes.toString("utf8")));
-  } catch (error51) {
-    if (error51 instanceof OfflineBackgroundRemovalResourceError) throw error51;
-    throw failure2("the manifest is not valid JSON");
-  }
-  const requestedDirectory = options.resourceDirectory ?? await defaultResourceDirectory();
-  const directoryMetadata = await lstat(requestedDirectory).catch((error51) => {
-    if (error51.code === "ENOENT") throw failure2("the packaged resource directory is missing");
-    throw error51;
-  });
-  if (!directoryMetadata.isDirectory() || directoryMetadata.isSymbolicLink()) throw failure2("the resource directory is not a real directory");
-  const resourceDirectory = await realpath(requestedDirectory);
-  const resolved = /* @__PURE__ */ new Map();
-  for (const resource of manifest.resources) {
-    const resourcePath = path13.resolve(resourceDirectory, resource.path);
-    if (path13.dirname(resourcePath) !== resourceDirectory) throw failure2(`a resource path escapes its directory: ${resource.id}`);
-    const bytes = await readRegularFile(resourcePath);
-    if (bytes.byteLength !== resource.bytes || createHash("sha256").update(bytes).digest("hex") !== resource.sha256) {
-      throw failure2(`integrity mismatch: ${resource.id}`);
-    }
-    resolved.set(resource.id, resourcePath);
-  }
-  return { manifestPath, resourceDirectory, resources: resolved };
-}
 
 // src/index.ts
 var ROUTEGO_INTEGRATION_PACKAGE_VERSION = 1;
+/*! Bundled license information:
 
-export { OfflineBackgroundRemovalResourceError, ProductionLocalRoutegoService, ROUTEGO_INTEGRATION_PACKAGE_VERSION, RoutegoMcpProcess, RoutegoMcpProcessShutdownError, STUDIO_CREATION_STREAM_PATH, createLocalRoutegoService, createProductionRoutegoMcpProcess, createRoutegoMcpProcess, createStudioCreationStreamRoute, runRoutegoImageCli, startRoutegoImageCli, verifyBackgroundRemovalResources };
+onnxruntime-web/dist/ort.node.min.mjs:
+  (*!
+   * ONNX Runtime Web v1.20.1
+   * Copyright (c) Microsoft Corporation. All rights reserved.
+   * Licensed under the MIT License.
+   *)
+*/
+
+export { OfflineBackgroundRemovalResourceError, ProductionLocalRoutegoService, ROUTEGO_INTEGRATION_PACKAGE_VERSION, RoutegoMcpProcess, RoutegoMcpProcessShutdownError, STUDIO_CREATION_STREAM_PATH, createLocalRoutegoService, createProductionRoutegoMcpProcess, createRoutegoMcpProcess, createStudioCreationStreamRoute, processBackgroundRemovalRequest, resolveProductionStagingRoot, runRoutegoImageCli, startRoutegoImageCli, verifyBackgroundRemovalResources };
