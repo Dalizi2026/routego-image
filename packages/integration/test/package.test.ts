@@ -63,11 +63,13 @@ describe("Routego Image plugin package", () => {
   let temporaryRoot: string;
   let firstPackage: string;
   let secondPackage: string;
+  let windowsPackage: string;
 
   beforeAll(async () => {
     temporaryRoot = await mkdtemp(path.join(os.tmpdir(), "routego-plugin-package-test-"));
     firstPackage = path.join(temporaryRoot, "first", "routego-image");
     secondPackage = path.join(temporaryRoot, "second", "routego-image");
+    windowsPackage = path.join(temporaryRoot, "windows", "routego-image-windows");
     await buildPluginPackage({
       repositoryRoot: REPOSITORY_ROOT,
       outputDirectory: firstPackage
@@ -75,6 +77,11 @@ describe("Routego Image plugin package", () => {
     await buildPluginPackage({
       repositoryRoot: REPOSITORY_ROOT,
       outputDirectory: secondPackage
+    });
+    await buildPluginPackage({
+      repositoryRoot: REPOSITORY_ROOT,
+      outputDirectory: windowsPackage,
+      target: "windows"
     });
   }, 120_000);
 
@@ -158,6 +165,30 @@ describe("Routego Image plugin package", () => {
     ].join("\n");
     await expect(execFileAsync(process.execPath, ["--input-type=module", "-e", importScript]))
       .resolves.toMatchObject({ stderr: "" });
+  });
+
+  it("builds a separately named Windows package with isolated local state", async () => {
+    const verification = await verifyPluginPackage(windowsPackage);
+    const manifest = JSON.parse(
+      await readFile(path.join(windowsPackage, ".codex-plugin", "plugin.json"), "utf8")
+    ) as { name: string; version: string; interface: { displayName: string } };
+    const launcher = await readFile(
+      path.join(windowsPackage, "scripts", "start-routego-image-windows.mjs"),
+      "utf8"
+    );
+    expect(verification.contentManifest).toMatchObject({
+      name: "routego-image-windows",
+      version: "1.0.0+codex.20260802"
+    });
+    expect(manifest).toMatchObject({
+      name: "routego-image-windows",
+      version: "1.0.0+codex.20260802",
+      interface: { displayName: "Routego Image for Windows v1.0.0" }
+    });
+    expect(verification.files).toContain("skills/routego-image-windows/SKILL.md");
+    expect(verification.files).toContain("scripts/start-routego-image-windows.mjs");
+    expect(launcher).toContain("ROUTEGO_PACKAGE_TARGET = \"windows\"");
+    expect(launcher).toContain("routego-image-windows");
   });
 
   it("rejects unlisted dependency trees and sensitive configuration", async () => {

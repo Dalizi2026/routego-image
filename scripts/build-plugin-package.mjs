@@ -25,12 +25,27 @@ import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_REPOSITORY_ROOT = path.resolve(SCRIPT_DIRECTORY, "..");
+const PACKAGE_TARGETS = Object.freeze({
+  mac: {
+    packageName: "routego-image",
+    manifestSource: ".codex-plugin/plugin.json",
+    skillSource: "skills/routego-image/SKILL.md",
+    skillTarget: "skills/routego-image/SKILL.md",
+    launcherSource: "scripts/start-routego-image.mjs",
+    launcherTarget: "scripts/start-routego-image.mjs"
+  },
+  windows: {
+    packageName: "routego-image-windows",
+    manifestSource: ".codex-plugin-windows/plugin.json",
+    skillSource: "skills/routego-image-windows/SKILL.md",
+    skillTarget: "skills/routego-image-windows/SKILL.md",
+    launcherSource: "scripts/start-routego-image-windows.mjs",
+    launcherTarget: "scripts/start-routego-image-windows.mjs"
+  }
+});
 const STATIC_SOURCE_FILES = [
-  [".codex-plugin/plugin.json", ".codex-plugin/plugin.json"],
   ["assets/composer-icon.png", "assets/composer-icon.png"],
   ["assets/logo.png", "assets/logo.png"],
-  ["skills/routego-image/SKILL.md", "skills/routego-image/SKILL.md"],
-  ["scripts/start-routego-image.mjs", "scripts/start-routego-image.mjs"],
   ["THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"],
   ["licenses/gpt_image_playground-MIT.txt", "licenses/gpt_image_playground-MIT.txt"],
   ["licenses/pngjs-MIT.txt", "licenses/pngjs-MIT.txt"],
@@ -110,11 +125,17 @@ async function copyContainedSource(repositoryRoot, sourceRelative, targetRoot, t
   await copyFile(resolved, target);
 }
 
-async function copyRoutegoSkill(repositoryRoot, packageRoot) {
-  const source = path.join(repositoryRoot, "skills/routego-image/SKILL.md");
-  const target = path.join(packageRoot, "skills/routego-image/SKILL.md");
-  await mkdir(path.dirname(target), { recursive: true });
-  await copyFile(source, target);
+function packageTarget(name) {
+  const target = PACKAGE_TARGETS[name];
+  if (target === undefined) throw new Error(`Unknown plugin package target: ${name}`);
+  return target;
+}
+
+async function copyPluginSkill(repositoryRoot, packageRoot, target) {
+  const source = path.join(repositoryRoot, ...target.skillSource.split("/"));
+  const destination = path.join(packageRoot, ...target.skillTarget.split("/"));
+  await mkdir(path.dirname(destination), { recursive: true });
+  await copyFile(source, destination);
 }
 
 async function collectRegularFiles(directory, relativeDirectory = "") {
@@ -231,7 +252,7 @@ async function auditRuntimeDependencies(repositoryRoot) {
   }
 }
 
-async function createContentManifest(packageRoot) {
+async function createContentManifest(packageRoot, target) {
   const files = (await collectRegularFiles(packageRoot))
     .filter((file) => file !== "artifact-manifest.json")
     .sort((left, right) => left.localeCompare(right, "en"));
@@ -248,7 +269,7 @@ async function createContentManifest(packageRoot) {
   }
   return {
     schemaVersion: 1,
-    name: "routego-image",
+    name: target.packageName,
     version: pluginManifest.version,
     node: ">=20.19.0",
     files: entries
@@ -276,11 +297,12 @@ function parseViteManifest(value) {
 
 export async function buildPluginPackage(options = {}) {
   const repositoryRoot = await realpath(path.resolve(options.repositoryRoot ?? DEFAULT_REPOSITORY_ROOT));
+  const target = packageTarget(options.target ?? "mac");
   const outputDirectory = path.resolve(
-    options.outputDirectory ?? path.join(repositoryRoot, ".routego-plugin-build", "routego-image")
+    options.outputDirectory ?? path.join(repositoryRoot, ".routego-plugin-build", target.packageName)
   );
-  if (path.basename(outputDirectory) !== "routego-image") {
-    throw new Error("The package output directory must be named routego-image.");
+  if (path.basename(outputDirectory) !== target.packageName) {
+    throw new Error(`The package output directory must be named ${target.packageName}.`);
   }
   if (outputDirectory === repositoryRoot || contained(outputDirectory, repositoryRoot)) {
     throw new Error("The package output directory cannot contain the source repository.");
@@ -296,7 +318,7 @@ export async function buildPluginPackage(options = {}) {
   const outputParent = path.dirname(outputDirectory);
   await mkdir(outputParent, { recursive: true });
   const workRoot = await mkdtemp(path.join(outputParent, ".routego-plugin-package-work-"));
-  const packageRoot = path.join(workRoot, "routego-image");
+  const packageRoot = path.join(workRoot, target.packageName);
   const integrationBuild = path.join(workRoot, "integration-build");
   const studioBuild = path.join(workRoot, "studio-build");
   const pnpm = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
@@ -308,7 +330,7 @@ export async function buildPluginPackage(options = {}) {
         pnpm,
         ["exec", "tsup", "--out-dir", integrationBuild],
         path.join(repositoryRoot, "packages/integration"),
-        { ROUTEGO_PLUGIN_BUNDLE: "1" }
+        { ROUTEGO_PLUGIN_BUNDLE: "1", ROUTEGO_PACKAGE_TARGET: target.packageName }
       ),
       run(
         pnpm,
@@ -319,11 +341,12 @@ export async function buildPluginPackage(options = {}) {
 
     await mkdir(packageRoot, { recursive: true });
     for (const [source, target] of STATIC_SOURCE_FILES) {
-      if (source === "skills/routego-image/SKILL.md") continue;
       await copyContainedSource(repositoryRoot, source, packageRoot, target);
     }
-    await copyRoutegoSkill(repositoryRoot, packageRoot);
-    await chmod(path.join(packageRoot, "scripts/start-routego-image.mjs"), 0o755);
+    await copyContainedSource(repositoryRoot, target.manifestSource, packageRoot, ".codex-plugin/plugin.json");
+    await copyContainedSource(repositoryRoot, target.launcherSource, packageRoot, target.launcherTarget);
+    await copyPluginSkill(repositoryRoot, packageRoot, target);
+    await chmod(path.join(packageRoot, ...target.launcherTarget.split("/")), 0o755);
 
     const runtimeSource = path.join(integrationBuild, "index.js");
     if (!(await exists(runtimeSource))) throw new Error("The bundled Integration runtime was not generated.");
@@ -376,7 +399,7 @@ export async function buildPluginPackage(options = {}) {
     };
     await writeFile(path.join(packageRoot, "runtime/studio-assets.json"), stableJson(studioManifest), "utf8");
 
-    const contentManifest = await createContentManifest(packageRoot);
+    const contentManifest = await createContentManifest(packageRoot, target);
     await writeFile(path.join(packageRoot, "artifact-manifest.json"), stableJson(contentManifest), "utf8");
     const verification = await verifyPluginPackage(packageRoot);
     await rename(packageRoot, outputDirectory);
@@ -387,9 +410,19 @@ export async function buildPluginPackage(options = {}) {
 }
 
 function parseArguments(argv) {
-  if (argv.length === 0) return {};
-  if (argv.length === 2 && argv[0] === "--output") return { outputDirectory: path.resolve(argv[1]) };
-  throw new Error("Usage: node scripts/build-plugin-package.mjs [--output <clean-routego-image-directory>]");
+  const parsed = {};
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    const value = argv[index + 1];
+    if ((argument === "--target" || argument === "--output") && value !== undefined) {
+      parsed[argument === "--target" ? "target" : "outputDirectory"] =
+        argument === "--target" ? value : path.resolve(value);
+      index += 1;
+      continue;
+    }
+    throw new Error("Usage: node scripts/build-plugin-package.mjs [--target mac|windows] [--output <clean-plugin-directory>]");
+  }
+  return parsed;
 }
 
 async function main() {

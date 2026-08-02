@@ -11,6 +11,7 @@
   "scripts": {
     "build": "pnpm -r --if-present build",
     "build:plugin": "node scripts/build-plugin-package.mjs",
+    "build:plugin:windows": "node scripts/build-plugin-package.mjs --target windows",
     "check:exports": "node scripts/check-package-exports.mjs",
     "governance:validate-handoff": "node .codex/routego-program/scripts/validate-handoff-capsule.mjs",
     "safety": "node scripts/check-repository-safety.mjs",

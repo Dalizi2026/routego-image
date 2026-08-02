@@ -77,6 +77,13 @@ jobs:
       - name: Verify reproducible plugin package and temporary install
         run: node scripts/ci-plugin-smoke.mjs
 
+      - name: Build and verify the Windows-only plugin package
+        if: runner.os == 'Windows'
+        run: |
+          pnpm build:plugin:windows
+          pnpm verify:plugin .routego-plugin-build/routego-image-windows
+          node scripts/ci-windows-plugin-smoke.mjs
+
       - name: Check tracked repository cleanliness
         run: git diff --exit-code
 

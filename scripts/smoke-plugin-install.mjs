@@ -21,6 +21,17 @@ import { pathToFileURL } from "node:url";
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.5(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
+const ACCEPTED_WINDOWS_PLUGIN_VERSION = /^1\.0\.0\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u;
+const PACKAGE_VARIANTS = new Map([
+  ["routego-image", {
+    acceptedVersion: ACCEPTED_PLUGIN_VERSION,
+    skillPath: "skills/routego-image/SKILL.md"
+  }],
+  ["routego-image-windows", {
+    acceptedVersion: ACCEPTED_WINDOWS_PLUGIN_VERSION,
+    skillPath: "skills/routego-image-windows/SKILL.md"
+  }]
+]);
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
 const OWNER_MARKER = ".routego-install-smoke-owner.json";
@@ -817,10 +828,7 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
     await client.close(paths.installedPackage);
     const studio = await exerciseSyntheticInstalledRuntime(paths, folderId);
     const legacyLibraryUpgraded = await exerciseLegacyLibraryUpgrade(paths);
-    const skillText = await readFile(
-      path.join(paths.installedPackage, "skills/routego-image/SKILL.md"),
-      "utf8"
-    );
+    const skillText = await readFile(path.join(paths.installedPackage, options.skillPath), "utf8");
     if (!/[A-Za-z]{4}/u.test(skillText) || !/\p{Script=Han}/u.test(skillText) ||
         !EXPECTED_TOOLS.every((name) => skillText.includes(`\`${name}\``))) {
       fail("the installed Skill is not bilingual or does not name the exact eight tools");
@@ -872,7 +880,7 @@ async function runInsideOwnedRoot(options, root, verification) {
     temp: path.join(root, "temp"),
     data: path.join(root, "data"),
     output: path.join(root, "output"),
-    installedPackage: path.join(root, "install", "routego-image")
+    installedPackage: path.join(root, "install", options.packageName)
   };
   await Promise.all([
     mkdir(paths.home, { recursive: true }),
@@ -1038,10 +1046,10 @@ export async function runPluginInstallSmoke(options) {
     fail("package does not match the accepted artifact manifest SHA-256");
   }
   const verification = await verifyPluginPackage(packageDirectory);
+  const variant = PACKAGE_VARIANTS.get(verification.contentManifest.name);
   if (verification.artifactManifestFileSha256 !== acceptedArtifactManifestSha256 ||
-      verification.contentManifest.name !== "routego-image" ||
-      !ACCEPTED_PLUGIN_VERSION.test(verification.contentManifest.version)) {
-    fail("strict package verification did not return an accepted Routego Image 1.0 artifact");
+      variant === undefined || !variant.acceptedVersion.test(verification.contentManifest.version)) {
+    fail("strict package verification did not return an accepted Routego Image artifact");
   }
   const temporaryRoot = await createOwnedTemporaryRoot(options.temporaryParent);
   let result;
@@ -1049,6 +1057,8 @@ export async function runPluginInstallSmoke(options) {
   try {
     result = await runInsideOwnedRoot({
       acceptedArtifactManifestSha256,
+      packageName: verification.contentManifest.name,
+      skillPath: variant.skillPath,
       ...(options.freshProcessCommand === undefined
         ? {}
         : { freshProcessCommand: options.freshProcessCommand }),

@@ -133,6 +133,11 @@ export interface ProductionRoutegoMcpProcessOptions {
   readonly entryModuleRoute: string;
   readonly styleRoutes?: readonly string[];
   readonly homeDirectory?: string;
+  /**
+   * Optional private root for the settings, credentials, uploads, and Library.
+   * Platform-specific plugin packages use this to keep their local state isolated.
+   */
+  readonly dataRoot?: string;
   readonly runtimeRoot?: string;
   readonly stagingRoot?: string;
   readonly library?: RoutegoLibraryService;
@@ -509,7 +514,17 @@ export async function createProductionRoutegoMcpProcess(
     options.runtimeRoot ?? path.join(selectedHome, ".codex", "routego-image", "runtime")
   );
   const stagingRoot = resolveProductionStagingRoot(runtimeRoot, options.stagingRoot);
-  const library = options.library ?? createRoutegoLibraryService({ homeDirectory: selectedHome });
+  const dataRoot = options.dataRoot === undefined ? undefined : path.resolve(options.dataRoot);
+  const library = options.library ?? createRoutegoLibraryService({
+    homeDirectory: selectedHome,
+    ...(dataRoot === undefined
+      ? {}
+      : {
+          settings: { dataRoot },
+          uploads: { dataRoot },
+          index: { root: path.join(dataRoot, "library") }
+        })
+  });
   const ownsEphemeralResources = options.ephemeralResources === undefined;
   const ephemeralResources = options.ephemeralResources ??
     await createEphemeralImageResourceRegistry({ root: path.join(runtimeRoot, "ephemeral") });

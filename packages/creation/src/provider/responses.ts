@@ -256,17 +256,23 @@ function invalidResult(
     readonly partialArtifacts?: readonly ImageArtifact[];
     readonly providerImageIds?: readonly string[];
     readonly providerResponseId?: string | undefined;
-  } = {}
+  } = {},
+  diagnosticDetails: Readonly<Record<string, unknown>> = {}
 ): NormalizedProviderResponse {
   return normalized(context, {
     ...outputs,
-    error: invalidProviderResponseError(safeMessage, reason, {
-      stage: "parse",
-      receivedAnyOutput:
-        (outputs.finalArtifacts?.length ?? 0) > 0 || (outputs.partialArtifacts?.length ?? 0) > 0,
-      mayHaveBilled: true,
-      partialArtifacts: outputs.partialArtifacts
-    })
+    error: invalidProviderResponseError(
+      safeMessage,
+      reason,
+      {
+        stage: "parse",
+        receivedAnyOutput:
+          (outputs.finalArtifacts?.length ?? 0) > 0 || (outputs.partialArtifacts?.length ?? 0) > 0,
+        mayHaveBilled: true,
+        partialArtifacts: outputs.partialArtifacts
+      },
+      diagnosticDetails
+    )
   });
 }
 
@@ -664,6 +670,24 @@ function parseJsonBytes(bytes: Uint8Array): unknown {
   return JSON.parse(text) as unknown;
 }
 
+function windowsResponseParseDiagnostics(
+  response: Response,
+  reason: string
+): Readonly<Record<string, unknown>> {
+  if (process.env["ROUTEGO_PACKAGE_TARGET"] !== "windows") return {};
+  const contentLength = response.headers.get("content-length");
+  const parsedLength = contentLength === null ? undefined : Number(contentLength);
+  return {
+    responseContentType: response.headers.get("content-type") ?? "missing",
+    responseContentEncoding: response.headers.get("content-encoding") ?? "missing",
+    responseContentLength: typeof parsedLength === "number" && Number.isSafeInteger(parsedLength) && parsedLength >= 0
+      ? parsedLength
+      : "missing-or-invalid",
+    responseParser: "strict-utf8-json",
+    responseParseReason: reason
+  };
+}
+
 export async function parseProviderResponse(
   response: Response,
   context: ProviderResponseParseContext
@@ -702,10 +726,13 @@ export async function parseProviderResponse(
   try {
     body = parseJsonBytes(await readBoundedBody(response, maximumBodyBytes));
   } catch (error) {
+    const reason = error instanceof Error ? error.message : "invalid-json-body";
     return invalidResult(
       context,
       "The provider returned invalid, non-UTF-8, or oversized JSON.",
-      error instanceof Error ? error.message : "invalid-json-body"
+      reason,
+      {},
+      windowsResponseParseDiagnostics(response, reason)
     );
   }
   return context.route.transport === "openai-responses"

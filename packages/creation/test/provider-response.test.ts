@@ -149,6 +149,56 @@ function sse(event: string, data: unknown, newline = "\n"): string {
 }
 
 describe("bounded Base64 and synchronous provider response normalization", () => {
+  it("adds only safe Windows response metadata when a success body cannot be parsed", async () => {
+    const priorTarget = process.env["ROUTEGO_PACKAGE_TARGET"];
+    try {
+      process.env["ROUTEGO_PACKAGE_TARGET"] = "windows";
+      const result = await parseProviderResponse(
+        new Response(Uint8Array.from([0xff, 0xfe, 0xfd]), {
+          status: 200,
+          headers: {
+            "content-type": "text/html; charset=gbk",
+            "content-encoding": "identity",
+            "content-length": "3"
+          }
+        }),
+        context()
+      );
+      expect(result.error).toMatchObject({
+        code: "invalid_response",
+        details: {
+          responseContentType: "text/html; charset=gbk",
+          responseContentEncoding: "identity",
+          responseContentLength: 3,
+          responseParser: "strict-utf8-json"
+        }
+      });
+      expect(JSON.stringify(result.error?.details)).not.toContain("provider.example");
+    } finally {
+      if (priorTarget === undefined) delete process.env["ROUTEGO_PACKAGE_TARGET"];
+      else process.env["ROUTEGO_PACKAGE_TARGET"] = priorTarget;
+    }
+  });
+
+  it("keeps Mac response parse diagnostics at the established minimal shape", async () => {
+    const priorTarget = process.env["ROUTEGO_PACKAGE_TARGET"];
+    try {
+      delete process.env["ROUTEGO_PACKAGE_TARGET"];
+      const result = await parseProviderResponse(
+        new Response(Uint8Array.from([0xff, 0xfe, 0xfd]), { status: 200 }),
+        context()
+      );
+      expect(result.error).toMatchObject({
+        code: "invalid_response",
+        details: { reason: expect.any(String) }
+      });
+      expect(result.error?.details).not.toHaveProperty("responseContentType");
+    } finally {
+      if (priorTarget === undefined) delete process.env["ROUTEGO_PACKAGE_TARGET"];
+      else process.env["ROUTEGO_PACKAGE_TARGET"] = priorTarget;
+    }
+  });
+
   it("detects PNG, JPEG, and WebP bytes rather than trusting the requested format", async () => {
     const inputBytes = new Uint8Array(syntheticPng());
     const inputs: PreparedImageInputs = {

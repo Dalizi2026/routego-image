@@ -164,7 +164,8 @@ export function mapProviderHttpError(
 export function invalidProviderResponseError(
   safeMessage: string,
   reason: string,
-  context: ProviderErrorContext = { stage: "parse", mayHaveBilled: true }
+  context: ProviderErrorContext = { stage: "parse", mayHaveBilled: true },
+  diagnosticDetails: Readonly<Record<string, unknown>> = {}
 ): RoutegoServiceError {
   return createProviderError(
     {
@@ -173,7 +174,7 @@ export function invalidProviderResponseError(
       stage: context.stage,
       safeMessage,
       retryDisposition: "never",
-      details: { reason }
+      details: { reason, ...diagnosticDetails }
     },
     { ...context, mayHaveBilled: context.mayHaveBilled ?? true }
   );
