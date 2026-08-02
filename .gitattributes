@@ -1,3 +1,7 @@
 # This file is copied byte-for-byte from the pinned onnxruntime-web package;
 # its upstream integrity hash includes the whitespace on line 4.
 packages/integration/resources/background-removal/ort-wasm-simd-threaded.mjs text eol=lf -whitespace
+
+# Package verification compares these shipped third-party notices by byte hash.
+licenses/*.txt text eol=lf
+THIRD_PARTY_NOTICES.md text eol=lf
