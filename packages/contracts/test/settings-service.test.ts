@@ -456,7 +456,6 @@ describe("separate Studio operation registry", () => {
       "setActiveProviderProfile",
       "studioProviderSwitch",
       "refreshModels",
-      "probeCapabilities",
       "listFolders",
       "reorderFolders",
       "getAssetDetail",
@@ -492,16 +491,6 @@ describe("separate Studio operation registry", () => {
         outputDirectory: { configured: false }
       })
     ).toMatchObject({ activeProviderId: "provider-a" });
-    expect(() =>
-      parseStudioOperationInput("probeCapabilities", {
-        providerId: "provider-a",
-        model: "gpt-image-2",
-        capability: "single-image-input",
-        transport: "single-endpoint-json",
-        requestShape: "single-endpoint-json:image"
-      })
-    ).toThrow();
-
     expect(
       parseStudioOperationOutput("updateSettings", {
         schemaVersion: 1,

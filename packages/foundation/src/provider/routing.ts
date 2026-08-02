@@ -189,7 +189,10 @@ function isProviderDrivenControl(capability: ProviderCapability): boolean {
   // Size and format are explicit provider controls whose results can be verified
   // from the returned artifact. Forward them once and fail closed on a mismatch
   // instead of requiring a separate, potentially billable probe first.
-  return capability === "custom-size" || capability === "output-format";
+  return [
+    "custom-size", "output-format", "quality-control", "native-variants",
+    "compression", "streaming", "partial-images", "moderation"
+  ].includes(capability);
 }
 
 function transparencyFor(
@@ -469,34 +472,19 @@ function selectFromCandidates(
     for (const capability of candidate.requiredCapabilities) {
       if (isProviderDrivenControl(capability)) continue;
       const record = findCapabilityRecord(context, candidate, capability);
-      if (
-        candidate.allowUnknownTextBaseline === true &&
-        capability === "text-generation" &&
-        (record === undefined || record.state === "unknown")
-      ) {
-        continue;
-      }
-      if (
-        request.kind === "edit" &&
-        context.allowUnverifiedDirectEdit === true &&
-        (record === undefined || record.state === "unknown")
-      ) {
-        continue;
-      }
-      if (
-        request.kind === "generate" &&
-        candidate.imageInputCount > 0 &&
-        context.allowUnverifiedDirectReferenceGeneration === true &&
-        (record === undefined || record.state === "unknown")
-      ) {
-        continue;
-      }
+      if (candidate.allowUnknownTextBaseline === true && capability === "text-generation" &&
+          (record === undefined || record.state === "unknown")) continue;
+      if (request.kind === "edit" && context.allowUnverifiedDirectEdit === true &&
+          (record === undefined || record.state === "unknown")) continue;
+      if (request.kind === "generate" && candidate.imageInputCount > 0 &&
+          context.allowUnverifiedDirectReferenceGeneration === true &&
+          (record === undefined || record.state === "unknown")) continue;
       if (record === undefined || record.state === "unknown" || record.state === "unsupported") {
         missing.push(capability);
         candidateUnavailable = true;
         continue;
       }
-      if (record.state === "degraded") {
+      if (record?.state === "degraded") {
         degraded = true;
       }
       const violations = capabilityLimitViolations(record, request, candidate.imageInputCount);

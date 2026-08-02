@@ -437,10 +437,7 @@ describe("provider route selection", () => {
       context(withoutModeration, { preferredTransports: ["single-endpoint-json"] }),
       request
     );
-    expect(unavailable.selected).toBe(false);
-    if (!unavailable.selected) {
-      expect(unavailable.missingCapabilities).toContain("moderation");
-    }
+    expect(unavailable).toMatchObject({ selected: true });
 
     const nativeTransparency = selectProviderRoute(
       context(
@@ -530,7 +527,7 @@ describe("provider route selection", () => {
     expect(decision).toMatchObject({ selected: true, transparency: "local-fallback" });
   });
 
-  it("enforces capability limits instead of silently degrading them", () => {
+  it("forwards explicit variant counts to the configured provider", () => {
     const decision = selectProviderRoute(
       context(
         [
@@ -543,15 +540,7 @@ describe("provider route selection", () => {
       ),
       { kind: "generate", prompt: "Too many variants", count: 3 }
     );
-    expect(decision.selected).toBe(false);
-    if (!decision.selected) {
-      expect(decision.limitViolations).toContainEqual({
-        capability: "native-variants",
-        limit: "maxVariants",
-        requested: 3,
-        supported: 2
-      });
-    }
+    expect(decision).toMatchObject({ selected: true });
   });
 
   it("allows one authorized direct edit on the configured generation endpoint without deriving an edits endpoint", () => {

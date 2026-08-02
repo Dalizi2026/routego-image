@@ -44,7 +44,10 @@ export function normalizeVisibleControls(
   const format = controls.transparentMode === "off" ? controls.format : "png";
   const transparentMode = format === "png" ? controls.transparentMode : "off";
   return {
-    size: controls.aspectRatio === "auto" ? controls.size : "auto",
+    // Studio defaults store an exact size together with its descriptive ratio
+    // (for example 2880x2880 and 1:1). The provider accepts one sizing control,
+    // so preserve the exact saved size and drop only the duplicate ratio.
+    size: controls.size,
     aspectRatio: controls.size === "auto" ? controls.aspectRatio : "auto",
     format,
     count: controls.count,

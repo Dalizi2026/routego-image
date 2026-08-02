@@ -5,8 +5,6 @@ import { mkdir, readdir, realpath, rm } from "node:fs/promises";
 import {
   confirmLegacyLibraryMigrationInputSchema,
   confirmLegacyLibraryMigrationResultSchema,
-  capabilityProbeInputSchema,
-  capabilityProbeResultSchema,
   discardUploadResourceInputSchema,
   discardUploadResourceResultSchema,
   executeLibraryMutationInputSchema,
@@ -70,8 +68,6 @@ import {
   updateSettingsResultSchema,
   upsertProviderProfileInputSchema,
   upsertProviderProfileResultSchema,
-  type CapabilityProbeInput,
-  type CapabilityProbeResult,
   type ConfirmLegacyLibraryMigrationInput,
   type ConfirmLegacyLibraryMigrationResult,
   type DiscardUploadResourceInput,
@@ -147,10 +143,6 @@ import {
   type PreparedImageInput
 } from "@routego-image/creation";
 import {
-  fingerprintProviderEndpoint,
-  selectProviderRoute
-} from "@routego-image/foundation";
-import {
   LibraryError,
   type ResolvedStableImageResource,
   type RoutegoLibraryService
@@ -206,10 +198,6 @@ import {
   refreshProviderModels,
   type RefreshProviderModelsOptions
 } from "../provider/models";
-import {
-  probeProviderCapability,
-  type ProbeProviderCapabilityOptions
-} from "../provider/probes";
 import { EphemeralImageResourceRegistry } from "../runtime/ephemeral-resources";
 
 export interface StudioSessionContext {
@@ -271,7 +259,6 @@ export interface LocalRoutegoServiceOptions {
   readonly fetch?: typeof fetch;
   readonly providerContextOptions?: Omit<LoadProviderContextOptions, "fetch">;
   readonly modelRefreshOptions?: Omit<RefreshProviderModelsOptions, "fetch">;
-  readonly capabilityProbeOptions?: Omit<ProbeProviderCapabilityOptions, "fetch">;
   readonly now?: () => Date;
   readonly createId?: (scope: string, order?: number, attempt?: number) => string;
   readonly maximumImageBytes?: number;
@@ -317,13 +304,6 @@ interface PublicInputDescriptor {
 type ParsedStudioBatchInput = ReturnType<typeof studioBatchInputSchema.parse>;
 
 const FIXED_BATCH_CONCURRENCY = 2 as const;
-
-/**
- * Codex currently stops awaiting one MCP tool call after five minutes. Keep
- * provider work in the local runtime when the user deliberately chooses a
- * longer Studio response deadline instead of letting the host discard it.
- */
-const CODEX_MCP_SYNC_WAIT_MS = 300_000;
 
 interface ProviderSnapshot {
   readonly context?: ProviderRuntimeContext;
@@ -567,28 +547,6 @@ function failureResult(
     failedSlots: [{ slot: 0, error }],
     relationships: [],
     error
-  });
-}
-
-function queuedResult(request: ImageOperationRequest, requestId: string): ImageOperationResult {
-  return imageOperationResultSchema.parse({
-    schemaVersion: 1,
-    requestId,
-    status: "queued",
-    requestedParams: request,
-    effectiveParams: request,
-    execution: {
-      attemptCount: 0,
-      providerRequestCount: 0,
-      receivedAnyOutput: false,
-      mayHaveBilled: false,
-      degradedContinuation: false,
-      providerImageIds: []
-    },
-    finalArtifacts: [],
-    partialArtifacts: [],
-    failedSlots: [],
-    relationships: []
   });
 }
 
@@ -919,19 +877,6 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     return refreshModelsResultSchema.parse(await refreshProviderModels(this.#options.library.settingsStore, parsed, options));
   }
 
-  async probeCapabilities(input: CapabilityProbeInput): Promise<CapabilityProbeResult> {
-    const parsed = capabilityProbeInputSchema.parse(input);
-    const settings = await this.#options.library.readSettings({});
-    const options = {
-      ...(this.#options.capabilityProbeOptions ?? {}),
-      ...(this.#options.capabilityProbeOptions?.timeoutMs === undefined
-        ? { timeoutMs: settings.defaults.responseTimeoutMs ?? 300_000 }
-        : {}),
-      ...(this.#options.fetch === undefined ? {} : { fetch: this.#options.fetch })
-    };
-    return capabilityProbeResultSchema.parse(await probeProviderCapability(this.#options.library.settingsStore, parsed, options));
-  }
-
   async updateSettings(input: UpdateSettingsInput): Promise<UpdateSettingsResult> {
     return updateSettingsResultSchema.parse(await this.#options.library.updateSettings(updateSettingsInputSchema.parse(input)));
   }
@@ -1097,71 +1042,6 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       signal: context.signal,
       ...(context.onEvent === undefined ? {} : { onEvent: context.onEvent })
     });
-  }
-
-  async #persistSuccessfulDirectImageCapabilities(
-    request: ImageOperationRequest,
-    provider: ProviderSnapshot,
-    creation: ImageOperationResult
-  ): Promise<void> {
-    const isDirectReferenceGeneration = request.kind === "generate" && request.references.length > 0;
-    if (
-      (request.kind !== "edit" && !isDirectReferenceGeneration) ||
-      creation.status !== "succeeded" ||
-      provider.context === undefined
-    ) {
-      return;
-    }
-    const context = isDirectReferenceGeneration
-      ? { ...provider.context, allowUnverifiedDirectReferenceGeneration: true }
-      : { ...provider.context, allowUnverifiedDirectEdit: true };
-    const decision = selectProviderRoute(context, request);
-    if (!decision.selected) return;
-
-    const capabilities = decision.requiredCapabilities.filter((capability) =>
-      (request.kind === "edit" && capability === "target-edit") ||
-      capability === "single-image-input" ||
-      capability === "multi-image-input" ||
-      capability === "data-url-input" ||
-      capability === "multipart-input"
-    );
-    if (capabilities.length === 0) return;
-
-    const observedAt = this.#now().toISOString();
-    const evidence = {
-      source: "successful-request" as const,
-      observedAt,
-      summary: isDirectReferenceGeneration
-        ? "A user-requested direct reference-image generation completed on this exact provider route."
-        : "A user-authorized direct image edit completed on this exact provider route.",
-      requestShape: decision.requestShape
-    };
-    const persisted = await Promise.allSettled(capabilities.map(async (capability) => {
-      const result = capabilityProbeResultSchema.parse({
-        schemaVersion: 1,
-        providerId: provider.context!.providerId,
-        model: provider.context!.model,
-        status: "completed",
-        mayHaveBilled: creation.execution.mayHaveBilled,
-        record: {
-          capability,
-          scope: {
-            providerId: provider.context!.providerId,
-            model: provider.context!.model,
-            endpointFingerprint: fingerprintProviderEndpoint(decision.endpoint),
-            transport: decision.transport,
-            requestShape: decision.requestShape
-          },
-          state: "supported",
-          evidence: [evidence],
-          verifiedAt: observedAt
-        }
-      });
-      await this.#options.library.settingsStore.persistCapabilityProbe(result);
-    }));
-    // Persistence is advisory post-success evidence. It must not turn a completed
-    // provider image request into a false failure when local configuration storage is busy.
-    void persisted;
   }
 
   async #materialize(
@@ -1400,40 +1280,6 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     }
   }
 
-  /**
-   * Starts a long-running public operation without tying it to the lifecycle
-   * of the MCP request that submitted it. `close()` still owns cancellation
-   * and waits for this promise, so no work is orphaned during shutdown.
-   */
-  #queuePublic(
-    input: ImageOperationRequest,
-    providerSnapshot?: ProviderSnapshot,
-    allowUnverifiedDirectEdit = false
-  ): ImageOperationResult {
-    const requestId = this.#id("request");
-    const controller = new AbortController();
-    const promise = this.#executePublicInner(
-      requestId,
-      input,
-      controller.signal,
-      providerSnapshot,
-      allowUnverifiedDirectEdit
-    );
-    this.#active.set(requestId, { controller, promise });
-    this.#activePromises.add(promise);
-    void promise.then(
-      () => {
-        this.#active.delete(requestId);
-        this.#activePromises.delete(promise);
-      },
-      () => {
-        this.#active.delete(requestId);
-        this.#activePromises.delete(promise);
-      }
-    );
-    return queuedResult(input, requestId);
-  }
-
   async #executePublicInner(
     requestId: string,
     input: ImageOperationRequest,
@@ -1484,7 +1330,6 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         }));
       }
       const creation = parsedCreation.data;
-      await this.#persistSuccessfulDirectImageCapabilities(staged.request, provider, creation);
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
       const normalized = await this.#normalizeOutputDimensions(
         staged.request,
@@ -1530,9 +1375,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     try {
       const defaults = await this.#publicDefaults();
       const request = resolvePublicImageRequest(input, defaults);
-      return defaults.responseTimeoutMs !== undefined && defaults.responseTimeoutMs > CODEX_MCP_SYNC_WAIT_MS
-        ? this.#queuePublic(request)
-        : await this.#executePublic(request);
+      return await this.#executePublic(request);
     } catch (error) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error, "config_corrupt"));
     }
@@ -1550,9 +1393,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     try {
       const defaults = await this.#publicDefaults();
       const request = resolvePublicImageRequest(input, defaults);
-      return defaults.responseTimeoutMs !== undefined && defaults.responseTimeoutMs > CODEX_MCP_SYNC_WAIT_MS
-        ? this.#queuePublic(request, undefined, true)
-        : await this.#executePublic(request, undefined, undefined, true);
+      return await this.#executePublic(request, undefined, undefined, true);
     } catch (error) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error, "config_corrupt"));
     }

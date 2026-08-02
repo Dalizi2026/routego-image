@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  capabilityProbeResultSchema,
   discardUploadResourceResultSchema,
   executeLibraryMutationResultSchema,
   finalizeUploadResourceResultSchema,
@@ -168,35 +167,6 @@ describe("deterministic mock application service", () => {
     });
     expect(cleared.profile).toMatchObject({ hasApiKey: false });
     expect(cleared.profile).not.toHaveProperty("apiKeyPreview");
-  });
-
-  it("models supported, failed, and degraded capability probes without real requests", async () => {
-    const input = {
-      providerId: "mock-provider",
-      model: "mock-image-model",
-      capability: "single-image-input" as const,
-      transport: "single-endpoint-json" as const,
-      requestShape: "single-endpoint-json:image",
-      confirmBillableProbe: true as const
-    };
-    const supported = await createMockRoutegoService({ fixture: "success" }).probeCapabilities(
-      input
-    );
-    const failed = await createMockRoutegoService({ fixture: "failure" }).probeCapabilities(input);
-    const degraded = await createMockRoutegoService({ fixture: "degraded" }).probeCapabilities(
-      input
-    );
-
-    expect(capabilityProbeResultSchema.parse(supported).record.state).toBe("supported");
-    expect(capabilityProbeResultSchema.parse(failed)).toMatchObject({
-      status: "failed",
-      record: { state: "unknown" },
-      error: { code: "timeout" }
-    });
-    expect(capabilityProbeResultSchema.parse(degraded)).toMatchObject({
-      status: "completed",
-      record: { state: "degraded" }
-    });
   });
 
   it("provides active generation-only Library fixtures and relative browser resources", async () => {

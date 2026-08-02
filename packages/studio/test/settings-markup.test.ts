@@ -110,9 +110,7 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).toContain("Response wait limit");
     expect(markup).toContain('value="300000"');
     expect(markup).toContain("cannot extend an earlier timeout imposed by the provider itself");
-    expect(markup).toContain("Verify current defaults");
-    expect(markup).toContain("Start verification (may be billable)");
-    expect(markup).toContain("Custom size and aspect ratio");
+    expect(markup).not.toContain("Start verification (may be billable)");
     expect(markup).toContain("Custom aspect ratio");
     expect(markup).toContain("21:9");
     expect(markup).toContain("Current configuration");
@@ -124,7 +122,7 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).toContain("2048 × 2048");
   });
 
-  it("offers a billable verification for a saved non-auto quality", () => {
+  it("keeps a saved non-auto quality selectable without offering a billable verification", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
         initialLanguage: "en",
@@ -136,8 +134,9 @@ describe("secret-safe Settings workspace markup", () => {
       })
     );
 
-    expect(markup).toContain("Requested image quality");
-    expect(markup).toContain("sends and confirms the high quality parameter");
+    expect(markup).toContain("Quality");
+    expect(markup).toContain('value="high" selected=""');
+    expect(markup).not.toContain("Start verification (may be billable)");
   });
 
   it("keeps the normal provider editor available for first-run guidance", () => {

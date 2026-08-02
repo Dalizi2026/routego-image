@@ -4,7 +4,6 @@ import type { ReadSettingsResult } from "@routego-image/contracts";
 
 import type { StudioGateway } from "../../api";
 import { useI18n } from "../../i18n";
-import { CapabilityProbePanel } from "./CapabilityProbePanel";
 import {
   configurableRatios,
   normalizeCustomAspectRatio,
@@ -85,7 +84,7 @@ const copy = {
     saved: "已保存。之后在 Codex 对话生图将默认使用这些参数。",
     failed: "设置未保存，请检查选项后重试。",
     nativeHint: "原生透明需要服务商明确支持；当前配置使用安全默认值。",
-    resolutionHint: "选择 1K、2K 或 4K 后，插件会按已验证的兼容尺寸矩阵发送给上游。"
+    resolutionHint: "选择 1K、2K 或 4K 后，插件会直接把所选的精确像素尺寸发送给上游。"
   },
   en: {
     eyebrow: "CODEX DEFAULTS / 01",
@@ -125,7 +124,7 @@ const copy = {
     saved: "Saved. Future Codex image requests will use these defaults unless overridden.",
     failed: "Settings were not saved. Check the options and try again.",
     nativeHint: "Native transparency requires explicit provider support; the current setup keeps a safe default.",
-    resolutionHint: "Routego sends the verified compatible size matrix for the selected 1K, 2K, or 4K aspect ratio."
+    resolutionHint: "Routego sends the exact selected pixel dimensions for the chosen 1K, 2K, or 4K aspect ratio."
   }
 } as const;
 
@@ -320,7 +319,6 @@ export function GenerationDefaultsPanel({
           <span>{outputCount}</span>
         </p>
         <div className="generation-defaults__actions">
-          {onboardingPreview ? null : <CapabilityProbePanel compact gateway={gateway} settings={settings} />}
           <button className="generation-defaults__save" data-onboarding-target="defaults-save" form="generation-defaults-form" type="submit" disabled={state.status === "busy"}>{state.status === "busy" ? labels.saving : onboardingPreview ? labels.onboardingPreviewSave : labels.save}</button>
         </div>
       </div>
