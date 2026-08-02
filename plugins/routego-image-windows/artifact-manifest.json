@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "name": "routego-image-windows",
-  "version": "1.0.5+codex.20260802",
+  "version": "1.0.5+codex.20260802-windows1",
   "node": ">=20.19.0",
   "files": [
     {
       "path": ".codex-plugin/plugin.json",
-      "bytes": 1448,
-      "sha256": "1176a4e57330b901d5afe5b3d32f90680bcab7f447255388448ac77697c20234"
+      "bytes": 1457,
+      "sha256": "abc258f934e55e2b409f8bb27dde4c95eb009fc4fb45bdf60f2b8219adc5f740"
     },
     {
       "path": "assets/composer-icon.png",
@@ -61,8 +61,8 @@
     },
     {
       "path": "runtime/index.js",
-      "bytes": 1699479,
-      "sha256": "aa14e8cd04a67830fc0b57443fe03b39be645e3b0c05c3bf74af97c08910ba1a"
+      "bytes": 1699922,
+      "sha256": "bce12328276aed1a08213f31282eaa2d131aa26872aae63d7c442543bc495ce5"
     },
     {
       "path": "runtime/resource-manifest.json",
@@ -86,8 +86,8 @@
     },
     {
       "path": "scripts/start-routego-image-windows.mjs",
-      "bytes": 3020,
-      "sha256": "c6f460e0f57e1eafdbd68eeed916a48d7a16e0add171a73e7faaf5750b3ed64a"
+      "bytes": 3265,
+      "sha256": "d9fc8f5951fdc499a94d6fbdbff13744816d9f0f1d0bd5e50a14f4bddc30f480"
     },
     {
       "path": "skills/routego-image-windows/SKILL.md",

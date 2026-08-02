@@ -44080,12 +44080,17 @@ var RoutegoMcpProcess = class {
         if (this.#closing) return;
         await this.#server.handleChunk(chunk);
         if (this.#server.closed) {
+          if (this.#options.retainHttpOnMcpDisconnect === true) return;
           await this.shutdown("mcp-shutdown");
           return;
         }
       }
       if (this.#closing) return;
       await this.#server.finish();
+      if (this.#options.retainHttpOnMcpDisconnect === true) {
+        this.#server.shutdown();
+        return;
+      }
       await this.shutdown(this.#server.closed ? "mcp-shutdown" : "stdin-eof");
     } catch (error51) {
       if (!this.#closing) {
@@ -44166,7 +44171,8 @@ function createRoutegoMcpProcess(options) {
     signalSource: processSignals(options.signalSource),
     diagnose: createDiagnosticReporter(error51, options.logger),
     ...options.maximumLineBytes === void 0 ? {} : { maximumLineBytes: options.maximumLineBytes },
-    ...options.shutdownTimeoutMs === void 0 ? {} : { shutdownTimeoutMs: options.shutdownTimeoutMs }
+    ...options.shutdownTimeoutMs === void 0 ? {} : { shutdownTimeoutMs: options.shutdownTimeoutMs },
+    ...options.retainHttpOnMcpDisconnect === void 0 ? {} : { retainHttpOnMcpDisconnect: options.retainHttpOnMcpDisconnect }
   });
 }
 async function createProductionRoutegoMcpProcess(options) {
@@ -44250,7 +44256,8 @@ async function createProductionRoutegoMcpProcess(options) {
       signalSource,
       diagnose,
       ...options.maximumLineBytes === void 0 ? {} : { maximumLineBytes: options.maximumLineBytes },
-      ...options.shutdownTimeoutMs === void 0 ? {} : { shutdownTimeoutMs: options.shutdownTimeoutMs }
+      ...options.shutdownTimeoutMs === void 0 ? {} : { shutdownTimeoutMs: options.shutdownTimeoutMs },
+      ...options.retainHttpOnMcpDisconnect === void 0 ? {} : { retainHttpOnMcpDisconnect: options.retainHttpOnMcpDisconnect }
     });
   } catch (error52) {
     if (ownsEphemeralResources) await ephemeralResources.shutdown().catch(() => 0);

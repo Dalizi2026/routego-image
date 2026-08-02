@@ -74,7 +74,11 @@ async function main() {
     ...studio,
     homeDirectory,
     dataRoot,
-    runtimeRoot: path.join(dataRoot, "runtime")
+    runtimeRoot: path.join(dataRoot, "runtime"),
+    // Codex hosts on Windows can close the MCP STDIO channel after returning
+    // the Studio URL. Keep the same authenticated loopback service alive so
+    // the opened page can keep using its local API.
+    retainHttpOnMcpDisconnect: true
   });
 }
 
