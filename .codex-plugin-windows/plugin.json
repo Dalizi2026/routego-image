@@ -1,6 +1,6 @@
 {
   "name": "routego-image-windows",
-  "version": "1.0.5+codex.20260802",
+  "version": "1.0.5+codex.20260802-windows1",
   "description": "Create, edit, organize, and review images with the local Routego Image Windows runtime.",
   "author": {
     "name": "Routego Image"

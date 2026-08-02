@@ -21,7 +21,7 @@ import { pathToFileURL } from "node:url";
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.5(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
-const ACCEPTED_WINDOWS_PLUGIN_VERSION = /^1\.0\.0\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u;
+const ACCEPTED_WINDOWS_PLUGIN_VERSION = /^1\.0\.5\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u;
 const PACKAGE_VARIANTS = new Map([
   ["routego-image", {
     acceptedVersion: ACCEPTED_PLUGIN_VERSION,
@@ -213,9 +213,13 @@ class AppServerClient {
     }
   }
 
+  endInput() {
+    if (!this.#closed && !this.#child.stdin.destroyed) this.#child.stdin.end();
+  }
+
   async close(temporaryRoot) {
     if (this.#closed) return;
-    if (!this.#child.stdin.destroyed) this.#child.stdin.end();
+    this.endInput();
     await Promise.race([
       new Promise((resolve) => this.#child.once("close", resolve)),
       new Promise((resolve) => setTimeout(resolve, 1_000))
@@ -829,6 +833,24 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
     const folderId = managed.affectedFolderIds?.[0];
     if (managed.action !== "create-folder" || typeof folderId !== "string") {
       fail("portable MCP did not create the synthetic Library identity");
+    }
+    if (options.packageName === "routego-image-windows") {
+      const launch = parsedToolResult(await client.request("tools/call", {
+        name: "routego_open_studio",
+        arguments: { address: "127.0.0.1", reuseExisting: false }
+      }));
+      const bootstrap = await fetch(launch.url, { redirect: "error" });
+      if (bootstrap.status !== 200) fail("Windows Studio launch did not load before MCP disconnect");
+      const session = sessionTokenFromBootstrap(await bootstrap.text());
+      const origin = new URL(launch.url).origin;
+      client.endInput();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      const retainedStatus = await checkedJson(await fetch(new URL("/api/v1/status", origin), {
+        headers: browserReadHeaders(session)
+      }));
+      if (retainedStatus.service?.status !== "ready" || retainedStatus.service?.studioAvailable !== true) {
+        fail("Windows Studio did not remain reachable after the MCP host closed STDIO");
+      }
     }
     await client.close(paths.installedPackage);
     const dataRoot = options.dataRootDirectory === undefined

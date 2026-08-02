@@ -181,17 +181,18 @@ describe("Routego Image plugin package", () => {
     );
     expect(verification.contentManifest).toMatchObject({
       name: "routego-image-windows",
-      version: "1.0.0+codex.20260802"
+      version: "1.0.5+codex.20260802-windows1"
     });
     expect(manifest).toMatchObject({
       name: "routego-image-windows",
-      version: "1.0.0+codex.20260802",
-      interface: { displayName: "Routego Image for Windows v1.0.0" }
+      version: "1.0.5+codex.20260802-windows1",
+      interface: { displayName: "Routego Image for Windows v1.0.5" }
     });
     expect(verification.files).toContain("skills/routego-image-windows/SKILL.md");
     expect(verification.files).toContain("scripts/start-routego-image-windows.mjs");
     expect(launcher).toContain("ROUTEGO_PACKAGE_TARGET = \"windows\"");
     expect(launcher).toContain("routego-image-windows");
+    expect(launcher).toContain("retainHttpOnMcpDisconnect: true");
   });
 
   it("rejects unlisted dependency trees and sensitive configuration", async () => {

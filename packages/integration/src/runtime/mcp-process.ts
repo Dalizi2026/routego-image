@@ -90,6 +90,13 @@ interface RoutegoMcpProcessConstructionOptions {
   readonly diagnose: RoutegoProcessDiagnosticSink;
   readonly maximumLineBytes?: number;
   readonly shutdownTimeoutMs?: number;
+  /**
+   * Some Windows MCP hosts close STDIO immediately after a tool response even
+   * while an authenticated Studio page is still using the loopback listener.
+   * Keep the HTTP/service lifecycle alive in that case; signals still perform
+   * the normal bounded shutdown.
+   */
+  readonly retainHttpOnMcpDisconnect?: boolean;
 }
 
 export interface CreateRoutegoMcpProcessOptions {
@@ -102,6 +109,7 @@ export interface CreateRoutegoMcpProcessOptions {
   readonly logger?: RoutegoProcessDiagnosticSink;
   readonly maximumLineBytes?: number;
   readonly shutdownTimeoutMs?: number;
+  readonly retainHttpOnMcpDisconnect?: boolean;
 }
 
 type ServiceOverrides = Omit<
@@ -153,6 +161,8 @@ export interface ProductionRoutegoMcpProcessOptions {
   readonly logger?: RoutegoProcessDiagnosticSink;
   readonly maximumLineBytes?: number;
   readonly shutdownTimeoutMs?: number;
+  /** Windows-only compatibility mode for hosts that close MCP STDIO after opening Studio. */
+  readonly retainHttpOnMcpDisconnect?: boolean;
 }
 
 /**
@@ -397,12 +407,20 @@ export class RoutegoMcpProcess {
         if (this.#closing) return;
         await this.#server.handleChunk(chunk);
         if (this.#server.closed) {
+          if (this.#options.retainHttpOnMcpDisconnect === true) return;
           await this.shutdown("mcp-shutdown");
           return;
         }
       }
       if (this.#closing) return;
       await this.#server.finish();
+      if (this.#options.retainHttpOnMcpDisconnect === true) {
+        // The MCP transport is no longer usable, but the authenticated Studio
+        // page must keep its same-process loopback API until the host signals
+        // termination. This mode is enabled only by the Windows launcher.
+        this.#server.shutdown();
+        return;
+      }
       await this.shutdown(this.#server.closed ? "mcp-shutdown" : "stdin-eof");
     } catch (error) {
       if (!this.#closing) {
@@ -497,7 +515,10 @@ export function createRoutegoMcpProcess(options: CreateRoutegoMcpProcessOptions)
       : { maximumLineBytes: options.maximumLineBytes }),
     ...(options.shutdownTimeoutMs === undefined
       ? {}
-      : { shutdownTimeoutMs: options.shutdownTimeoutMs })
+      : { shutdownTimeoutMs: options.shutdownTimeoutMs }),
+    ...(options.retainHttpOnMcpDisconnect === undefined
+      ? {}
+      : { retainHttpOnMcpDisconnect: options.retainHttpOnMcpDisconnect })
   });
 }
 
@@ -592,7 +613,10 @@ export async function createProductionRoutegoMcpProcess(
         : { maximumLineBytes: options.maximumLineBytes }),
       ...(options.shutdownTimeoutMs === undefined
         ? {}
-        : { shutdownTimeoutMs: options.shutdownTimeoutMs })
+        : { shutdownTimeoutMs: options.shutdownTimeoutMs }),
+      ...(options.retainHttpOnMcpDisconnect === undefined
+        ? {}
+        : { retainHttpOnMcpDisconnect: options.retainHttpOnMcpDisconnect })
     });
   } catch (error) {
     if (ownsEphemeralResources) await ephemeralResources.shutdown().catch(() => 0);
