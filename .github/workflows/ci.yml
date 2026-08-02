@@ -23,7 +23,7 @@ jobs:
           - ubuntu-latest
           - macos-latest
         node:
-          - 20.19.0
+          - 24.18.0
     env:
       CI: "1"
     steps:
