@@ -65,9 +65,14 @@ async function main() {
   if (typeof runtime.runRoutegoImageCli !== "function") {
     throw new Error("Routego Image runtime entry is invalid.");
   }
-  const dataRoot = path.join(homedir(), ".codex", "routego-image-windows");
+  // Keep every Windows-specific persisted path rooted at the same user profile.
+  // USERPROFILE is the Windows-native source; HOME is retained for portable
+  // Codex hosts and test runners that provide an isolated profile that way.
+  const homeDirectory = process.env.USERPROFILE?.trim() || process.env.HOME?.trim() || homedir();
+  const dataRoot = path.join(homeDirectory, ".codex", "routego-image-windows");
   await runtime.runRoutegoImageCli({
     ...studio,
+    homeDirectory,
     dataRoot,
     runtimeRoot: path.join(dataRoot, "runtime")
   });

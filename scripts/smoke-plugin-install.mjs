@@ -428,7 +428,8 @@ async function exerciseStudio(urlText, installedPackage, folderId) {
   const folderCollection = Array.isArray(folders) ? folders : folders.folders;
   if (!Array.isArray(folderCollection) ||
       !folderCollection.some((folder) => folder?.folderId === folderId || folder?.id === folderId)) {
-    fail("Studio did not observe the folder identity created through MCP");
+    const returnedFolderCount = Array.isArray(folderCollection) ? folderCollection.length : -1;
+    fail(`Studio did not observe the folder identity created through MCP (returnedFolderCount=${returnedFolderCount})`);
   }
 
   const pngSha256 = sha256(SYNTHETIC_PNG);
