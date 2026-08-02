@@ -181,11 +181,11 @@ describe("Routego Image plugin package", () => {
     );
     expect(verification.contentManifest).toMatchObject({
       name: "routego-image-windows",
-      version: "1.0.5+codex.20260802-windows2"
+      version: "1.0.5+codex.20260802-windows3"
     });
     expect(manifest).toMatchObject({
       name: "routego-image-windows",
-      version: "1.0.5+codex.20260802-windows2",
+      version: "1.0.5+codex.20260802-windows3",
       interface: { displayName: "Routego Image for Windows v1.0.5" }
     });
     expect(verification.files).toContain("skills/routego-image-windows/SKILL.md");

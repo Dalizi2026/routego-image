@@ -527,7 +527,7 @@ describe("provider route selection", () => {
     expect(decision).toMatchObject({ selected: true, transparency: "local-fallback" });
   });
 
-  it("forwards explicit variant counts to the configured provider", () => {
+  it("requires a routed variant capability before submitting multiple images", () => {
     const decision = selectProviderRoute(
       context(
         [
@@ -540,7 +540,7 @@ describe("provider route selection", () => {
       ),
       { kind: "generate", prompt: "Too many variants", count: 3 }
     );
-    expect(decision).toMatchObject({ selected: true });
+    expect(decision).toMatchObject({ selected: false });
   });
 
   it("allows one authorized direct edit on the configured generation endpoint without deriving an edits endpoint", () => {

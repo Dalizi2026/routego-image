@@ -190,8 +190,7 @@ function isProviderDrivenControl(capability: ProviderCapability): boolean {
   // from the returned artifact. Forward them once and fail closed on a mismatch
   // instead of requiring a separate, potentially billable probe first.
   return [
-    "custom-size", "output-format", "quality-control", "native-variants",
-    "compression", "streaming", "partial-images", "moderation"
+    "custom-size", "output-format", "quality-control", "compression", "moderation"
   ].includes(capability);
 }
 
