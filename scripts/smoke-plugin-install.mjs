@@ -25,11 +25,13 @@ const ACCEPTED_WINDOWS_PLUGIN_VERSION = /^1\.0\.0\+codex\.[a-z0-9](?:[a-z0-9-]{0
 const PACKAGE_VARIANTS = new Map([
   ["routego-image", {
     acceptedVersion: ACCEPTED_PLUGIN_VERSION,
-    skillPath: "skills/routego-image/SKILL.md"
+    skillPath: "skills/routego-image/SKILL.md",
+    dataRootDirectory: undefined
   }],
   ["routego-image-windows", {
     acceptedVersion: ACCEPTED_WINDOWS_PLUGIN_VERSION,
-    skillPath: "skills/routego-image-windows/SKILL.md"
+    skillPath: "skills/routego-image-windows/SKILL.md",
+    dataRootDirectory: path.join(".codex", "routego-image-windows")
   }]
 ]);
 
@@ -579,7 +581,7 @@ async function syntheticExecution(request, context) {
   };
 }
 
-async function exerciseSyntheticInstalledRuntime(paths, folderId) {
+async function exerciseSyntheticInstalledRuntime(paths, folderId, dataRoot) {
   const runtimeModule = await import(
     `${pathToFileURL(path.join(paths.installedPackage, "runtime/index.js")).href}?smoke=${randomUUID()}`
   );
@@ -607,6 +609,7 @@ async function exerciseSyntheticInstalledRuntime(paths, folderId) {
     input,
     output,
     error,
+    ...(dataRoot === undefined ? {} : { dataRoot }),
     serviceOptions: {
       executeCreation: syntheticExecution,
       defaultModel: "synthetic-model"
@@ -826,8 +829,13 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
       fail("portable MCP did not create the synthetic Library identity");
     }
     await client.close(paths.installedPackage);
-    const studio = await exerciseSyntheticInstalledRuntime(paths, folderId);
-    const legacyLibraryUpgraded = await exerciseLegacyLibraryUpgrade(paths);
+    const dataRoot = options.dataRootDirectory === undefined
+      ? undefined
+      : path.join(paths.home, options.dataRootDirectory);
+    const studio = await exerciseSyntheticInstalledRuntime(paths, folderId, dataRoot);
+    const legacyLibraryUpgraded = dataRoot === undefined
+      ? await exerciseLegacyLibraryUpgrade(paths)
+      : false;
     const skillText = await readFile(path.join(paths.installedPackage, options.skillPath), "utf8");
     if (!/[A-Za-z]{4}/u.test(skillText) || !/\p{Script=Han}/u.test(skillText) ||
         !EXPECTED_TOOLS.every((name) => skillText.includes(`\`${name}\``))) {
@@ -1059,6 +1067,7 @@ export async function runPluginInstallSmoke(options) {
       acceptedArtifactManifestSha256,
       packageName: verification.contentManifest.name,
       skillPath: variant.skillPath,
+      dataRootDirectory: variant.dataRootDirectory,
       ...(options.freshProcessCommand === undefined
         ? {}
         : { freshProcessCommand: options.freshProcessCommand }),
