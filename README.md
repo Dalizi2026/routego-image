@@ -4,7 +4,7 @@ Routego Image 是一个面向 Codex 的本地个人图像插件：通过用户�
 
 当前发布版本：**v1.0.5**（插件包版本 `1.0.5+codex.20260802`）。
 
-Windows 使用独立插件包：**Routego Image for Windows v1.0.0**（`routego-image-windows`）。它与 Mac 版隔离本地配置、图库与运行时数据，避免误读取彼此的供应商信息。每次先以 Mac 主版完成验证，再同步共享核心并单独通过 Windows 安装冒烟测试后发布 Windows 维护版。
+Windows 使用独立插件包：**Routego Image for Windows v1.0.5**（`routego-image-windows`）。它与 Mac 版隔离本地配置、图库与运行时数据，避免误读取彼此的供应商信息。Windows 与 Mac 始终使用相同的公开功能版本号；每次先以 Mac 主版完成验证，再同步共享核心并单独通过 Windows 安装冒烟测试后发布同版本的 Windows 维护版。
 
 ## 核心能力
 
@@ -22,7 +22,7 @@ Windows 使用独立插件包：**Routego Image for Windows v1.0.0**（`routego-
 - 原生透明回退结果会明确标记为需要人工复核，不再把边缘质量不足的结果当作成功交付。
 - 修复后台任务完成后的图库可见性与发布包校验，更新插件包、许可清单和安装冒烟检查。
 
-### Windows v1.0.0
+### Windows v1.0.5
 
 - 新增独立 Windows 插件包、启动入口和本地数据目录，不影响既有 Mac 安装及配置。
 - 对 Windows 的异常图像响应记录安全协议诊断（编码、内容类型、长度与解析阶段），不保存服务商原始正文、接口地址或密钥。

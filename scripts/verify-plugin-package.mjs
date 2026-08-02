@@ -22,7 +22,7 @@ const BACKGROUND_REMOVAL_RESOURCES = new Map([
 ]);
 const MINIMUM_RAW_BASE64_PAYLOAD_CHARS = 96;
 const ACCEPTED_MAC_PLUGIN_VERSION = /^1\.0\.5(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
-const ACCEPTED_WINDOWS_PLUGIN_VERSION = /^1\.0\.0\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u;
+const ACCEPTED_WINDOWS_PLUGIN_VERSION = /^1\.0\.5\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u;
 const ACCEPTED_MAC_PLUGIN_MANIFEST = {
   name: "routego-image",
   description: "Create, edit, organize, and review images with the local Routego Image runtime.",
@@ -68,7 +68,7 @@ const ACCEPTED_WINDOWS_PLUGIN_MANIFEST = {
     }
   },
   interface: {
-    displayName: "Routego Image for Windows v1.0.0",
+    displayName: "Routego Image for Windows v1.0.5",
     shortDescription: "Windows 专用的本地图片生成、编辑、图库与 Studio 工作流。\nWindows-local image creation, editing, Library, and Studio workflows.",
     longDescription: "面向 Windows 的独立 Routego Image 运行时，提供安全网络响应诊断、图片生成、编辑、图库与 Studio 工作流。\nA Windows-specific Routego Image runtime with safe network-response diagnostics, image creation, editing, Library, and Studio workflows.",
     developerName: "Routego Image",

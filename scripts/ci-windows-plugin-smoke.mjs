@@ -38,7 +38,7 @@ async function main() {
       temporaryParent: path.join(temporaryRoot, "install-roots")
     });
     if (smoke.artifact.name !== "routego-image-windows" ||
-        smoke.artifact.version !== "1.0.0+codex.20260802" ||
+        smoke.artifact.version !== "1.0.5+codex.20260802" ||
         smoke.codex.freshProcess !== true || smoke.mcp.offlineSafe !== true ||
         smoke.cleanup.removedOwnedRoot !== true) {
       throw new Error("The temporary installed Windows package did not satisfy the offline smoke contract.");
