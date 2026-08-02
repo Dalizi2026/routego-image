@@ -41,7 +41,9 @@ export interface SettingsWorkspaceProps {
   readonly settings: ReadSettingsResult;
   readonly onSettingsChange: (settings: ReadSettingsResult) => void;
   readonly firstRunSession?: boolean | undefined;
-  readonly onOpenWorkbench?: (() => void) | undefined;
+  readonly onboardingPreview?: boolean | undefined;
+  readonly onReplayOnboarding?: (() => void) | undefined;
+  readonly onProviderSaved?: (() => void) | undefined;
 }
 
 export interface ProviderSwitchFeedback {

@@ -16,6 +16,7 @@ import {
 import {
   RoutegoMcpProcessShutdownError,
   createRoutegoMcpProcess,
+  resolveProductionStagingRoot,
   type ManagedRoutegoHttpLifecycle,
   type ManagedRoutegoService,
   type RoutegoMcpInput,
@@ -33,6 +34,22 @@ const EXPECTED_TOOLS = [
   "routego_manage_library",
   "routego_open_studio"
 ] as const;
+
+describe("production staging ownership", () => {
+  it("isolates default staging folders by runtime process while preserving an explicit root", () => {
+    const runtimeRoot = "/tmp/routego-image-runtime";
+
+    expect(resolveProductionStagingRoot(runtimeRoot, undefined, 4101)).toBe(
+      "/tmp/routego-image-runtime/staging/process-4101"
+    );
+    expect(resolveProductionStagingRoot(runtimeRoot, undefined, 4102)).toBe(
+      "/tmp/routego-image-runtime/staging/process-4102"
+    );
+    expect(resolveProductionStagingRoot(runtimeRoot, "/tmp/routego-image-explicit-staging", 4101)).toBe(
+      "/tmp/routego-image-explicit-staging"
+    );
+  });
+});
 
 class ControlledInput implements RoutegoMcpInput {
   readonly destroy = vi.fn((_error?: Error) => {
@@ -230,7 +247,7 @@ describe("task 4.3 MCP process protocol", () => {
     expect(resultOf(responses[0]!)).toMatchObject({
       protocolVersion: "2025-06-18",
       capabilities: { tools: {} },
-      serverInfo: { name: "routego-image", version: "1.0.0" }
+      serverInfo: { name: "routego-image", version: "1.0.5" }
     });
     const tools = resultOf(responses[1]!)["tools"] as Array<{
       name: string;

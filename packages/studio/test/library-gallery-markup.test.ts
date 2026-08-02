@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 import type { StudioLibrarySearchItem } from "@routego-image/contracts";
 
 import type { StudioGateway } from "../src/api";
-import { GalleryCard } from "../src/features/library";
+import { I18nProvider } from "../src/i18n";
+import { GalleryCard, LibraryWorkspace } from "../src/features/library";
 
 const item: StudioLibrarySearchItem = {
   assetId: "asset-gallery-01",
@@ -18,11 +19,27 @@ const item: StudioLibrarySearchItem = {
   height: 2048,
   status: "succeeded",
   folderIds: [],
-  createdAt: "2026-07-28T08:00:00.000Z",
-  currentMark: false
+  createdAt: "2026-07-28T08:00:00.000Z"
 };
 
 describe("sidebar-first Library gallery markup", () => {
+  it("includes an accessible refresh action in the Library batch toolbar", () => {
+    const markup = renderToStaticMarkup(
+      createElement(I18nProvider, {
+        initialLanguage: "en",
+        children: createElement(LibraryWorkspace, {
+          gateway: {} as StudioGateway,
+          view: "library",
+          providers: []
+        })
+      })
+    );
+
+    expect(markup).toContain('class="library-workspace__refresh"');
+    expect(markup).toContain('aria-label="Refresh Library"');
+    expect(markup).toContain('data-refreshing="true"');
+  });
+
   it("keeps prompts out of thumbnail text while retaining accessible detail labels", () => {
     const markup = renderToStaticMarkup(
       createElement(GalleryCard, {

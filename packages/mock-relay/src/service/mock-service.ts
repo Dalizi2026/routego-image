@@ -461,7 +461,6 @@ export class MockRoutegoService implements LocalRoutegoService {
       model: "mock-image-model",
       kind: seed.kind,
       status: partial ? "partial" : "succeeded",
-      currentMark: assetId === "mock-asset-output",
       mimeType: "image/png",
       width: seed.size === "1536x1024" ? 1536 : 1024,
       height: 1024,
@@ -521,7 +520,6 @@ export class MockRoutegoService implements LocalRoutegoService {
         "remove-folders",
         "export-zip",
         "download",
-        "mark",
         "copy-generation-info"
       ]
     };

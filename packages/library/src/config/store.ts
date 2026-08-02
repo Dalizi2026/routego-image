@@ -781,18 +781,32 @@ export class LibrarySettingsStore {
       const state = await this.#loadUnderLocks();
       const profile = state.config.profiles.find((item) => item.id === parsed.providerId);
       if (!profile) throw new LibraryError("not_found", "The provider profile does not exist.");
+      const models = Array.from(new Set(parsed.models));
+      const fallbackModel = models[0];
+      const defaultModel =
+        fallbackModel === undefined || profile.defaultModel === undefined || models.includes(profile.defaultModel)
+          ? profile.defaultModel
+          : fallbackModel;
       const updated: StoredProviderProfile = {
         ...profile,
-        models: Array.from(new Set(parsed.models)),
+        ...(defaultModel === undefined ? {} : { defaultModel }),
+        models,
         modelsRefreshedAt: refreshedAt,
         updatedAt: refreshedAt
       };
+      const defaults =
+        state.config.activeProviderId === profile.id &&
+        fallbackModel !== undefined &&
+        !models.includes(state.config.defaults.model ?? "")
+          ? { ...state.config.defaults, model: defaultModel ?? fallbackModel }
+          : state.config.defaults;
       await this.#commitConfig(state.config, {
         ...state.config,
         revision: state.config.revision + 1,
         profiles: state.config.profiles.map((item) =>
           item.id === profile.id ? updated : item
-        )
+        ),
+        defaults
       });
     });
   }

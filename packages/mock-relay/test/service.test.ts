@@ -231,26 +231,6 @@ describe("deterministic mock application service", () => {
     );
   });
 
-  it("preserves a deterministic generation-only mark mutation", async () => {
-    const service = createMockRoutegoService();
-    const preflight = await service.preflightLibraryMutation({
-      mutation: { action: "mark", assetIds: ["mock-asset-a"] }
-    });
-    expect(preflightLibraryMutationResultSchema.parse(preflight)).toMatchObject({
-      status: "ready",
-      requiredConfirmations: []
-    });
-    expect(preflight.items.map((item) => item.eligible)).toEqual([true]);
-
-    const result = await service.executeLibraryMutation({
-      preflightId: preflight.preflightId,
-      action: "mark",
-      confirmations: []
-    });
-    expect(executeLibraryMutationResultSchema.parse(result)).toMatchObject({ status: "succeeded" });
-    expect(result.items.map((item) => item.status)).toEqual(["succeeded"]);
-  });
-
   it("returns structured local-service failures and exposes invalid-output for boundary tests", async () => {
     await expect(
       createMockRoutegoService({ fixtureByOperation: { readSettings: "failure" } }).readSettings({})

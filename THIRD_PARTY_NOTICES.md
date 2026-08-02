@@ -27,6 +27,15 @@ This file does not treat the upstream dependency tree as Routego Image dependenc
 - Distribution: bundled pure-JavaScript runtime dependency; no native addon or install script is included in the Routego Image plugin.
 - Complete license text: `licenses/pngjs-MIT.txt`
 
+### onnxruntime-web 1.20.1
+
+- Project: `ONNX Runtime Web`
+- Repository: https://github.com/microsoft/onnxruntime
+- Version: `1.20.1`
+- License: MIT
+- Distribution: bundled WebAssembly inference runtime for the verified local U²-Netp background-removal model; no native addon or dependency install script is included in the Routego Image plugin.
+- Complete license text: `licenses/onnxruntime-web-MIT.txt`
+
 ### zod 4.4.3
 
 - Project: `zod`

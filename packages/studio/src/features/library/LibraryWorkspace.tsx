@@ -25,14 +25,15 @@ import {
   relationshipResourceInput,
   selectComparisonRelationships
 } from "./comparison";
-import { fetchLibraryDownload, triggerLibraryDownload } from "./download";
+import {
+  fetchLibraryDownload,
+  resolveOriginalLibraryResource,
+  triggerLibraryDownload
+} from "./download";
 import {
   copiedGenerationInformation,
   createCopyGenerationInfoRequest,
-  createMarkImageRequest,
-  nextCurrentMarkRecordId,
-  type CopyGenerationInfoResult,
-  type MarkImageResult
+  type CopyGenerationInfoResult
 } from "./handoff";
 import {
   advanceLibraryPage,
@@ -58,7 +59,7 @@ import "./library.css";
 
 function invokeBrowserSafeLibraryAction<Result>(
   gateway: StudioGateway,
-  path: "/api/v1/library/copy-generation-info" | "/api/v1/library/mark",
+  path: "/api/v1/library/copy-generation-info",
   input: { readonly schemaVersion: 1; readonly recordId: string }
 ): Promise<Result> {
   return (gateway.invoke as unknown as (operation: string, payload: typeof input) => Promise<Result>)(
@@ -95,6 +96,7 @@ const copy = {
     loading: "正在读取受保护图库",
     empty: "没有符合当前筛选的作品",
     emptyBody: "保留当前筛选，或重置条件查看其他本地作品。",
+    onboardingEmpty: "保存默认参数后，回到 Codex 对话开始生成。第一张完成后会自动出现在这里。",
     searchFailure: "图库检索未完成",
     page: "页",
     previous: "上一页",
@@ -103,8 +105,9 @@ const copy = {
     openDetail: "查看详情",
     createdAt: "创建时间",
     close: "关闭详情",
+    detailTitle: "图片详情",
     detailLoading: "正在装载档案详情",
-    detailFailure: "档案详情无法载入",
+    detailFailure: "图片详情加载失败",
     requested: "请求参数",
     effective: "实际参数",
     execution: "执行记录",
@@ -127,18 +130,25 @@ const copy = {
     selectPage: "选择当前页",
     clearPage: "取消当前页选择",
     cancelSelection: "取消选择",
-    selectedCount: "已选择"
+    selectedCount: "已选择",
+    refreshLibrary: "刷新图库"
     ,locations: "资源库位置"
     ,addLocation: "选择文件夹"
     ,add: "添加"
-    ,moveSelected: "移动所选图片"
+    ,moveSelected: "移动图片"
     ,moveTo: "移动到"
-    ,deleteSelected: "删除所选图片"
+    ,deleteSelected: "删除图片"
     ,deleteConfirm: "将永久删除所选图片及其对应本地文件，无法撤销。是否继续？"
     ,renameHint: "双击名称可重命名"
     ,rename: "重命名"
     ,preview: "查看原图"
+    ,previewLoading: "正在加载原图…"
+    ,previewFailure: "原图加载失败"
     ,closePreview: "关闭预览"
+    ,zoomIn: "放大"
+    ,zoomOut: "缩小"
+    ,resetZoom: "恢复 100%"
+    ,zoomHelp: "滚动滚轮或触控板缩放，放大后可拖动图片"
     ,workInfo: "作品信息与提示词"
     ,technicalInfo: "技术详情"
     ,comparisonInfo: "编辑前后对比"
@@ -150,6 +160,10 @@ const copy = {
     ,last7Days: "一周内"
     ,last30Days: "30 天内"
     ,customTimeRange: "自定义时间范围"
+    ,dimensionMismatch: "实际尺寸与请求尺寸不一致"
+    ,requestedDimensions: "请求尺寸"
+    ,actualDimensions: "实际尺寸"
+    ,requestedAspectRatio: "请求比例"
   },
   en: {
     libraryEyebrow: "ARCHIVE / 02",
@@ -178,6 +192,7 @@ const copy = {
     loading: "Loading the protected Library",
     empty: "No work matches these filters",
     emptyBody: "Keep the filters or reset them to inspect other local work.",
+    onboardingEmpty: "Save your defaults, then return to Codex to create an image. Your first result will appear here automatically.",
     searchFailure: "Library search did not complete",
     page: "Page",
     previous: "Previous",
@@ -186,8 +201,9 @@ const copy = {
     openDetail: "Open detail",
     createdAt: "Created",
     close: "Close detail",
+    detailTitle: "Image details",
     detailLoading: "Loading archive detail",
-    detailFailure: "Archive detail could not load",
+    detailFailure: "Image details could not load",
     requested: "Requested parameters",
     effective: "Effective parameters",
     execution: "Execution record",
@@ -210,18 +226,25 @@ const copy = {
     selectPage: "Select current page",
     clearPage: "Clear current-page selection",
     cancelSelection: "Cancel selection",
-    selectedCount: "Selected"
+    selectedCount: "Selected",
+    refreshLibrary: "Refresh Library"
     ,locations: "Library directories"
     ,addLocation: "Choose folder"
     ,add: "Add"
-    ,moveSelected: "Move selected images"
+    ,moveSelected: "Move images"
     ,moveTo: "Move to"
-    ,deleteSelected: "Delete selected images"
+    ,deleteSelected: "Delete images"
     ,deleteConfirm: "Selected images and their corresponding local files will be permanently deleted. Continue?"
     ,renameHint: "Double-click a name to rename it"
     ,rename: "Rename"
     ,preview: "View original"
+    ,previewLoading: "Loading original…"
+    ,previewFailure: "Original image could not load"
     ,closePreview: "Close preview"
+    ,zoomIn: "Zoom in"
+    ,zoomOut: "Zoom out"
+    ,resetZoom: "Reset to 100%"
+    ,zoomHelp: "Use the wheel or trackpad to zoom, then drag the enlarged image"
     ,workInfo: "Artwork and prompt"
     ,technicalInfo: "Technical details"
     ,comparisonInfo: "Before / after comparison"
@@ -233,6 +256,10 @@ const copy = {
     ,last7Days: "Last 7 days"
     ,last30Days: "Last 30 days"
     ,customTimeRange: "Custom time range"
+    ,dimensionMismatch: "Actual dimensions differ from the request"
+    ,requestedDimensions: "Requested dimensions"
+    ,actualDimensions: "Actual dimensions"
+    ,requestedAspectRatio: "Requested aspect ratio"
   }
 } as const;
 
@@ -289,6 +316,174 @@ function assetStatusLabel(status: string, language: "zh" | "en"): string {
     deleted: "已删除"
   };
   return labels[status] ?? status;
+}
+
+const previewZoomMinimum = 0.25;
+const previewZoomMaximum = 5;
+
+export function clampPreviewZoom(zoom: number): number {
+  return Math.min(previewZoomMaximum, Math.max(previewZoomMinimum, zoom));
+}
+
+export function previewZoomFromWheel(currentZoom: number, deltaY: number): number {
+  return clampPreviewZoom(currentZoom * Math.exp(-deltaY * 0.002));
+}
+
+function OriginalImagePreview({
+  gateway,
+  descriptor,
+  alt,
+  labels,
+  onClose
+}: {
+  readonly gateway: StudioGateway;
+  readonly descriptor: BrowserResourceDescriptor;
+  readonly alt: string;
+  readonly labels: Labels;
+  readonly onClose: () => void;
+}) {
+  const [zoom, setZoom] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const dragRef = useRef<
+    | {
+        pointerId: number;
+        originX: number;
+        originY: number;
+        offsetX: number;
+        offsetY: number;
+      }
+    | undefined
+  >(undefined);
+
+  const changeZoom = (nextZoom: number) => {
+    const clamped = clampPreviewZoom(nextZoom);
+    setZoom(clamped);
+    if (clamped <= 1) setOffset({ x: 0, y: 0 });
+  };
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [onClose]);
+
+  return (
+    <div
+      className="library-image-preview"
+      role="dialog"
+      aria-modal="true"
+      aria-label={labels.preview}
+      onClick={onClose}
+    >
+      <div className="library-image-preview__toolbar" onClick={(event) => event.stopPropagation()}>
+        <p id="library-image-preview-help">{labels.zoomHelp}</p>
+        <div className="library-image-preview__controls">
+          <button
+            type="button"
+            aria-label={labels.zoomOut}
+            title={labels.zoomOut}
+            disabled={zoom <= previewZoomMinimum}
+            onClick={() => changeZoom(zoom / 1.25)}
+          >
+            −
+          </button>
+          <button
+            type="button"
+            className="library-image-preview__scale"
+            aria-label={labels.resetZoom}
+            title={labels.resetZoom}
+            onClick={() => changeZoom(1)}
+          >
+            {Math.round(zoom * 100)}%
+          </button>
+          <button
+            type="button"
+            aria-label={labels.zoomIn}
+            title={labels.zoomIn}
+            disabled={zoom >= previewZoomMaximum}
+            onClick={() => changeZoom(zoom * 1.25)}
+          >
+            +
+          </button>
+        </div>
+        <button
+          type="button"
+          className="library-image-preview__close"
+          onClick={(event) => {
+            event.stopPropagation();
+            onClose();
+          }}
+        >
+          {labels.closePreview}
+        </button>
+      </div>
+      <div
+        className="library-image-preview__viewport"
+        data-dragging={dragRef.current === undefined ? "false" : "true"}
+        tabIndex={0}
+        aria-describedby="library-image-preview-help"
+        onClick={(event) => event.stopPropagation()}
+        onDoubleClick={() => changeZoom(1)}
+        onWheel={(event) => {
+          event.preventDefault();
+          changeZoom(previewZoomFromWheel(zoom, event.deltaY));
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "+" || event.key === "=") {
+            event.preventDefault();
+            changeZoom(zoom * 1.25);
+          } else if (event.key === "-") {
+            event.preventDefault();
+            changeZoom(zoom / 1.25);
+          } else if (event.key === "0") {
+            event.preventDefault();
+            changeZoom(1);
+          }
+        }}
+        onPointerDown={(event) => {
+          if (zoom <= 1) return;
+          dragRef.current = {
+            pointerId: event.pointerId,
+            originX: event.clientX,
+            originY: event.clientY,
+            offsetX: offset.x,
+            offsetY: offset.y
+          };
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove={(event) => {
+          const drag = dragRef.current;
+          if (drag === undefined || drag.pointerId !== event.pointerId) return;
+          setOffset({
+            x: drag.offsetX + event.clientX - drag.originX,
+            y: drag.offsetY + event.clientY - drag.originY
+          });
+        }}
+        onPointerUp={(event) => {
+          if (dragRef.current?.pointerId !== event.pointerId) return;
+          dragRef.current = undefined;
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }}
+        onPointerCancel={() => {
+          dragRef.current = undefined;
+        }}
+      >
+        <div
+          className="library-image-preview__canvas"
+          style={{ transform: `translate3d(${offset.x}px, ${offset.y}px, 0) scale(${zoom})` }}
+        >
+          <ProtectedImage
+            gateway={gateway}
+            descriptor={descriptor}
+            alt={alt}
+            className="library-image-preview__image"
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function FilterPanel({
@@ -538,6 +733,67 @@ function ParameterLedger({
   );
 }
 
+function dimensionMismatch(asset: Pick<LibraryAssetDetail, "width" | "height" | "requestedParams">): {
+  readonly requestedLabel: "dimensions" | "aspectRatio";
+  readonly requested: string;
+  readonly actual: string;
+} | undefined {
+  const actual = `${asset.width} × ${asset.height}`;
+  const size = /^(\d+)x(\d+)$/u.exec(asset.requestedParams.size);
+  if (size !== null) {
+    const requestedWidth = Number(size[1]);
+    const requestedHeight = Number(size[2]);
+    if (asset.width !== requestedWidth || asset.height !== requestedHeight) {
+      return { requestedLabel: "dimensions", requested: `${requestedWidth} × ${requestedHeight}`, actual };
+    }
+    return undefined;
+  }
+
+  const requestedAspectRatio = asset.requestedParams.aspectRatio;
+  if (requestedAspectRatio === "auto") return undefined;
+  if (requestedAspectRatio === "square" || requestedAspectRatio === "1:1") {
+    return asset.width === asset.height
+      ? undefined
+      : { requestedLabel: "aspectRatio", requested: "1:1", actual };
+  }
+  if (requestedAspectRatio === "portrait") {
+    return asset.width < asset.height
+      ? undefined
+      : { requestedLabel: "aspectRatio", requested: "portrait", actual };
+  }
+  if (requestedAspectRatio === "landscape") {
+    return asset.width > asset.height
+      ? undefined
+      : { requestedLabel: "aspectRatio", requested: "landscape", actual };
+  }
+  const ratio = /^(\d+):(\d+)$/u.exec(requestedAspectRatio);
+  if (ratio === null) return undefined;
+  const requestedWidth = Number(ratio[1]);
+  const requestedHeight = Number(ratio[2]);
+  if (asset.width * requestedHeight === asset.height * requestedWidth) return undefined;
+  return { requestedLabel: "aspectRatio", requested: requestedAspectRatio, actual };
+}
+
+export function DimensionMismatchNotice({
+  asset,
+  labels
+}: {
+  readonly asset: Pick<LibraryAssetDetail, "width" | "height" | "requestedParams">;
+  readonly labels: Pick<Labels, "dimensionMismatch" | "requestedDimensions" | "actualDimensions" | "requestedAspectRatio">;
+}) {
+  const mismatch = dimensionMismatch(asset);
+  if (mismatch === undefined) return null;
+  return (
+    <div className="library-detail__dimension-warning" role="status">
+      <strong>{labels.dimensionMismatch}</strong>
+      <span>
+        {mismatch.requestedLabel === "dimensions" ? labels.requestedDimensions : labels.requestedAspectRatio}
+        ：{mismatch.requested} · {labels.actualDimensions}：{mismatch.actual}
+      </span>
+    </div>
+  );
+}
+
 function DetailDrawer({
   gateway,
   state,
@@ -547,9 +803,7 @@ function DetailDrawer({
   actionMessage,
   actionBusy,
   onClose,
-  currentMarkRecordId,
   onCopyGenerationInfo,
-  onMarkImage,
   onDownload
 }: {
   readonly gateway: StudioGateway;
@@ -560,17 +814,51 @@ function DetailDrawer({
   readonly actionMessage?: string | undefined;
   readonly actionBusy: boolean;
   readonly onClose: () => void;
-  readonly currentMarkRecordId?: string | undefined;
   readonly onCopyGenerationInfo: (asset: LibraryAssetDetail) => void;
-  readonly onMarkImage: (asset: LibraryAssetDetail) => void;
   readonly onDownload: (asset: LibraryAssetDetail) => void;
 }) {
-  const [previewResource, setPreviewResource] = useState<BrowserResourceDescriptor | undefined>();
-  if (state.status === "idle") return null;
   const asset = state.status === "ready" ? state.asset : undefined;
+  const [originalPreview, setOriginalPreview] = useState<
+    | { readonly status: "idle" }
+    | { readonly status: "loading" }
+    | { readonly status: "ready"; readonly resource: BrowserResourceDescriptor }
+    | { readonly status: "failure"; readonly safeMessage: string }
+  >({ status: "idle" });
+  const previewRequestRef = useRef(0);
+
+  useEffect(() => {
+    previewRequestRef.current += 1;
+    setOriginalPreview({ status: "idle" });
+  }, [asset?.id]);
+
+  if (state.status === "idle") return null;
   const comparison = asset === undefined ? {} : selectComparisonRelationships(asset);
   const sourceState = resourceForRelationship(resources, comparison.source?.id);
   const outputState = resourceForRelationship(resources, comparison.output?.id);
+  const openOriginalPreview = () => {
+    if (asset === undefined || originalPreview.status === "loading") return;
+    const requestId = previewRequestRef.current + 1;
+    previewRequestRef.current = requestId;
+    setOriginalPreview({ status: "loading" });
+    void resolveOriginalLibraryResource(gateway, asset)
+      .then((resource) => {
+        if (previewRequestRef.current === requestId) {
+          setOriginalPreview({ status: "ready", resource });
+        }
+      })
+      .catch((error) => {
+        if (previewRequestRef.current === requestId) {
+          setOriginalPreview({
+            status: "failure",
+            safeMessage: error instanceof Error ? error.message : labels.previewFailure
+          });
+        }
+      });
+  };
+  const closeOriginalPreview = () => {
+    previewRequestRef.current += 1;
+    setOriginalPreview({ status: "idle" });
+  };
   return (
     <div className="library-detail" role="dialog" aria-modal="true" aria-labelledby="library-detail-title">
       <div className="library-detail__scrim" onClick={onClose} aria-hidden="true" />
@@ -579,7 +867,11 @@ function DetailDrawer({
           <div>
             <p>IMAGE / DETAIL</p>
             <h2 id="library-detail-title">
-              {asset?.displayName ?? (state.status === "loading" ? labels.detailLoading : labels.detailFailure)}
+              {state.status === "ready"
+                ? state.asset.displayName ?? labels.detailTitle
+                : state.status === "loading"
+                  ? labels.detailLoading
+                  : labels.detailFailure}
             </h2>
           </div>
           <button type="button" onClick={onClose}>{labels.close}</button>
@@ -596,7 +888,7 @@ function DetailDrawer({
                   <button
                     type="button"
                     className="library-detail__preview-image"
-                    onClick={() => setPreviewResource(outputState.resource)}
+                    onClick={openOriginalPreview}
                     aria-label={labels.preview}
                   >
                     <ProtectedImage
@@ -605,9 +897,19 @@ function DetailDrawer({
                       alt={asset.displayName ?? asset.model}
                     />
                   </button>
-                  <button type="button" className="library-detail__preview-button" onClick={() => setPreviewResource(outputState.resource)}>
-                    {labels.preview}
+                  <button
+                    type="button"
+                    className="library-detail__preview-button"
+                    disabled={originalPreview.status === "loading"}
+                    onClick={openOriginalPreview}
+                  >
+                    {originalPreview.status === "loading" ? labels.previewLoading : labels.preview}
                   </button>
+                  {originalPreview.status === "failure" ? (
+                    <p className="library-detail__preview-error" role="alert">
+                      {labels.previewFailure}：{originalPreview.safeMessage}
+                    </p>
+                  ) : null}
                 </>
               ) : (
                 <p className="library-detail__preview-loading">{labels.loading}</p>
@@ -620,17 +922,11 @@ function DetailDrawer({
                 <p>{asset.kind.toUpperCase()} · {asset.model}</p>
                 <p>{formatTimestamp(asset.createdAt, language)}</p>
               </div>
+              <DimensionMismatchNotice asset={asset} labels={labels} />
               <div className="library-detail__actions">
                 {asset.allowedActions.includes("copy-generation-info") ? (
                   <button type="button" disabled={actionBusy} onClick={() => onCopyGenerationInfo(asset)}>
                     {language === "zh" ? "复制生成信息" : "Copy generation info"}
-                  </button>
-                ) : null}
-                {asset.allowedActions.includes("mark") ? (
-                  <button type="button" disabled={actionBusy} onClick={() => onMarkImage(asset)}>
-                    {currentMarkRecordId === asset.id
-                      ? language === "zh" ? "取消标记" : "Clear mark"
-                      : language === "zh" ? "标记图片" : "Mark image"}
                   </button>
                 ) : null}
                 {asset.allowedActions.includes("download") ? (
@@ -681,11 +977,14 @@ function DetailDrawer({
           </div>
         ) : null}
       </aside>
-      {previewResource ? (
-        <div className="library-image-preview" role="dialog" aria-modal="true" aria-label={labels.preview} onClick={() => setPreviewResource(undefined)}>
-          <button type="button" className="library-image-preview__close" onClick={() => setPreviewResource(undefined)}>{labels.closePreview}</button>
-          <ProtectedImage gateway={gateway} descriptor={previewResource} alt={asset?.displayName ?? asset?.model ?? labels.preview} />
-        </div>
+      {originalPreview.status === "ready" ? (
+        <OriginalImagePreview
+          gateway={gateway}
+          descriptor={originalPreview.resource}
+          alt={asset?.displayName ?? asset?.model ?? labels.preview}
+          labels={labels}
+          onClose={closeOriginalPreview}
+        />
       ) : null}
     </div>
   );
@@ -694,12 +993,14 @@ function DetailDrawer({
 export function LibraryWorkspace({
   gateway,
   view,
-  providers
+  providers,
+  onboarding = false
 }: {
   readonly gateway: StudioGateway;
   readonly view: LibraryView;
   readonly providers: readonly ProviderProfileDescriptor[];
   readonly onCreationHandoff?: (handoff: LibraryCreationHandoff) => void;
+  readonly onboarding?: boolean;
 }) {
   void view;
   const libraryView: LibraryView = "library";
@@ -727,10 +1028,6 @@ export function LibraryWorkspace({
   const [locations, setLocations] = useState<ReadonlyArray<NonNullable<RoutegoManageLibraryResult["locations"]>[number]>>([]);
   const [destinationLocationId, setDestinationLocationId] = useState("");
   const [editingAssetId, setEditingAssetId] = useState<string | undefined>();
-  const [markState, setMarkState] = useState<{
-    readonly known: boolean;
-    readonly currentMarkRecordId?: string | undefined;
-  }>({ known: false });
   const searchRequestRef = useRef(0);
   const cursor = currentLibraryCursor(page);
 
@@ -948,32 +1245,6 @@ export function LibraryWorkspace({
     [gateway, labels.handoffFailure, language]
   );
 
-  const markImage = useCallback(
-    async (asset: LibraryAssetDetail) => {
-      setActionBusy(true);
-      setActionMessage(undefined);
-      try {
-        const result = await invokeBrowserSafeLibraryAction<MarkImageResult>(
-          gateway,
-          "/api/v1/library/mark",
-          createMarkImageRequest(asset.id)
-        );
-        const nextMarkId = nextCurrentMarkRecordId(result);
-        setMarkState({ known: true, currentMarkRecordId: nextMarkId });
-        setActionMessage(
-          nextMarkId === undefined
-            ? language === "zh" ? "图片标记已取消。" : "Image mark cleared."
-            : language === "zh" ? "图片已标记。" : "Image marked."
-        );
-      } catch (error) {
-        setActionMessage(error instanceof Error ? error.message : labels.handoffFailure);
-      } finally {
-        setActionBusy(false);
-      }
-    },
-    [gateway, labels.handoffFailure, language]
-  );
-
   const download = useCallback(
     async (asset: LibraryAssetDetail) => {
       setActionBusy(true);
@@ -996,6 +1267,15 @@ export function LibraryWorkspace({
     setFolderRevision((value) => value + 1);
     setDetailRevision((value) => value + 1);
   }, []);
+
+  const refreshLibrary = useCallback(() => {
+    setSelectedAssetIds([]);
+    setActionMessage(undefined);
+    refreshLibraryState();
+    void refreshLocations().catch((error) => {
+      setActionMessage(error instanceof Error ? error.message : labels.searchFailure);
+    });
+  }, [labels.searchFailure, refreshLibraryState, refreshLocations]);
 
   const addLocation = useCallback(async () => {
     setActionBusy(true);
@@ -1056,10 +1336,6 @@ export function LibraryWorkspace({
   );
 
   const items = searchState.status === "ready" ? searchState.items : [];
-  const listedCurrentMarkRecordId = items.find((item) => item.currentMark)?.assetId;
-  const currentMarkRecordId = markState.known
-    ? markState.currentMarkRecordId
-    : listedCurrentMarkRecordId;
   const currentPageIds = items.map((item) => item.assetId);
   const allCurrentPageSelected =
     currentPageIds.length > 0 && currentPageIds.every((assetId) => selectedAssetIds.includes(assetId));
@@ -1141,6 +1417,17 @@ export function LibraryWorkspace({
         </div>
         <button
           type="button"
+          className="library-workspace__refresh"
+          aria-label={labels.refreshLibrary}
+          title={labels.refreshLibrary}
+          data-refreshing={searchState.status === "loading"}
+          disabled={actionBusy || pageBusy || searchState.status === "loading"}
+          onClick={refreshLibrary}
+        >
+          <span aria-hidden="true" />
+        </button>
+        <button
+          type="button"
           className="library-workspace__clear-selection"
           disabled={!selectionMode}
           onClick={() => setSelectedAssetIds([])}
@@ -1164,7 +1451,7 @@ export function LibraryWorkspace({
           <option value="">{labels.moveTo}</option>
           {locations.filter((location) => !location.isDefault).map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
         </select>
-        <button type="button" disabled={actionBusy || selectedAssetIds.length === 0 || destinationLocationId === ""} onClick={() => void moveSelected()}>{labels.moveSelected}</button>
+        <button type="button" className="library-workspace__move" disabled={actionBusy || selectedAssetIds.length === 0 || destinationLocationId === ""} onClick={() => void moveSelected()}>{labels.moveSelected}</button>
         <button type="button" className="library-workspace__delete" disabled={actionBusy || selectedAssetIds.length === 0} onClick={() => void deleteSelected()}>{labels.deleteSelected}</button>
       </div>
 
@@ -1185,6 +1472,7 @@ export function LibraryWorkspace({
           action={<button type="button" onClick={resetFilters}>{labels.reset}</button>}
         >
           <p>{labels.emptyBody}</p>
+          {onboarding ? <p className="library-workspace__onboarding-empty">{labels.onboardingEmpty}</p> : null}
         </AsyncStatePanel>
       ) : (
         <>
@@ -1263,9 +1551,7 @@ export function LibraryWorkspace({
         actionMessage={actionMessage}
         actionBusy={actionBusy}
         onClose={() => setSelectedAssetId(undefined)}
-        currentMarkRecordId={currentMarkRecordId}
         onCopyGenerationInfo={(asset) => void copyGenerationInfo(asset)}
-        onMarkImage={(asset) => void markImage(asset)}
         onDownload={(asset) => void download(asset)}
       />
     </section>

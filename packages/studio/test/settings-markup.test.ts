@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import type { ReadSettingsResult } from "@routego-image/contracts";
 
 import type { StudioGateway } from "../src/api";
-import { GenerationDefaultsPanel, SettingsWorkspace } from "../src/features/settings";
+import { GenerationDefaultsPanel, OnboardingTour, SettingsWorkspace } from "../src/features/settings";
 import { I18nProvider } from "../src/i18n";
 
 const settings: ReadSettingsResult = {
@@ -113,11 +113,34 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).toContain("Verify current defaults");
     expect(markup).toContain("Start verification (may be billable)");
     expect(markup).toContain("Custom size and aspect ratio");
-    expect(markup).toContain("Custom dimensions");
+    expect(markup).toContain("Custom aspect ratio");
     expect(markup).toContain("21:9");
+    expect(markup).toContain("Current configuration");
+    expect(markup).toContain("Image size");
+    expect(markup).toContain("Output options");
+    expect(markup).toContain('id="generation-defaults-form"');
+    expect(markup).toContain('form="generation-defaults-form"');
+    expect(markup).toContain("synthetic-image-model");
+    expect(markup).toContain("2048 × 2048");
   });
 
-  it("renders first run as a concise provider editor", () => {
+  it("offers a billable verification for a saved non-auto quality", () => {
+    const markup = renderToStaticMarkup(
+      createElement(I18nProvider, {
+        initialLanguage: "en",
+        children: createElement(GenerationDefaultsPanel, {
+          gateway: {} as StudioGateway,
+          settings: { ...settings, defaults: { ...settings.defaults, quality: "high" } },
+          onSettingsChange: () => undefined
+        })
+      })
+    );
+
+    expect(markup).toContain("Requested image quality");
+    expect(markup).toContain("sends and confirms the high quality parameter");
+  });
+
+  it("keeps the normal provider editor available for first-run guidance", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
         initialLanguage: "en",
@@ -131,7 +154,11 @@ describe("secret-safe Settings workspace markup", () => {
     );
 
     expect(markup).toContain("Provider management");
+    expect(markup).toContain('data-onboarding-target="provider-form"');
+    expect(markup).toContain('data-onboarding-target="provider-save"');
+    expect(markup).toContain("Save");
     expect(markup).toContain("API endpoint");
+    expect(markup).toContain('placeholder="routego.xyz"');
     expect(markup).toContain('type="password"');
     expect(markup).toContain("Get models");
     expect(markup).toContain("https://relay.example.invalid/");
@@ -142,6 +169,60 @@ describe("secret-safe Settings workspace markup", () => {
     expect(markup).not.toContain("Four-state capability evidence");
   });
 
+  it("renders a compact tour bubble for the real defaults save control", () => {
+    const markup = renderToStaticMarkup(
+      createElement(I18nProvider, {
+        initialLanguage: "en",
+        children: createElement(OnboardingTour, {
+          step: "defaults",
+          preview: false,
+          onAdvance: () => undefined,
+          onBack: undefined,
+          onDismiss: () => undefined
+        })
+      })
+    );
+
+    expect(markup).toContain('data-onboarding-step="defaults"');
+    expect(markup).toContain("GUIDE 2 / 3");
+    expect(markup).toContain("Save image defaults");
+    expect(markup).toContain("highlighted save button");
+    expect(markup).toContain("complete the highlighted action");
+  });
+
+  it("replays onboarding without exposing the provider editor or saving defaults", () => {
+    const providerMarkup = renderToStaticMarkup(
+      createElement(I18nProvider, {
+        initialLanguage: "en",
+        children: createElement(SettingsWorkspace, {
+          gateway: {} as StudioGateway,
+          settings,
+          onSettingsChange: () => undefined,
+          onboardingPreview: true
+        })
+      })
+    );
+    const defaultsMarkup = renderToStaticMarkup(
+      createElement(I18nProvider, {
+        initialLanguage: "en",
+        children: createElement(GenerationDefaultsPanel, {
+          gateway: {} as StudioGateway,
+          settings,
+          onSettingsChange: () => undefined,
+          onboardingPreview: true
+        })
+      })
+    );
+
+    expect(providerMarkup).toContain("Provider management");
+    expect(providerMarkup).toContain('data-onboarding-target="provider-summary"');
+    expect(providerMarkup).not.toContain("API endpoint");
+    expect(defaultsMarkup).toContain("Set Codex image defaults");
+    expect(defaultsMarkup).toContain("Finish onboarding preview");
+    expect(defaultsMarkup).toContain('data-onboarding-target="defaults-save"');
+    expect(defaultsMarkup).not.toContain("Start verification (may be billable)");
+  });
+
   it("keeps repeat configuration to provider choice, summary, and an explicit edit action", () => {
     const markup = renderToStaticMarkup(
       createElement(I18nProvider, {
@@ -149,14 +230,17 @@ describe("secret-safe Settings workspace markup", () => {
         children: createElement(SettingsWorkspace, {
           gateway: {} as StudioGateway,
           settings,
-          onSettingsChange: () => undefined
+          onSettingsChange: () => undefined,
+          onReplayOnboarding: () => undefined
         })
       })
     );
 
     expect(markup).toContain("Provider management");
+    expect(markup).toContain("Review onboarding");
     expect(markup).toContain("Current provider");
     expect(markup).toContain("Edit");
+    expect(markup).toContain("Remove provider");
     expect(markup).toContain("API key configured");
     expect(markup).toContain("Current model");
     expect(markup).not.toContain("Advanced settings");

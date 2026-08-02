@@ -579,6 +579,42 @@ describe("same-identity PNG chromakey", () => {
     expect(JSON.stringify(result)).not.toContain("relationship");
   });
 
+  it("removes provider green-screen variance and neutralizes adjacent green spill", async () => {
+    const root = await temporaryRoot();
+    const bytes = pngBytes({
+      pixel: (x, y) => {
+        if (x === 1 && y === 1) return [225, 242, 218, 255];
+        if (x === 1 && y === 0) return [255, 250, 244, 255];
+        // This is a realistic generated variation of requested #00ff00,
+        // not a mathematically exact key pixel.
+        return [25, 233, 38, 255];
+      }
+    });
+    const { transaction, output } = await materializedPng({
+      root,
+      id: "artifact-generated-green-screen",
+      bytes
+    });
+
+    const result = await applyPngChromakey({
+      transaction,
+      output,
+      requestedMode: "chromakey",
+      contentClass: "simple",
+      keyColor,
+      tolerance: 64
+    });
+
+    expect(result).toMatchObject({ status: "applied", removedPixels: 7 });
+    const decoded = PNG.sync.read(await readFile(result.output.path));
+    expect(decoded.data[3]).toBe(0);
+    const edgeOffset = (0 * 3 + 1) * 4;
+    expect(decoded.data[edgeOffset + 3]).toBe(255);
+    expect(decoded.data[edgeOffset + 1]).toBeLessThanOrEqual(
+      Math.max(decoded.data[edgeOffset]!, decoded.data[edgeOffset + 2]!)
+    );
+  });
+
   it.each<ChromakeyContentClass>([
     "hair",
     "fur",

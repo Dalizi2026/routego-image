@@ -6,7 +6,9 @@
   --ink-800: #181d1a;
   --ink-700: #252c28;
   --paper-100: #f4f5ef;
+  --paper-200: #dde1da;
   --paper-300: #c8cec5;
+  --paper-400: #a6afa5;
   --paper-500: #8a9389;
   /* Legacy semantic aliases retain functional states while the product surface uses lime. */
   --amber-300: #c9ff36;
@@ -16,6 +18,7 @@
   --cyan-500: #58c8ad;
   --red-400: #ff7068;
   --olive-400: #9fd14c;
+  --accent-foreground: #070908;
   --line: rgba(216, 230, 215, 0.13);
   --line-strong: rgba(216, 230, 215, 0.24);
   --focus: 0 0 0 2px var(--ink-950), 0 0 0 4px var(--amber-300);

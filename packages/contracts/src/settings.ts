@@ -7,7 +7,7 @@ import {
   timestampSchema
 } from "./common";
 import { routegoServiceErrorSchema } from "./errors";
-import { imageSizeSchema } from "./image";
+import { imageQualitySchema, imageSizeSchema } from "./image";
 import {
   providerCapabilityRecordSchema,
   providerCapabilitySchema,
@@ -269,9 +269,27 @@ export const capabilityProbeInputSchema = z
     transport: providerTransportSchema,
     requestShape: z.string().trim().min(1).max(160),
     requestedSize: imageSizeSchema.optional(),
+    requestedQuality: imageQualitySchema.exclude(["auto"]).optional(),
     confirmBillableProbe: z.literal(true)
   })
-  .strict();
+  .strict()
+  .superRefine((value, context) => {
+    const isQualityProbe = value.capability === "quality-control";
+    if (isQualityProbe && value.requestedQuality === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["requestedQuality"],
+        message: "Quality-control probes require one explicit non-auto quality."
+      });
+    }
+    if (!isQualityProbe && value.requestedQuality !== undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["requestedQuality"],
+        message: "Requested quality is only valid for quality-control probes."
+      });
+    }
+  });
 
 export const capabilityProbeResultSchema = z
   .object({

@@ -134,7 +134,6 @@ describe("task 6.1 offline production composition", () => {
       effectiveParams: { prompt: "A deterministic offline Routego image" }
     });
     expect(detail.asset?.allowedActions).toEqual(expect.arrayContaining([
-      "mark",
       "copy-generation-info",
       "export-zip",
       "download"
@@ -360,7 +359,7 @@ describe("task 6.5 native transparency fallback", () => {
     expect(PNG.sync.read(bytes).data[3]).toBe(0);
   });
 
-  it("processes an opaque native result locally without replaying the provider request", async () => {
+  it("keeps a local native fallback reviewable without claiming verified native transparency", async () => {
     const providerCalls: ImageOperationRequest[] = [];
     let localCalls = 0;
     const localRemoval = vi.spyOn(BackgroundRemovalQueue.prototype, "remove").mockImplementation(async (bytes) => {
@@ -388,7 +387,8 @@ describe("task 6.5 native transparency fallback", () => {
       outputDir: created.outputRoot
     }));
 
-    expect(result.status).toBe("succeeded");
+    expect(result.status).toBe("partial");
+    expect(result.error).toMatchObject({ code: "postprocess_failed", stage: "postprocess" });
     expect(result.execution.providerRequestCount).toBe(1);
     expect(providerCalls).toHaveLength(1);
     expect(localRemoval).toHaveBeenCalledTimes(1);

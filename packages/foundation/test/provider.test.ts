@@ -343,6 +343,50 @@ describe("provider route selection", () => {
     if (decision.selected) expect(decision.degraded).toBe(degraded);
   });
 
+  it("allows one direct reference-generation submission when its scoped input evidence is unknown", () => {
+    const request = {
+      kind: "generate",
+      prompt: "Use the supplied layout reference",
+      references: [{ path: "/synthetic/reference.png", role: "layout" }]
+    };
+    const selected = selectProviderRoute(
+      context([], { allowUnverifiedDirectReferenceGeneration: true }),
+      request
+    );
+
+    expect(selected).toMatchObject({
+      selected: true,
+      tier: "A",
+      transport: "single-endpoint-json",
+      requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
+      effectiveKind: "generate",
+      replayPolicy: "never"
+    });
+  });
+
+  it("keeps explicitly unsupported reference-generation evidence unavailable", () => {
+    const shape = PROVIDER_REQUEST_SHAPES.singleEndpointImage;
+    const records = ["single-image-input", "data-url-input"].map((name) =>
+      capability(name as ProviderCapability, { state: "unsupported", requestShape: shape })
+    );
+    const decision = selectProviderRoute(
+      context(records, { allowUnverifiedDirectReferenceGeneration: true }),
+      {
+        kind: "generate",
+        prompt: "Do not bypass an explicit reference-input rejection",
+        references: [{ path: "/synthetic/reference.png", role: "reference" }]
+      }
+    );
+
+    expect(decision.selected).toBe(false);
+    if (!decision.selected) {
+      expect(decision.missingCapabilities).toEqual(expect.arrayContaining([
+        "single-image-input",
+        "data-url-input"
+      ]));
+    }
+  });
+
   it("requires evidence for every non-default requested feature", () => {
     const featureCapabilities: ProviderCapability[] = [
       "native-variants",
@@ -473,6 +517,17 @@ describe("provider route selection", () => {
     if (decision.selected) {
       expect(decision.requiredCapabilities).not.toContain("native-transparency");
     }
+  });
+
+  it("keeps an unknown direct-edit route on the local fallback until native transparency is proven", () => {
+    const decision = selectProviderRoute(
+      context([], {
+        preferredTransports: ["single-endpoint-json"],
+        allowUnverifiedDirectEdit: true
+      }),
+      { kind: "edit", prompt: "Transparent product", targetImage: { path: "/tmp/product.png" }, invariants: { preserve: ["product"] }, transparentMode: "native", format: "png" }
+    );
+    expect(decision).toMatchObject({ selected: true, transparency: "local-fallback" });
   });
 
   it("enforces capability limits instead of silently degrading them", () => {

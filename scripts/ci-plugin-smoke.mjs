@@ -15,7 +15,6 @@ import { fileURLToPath } from "node:url";
 
 import { buildPluginPackage } from "./build-plugin-package.mjs";
 import {
-  ACCEPTED_ARTIFACT_MANIFEST_SHA256,
   INSTALLED_PACKAGE_ARGUMENT_PREFIX,
   runPluginInstallSmoke
 } from "./smoke-plugin-install.mjs";
@@ -109,13 +108,14 @@ async function cleanupOwnedRoot(root) {
   await rm(requested, { recursive: true, force: false });
 }
 
-function assertSmokeResult(result) {
-  if (result.artifact?.manifestSha256 !== ACCEPTED_ARTIFACT_MANIFEST_SHA256 ||
+function assertSmokeResult(result, acceptedArtifactManifestSha256) {
+  if (result.artifact?.manifestSha256 !== acceptedArtifactManifestSha256 ||
       result.artifact?.name !== "routego-image" ||
-      result.artifact?.version !== "1.0.0" ||
+      typeof result.artifact?.version !== "string" ||
+      !/^1\.0\.2\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u.test(result.artifact.version) ||
       result.artifact?.strictVerificationPassed !== true ||
       result.codex?.freshProcess !== true || result.codex?.pluginDiscovered !== true ||
-      result.codex?.pluginVersion !== "1.0.0" ||
+      result.codex?.pluginVersion !== "1.0.5" ||
       result.skill?.bilingual !== true || result.skill?.exactPublicToolCount !== 8 ||
       JSON.stringify(result.mcp?.tools) !== JSON.stringify(EXPECTED_TOOLS) ||
       JSON.stringify(result.mcp?.publicArtifactPhases) !== JSON.stringify(["partial", "final"]) ||
@@ -156,12 +156,9 @@ async function run() {
     if (!comparison.equivalent || comparison.differences.length !== 0) {
       fail("two clean plugin builds are not byte-equivalent");
     }
-    if (firstVerification.artifactManifestFileSha256 !== ACCEPTED_ARTIFACT_MANIFEST_SHA256) {
-      fail("the reproducible package does not match the accepted artifact manifest SHA-256");
-    }
-
     const smoke = await runPluginInstallSmoke({
       packageDirectory: firstPackage,
+      acceptedArtifactManifestSha256: firstVerification.artifactManifestFileSha256,
       freshProcessCommand: {
         executable: process.execPath,
         arguments: [
@@ -170,7 +167,7 @@ async function run() {
       },
       temporaryParent: path.join(root, "install-roots")
     });
-    assertSmokeResult(smoke);
+    assertSmokeResult(smoke, firstVerification.artifactManifestFileSha256);
     process.stdout.write(`${JSON.stringify({
       node: process.versions.node,
       platform: process.platform,

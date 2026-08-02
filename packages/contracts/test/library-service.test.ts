@@ -17,8 +17,6 @@ import {
   libraryMigrationPreflightResultSchema,
   libraryMutationRequestSchema,
   listFoldersResultSchema,
-  markLibraryAssetInputSchema,
-  markLibraryAssetResultSchema,
   MAX_LIBRARY_ASSET_RENDITIONS,
   parseStudioOperationInput,
   parseStudioOperationOutput,
@@ -126,7 +124,6 @@ const assetDetail = (overrides: Record<string, unknown> = {}) => ({
   model: "gpt-image-2",
   kind: "generate",
   status: "succeeded",
-  currentMark: false,
   primaryArtifactId: "artifact-final-0",
   mimeType: "image/png",
   width: 1024,
@@ -147,7 +144,7 @@ const assetDetail = (overrides: Record<string, unknown> = {}) => ({
     }
   ],
   folders: [],
-  allowedActions: ["mark", "copy-generation-info", "download"],
+  allowedActions: ["copy-generation-info", "download"],
   ...overrides
 });
 
@@ -165,10 +162,9 @@ describe("folder and complete asset detail contracts", () => {
     ).toBe(false);
   });
 
-  it("represents generation parameters, folder state, mark actions, and generation relationships", () => {
+  it("represents generation parameters, folder state, and generation relationships", () => {
     const detail = libraryAssetDetailSchema.parse(
       assetDetail({
-        currentMark: true,
         relationships: [
           {
             id: "relationship-reference-0",
@@ -198,14 +194,12 @@ describe("folder and complete asset detail contracts", () => {
           "remove-folders",
           "export-zip",
           "download",
-          "mark",
           "copy-generation-info"
         ]
       })
     );
     expect(detail.kind).toBe("generate");
-    expect(detail.currentMark).toBe(true);
-    expect(detail.allowedActions).toContain("mark");
+    expect(detail.allowedActions).not.toContain("mark");
     expect(detail.allowedActions).not.toContain("edit");
     expect(detail.allowedActions).not.toContain("soft-delete");
     expect(detail.requestedParams).not.toHaveProperty("target");
@@ -419,7 +413,6 @@ describe("path-free Studio Library search", () => {
           status: "partial",
           folderIds: ["folder-a"],
           createdAt: TEST_TIMESTAMP,
-          currentMark: true,
           thumbnail: resource
         }
       ],
@@ -428,7 +421,6 @@ describe("path-free Studio Library search", () => {
     });
     const item = result.items[0]!;
     expect(item.kind).toBe("generate");
-    expect(item.currentMark).toBe(true);
     expect(getAssetDetailInputSchema.parse({ assetId: item.assetId }).assetId).toBe(
       "asset-output"
     );
@@ -498,11 +490,11 @@ describe("preflighted Library mutation and per-item partial results", () => {
       }).action
     ).toBe("assign-folders");
     expect(
-      libraryMutationRequestSchema.parse({
+      libraryMutationRequestSchema.safeParse({
         action: "mark",
         assetIds: ["asset-a"]
-      }).action
-    ).toBe("mark");
+      }).success
+    ).toBe(false);
     expect(
       libraryMutationRequestSchema.safeParse({
         action: "soft-delete",
@@ -537,7 +529,7 @@ describe("preflighted Library mutation and per-item partial results", () => {
           targetKind: "asset",
           eligible: true,
           currentStatus: "succeeded",
-          allowedActions: ["assign-folders", "export-zip", "mark"],
+          allowedActions: ["assign-folders", "export-zip"],
           requiredConfirmations: []
         },
         {
@@ -608,51 +600,7 @@ describe("preflighted Library mutation and per-item partial results", () => {
   });
 });
 
-describe("browser-safe mark, regeneration-copy, and migration contracts", () => {
-  it("toggles a single current mark without provider work", () => {
-    expect(markLibraryAssetInputSchema.parse({ recordId: "asset-output" }).recordId).toBe(
-      "asset-output"
-    );
-    expect(
-      markLibraryAssetResultSchema.parse({
-        schemaVersion: 1,
-        status: "succeeded",
-        recordId: "asset-output",
-        currentMarkRecordId: "asset-output",
-        markCleared: false,
-        providerRequestCount: 0
-      }).currentMarkRecordId
-    ).toBe("asset-output");
-    expect(
-      markLibraryAssetResultSchema.parse({
-        schemaVersion: 1,
-        status: "succeeded",
-        recordId: "asset-output",
-        markCleared: true,
-        providerRequestCount: 0
-      }).markCleared
-    ).toBe(true);
-    expect(
-      markLibraryAssetResultSchema.safeParse({
-        schemaVersion: 1,
-        status: "succeeded",
-        recordId: "asset-output",
-        currentMarkRecordId: "asset-other",
-        markCleared: false,
-        providerRequestCount: 0
-      }).success
-    ).toBe(false);
-    expect(
-      markLibraryAssetResultSchema.safeParse({
-        schemaVersion: 1,
-        status: "failed",
-        recordId: "asset-missing",
-        markCleared: false,
-        providerRequestCount: 0
-      }).success
-    ).toBe(false);
-  });
-
+describe("browser-safe regeneration-copy and migration contracts", () => {
   it("projects safe generation information without paths or credentials", () => {
     expect(copyGenerationInfoInputSchema.parse({ recordId: "asset-output" }).recordId).toBe(
       "asset-output"

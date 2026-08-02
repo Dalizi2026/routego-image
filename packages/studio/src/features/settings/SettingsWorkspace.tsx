@@ -12,6 +12,7 @@ import {
   createProviderProfileDraft,
   mergeActiveProviderProfile,
   mergeRefreshedModels,
+  mergeRemovedProviderProfile,
   mergeUpsertProviderProfile
 } from "./state";
 import type { ProviderProfileDraft, SettingsAsyncState, SettingsWorkspaceProps } from "./types";
@@ -22,13 +23,19 @@ const copy = {
     eyebrow: "PROVIDER / LIBRARY",
     title: "供应商管理",
     lead: "选择一个供应商即可切换；需要修改时再打开编辑。API Key 仅保存在本机，页面不会显示它。",
+    replayOnboarding: "重新查看新手引导",
     select: "当前供应商",
     empty: "还没有供应商资料",
     newProfile: "新建供应商",
     edit: "编辑",
+    remove: "删除供应商",
+    removeConfirm: "将删除“{name}”及保存在本机的 API Key，此操作不能撤销。是否继续？",
+    removing: "正在删除…",
+    removed: "供应商已删除。",
     cancel: "取消",
     name: "名称",
     endpoint: "调用端点",
+    endpointPlaceholder: "routego.xyz",
     endpointHelp: "填写服务商提供的 API 地址或完整生图端点，模型地址会自动处理。",
     key: "API Key",
     keyStored: "已保存；留空则不修改",
@@ -52,13 +59,19 @@ const copy = {
     eyebrow: "PROVIDER / LIBRARY",
     title: "Provider management",
     lead: "Choose a provider to switch. Open Edit only when changes are needed. API keys stay local and are never displayed.",
+    replayOnboarding: "Review onboarding",
     select: "Current provider",
     empty: "No provider saved yet",
     newProfile: "New provider",
     edit: "Edit",
+    remove: "Remove provider",
+    removeConfirm: "Remove “{name}” and its locally stored API key? This cannot be undone.",
+    removing: "Removing…",
+    removed: "Provider removed.",
     cancel: "Cancel",
     name: "Name",
     endpoint: "API endpoint",
+    endpointPlaceholder: "routego.xyz",
     endpointHelp: "Enter the API address or complete image endpoint from the provider. Model discovery is handled automatically.",
     key: "API key",
     keyStored: "Stored; leave blank to keep it",
@@ -99,7 +112,10 @@ export function SettingsWorkspace({
   gateway,
   settings,
   onSettingsChange,
-  firstRunSession = false
+  firstRunSession = false,
+  onboardingPreview = false,
+  onReplayOnboarding,
+  onProviderSaved
 }: SettingsWorkspaceProps) {
   const { language } = useI18n();
   const labels = copy[language];
@@ -112,6 +128,7 @@ export function SettingsWorkspace({
   const [fieldErrors, setFieldErrors] = useState<Readonly<Record<string, string>>>({});
 
   const selectedProfile = settings.profiles.find((profile) => profile.id === selectedProfileId);
+  const previewProfile = activeSettingsProfile(settings) ?? settings.profiles[0];
   const busy = state.status === "busy";
   const keyMissing = selectedProfile?.hasApiKey !== true && draft.apiKeyReplacement.trim() === "";
 
@@ -153,6 +170,26 @@ export function SettingsWorkspace({
     setEditing(true);
   };
 
+  const removeSelectedProfile = async () => {
+    if (selectedProfile === undefined || busy) return;
+    if (!window.confirm(labels.removeConfirm.replace("{name}", selectedProfile.name))) return;
+    setState({ status: "busy", operation: "remove" });
+    try {
+      const result = await gateway.invoke("removeProviderProfile", { profileId: selectedProfile.id });
+      const next = mergeRemovedProviderProfile(settings, result);
+      const fallback = next.profiles.find((profile) => profile.id === result.activeProviderId) ?? next.profiles[0];
+      onSettingsChange(next);
+      setSelectedProfileId(fallback?.id ?? "new");
+      setDraft(createProviderProfileDraft(fallback));
+      setModels(fallback?.models ?? []);
+      setFieldErrors({});
+      setEditing(fallback === undefined);
+      setState({ status: "success", message: labels.removed });
+    } catch (error) {
+      setState({ status: "failure", safeMessage: safeMessage(error) });
+    }
+  };
+
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     let input;
@@ -175,6 +212,7 @@ export function SettingsWorkspace({
       setModels(result.profile.models);
       setEditing(false);
       setState({ status: "success", message: labels.saved });
+      if (firstRunSession) onProviderSaved?.();
     } catch (error) {
       setState({ status: "failure", safeMessage: safeMessage(error) });
     }
@@ -221,11 +259,28 @@ export function SettingsWorkspace({
   return (
     <section className="provider-manager" aria-labelledby="provider-manager-title">
       <header className="provider-manager__heading">
-        <p>{labels.eyebrow}</p>
-        <h1 id="provider-manager-title" tabIndex={-1}>{labels.title}</h1>
-        <span>{labels.lead}</span>
+        <div className="provider-manager__heading-copy">
+          <p>{labels.eyebrow}</p>
+          <h1 id="provider-manager-title" tabIndex={-1}>{labels.title}</h1>
+          <span>{labels.lead}</span>
+        </div>
+        {!onboardingPreview && onReplayOnboarding !== undefined ? (
+          <button className="provider-manager__replay" type="button" onClick={onReplayOnboarding}>
+            {labels.replayOnboarding}
+          </button>
+        ) : null}
       </header>
 
+      {onboardingPreview ? (
+        <section className="provider-manager__preview" data-onboarding-target="provider-summary" aria-label={labels.select}>
+          <div className="provider-manager__summary">
+            <strong>{previewProfile?.name ?? labels.empty}</strong>
+            <span>{previewProfile?.hasApiKey ? labels.configured : labels.keyMissing}</span>
+            <span>{labels.activeModel}：{settings.defaults.model ?? previewProfile?.defaultModel ?? "—"}</span>
+          </div>
+        </section>
+      ) : (
+        <>
       <section className="provider-manager__picker" aria-label={labels.select}>
         <label>
           <span>{labels.select}</span>
@@ -243,16 +298,17 @@ export function SettingsWorkspace({
         </label>
         <button type="button" disabled={busy} onClick={startNew}>{labels.newProfile}</button>
         {selectedProfile && !editing ? <button type="button" disabled={busy} onClick={() => setEditing(true)}>{labels.edit}</button> : null}
+        {selectedProfile ? <button className="provider-manager__delete" type="button" disabled={busy} onClick={() => void removeSelectedProfile()}>{busy && state.operation === "remove" ? labels.removing : labels.remove}</button> : null}
       </section>
 
       {!editing && selectedProfile ? (
-        <section className="provider-manager__summary">
+        <section className="provider-manager__summary" data-onboarding-target="provider-summary">
           <strong>{selectedProfile.name}</strong>
           <span>{selectedProfile.hasApiKey ? labels.configured : labels.keyMissing}</span>
           <span>{labels.activeModel}：{settings.defaults.model ?? selectedProfile.defaultModel ?? "—"}</span>
         </section>
       ) : (
-        <form className="provider-manager__form" onSubmit={(event) => void save(event)}>
+        <form className="provider-manager__form" data-onboarding-target="provider-form" onSubmit={(event) => void save(event)}>
           <label>
             <span>{labels.name}</span>
             <input required maxLength={200} value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} />
@@ -260,7 +316,7 @@ export function SettingsWorkspace({
           </label>
           <label>
             <span>{labels.endpoint}</span>
-            <input required type="url" autoComplete="url" spellCheck={false} value={draft.generation.value} onChange={(event) => setDraft((current) => ({ ...current, generation: { ...current.generation, value: event.target.value, requiresReentry: false } }))} />
+            <input className="provider-manager__endpoint-input" required type="url" autoComplete="url" spellCheck={false} placeholder={labels.endpointPlaceholder} value={draft.generation.value} onChange={(event) => setDraft((current) => ({ ...current, generation: { ...current.generation, value: event.target.value, requiresReentry: false } }))} />
             <small>{labels.endpointHelp}</small>
             {fieldErrors["endpoints.generation"] ?? fieldErrors["endpoints.generation.value"] ? <small className="settings-field-error">{fieldErrors["endpoints.generation"] ?? fieldErrors["endpoints.generation.value"]}</small> : null}
           </label>
@@ -276,13 +332,15 @@ export function SettingsWorkspace({
             <button type="button" disabled={busy || draft.generation.value.trim() === "" || keyMissing} onClick={() => void getModels()}>{busy && state.operation === "get-models" ? labels.gettingModels : labels.getModels}</button>
           </div>
           <div className="provider-manager__actions">
-            <button type="submit" disabled={busy}>{busy && state.operation === "save" ? labels.saving : labels.save}</button>
+            <button data-onboarding-target="provider-save" type="submit" disabled={busy}>{busy && state.operation === "save" ? labels.saving : labels.save}</button>
             {selectedProfile ? <button type="button" disabled={busy} onClick={() => { setDraft(createProviderProfileDraft(selectedProfile)); setModels(selectedProfile.models); setEditing(false); setState({ status: "idle" }); }}>{labels.cancel}</button> : null}
           </div>
           <StateMessage state={state} labels={labels} />
         </form>
       )}
       {!editing ? <StateMessage state={state} labels={labels} /> : null}
+        </>
+      )}
     </section>
   );
 }

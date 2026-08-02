@@ -112,6 +112,7 @@ function probeInput(input: {
   readonly transport?: CapabilityProbeInput["transport"];
   readonly requestShape?: string;
   readonly requestedSize?: string;
+  readonly requestedQuality?: "low" | "medium" | "high";
 }): CapabilityProbeInput {
   return capabilityProbeInputSchema.parse({
     providerId: input.providerId,
@@ -120,6 +121,7 @@ function probeInput(input: {
     transport: input.transport ?? "single-endpoint-json",
     requestShape: input.requestShape ?? PROVIDER_REQUEST_SHAPES.singleEndpointImage,
     ...(input.requestedSize === undefined ? {} : { requestedSize: input.requestedSize }),
+    ...(input.requestedQuality === undefined ? {} : { requestedQuality: input.requestedQuality }),
     confirmBillableProbe: true
   });
 }
@@ -308,6 +310,7 @@ async function assertProbeRequestSemantics(
   }
   if (pair.capability === "native-variants") expect(body["n"]).toBe(2);
   if (pair.capability === "custom-size") expect(body["size"]).toBe("256x256");
+  if (pair.capability === "quality-control") expect(body["quality"]).toBe("high");
   if (pair.capability === "output-format") expect(body["output_format"]).toBe("jpeg");
   if (pair.capability === "native-transparency") expect(body["background"]).toBe("transparent");
 }
@@ -648,7 +651,8 @@ describe("exact confirmed capability probes", () => {
       providerId: "provider-synthetic",
       capability: pair.capability,
       transport: pair.transport,
-      requestShape: pair.requestShape
+      requestShape: pair.requestShape,
+      ...(pair.capability === "quality-control" ? { requestedQuality: "high" as const } : {})
     }), { fetch: fetchImpl, now: () => now });
 
     expect(fetchImpl).toHaveBeenCalledTimes(1);
@@ -665,6 +669,35 @@ describe("exact confirmed capability probes", () => {
           requestShape: pair.requestShape
         }
       }
+    });
+  });
+
+  it("accumulates each conclusively accepted quality for the same provider route", async () => {
+    const { owner } = mockProbeOwner();
+    const fetchImpl = vi.fn<typeof fetch>(async (_input, init) => {
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      expect(["low", "high"]).toContain(body["quality"]);
+      return successfulProbeResponse({ capability: "quality-control", transport: "openai-images" });
+    });
+
+    await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "quality-control",
+      transport: "openai-images",
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesGenerationsJson,
+      requestedQuality: "low"
+    }), { fetch: fetchImpl, now: () => now });
+    const result = await probeProviderCapability(owner, probeInput({
+      providerId: "provider-synthetic",
+      capability: "quality-control",
+      transport: "openai-images",
+      requestShape: PROVIDER_REQUEST_SHAPES.imagesGenerationsJson,
+      requestedQuality: "high"
+    }), { fetch: fetchImpl, now: () => now });
+
+    expect(result.record).toMatchObject({
+      state: "supported",
+      limits: { supportedQualities: ["low", "high"] }
     });
   });
 
@@ -844,7 +877,7 @@ describe("exact confirmed capability probes", () => {
           const transport = requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointText
             ? "single-endpoint-json" as const
             : "openai-images" as const;
-          return ["quality-control", "compression", "moderation"].map((capability) => ({
+          return ["compression", "moderation"].map((capability) => ({
             transport,
             requestShape,
             capability: capability as ProviderCapability

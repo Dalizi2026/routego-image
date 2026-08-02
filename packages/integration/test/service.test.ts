@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
-import { access, mkdir, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 
 import {
   capabilityProbeInputSchema,
@@ -441,9 +441,9 @@ describe("task 3.5 contract surface and recovery", () => {
     const { service, library } = await createHarness({ executeCreation: execute });
     const prepare = vi.spyOn(library.galleryService, "prepareRegeneration");
 
-    await expect(service.prepareRegeneration({})).rejects.toThrow("No generation record is currently marked");
+    await expect(service.prepareRegeneration({ recordId: "asset-output" })).rejects.toThrow();
 
-    expect(prepare).toHaveBeenCalledWith({ schemaVersion: 1 });
+    expect(prepare).toHaveBeenCalledWith({ schemaVersion: 1, recordId: "asset-output" });
     expect(execute).not.toHaveBeenCalled();
   });
 
@@ -480,6 +480,38 @@ describe("task 3.5 contract surface and recovery", () => {
     expect(events.map((event) => event.type)).toEqual(["started", "failed"]);
     expect(events[1]).toMatchObject({ type: "failed", error: { code: "config_corrupt" } });
     expect(execute).not.toHaveBeenCalled();
+  });
+
+  it("continues a long Studio-configured generation after the MCP call returns queued", async () => {
+    let markStarted: (() => void) | undefined;
+    let release: (() => void) | undefined;
+    const started = new Promise<void>((resolve) => { markStarted = resolve; });
+    const held = new Promise<void>((resolve) => { release = resolve; });
+    const execute = vi.fn<CreationExecution>(async (request, context) => {
+      markStarted?.();
+      await held;
+      return succeededResult(request, context.requestId);
+    });
+    const { service } = await createHarness({ executeCreation: execute });
+    const settings = await service.readSettings({});
+    await service.updateSettings({
+      defaults: { ...settings.defaults, responseTimeoutMs: 600_000 }
+    });
+
+    const queued = await service.generate(publicRequest());
+
+    expect(queued).toMatchObject({
+      status: "queued",
+      execution: { providerRequestCount: 0, receivedAnyOutput: false },
+      finalArtifacts: []
+    });
+    await started;
+    expect(execute).toHaveBeenCalledTimes(1);
+
+    release?.();
+    await service.close();
+    const saved = await service.searchLibrary({ query: "synthetic production service result" });
+    expect(saved).toMatchObject({ total: 1, items: [{ status: "succeeded" }] });
   });
 });
 
@@ -590,6 +622,98 @@ describe("task 3.5 public composition", () => {
     ]);
   });
 
+  it("resolves omitted public edit controls from active defaults while retaining explicit overrides", async () => {
+    const observed: ImageOperationRequest[] = [];
+    const execute: CreationExecution = async (request, context) => {
+      observed.push(request);
+      return request.format === "jpeg"
+        ? succeededJpegResult(request, context.requestId)
+        : succeededResult(request, context.requestId);
+    };
+    const { service, library, output } = await createHarness({ executeCreation: execute });
+    const settings = await library.readSettings({});
+    await library.updateSettings({
+      defaults: {
+        ...settings.defaults,
+        size: "216x384",
+        aspectRatio: "9:16",
+        quality: "high",
+        format: "jpeg",
+        count: 1,
+        partialImages: 0,
+        transparentMode: "off",
+        moderation: "auto",
+        saveToLibrary: true
+      }
+    });
+    const targetPath = path.join(output, "edit-target.png");
+    await writeFile(targetPath, pngBytes());
+    const baseEdit = {
+      kind: "edit" as const,
+      prompt: "Apply the saved defaults to this edit",
+      targetImage: { path: targetPath, label: "Target" },
+      invariants: { preserve: ["Keep the subject unchanged"] }
+    };
+
+    const inherited = await service.edit(baseEdit);
+    const explicit = await service.edit({
+      ...baseEdit,
+      prompt: "Keep explicit edit controls",
+      size: "30x20",
+      aspectRatio: "3:2",
+      quality: "medium",
+      format: "png",
+      count: 1,
+      partialImages: 0,
+      transparentMode: "off",
+      moderation: "low",
+      saveToLibrary: false,
+      outputDir: output
+    });
+
+    expect(inherited).toMatchObject({
+      status: "succeeded",
+      requestedParams: { kind: "edit", size: "216x384", aspectRatio: "9:16", quality: "high", format: "jpeg" },
+      effectiveParams: { kind: "edit", size: "216x384", aspectRatio: "9:16", quality: "high", format: "jpeg" }
+    });
+    expect(explicit).toMatchObject({
+      status: "succeeded",
+      requestedParams: { kind: "edit", size: "30x20", aspectRatio: "3:2", quality: "medium", format: "png", moderation: "low", saveToLibrary: false },
+      effectiveParams: { kind: "edit", size: "30x20", aspectRatio: "3:2", quality: "medium", format: "png", moderation: "low", saveToLibrary: false }
+    });
+    expect(observed.map((request) => ({
+      kind: request.kind,
+      size: request.size,
+      aspectRatio: request.aspectRatio,
+      quality: request.quality,
+      format: request.format,
+      moderation: request.moderation,
+      saveToLibrary: request.saveToLibrary,
+      targetLabel: request.kind === "edit" ? request.targetImage.label : undefined
+    }))).toEqual([
+      {
+        kind: "edit",
+        size: "216x384",
+        aspectRatio: "9:16",
+        quality: "high",
+        format: "jpeg",
+        moderation: "auto",
+        saveToLibrary: true,
+        targetLabel: "Target"
+      },
+      {
+        kind: "edit",
+        size: "30x20",
+        aspectRatio: "3:2",
+        quality: "medium",
+        format: "png",
+        moderation: "low",
+        saveToLibrary: false,
+        targetLabel: "Target"
+      }
+    ]);
+  });
+
   it("stops before Creation when public defaults cannot be read", async () => {
     const execute = vi.fn<CreationExecution>();
     const { service, library } = await createHarness({ executeCreation: execute });
@@ -657,24 +781,52 @@ describe("task 3.5 public composition", () => {
     expect(decodeJpeg(bytes, { useTArray: true })).toMatchObject({ width: 100, height: 100 });
   });
 
-  it("rejects mismatched size, aspect ratio, and output count before saving", async () => {
+  it("saves a complete image whose dimensions differ from the request", async () => {
     const { service } = await createHarness({
       executeCreation: async (request, context) => {
         const result = succeededResult(request, context.requestId);
-        const first = result.finalArtifacts[0]!;
+        const first = artifact(`${context.requestId}:mismatched-size`, "final", 0, 0x55, 3, 2);
         return imageOperationResultSchema.parse({
           ...result,
-          finalArtifacts: [{ ...first, width: 3, height: 2 }],
+          finalArtifacts: [first],
           relationships: [{ inputRole: "output", outputArtifactId: first.id, order: 0 }]
         });
       }
     });
     const result = await service.generate(publicRequest({
-      size: "auto",
+      size: "100x100",
       aspectRatio: "1:1",
-      count: 2,
       format: "png"
     }));
+    const library = await service.searchLibrary({});
+    const detail = await service.getAssetDetail({ assetId: library.items[0]!.id });
+
+    expect(result).toMatchObject({
+      status: "succeeded",
+      requestedParams: { size: "100x100" },
+      finalArtifacts: [{ width: 3, height: 2, mimeType: "image/png" }]
+    });
+    expect(library.items).toHaveLength(1);
+    expect(detail.asset).toMatchObject({
+      width: 3,
+      height: 2,
+      requestedParams: { size: "100x100" }
+    });
+  });
+
+  it("still rejects a provider result with an incorrect output count", async () => {
+    const { service } = await createHarness({
+      executeCreation: async (request, context) => {
+        const result = succeededResult(request, context.requestId);
+        return imageOperationResultSchema.parse({
+          ...result,
+          finalArtifacts: [result.finalArtifacts[0]!],
+          relationships: [{ inputRole: "output", outputArtifactId: result.finalArtifacts[0]!.id, order: 0 }]
+        });
+      }
+    });
+
+    const result = await service.generate(publicRequest({ count: 2 }));
     const library = await service.searchLibrary({});
 
     expect(result).toMatchObject({
@@ -682,8 +834,7 @@ describe("task 3.5 public composition", () => {
       error: {
         code: "invalid_response",
         details: {
-          mismatches: ["count", "aspectRatio"],
-          actualOutputs: [{ width: 3, height: 2, mimeType: "image/png" }],
+          mismatches: ["count"],
           observedExecution: { transport: "single-endpoint-json", providerRequestCount: 1 }
         }
       }

@@ -67,6 +67,7 @@ export interface ProbeProviderCapabilityOptions {
 
 type ProbeResponseProof =
   | "images-output"
+  | "images-quality-control"
   | "images-two-outputs"
   | "images-custom-size"
   | "images-jpeg-output"
@@ -93,6 +94,7 @@ const CAPABILITY_PROBE_DEFINITIONS: readonly CapabilityProbeDefinition[] = [
       : "openai-images" as const;
     return [
       { transport, requestShape, capability: "text-generation", responseProof: "images-output" },
+      { transport, requestShape, capability: "quality-control", responseProof: "images-quality-control" },
       { transport, requestShape, capability: "native-variants", responseProof: "images-two-outputs" },
       { transport, requestShape, capability: "custom-size", responseProof: "images-custom-size" },
       { transport, requestShape, capability: "output-format", responseProof: "images-jpeg-output" },
@@ -147,7 +149,7 @@ export const CAPABILITY_PROBE_PAIRS: readonly CapabilityProbePair[] =
 
 function safeTimeout(value: number | undefined): number {
   const timeout = value ?? DEFAULT_CAPABILITY_PROBE_TIMEOUT_MS;
-  if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 300_000) {
+  if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 600_000) {
     throw new ProviderIntegrationError(
       createProviderServiceError({
         code: "invalid_input",
@@ -212,6 +214,7 @@ function jsonProbeBody(input: CapabilityProbeInput): string {
   const controls = {
     ...(input.capability === "native-variants" ? { n: 2 } : {}),
     ...(input.capability === "custom-size" ? { size: customProbeSize(input).value } : {}),
+    ...(input.capability === "quality-control" ? { quality: input.requestedQuality } : {}),
     ...(input.capability === "output-format" ? { output_format: "jpeg" } : {}),
     ...(input.capability === "native-transparency" ? { background: "transparent" } : {})
   };
@@ -678,6 +681,7 @@ function responseProvesCapability(
   if (outputs === undefined) return false;
   switch (proof) {
     case "images-output":
+    case "images-quality-control":
     case "responses-completed-output":
       return outputs.length >= 1;
     case "images-two-outputs":
@@ -1086,6 +1090,9 @@ export async function probeProviderCapability(
   const customSizeLimits = parsed.capability === "custom-size"
     ? { supportedSizes: [expectedSize.value] }
     : undefined;
+  const qualityLimits = parsed.capability === "quality-control" && parsed.requestedQuality !== undefined
+    ? { supportedQualities: [parsed.requestedQuality] }
+    : undefined;
   const observation = finalOutcome.outcome === "supported"
     ? {
         outcome: "supported" as const,
@@ -1097,7 +1104,9 @@ export async function probeProviderCapability(
           ...(shape === undefined ? {} : { responseShape: shape }),
           ...(status === undefined ? {} : { httpStatus: status })
         }),
-        ...(customSizeLimits === undefined ? {} : { limits: customSizeLimits })
+        ...(customSizeLimits === undefined && qualityLimits === undefined
+          ? {}
+          : { limits: { ...customSizeLimits, ...qualityLimits } })
       }
     : finalOutcome.outcome === "unsupported"
       ? {
@@ -1125,7 +1134,9 @@ export async function probeProviderCapability(
           ...(shape === undefined ? {} : { responseShape: shape }),
           ...(status === undefined ? {} : { httpStatus: status })
         }),
-        ...(customSizeLimits === undefined ? {} : { limits: customSizeLimits })
+        ...(customSizeLimits === undefined && qualityLimits === undefined
+          ? {}
+          : { limits: { ...customSizeLimits, ...qualityLimits } })
       };
   const record = transitionCapability(current, observation);
   const result = capabilityProbeResultSchema.parse({

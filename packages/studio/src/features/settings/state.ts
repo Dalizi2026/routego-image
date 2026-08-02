@@ -330,11 +330,27 @@ export function mergeRefreshedModels(
   result: RefreshModelsResult
 ): ReadSettingsResult {
   if (result.status !== "succeeded") return current;
+  const profile = current.profiles.find((item) => item.id === result.providerId);
+  if (profile === undefined) return current;
+  const models = Array.from(new Set(result.models));
+  const fallbackModel = models[0];
+  const defaultModel =
+    fallbackModel === undefined || profile.defaultModel === undefined || models.includes(profile.defaultModel)
+      ? profile.defaultModel
+      : fallbackModel;
   return {
     ...current,
     profiles: current.profiles.map((profile) =>
-      profile.id === result.providerId ? { ...profile, models: result.models } : profile
-    )
+      profile.id === result.providerId
+        ? { ...profile, ...(defaultModel === undefined ? {} : { defaultModel }), models }
+        : profile
+    ),
+    defaults:
+      current.activeProviderId === result.providerId &&
+      fallbackModel !== undefined &&
+      !models.includes(current.defaults.model ?? "")
+        ? { ...current.defaults, model: defaultModel ?? fallbackModel }
+        : current.defaults
   };
 }
 

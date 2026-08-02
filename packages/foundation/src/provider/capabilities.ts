@@ -52,10 +52,20 @@ function mergeLimits(
     ...(current?.supportedSizes ?? []),
     ...(observed.supportedSizes ?? [])
   ];
+  const supportedQualities = [
+    ...(current?.supportedQualities ?? []),
+    ...(observed.supportedQualities ?? [])
+  ];
+  const supportedFormats = [
+    ...(current?.supportedFormats ?? []),
+    ...(observed.supportedFormats ?? [])
+  ];
   return {
     ...current,
     ...observed,
-    ...(supportedSizes.length === 0 ? {} : { supportedSizes: [...new Set(supportedSizes)] })
+    ...(supportedSizes.length === 0 ? {} : { supportedSizes: [...new Set(supportedSizes)] }),
+    ...(supportedQualities.length === 0 ? {} : { supportedQualities: [...new Set(supportedQualities)] }),
+    ...(supportedFormats.length === 0 ? {} : { supportedFormats: [...new Set(supportedFormats)] })
   };
 }
 

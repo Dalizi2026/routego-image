@@ -196,16 +196,6 @@ describe("public routego_manage_library compatibility", () => {
     });
   });
 
-  it("marks an active generation through the scoped mutation service", async () => {
-    const { service, indexStore } = await createService();
-    const preflight = await service.preflightLibraryMutation({
-      mutation: { action: "mark", assetIds: ["asset-one"] }
-    });
-    const result = await service.executeLibraryMutation({ preflightId: preflight.preflightId, action: "mark" });
-    expect(result).toMatchObject({ status: "succeeded", items: [{ affectedAssetId: "asset-one" }] });
-    expect((await indexStore.read()).currentMarkRecordId).toBe("asset-one");
-  });
-
   it("fails closed for ZIP actions that belong to later portability tasks", async () => {
     const { service } = await createService();
     await expect(
@@ -271,23 +261,6 @@ describe("safe generation information and read-only recipe preparation", () => {
     });
     expect(await indexStore.read()).toEqual(before);
 
-    await indexStore.runExclusive(async ({ index, commit }) => {
-      await commit({
-        blobs: index.blobs,
-        assets: index.assets,
-        folders: index.folders,
-        currentMarkRecordId: "asset-one"
-      });
-    });
-    const fromMark = await service.prepareRegeneration({});
-    expect(fromMark.recipe.sourceRecordId).toBe("asset-one");
-    expect((await indexStore.read()).currentMarkRecordId).toBe("asset-one");
-  });
-
-  it("fails closed for absent current marks without returning partial text", async () => {
-    const { service, indexStore } = await createService();
-    await expect(service.prepareRegeneration({})).rejects.toMatchObject({ code: "not_found" });
-    expect(await indexStore.read()).toMatchObject({ schemaVersion: 2, revision: 1 });
   });
 
   it("rejects stored prompts that could expose paths or credentials", async () => {
@@ -324,32 +297,6 @@ describe("safe generation information and read-only recipe preparation", () => {
 });
 
 describe("Studio Library mutation service", () => {
-  it("returns a conflict when a marked target changes after preflight", async () => {
-    const { service, indexStore } = await createService();
-    const preflight = await service.preflightLibraryMutation({
-      mutation: { action: "mark", assetIds: ["asset-two"] }
-    });
-    await indexStore.runExclusive(async ({ index, commit }) => {
-      await commit({
-        blobs: index.blobs,
-        folders: index.folders,
-        assets: index.assets.map((asset) =>
-          asset.id === "asset-two"
-            ? { ...asset, updatedAt: "2026-07-18T06:01:00.000Z" }
-            : asset
-        )
-      });
-    });
-    const result = await service.executeLibraryMutation({
-      preflightId: preflight.preflightId,
-      action: "mark"
-    });
-    expect(result).toMatchObject({
-      status: "failed",
-      items: [{ targetId: "asset-two", status: "failed", error: { code: "conflict" } }]
-    });
-  });
-
   it("blocks ZIP preflight/execution and rejects missing preflight reuse", async () => {
     const { service } = await createService();
     const zip = await service.preflightLibraryMutation({

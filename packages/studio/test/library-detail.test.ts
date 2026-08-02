@@ -7,14 +7,17 @@ import type { BrowserResourceDescriptor, LibraryAssetDetail } from "@routego-ima
 import type { StudioGateway } from "../src/api";
 import { I18nProvider } from "../src/i18n";
 import {
+  DimensionMismatchNotice,
   ImageComparison,
   clampComparisonPosition,
+  clampPreviewZoom,
   comparisonPositionFromKey,
   comparisonPositionFromPointer,
   fetchLibraryDownload,
   orderedLibraryRelationships,
   relationshipResourceInput,
   selectComparisonRelationships,
+  previewZoomFromWheel,
   triggerLibraryDownload
 } from "../src/features/library";
 
@@ -68,6 +71,28 @@ const asset = {
 } as unknown as LibraryAssetDetail;
 
 describe("Library detail resources, comparison, and download", () => {
+  it("labels a saved image when its actual dimensions differ from the request", () => {
+    const markup = renderToStaticMarkup(
+      createElement(DimensionMismatchNotice, {
+        asset: {
+          width: 1488,
+          height: 1057,
+          requestedParams: { size: "2048x1456", aspectRatio: "7:5" }
+        } as LibraryAssetDetail,
+        labels: {
+          dimensionMismatch: "实际尺寸与请求尺寸不一致",
+          requestedDimensions: "请求尺寸",
+          actualDimensions: "实际尺寸",
+          requestedAspectRatio: "请求比例"
+        }
+      })
+    );
+
+    expect(markup).toContain("实际尺寸与请求尺寸不一致");
+    expect(markup).toContain("请求尺寸：2048 × 1456");
+    expect(markup).toContain("实际尺寸：1488 × 1057");
+  });
+
   it("keeps relationship order and protected resource lookups aligned", () => {
     const ordered = orderedLibraryRelationships(asset);
     expect(ordered.map((relationship) => relationship.id)).toEqual([
@@ -121,6 +146,15 @@ describe("Library detail resources, comparison, and download", () => {
     expect(markup).toContain('min="0"');
     expect(markup).toContain('max="100"');
     expect(markup).toContain('aria-label="Comparison divider"');
+  });
+
+  it("keeps original-image zoom within usable limits for wheel and trackpad input", () => {
+    expect(clampPreviewZoom(0.1)).toBe(0.25);
+    expect(clampPreviewZoom(8)).toBe(5);
+    expect(previewZoomFromWheel(1, -120)).toBeGreaterThan(1);
+    expect(previewZoomFromWheel(1, 120)).toBeLessThan(1);
+    expect(previewZoomFromWheel(5, -120)).toBe(5);
+    expect(previewZoomFromWheel(0.25, 120)).toBe(0.25);
   });
 
   it("downloads only a protected original and always revokes the temporary object URL", async () => {

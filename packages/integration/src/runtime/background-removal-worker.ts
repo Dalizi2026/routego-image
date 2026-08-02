@@ -1,6 +1,10 @@
 import { parentPort } from "node:worker_threads";
+import path from "node:path";
 
+import * as ort from "onnxruntime-web";
 import { PNG } from "pngjs";
+
+import { verifyBackgroundRemovalResources } from "./background-removal-resources";
 
 export const WORKER_MAX_WIDTH = 4_096;
 export const WORKER_MAX_HEIGHT = 4_096;
@@ -29,7 +33,7 @@ export type BackgroundRemovalWorkerResponse =
     }
   | {
       readonly type: "failure";
-      readonly code: "invalid-input" | "input-too-large" | "output-too-large" | "inference-unavailable" | "worker-failed" | "quality-gate-failed";
+      readonly code: "invalid-input" | "input-too-large" | "output-too-large" | "inference-unavailable" | "worker-failed" | "quality-gate-failed" | "timeout" | "cancelled";
       readonly message: string;
     };
 
@@ -57,6 +61,11 @@ export interface QualityGateFailure {
 }
 
 const PNG_SIGNATURE = Uint8Array.of(137, 80, 78, 71, 13, 10, 26, 10);
+const U2NET_INPUT_SIZE = 320;
+const U2NET_MEAN = [0.485, 0.456, 0.406] as const;
+const U2NET_STANDARD_DEVIATION = [0.229, 0.224, 0.225] as const;
+
+let u2netSession: Promise<ort.InferenceSession> | undefined;
 
 function failure(
   code: BackgroundRemovalWorkerResponse extends infer T
@@ -233,6 +242,116 @@ export function preprocessRgba(rgba: Uint8Array): Float32Array {
   return normalized;
 }
 
+function clampByte(value: number): number {
+  return Math.max(0, Math.min(255, Math.round(value)));
+}
+
+function bilinearSample(
+  values: Uint8Array | Float32Array,
+  width: number,
+  height: number,
+  x: number,
+  y: number,
+  channels: number,
+  channel: number
+): number {
+  const x0 = Math.max(0, Math.min(width - 1, Math.floor(x)));
+  const y0 = Math.max(0, Math.min(height - 1, Math.floor(y)));
+  const x1 = Math.min(width - 1, x0 + 1);
+  const y1 = Math.min(height - 1, y0 + 1);
+  const tx = x - x0;
+  const ty = y - y0;
+  const a = values[(y0 * width + x0) * channels + channel]!;
+  const b = values[(y0 * width + x1) * channels + channel]!;
+  const c = values[(y1 * width + x0) * channels + channel]!;
+  const d = values[(y1 * width + x1) * channels + channel]!;
+  return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+}
+
+/**
+ * U²-Netp uses ImageNet-normalized NCHW input. This is equivalent to the
+ * preprocessing used by rembg's U²-Net session, while keeping the pixels and
+ * model entirely local to the plugin runtime.
+ */
+export function createU2netInput(rgba: Uint8Array, width: number, height: number): Float32Array {
+  const pixels = U2NET_INPUT_SIZE * U2NET_INPUT_SIZE;
+  const input = new Float32Array(3 * pixels);
+  for (let y = 0; y < U2NET_INPUT_SIZE; y += 1) {
+    const sourceY = ((y + 0.5) * height) / U2NET_INPUT_SIZE - 0.5;
+    for (let x = 0; x < U2NET_INPUT_SIZE; x += 1) {
+      const sourceX = ((x + 0.5) * width) / U2NET_INPUT_SIZE - 0.5;
+      const destination = y * U2NET_INPUT_SIZE + x;
+      for (let channel = 0; channel < 3; channel += 1) {
+        const normalized = bilinearSample(rgba, width, height, sourceX, sourceY, 4, channel) / 255;
+        input[channel * pixels + destination] = (normalized - U2NET_MEAN[channel]!) / U2NET_STANDARD_DEVIATION[channel]!;
+      }
+    }
+  }
+  return input;
+}
+
+export function resizeU2netMask(
+  mask: Float32Array,
+  outputWidth: number,
+  outputHeight: number
+): Uint8Array {
+  if (mask.length !== U2NET_INPUT_SIZE * U2NET_INPUT_SIZE) {
+    throw new TypeError("The U²-Net output mask has an unexpected shape.");
+  }
+  let minimum = Number.POSITIVE_INFINITY;
+  let maximum = Number.NEGATIVE_INFINITY;
+  for (const value of mask) {
+    if (!Number.isFinite(value)) throw new TypeError("The U²-Net output mask contains a non-finite value.");
+    minimum = Math.min(minimum, value);
+    maximum = Math.max(maximum, value);
+  }
+  if (!(maximum > minimum)) throw new TypeError("The U²-Net output mask has no usable contrast.");
+  const normalized = new Float32Array(mask.length);
+  const scale = 1 / (maximum - minimum);
+  for (let index = 0; index < mask.length; index += 1) normalized[index] = (mask[index]! - minimum) * scale;
+
+  const output = new Uint8Array(outputWidth * outputHeight);
+  for (let y = 0; y < outputHeight; y += 1) {
+    const sourceY = ((y + 0.5) * U2NET_INPUT_SIZE) / outputHeight - 0.5;
+    for (let x = 0; x < outputWidth; x += 1) {
+      const sourceX = ((x + 0.5) * U2NET_INPUT_SIZE) / outputWidth - 0.5;
+      output[y * outputWidth + x] = clampByte(
+        bilinearSample(normalized, U2NET_INPUT_SIZE, U2NET_INPUT_SIZE, sourceX, sourceY, 1, 0) * 255
+      );
+    }
+  }
+  return output;
+}
+
+async function loadU2netSession(): Promise<ort.InferenceSession> {
+  const verified = await verifyBackgroundRemovalResources();
+  const modelPath = verified.resources.get("u2netp-model");
+  const loaderPath = verified.resources.get("onnxruntime-web-simd-threaded-loader");
+  if (modelPath === undefined || loaderPath === undefined) {
+    throw new Error("The packaged U²-Netp inference resources are incomplete.");
+  }
+  ort.env.wasm.wasmPaths = `${path.dirname(loaderPath)}${path.sep}`;
+  ort.env.wasm.numThreads = 1;
+  ort.env.wasm.proxy = false;
+  return await ort.InferenceSession.create(modelPath, { executionProviders: ["wasm"] });
+}
+
+async function inferU2netMask(rgba: Uint8Array, width: number, height: number): Promise<Uint8Array> {
+  u2netSession ??= loadU2netSession();
+  const session = await u2netSession;
+  const inputName = session.inputNames[0];
+  const outputName = session.outputNames[0];
+  if (inputName === undefined || outputName === undefined) throw new Error("The packaged U²-Netp model has an invalid input or output contract.");
+  const output = await session.run({
+    [inputName]: new ort.Tensor("float32", createU2netInput(rgba, width, height), [1, 3, U2NET_INPUT_SIZE, U2NET_INPUT_SIZE])
+  });
+  const tensor = output[outputName];
+  if (tensor === undefined || tensor.type !== "float32" || !(tensor.data instanceof Float32Array)) {
+    throw new Error("The packaged U²-Netp model returned an invalid alpha mask.");
+  }
+  return resizeU2netMask(tensor.data, width, height);
+}
+
 export function compositeMask(
   rgba: Uint8Array,
   width: number,
@@ -266,11 +385,16 @@ export async function processBackgroundRemovalRequest(
   const { width, height, rgba } = bounded;
   const sourceFailure = validateOpaqueSource(rgba, width, height);
   if (sourceFailure) return failure(sourceFailure.code, sourceFailure.message);
-  preprocessRgba(rgba);
-  if (request.mask === undefined) {
-    return failure("inference-unavailable", "The local inference backend is not available in this runtime.");
+  let inferredMask: Uint8Array | Float32Array;
+  try {
+    inferredMask = request.mask ?? await inferU2netMask(rgba, width, height);
+  } catch (error) {
+    return failure(
+      "inference-unavailable",
+      error instanceof Error ? `The local U²-Netp inference backend is unavailable: ${error.message}` : "The local U²-Netp inference backend is unavailable."
+    );
   }
-  const validatedMask = validateMaskQuality(request.mask, width, height);
+  const validatedMask = validateMaskQuality(inferredMask, width, height);
   if ("code" in validatedMask) return failure(validatedMask.code, validatedMask.message);
   try {
     const bytes = compositeMask(rgba, width, height, validatedMask, request.maxOutputBytes);

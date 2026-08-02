@@ -9,7 +9,7 @@ import type {
 import { StudioGatewayError, type StudioGateway } from "../api";
 import { AppNavigation, AsyncStatePanel, NoticeStack } from "../components";
 import { LibraryWorkspace } from "../features/library";
-import { GenerationDefaultsPanel, SettingsWorkspace } from "../features/settings";
+import { GenerationDefaultsPanel, OnboardingTour, SettingsWorkspace } from "../features/settings";
 import { mergeStudioProviderSwitch } from "../features/settings/state";
 import { I18nProvider, useI18n, type MessageKey } from "../i18n";
 import "../styles/index.css";
@@ -252,14 +252,27 @@ function StudioWorkspace({
   const { language, t, toggleLanguage } = useI18n();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const firstRunSession = useRef(initialStudioRouteForSettings(settings) === "settings").current;
+  const [onboardingStep, setOnboardingStep] = useState<"none" | "provider" | "defaults" | "finish">(
+    firstRunSession ? "provider" : "none"
+  );
   const [state, dispatch] = useReducer(studioAppReducer, {
     ...initialStudioAppState,
     route: initialStudioRouteForSettings(settings),
     notices: firstRunSession ? [] : noticesFor(service, settings)
   });
-  const firstRunSetupVisible = firstRunSession && state.route === "settings";
+  const onboardingPreview = onboardingStep !== "none" && !firstRunSession;
+  const openDefaultsOnboarding = () => {
+    setOnboardingStep("defaults");
+    dispatch({ type: "navigate", route: "workbench" });
+  };
   const workbenchContent = routeContent?.workbench ?? (
-    <GenerationDefaultsPanel gateway={gateway} settings={settings} onSettingsChange={onSettingsChange} />
+    <GenerationDefaultsPanel
+      gateway={gateway}
+      settings={settings}
+      onSettingsChange={onSettingsChange}
+      onboardingPreview={onboardingStep === "defaults" && onboardingPreview}
+      onOnboardingComplete={onboardingStep === "defaults" ? () => setOnboardingStep("finish") : undefined}
+    />
   );
   const content = {
     library:
@@ -276,8 +289,13 @@ function StudioWorkspace({
           gateway={gateway}
           settings={settings}
           onSettingsChange={onSettingsChange}
-          firstRunSession={firstRunSession}
-          onOpenWorkbench={() => dispatch({ type: "navigate", route: "workbench" })}
+          firstRunSession={firstRunSession && onboardingStep === "provider"}
+          onboardingPreview={onboardingStep === "provider" && onboardingPreview}
+          onProviderSaved={openDefaultsOnboarding}
+          onReplayOnboarding={() => {
+            setOnboardingStep("provider");
+            dispatch({ type: "navigate", route: "settings" });
+          }}
         />
       )
   } satisfies Partial<Record<Exclude<StudioRoute, "workbench">, ReactNode>>;
@@ -291,16 +309,14 @@ function StudioWorkspace({
 
   return (
     <div
-      className={`studio-shell studio-shell--sidebar${firstRunSetupVisible ? " studio-shell--setup" : ""}`}
+      className="studio-shell studio-shell--sidebar"
       data-language={language}
       data-theme={theme}
     >
       <a className="skip-link" href="#studio-workspace">
         {t("app.skip")}
       </a>
-      {firstRunSetupVisible ? null : (
-        <AppNavigation route={state.route} onNavigate={(route) => dispatch({ type: "navigate", route })} />
-      )}
+      <AppNavigation route={state.route} onNavigate={(route) => dispatch({ type: "navigate", route })} />
       <header className="studio-header">
         <div className="studio-header__identity">
           <p>{t("app.brand")}</p>
@@ -322,7 +338,7 @@ function StudioWorkspace({
             aria-label={language === "zh" ? (theme === "dark" ? "切换为白天模式" : "切换为黑夜模式") : (theme === "dark" ? "Switch to light mode" : "Switch to dark mode")}
             onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")}
           >
-            <span className="theme-toggle__badge" aria-hidden="true">{theme === "dark" ? "☀" : "◐"}</span>
+            <span className="theme-toggle__badge" aria-hidden="true" />
             <span className="theme-toggle__copy">{language === "zh" ? (theme === "dark" ? "白天" : "黑夜") : (theme === "dark" ? "Light" : "Dark")}</span>
           </button>
           <button
@@ -331,20 +347,22 @@ function StudioWorkspace({
             aria-label={t("app.language")}
             onClick={toggleLanguage}
           >
-            <span className="language-toggle__badge">{language === "zh" ? "中" : "EN"}</span>
-            <span className="language-toggle__copy">{t("app.languageAction")}</span>
+            <span className="language-toggle__badge" aria-hidden="true">
+              {language === "zh" ? "EN" : "中"}
+            </span>
+            <span className="language-toggle__copy">
+              {language === "zh" ? "English" : "中文"}
+            </span>
           </button>
         </div>
       </header>
-      {firstRunSetupVisible ? null : (
-        <NoticeStack
-          notices={state.notices}
-          onDismiss={(id) => dispatch({ type: "dismiss-notice", id })}
-        />
-      )}
+      <NoticeStack
+        notices={state.notices}
+        onDismiss={(id) => dispatch({ type: "dismiss-notice", id })}
+      />
       <main
         id="studio-workspace"
-        className={`studio-workspace${firstRunSetupVisible ? " studio-workspace--setup" : ""}`}
+        className="studio-workspace"
         ref={headingRef}
       >
         <section className="studio-workspace__primary" aria-live="polite">
@@ -362,6 +380,26 @@ function StudioWorkspace({
         <span>ROUTEGO IMAGE / LOCAL PRODUCTION SURFACE</span>
         <span aria-hidden="true">F·8 — 1/125 — ISO 400</span>
       </footer>
+      {onboardingStep !== "none" ? (
+        <OnboardingTour
+          step={onboardingStep}
+          preview={onboardingPreview}
+          onAdvance={() => {
+            if (onboardingStep === "provider") {
+              openDefaultsOnboarding();
+            } else if (onboardingStep === "defaults") {
+              setOnboardingStep("finish");
+            } else {
+              setOnboardingStep("none");
+            }
+          }}
+          onBack={onboardingPreview && onboardingStep === "defaults" ? () => {
+            setOnboardingStep("provider");
+            dispatch({ type: "navigate", route: "settings" });
+          } : undefined}
+          onDismiss={() => setOnboardingStep("none")}
+        />
+      ) : null}
     </div>
   );
 }

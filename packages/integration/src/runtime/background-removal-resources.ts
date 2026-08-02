@@ -38,7 +38,8 @@ const MODULE_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const REQUIRED_RESOURCE_IDS = new Set([
   "u2netp-model",
   "onnxruntime-web-simd-threaded-jsep",
-  "onnxruntime-web-simd-threaded"
+  "onnxruntime-web-simd-threaded",
+  "onnxruntime-web-simd-threaded-loader"
 ]);
 
 function failure(message: string): OfflineBackgroundRemovalResourceError {
@@ -92,6 +93,22 @@ async function defaultResourceDirectory(): Promise<string> {
   throw failure("the packaged resource directory is missing");
 }
 
+async function defaultManifestPath(): Promise<string> {
+  const candidates = [
+    path.join(MODULE_DIRECTORY, "resource-manifest.json"),
+    path.resolve(MODULE_DIRECTORY, "../src/runtime/resource-manifest.json")
+  ];
+  for (const candidate of candidates) {
+    try {
+      const metadata = await lstat(candidate);
+      if (!metadata.isSymbolicLink() && metadata.isFile()) return candidate;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+  }
+  throw failure("the resource manifest is missing");
+}
+
 async function readRegularFile(file: string): Promise<Buffer> {
   const metadata = await lstat(file).catch((error: NodeJS.ErrnoException) => {
     if (error.code === "ENOENT") throw failure(`a required resource is missing: ${path.basename(file)}`);
@@ -104,7 +121,7 @@ async function readRegularFile(file: string): Promise<Buffer> {
 export async function verifyBackgroundRemovalResources(
   options: VerifyBackgroundRemovalResourcesOptions = {}
 ): Promise<VerifiedBackgroundRemovalResources> {
-  const manifestPath = path.resolve(options.manifestPath ?? path.join(MODULE_DIRECTORY, "resource-manifest.json"));
+  const manifestPath = path.resolve(options.manifestPath ?? await defaultManifestPath());
   const manifestBytes = await readRegularFile(manifestPath);
   let manifest: BackgroundRemovalResourceManifest;
   try {

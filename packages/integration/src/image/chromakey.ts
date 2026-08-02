@@ -193,6 +193,46 @@ function isKeyPixel(
   );
 }
 
+function isGeneratedGreenScreenPixel(
+  red: number,
+  green: number,
+  blue: number,
+  keyColor: ChromakeyColor
+): boolean {
+  // A provider may turn #00FF00 into a subtly shaded render (for example
+  // rgb(25,233,38)). Treat that predictable generator variance as key color
+  // only when the configured key itself is vivid green and green clearly
+  // dominates both remaining channels. This cannot trigger for arbitrary
+  // background colours and is intentionally limited to explicit chromakey.
+  if (keyColor.green < 224 || keyColor.red > 32 || keyColor.blue > 32) return false;
+  return green >= 160 && green - Math.max(red, blue) >= 42;
+}
+
+function removeGreenScreenSpill(decoded: PNG): void {
+  const { width, height, data } = decoded;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const offset = (y * width + x) * 4;
+      if (data[offset + 3] !== 255) continue;
+      let touchesTransparency = false;
+      for (let neighborY = Math.max(0, y - 1); neighborY <= Math.min(height - 1, y + 1) && !touchesTransparency; neighborY += 1) {
+        for (let neighborX = Math.max(0, x - 1); neighborX <= Math.min(width - 1, x + 1); neighborX += 1) {
+          if (data[(neighborY * width + neighborX) * 4 + 3] === 0) {
+            touchesTransparency = true;
+            break;
+          }
+        }
+      }
+      if (!touchesTransparency) continue;
+      const red = data[offset]!;
+      const green = data[offset + 1]!;
+      const blue = data[offset + 2]!;
+      const neutral = Math.max(red, blue);
+      if (green > neutral + 3) data[offset + 1] = neutral;
+    }
+  }
+}
+
 function refusal(
   output: MaterializedImageOutput,
   reason: ChromakeyRefusalReason,
@@ -290,7 +330,8 @@ export async function applyPngChromakey(
         blue !== undefined &&
         alpha !== undefined &&
         alpha > 0 &&
-        isKeyPixel(red, green, blue, keyColor, tolerance)
+        (isKeyPixel(red, green, blue, keyColor, tolerance) ||
+          isGeneratedGreenScreenPixel(red, green, blue, keyColor))
       ) {
         decoded.data[offset + 3] = 0;
         removedPixels += 1;
@@ -304,6 +345,7 @@ export async function applyPngChromakey(
     if (remainingVisiblePixels === 0) {
       return refusal(input.output, "key-dominates-image", input.requestedMode);
     }
+    removeGreenScreenSpill(decoded);
 
     const encoded = PNG.sync.write(decoded, {
       colorType: 6,

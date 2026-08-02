@@ -171,7 +171,7 @@ export const routegoEditInputSchema = imageOperationRequestSchema.refine(
 export const routegoPrepareRegenerationInputSchema = z
   .object({
     schemaVersion: routegoSchemaVersionSchema.default(1),
-    recordId: identifierSchema.optional()
+    recordId: identifierSchema
   })
   .strict();
 

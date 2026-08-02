@@ -167,9 +167,7 @@ describe("public tool contracts", () => {
       }).success
     ).toBe(false);
 
-    expect(routegoPrepareRegenerationInputSchema.parse({})).toEqual({
-      schemaVersion: 1
-    });
+    expect(routegoPrepareRegenerationInputSchema.safeParse({}).success).toBe(false);
     expect(
       routegoPrepareRegenerationInputSchema.parse({
         recordId: "asset-generation-1"

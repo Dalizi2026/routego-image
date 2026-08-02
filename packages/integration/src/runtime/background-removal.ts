@@ -9,6 +9,7 @@ import {
   WORKER_MAX_PIXELS,
   WORKER_MAX_WIDTH,
   inspectPngAlpha,
+  processBackgroundRemovalRequest,
   type BackgroundRemovalWorkerRequest,
   type BackgroundRemovalWorkerResponse
 } from "./background-removal-worker";
@@ -191,6 +192,12 @@ export class BackgroundRemovalQueue {
     if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 120_000) {
       return resultFailure("failed", item.bytes, { code: "worker-failed", message: "The local background-removal timeout is invalid." }, parsed.width, parsed.height);
     }
+    // The packaged plugin is a single self-contained ESM runtime. Running the
+    // verified ONNX worker logic in this queue avoids a second unbundled worker
+    // entrypoint while preserving serialized execution and all output gates.
+    if (item.options.workerFactory === undefined) {
+      return await this.#runLocally(item, parsed, timeoutMs);
+    }
     let worker: BackgroundRemovalWorkerLike;
     try {
       worker = item.options.workerFactory?.() ?? defaultWorkerFactory();
@@ -251,6 +258,62 @@ export class BackgroundRemovalQueue {
         ...(item.options.mask === undefined ? {} : { mask: item.options.mask })
       });
     });
+  }
+
+  async #runLocally(
+    item: QueueItem,
+    parsed: { readonly width: number; readonly height: number },
+    timeoutMs: number
+  ): Promise<BackgroundRemovalResult> {
+    if (item.options.signal?.aborted) {
+      return resultFailure("cancelled", item.bytes, { code: "cancelled", message: "Local background removal was cancelled." }, parsed.width, parsed.height);
+    }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<BackgroundRemovalWorkerResponse>((resolve) => {
+      timer = setTimeout(() => resolve({
+        type: "failure",
+        code: "timeout",
+        message: "Local background removal exceeded its deadline."
+      } as BackgroundRemovalWorkerResponse), timeoutMs);
+    });
+    const cancelled = new Promise<BackgroundRemovalWorkerResponse>((resolve) => {
+      item.options.signal?.addEventListener("abort", () => resolve({
+        type: "failure",
+        code: "cancelled",
+        message: "Local background removal was cancelled."
+      } as BackgroundRemovalWorkerResponse), { once: true });
+    });
+    let response: BackgroundRemovalWorkerResponse;
+    try {
+      response = await Promise.race([
+        processBackgroundRemovalRequest({
+          type: "process",
+          bytes: item.bytes,
+          ...(item.options.maxInputBytes === undefined ? {} : { maxInputBytes: item.options.maxInputBytes }),
+          ...(item.options.maxOutputBytes === undefined ? {} : { maxOutputBytes: item.options.maxOutputBytes }),
+          ...(item.options.mask === undefined ? {} : { mask: item.options.mask })
+        }),
+        timeout,
+        cancelled
+      ]);
+    } catch {
+      return resultFailure("failed", item.bytes, { code: "worker-failed", message: "The local background-removal runtime failed." }, parsed.width, parsed.height);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+    }
+    if (response.type === "failure") {
+      const code = response.code;
+      return resultFailure(code === "cancelled" ? "cancelled" : "failed", item.bytes, { code, message: response.message }, parsed.width, parsed.height);
+    }
+    if (!(response.bytes instanceof Uint8Array) || response.width !== parsed.width || response.height !== parsed.height) {
+      return resultFailure("failed", item.bytes, { code: "quality-gate-failed", message: "The local background-removal runtime returned mismatched output dimensions." }, parsed.width, parsed.height);
+    }
+    if (response.bytes.byteLength > (item.options.maxOutputBytes ?? BACKGROUND_REMOVAL_MAX_OUTPUT_BYTES)) {
+      return resultFailure("failed", item.bytes, { code: "output-too-large", message: "The local background-removal output exceeds the byte limit." }, parsed.width, parsed.height);
+    }
+    const outputQuality = inspectPngAlpha(response.bytes, parsed.width, parsed.height);
+    if ("code" in outputQuality) return resultFailure("failed", item.bytes, outputQuality, parsed.width, parsed.height);
+    return { status: "succeeded", originalBytes: new Uint8Array(item.bytes), transparentBytes: new Uint8Array(response.bytes), width: response.width, height: response.height };
   }
 }
 

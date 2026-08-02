@@ -37,15 +37,10 @@ function ceilToMultiple(value: number): number {
   return Math.max(SIZE_MULTIPLE, Math.ceil(value / SIZE_MULTIPLE) * SIZE_MULTIPLE);
 }
 
-export function parseImageDimensions(size: string): { readonly width: string; readonly height: string } | undefined {
-  const match = /^(\d+)x(\d+)$/u.exec(size);
-  return match === null ? undefined : { width: match[1]!, height: match[2]! };
-}
-
 /**
- * Normalizes a manual size using the limits accepted by the OpenAI-compatible
- * image routes used by the supported providers. The resulting value is also
- * the exact value persisted and sent upstream.
+ * Normalizes a calculated size using the limits accepted by the OpenAI-compatible
+ * image routes used by the supported providers. The returned value is the exact
+ * value persisted and sent upstream.
  */
 export function normalizeCustomImageSize(widthText: string, heightText: string): string | undefined {
   const width = Number(widthText);
@@ -83,8 +78,77 @@ export function normalizedRatio(value: string): ConfigurableRatio {
   return configurableRatios.includes(value as ConfigurableRatio) ? value as ConfigurableRatio : "1:1";
 }
 
+function greatestCommonDivisor(left: number, right: number): number {
+  let dividend = left;
+  let divisor = right;
+  while (divisor !== 0) {
+    const remainder = dividend % divisor;
+    dividend = divisor;
+    divisor = remainder;
+  }
+  return dividend;
+}
+
+/**
+ * Converts user-entered W:H text into Routego's canonical aspect-ratio form.
+ * Custom ratios follow the same 3:1 bounds as arbitrary provider dimensions.
+ */
+export function normalizeCustomAspectRatio(value: string): string | undefined {
+  const match = /^\s*([1-9]\d{0,4})\s*:\s*([1-9]\d{0,4})\s*$/u.exec(value);
+  if (match === null) return undefined;
+
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  const divisor = greatestCommonDivisor(width, height);
+  const normalizedWidth = width / divisor;
+  const normalizedHeight = height / divisor;
+  if (
+    normalizedWidth > 999 ||
+    normalizedHeight > 999 ||
+    normalizedWidth / normalizedHeight > MAX_ASPECT_RATIO ||
+    normalizedHeight / normalizedWidth > MAX_ASPECT_RATIO
+  ) {
+    return undefined;
+  }
+
+  return `${normalizedWidth}:${normalizedHeight}`;
+}
+
+/**
+ * Derives a concise W:H ratio from a saved dimension string. This keeps older
+ * custom-dimension defaults editable after moving the UI to aspect ratios.
+ */
+export function ratioForImageSize(size: string): string | undefined {
+  const match = /^(\d+)x(\d+)$/u.exec(size);
+  if (match === null) return undefined;
+  return normalizeCustomAspectRatio(`${match[1]}:${match[2]}`);
+}
+
+export function suggestedTierForSize(size: string): ResolutionTier {
+  const match = /^(\d+)x(\d+)$/u.exec(size);
+  if (match === null) return "auto";
+  const longestEdge = Math.max(Number(match[1]), Number(match[2]));
+  if (longestEdge <= 1_536) return "1K";
+  if (longestEdge <= 2_560) return "2K";
+  return "4K";
+}
+
+function sizeForCustomRatio(tier: Exclude<ResolutionTier, "auto">, ratio: string): string {
+  const normalized = normalizeCustomAspectRatio(ratio);
+  if (normalized === undefined) return sizePresets[tier]["1:1"];
+
+  const [widthRatio, heightRatio] = normalized.split(":").map(Number) as [number, number];
+  const largestEdge = tier === "1K" ? 1_024 : tier === "2K" ? 2_048 : 3_840;
+  const width = widthRatio >= heightRatio ? largestEdge : largestEdge * (widthRatio / heightRatio);
+  const height = widthRatio >= heightRatio ? largestEdge * (heightRatio / widthRatio) : largestEdge;
+  return normalizeCustomImageSize(String(Math.round(width)), String(Math.round(height))) ?? sizePresets[tier]["1:1"];
+}
+
 export function sizeForTier(tier: ResolutionTier, ratio: string): string {
-  return tier === "auto" ? "auto" : sizePresets[tier][normalizedRatio(ratio)];
+  if (tier === "auto") return "auto";
+  return configurableRatios.includes(ratio as ConfigurableRatio)
+    ? sizePresets[tier][ratio as ConfigurableRatio]
+    : sizeForCustomRatio(tier, ratio);
 }
 
 export function tierForSize(size: string): ResolutionTier | undefined {

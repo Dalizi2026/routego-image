@@ -17,10 +17,11 @@ const ONNXRUNTIME_WEB_LICENSE_SHA256 = "7df20dcdf9197e9945c14858d41c60f11b52b93e
 const BACKGROUND_REMOVAL_RESOURCES = new Map([
   ["u2netp-model", { path: "u2netp.onnx", bytes: 4574861, sha256: "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8", version: "u2netp", license: "Apache-2.0", source: "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx" }],
   ["onnxruntime-web-simd-threaded-jsep", { path: "ort-wasm-simd-threaded.jsep.wasm", bytes: 21663894, sha256: "185b0861a6cd6cbdfb057289338090436483cc59e10a7bc83bd167b15531a51b", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }],
-  ["onnxruntime-web-simd-threaded", { path: "ort-wasm-simd-threaded.wasm", bytes: 11246032, sha256: "207d02be4591c156b0a98f024f3d58005b5b04c92274d759fb390338c63559ea", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }]
+  ["onnxruntime-web-simd-threaded", { path: "ort-wasm-simd-threaded.wasm", bytes: 11246032, sha256: "207d02be4591c156b0a98f024f3d58005b5b04c92274d759fb390338c63559ea", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }],
+  ["onnxruntime-web-simd-threaded-loader", { path: "ort-wasm-simd-threaded.mjs", bytes: 24618, sha256: "745eb7c0ce6f18a6aa521971b2877babc7ffb27eecb58ab3bc6e5ef4692672e8", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }]
 ]);
 const MINIMUM_RAW_BASE64_PAYLOAD_CHARS = 96;
-const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
+const ACCEPTED_PLUGIN_VERSION = /^1\.0\.5(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 const ACCEPTED_PLUGIN_MANIFEST = {
   name: "routego-image",
   description: "Create, edit, organize, and review images with the local Routego Image runtime.",
@@ -36,7 +37,7 @@ const ACCEPTED_PLUGIN_MANIFEST = {
     }
   },
   interface: {
-    displayName: "Routego Image",
+    displayName: "Routego Image v1.0.5",
     shortDescription: "本地图片生成、编辑、图库与 Studio 工作流。\nLocal image creation, editing, Library, and Studio workflows.",
     longDescription: "生成和编辑图片、运行独立批次、管理图库并继续在本地 Studio 工作。\nGenerate and edit images, run independent batches, manage the Library, and continue in the local Studio.",
     developerName: "Routego Image",
@@ -51,6 +52,7 @@ const ACCEPTED_PLUGIN_MANIFEST = {
     logo: "./assets/logo.png"
   }
 };
+const ACCEPTED_PLUGIN_DISPLAY_NAMES = new Set(["Routego Image v1.0.5"]);
 const EXACT_FILES = new Set([
   ".codex-plugin/plugin.json",
   "assets/composer-icon.png",
@@ -181,8 +183,18 @@ function validateContentManifest(value, expectedVersion) {
 
 function validatePluginManifest(value) {
   const version = plainObject(value) ? value.version : undefined;
+  const displayName = plainObject(value) && plainObject(value.interface)
+    ? value.interface.displayName
+    : undefined;
+  const acceptedManifest = typeof displayName === "string" && ACCEPTED_PLUGIN_DISPLAY_NAMES.has(displayName)
+    ? {
+        ...ACCEPTED_PLUGIN_MANIFEST,
+        version,
+        interface: { ...ACCEPTED_PLUGIN_MANIFEST.interface, displayName }
+      }
+    : undefined;
   if (typeof version !== "string" || !ACCEPTED_PLUGIN_VERSION.test(version) ||
-      !isDeepStrictEqual(value, { ...ACCEPTED_PLUGIN_MANIFEST, version })) {
+      !isDeepStrictEqual(value, acceptedManifest)) {
     fail("the Codex plugin manifest does not exactly match the accepted canonical manifest");
   }
   return version;
@@ -373,7 +385,7 @@ export async function verifyPluginPackage(packageDirectory) {
     validateTextSecurity(file, text, root);
   }
   const notices = (await boundedRead(path.join(root, "THIRD_PARTY_NOTICES.md"))).toString("utf8");
-  if (!notices.includes("gpt_image_playground") || !notices.includes("pngjs 7.0.0") ||
+  if (!notices.includes("gpt_image_playground") || !notices.includes("pngjs 7.0.0") || !notices.includes("onnxruntime-web 1.20.1") ||
       !notices.includes("licenses/pngjs-MIT.txt") || !notices.includes("zod 4.4.3") ||
       !notices.includes("Copyright (c) 2025 Colin McDonnell") ||
       !notices.includes("THE SOFTWARE IS PROVIDED \"AS IS\"")) {

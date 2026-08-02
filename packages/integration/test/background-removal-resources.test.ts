@@ -27,6 +27,7 @@ describe("offline background-removal resources", () => {
     expect([...verified.resources.keys()].sort()).toEqual([
       "onnxruntime-web-simd-threaded",
       "onnxruntime-web-simd-threaded-jsep",
+      "onnxruntime-web-simd-threaded-loader",
       "u2netp-model"
     ]);
   }, 30_000);

@@ -224,6 +224,28 @@ export interface ChromakeyPolicy {
   readonly autoEligible?: boolean;
 }
 
+const DEFAULT_CHROMAKEY_POLICY: ChromakeyPolicy = {
+  contentClass: "simple",
+  keyColor: { red: 0, green: 255, blue: 0 },
+  // Image generators commonly vary a requested #00FF00 background by a few
+  // dozen RGB values. The chromakey implementation also verifies green
+  // dominance, so this remains limited to deliberate green-screen jobs.
+  tolerance: 64
+};
+
+function defaultChromakeyPolicy(
+  request: ImageOperationRequest
+): ChromakeyPolicy | undefined {
+  // Both modes use the executor's deterministic green-screen instruction on
+  // routes without verified native alpha. Auto is therefore a controlled
+  // choice made before generation, never an attempt to key an arbitrary scene.
+  return request.transparentMode === "chromakey"
+    ? DEFAULT_CHROMAKEY_POLICY
+    : request.transparentMode === "auto"
+      ? { ...DEFAULT_CHROMAKEY_POLICY, autoEligible: true }
+      : undefined;
+}
+
 export interface CreationExecutionContext {
   readonly requestId: string;
   readonly signal: AbortSignal;
@@ -295,6 +317,13 @@ interface PublicInputDescriptor {
 type ParsedStudioBatchInput = ReturnType<typeof studioBatchInputSchema.parse>;
 
 const FIXED_BATCH_CONCURRENCY = 2 as const;
+
+/**
+ * Codex currently stops awaiting one MCP tool call after five minutes. Keep
+ * provider work in the local runtime when the user deliberately chooses a
+ * longer Studio response deadline instead of letting the host discard it.
+ */
+const CODEX_MCP_SYNC_WAIT_MS = 300_000;
 
 interface ProviderSnapshot {
   readonly context?: ProviderRuntimeContext;
@@ -398,11 +427,11 @@ function hasOwn(input: unknown, key: string): boolean {
   return input !== null && typeof input === "object" && Object.hasOwn(input, key);
 }
 
-function resolvePublicGenerationRequest(
-  input: RoutegoGenerateInput,
+function resolvePublicImageRequest(
+  input: RoutegoGenerateInput | RoutegoEditInput,
   defaults: RoutegoStatusResult["defaults"]
 ): ImageOperationRequest {
-  const parsed = routegoGenerateInputSchema.parse(input);
+  const parsed = imageOperationRequestSchema.parse(input);
   const resolved = { ...parsed } as Record<string, unknown>;
   for (const key of PUBLIC_DEFAULT_CONTROL_KEYS) {
     if (!hasOwn(input, key)) resolved[key] = defaults[key];
@@ -420,28 +449,12 @@ function outputContractError(
     : request.format === "jpeg"
       ? "image/jpeg"
       : "image/webp";
-  const sizeMatch = request.size === "auto" ? undefined : /^(\d+)x(\d+)$/u.exec(request.size);
-  const size = sizeMatch === null ? undefined : sizeMatch;
-  const ratio = request.size !== "auto" || request.aspectRatio === "auto"
-    ? undefined
-    : request.aspectRatio === "square"
-      ? [1, 1] as const
-      : /^(\d+):(\d+)$/u.exec(request.aspectRatio)?.slice(1).map(Number) as [number, number] | undefined;
   const violations: string[] = [];
   if (result.finalArtifacts.length !== request.count) {
     violations.push("count");
   }
   for (const artifact of result.finalArtifacts) {
     if (artifact.mimeType !== expectedMimeType) violations.push("format");
-    if (size !== undefined && (artifact.width !== Number(size[1]) || artifact.height !== Number(size[2]))) {
-      violations.push("size");
-    }
-    if (
-      ratio !== undefined &&
-      (artifact.width === undefined || artifact.height === undefined || artifact.width * ratio[1] !== artifact.height * ratio[0])
-    ) {
-      violations.push("aspectRatio");
-    }
   }
   if (violations.length === 0) return undefined;
   const actualOutputs = result.finalArtifacts.map((artifact) => ({
@@ -456,7 +469,7 @@ function outputContractError(
   return new ProviderIntegrationError(createProviderServiceError({
     code: "invalid_response",
     stage: "complete",
-    safeMessage: "The provider output does not match the requested size, aspect ratio, format, or count.",
+    safeMessage: "The provider output does not match the requested format or output count.",
     mayHaveBilled: result.execution.mayHaveBilled,
     details: {
       mismatches: [...new Set(violations)],
@@ -469,7 +482,7 @@ function outputContractError(
 function defaultHealth(status: RoutegoStatusResult["service"]["status"]): RoutegoStatusResult["service"] {
   return routegoServiceHealthSchema.parse({
     status,
-    version: "1.0.0",
+    version: "1.0.5",
     nodeVersion: process.version,
     uptimeSeconds: 0,
     mcpAvailable: false,
@@ -554,6 +567,28 @@ function failureResult(
     failedSlots: [{ slot: 0, error }],
     relationships: [],
     error
+  });
+}
+
+function queuedResult(request: ImageOperationRequest, requestId: string): ImageOperationResult {
+  return imageOperationResultSchema.parse({
+    schemaVersion: 1,
+    requestId,
+    status: "queued",
+    requestedParams: request,
+    effectiveParams: request,
+    execution: {
+      attemptCount: 0,
+      providerRequestCount: 0,
+      receivedAnyOutput: false,
+      mayHaveBilled: false,
+      degradedContinuation: false,
+      providerImageIds: []
+    },
+    finalArtifacts: [],
+    partialArtifacts: [],
+    failedSlots: [],
+    relationships: []
   });
 }
 
@@ -886,8 +921,12 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
 
   async probeCapabilities(input: CapabilityProbeInput): Promise<CapabilityProbeResult> {
     const parsed = capabilityProbeInputSchema.parse(input);
+    const settings = await this.#options.library.readSettings({});
     const options = {
       ...(this.#options.capabilityProbeOptions ?? {}),
+      ...(this.#options.capabilityProbeOptions?.timeoutMs === undefined
+        ? { timeoutMs: settings.defaults.responseTimeoutMs ?? 300_000 }
+        : {}),
       ...(this.#options.fetch === undefined ? {} : { fetch: this.#options.fetch })
     };
     return capabilityProbeResultSchema.parse(await probeProviderCapability(this.#options.library.settingsStore, parsed, options));
@@ -1060,19 +1099,27 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     });
   }
 
-  async #persistSuccessfulDirectEditCapabilities(
+  async #persistSuccessfulDirectImageCapabilities(
     request: ImageOperationRequest,
     provider: ProviderSnapshot,
     creation: ImageOperationResult
   ): Promise<void> {
-    if (request.kind !== "edit" || creation.status !== "succeeded" || provider.context === undefined) {
+    const isDirectReferenceGeneration = request.kind === "generate" && request.references.length > 0;
+    if (
+      (request.kind !== "edit" && !isDirectReferenceGeneration) ||
+      creation.status !== "succeeded" ||
+      provider.context === undefined
+    ) {
       return;
     }
-    const decision = selectProviderRoute(provider.context, request);
+    const context = isDirectReferenceGeneration
+      ? { ...provider.context, allowUnverifiedDirectReferenceGeneration: true }
+      : { ...provider.context, allowUnverifiedDirectEdit: true };
+    const decision = selectProviderRoute(context, request);
     if (!decision.selected) return;
 
     const capabilities = decision.requiredCapabilities.filter((capability) =>
-      capability === "target-edit" ||
+      (request.kind === "edit" && capability === "target-edit") ||
       capability === "single-image-input" ||
       capability === "multi-image-input" ||
       capability === "data-url-input" ||
@@ -1084,7 +1131,9 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     const evidence = {
       source: "successful-request" as const,
       observedAt,
-      summary: "A user-authorized direct image edit completed on this exact provider route.",
+      summary: isDirectReferenceGeneration
+        ? "A user-requested direct reference-image generation completed on this exact provider route."
+        : "A user-authorized direct image edit completed on this exact provider route.",
       requestShape: decision.requestShape
     };
     const persisted = await Promise.allSettled(capabilities.map(async (capability) => {
@@ -1111,7 +1160,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       await this.#options.library.settingsStore.persistCapabilityProbe(result);
     }));
     // Persistence is advisory post-success evidence. It must not turn a completed
-    // provider edit into a false failure when local configuration storage is busy.
+    // provider image request into a false failure when local configuration storage is busy.
     void persisted;
   }
 
@@ -1153,7 +1202,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     const issues: string[] = [];
     const replacements = new Map<string, MaterializedImageOutput>();
     for (const output of materialization.outputs.filter((candidate) => candidate.phase === "final")) {
-      const policy = this.#options.chromakeyPolicy?.(request, output);
+      const policy = this.#options.chromakeyPolicy?.(request, output) ?? defaultChromakeyPolicy(request);
       if (policy === undefined) {
         issues.push("Transparency processing requires an explicit approved chromakey policy.");
         continue;
@@ -1286,6 +1335,12 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
           output.artifactId,
           await transaction.stageReplacement(output, processed.transparentBytes, "image/png")
         );
+        // A local segmentation result has real alpha but is not proof that
+        // this provider delivered the requested native alpha. Preserve it for
+        // review without ever presenting it as a verified native success.
+        issues.push(
+          "The provider did not return verified native alpha; the local transparent fallback requires visual review."
+        );
       } catch {
         issues.push("The transparent rendition failed bounded output validation; the provider original remains available.");
       }
@@ -1345,6 +1400,40 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     }
   }
 
+  /**
+   * Starts a long-running public operation without tying it to the lifecycle
+   * of the MCP request that submitted it. `close()` still owns cancellation
+   * and waits for this promise, so no work is orphaned during shutdown.
+   */
+  #queuePublic(
+    input: ImageOperationRequest,
+    providerSnapshot?: ProviderSnapshot,
+    allowUnverifiedDirectEdit = false
+  ): ImageOperationResult {
+    const requestId = this.#id("request");
+    const controller = new AbortController();
+    const promise = this.#executePublicInner(
+      requestId,
+      input,
+      controller.signal,
+      providerSnapshot,
+      allowUnverifiedDirectEdit
+    );
+    this.#active.set(requestId, { controller, promise });
+    this.#activePromises.add(promise);
+    void promise.then(
+      () => {
+        this.#active.delete(requestId);
+        this.#activePromises.delete(promise);
+      },
+      () => {
+        this.#active.delete(requestId);
+        this.#activePromises.delete(promise);
+      }
+    );
+    return queuedResult(input, requestId);
+  }
+
   async #executePublicInner(
     requestId: string,
     input: ImageOperationRequest,
@@ -1367,10 +1456,16 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       });
       const staged = await stagePreparedPublicOperationSources(prepared, { transaction });
       const selectedProvider = providerSnapshot ?? await this.#provider(requestId, signal);
-      const provider = allowUnverifiedDirectEdit && selectedProvider.context !== undefined
+      const isDirectReferenceGeneration = input.kind === "generate" && input.references.length > 0;
+      const allowUnverifiedImageInput = allowUnverifiedDirectEdit || isDirectReferenceGeneration;
+      const provider = allowUnverifiedImageInput && selectedProvider.context !== undefined
         ? freezeProviderSnapshot({
             ...selectedProvider,
-            context: { ...selectedProvider.context, allowUnverifiedDirectEdit: true }
+            context: {
+              ...selectedProvider.context,
+              ...(allowUnverifiedDirectEdit ? { allowUnverifiedDirectEdit: true } : {}),
+              ...(isDirectReferenceGeneration ? { allowUnverifiedDirectReferenceGeneration: true } : {})
+            }
           })
         : selectedProvider;
       creationInvoked = true;
@@ -1389,7 +1484,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         }));
       }
       const creation = parsedCreation.data;
-      await this.#persistSuccessfulDirectEditCapabilities(staged.request, provider, creation);
+      await this.#persistSuccessfulDirectImageCapabilities(staged.request, provider, creation);
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
       const normalized = await this.#normalizeOutputDimensions(
         staged.request,
@@ -1433,7 +1528,11 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     const parsed = routegoGenerateInputSchema.parse(input);
     if (this.#status !== "ready") return failureResult(parsed, this.#id("request"), this.#recoveryError ?? errorFromUnknown({ code: "config_corrupt" }, "config_corrupt"));
     try {
-      return await this.#executePublic(resolvePublicGenerationRequest(input, await this.#publicDefaults()));
+      const defaults = await this.#publicDefaults();
+      const request = resolvePublicImageRequest(input, defaults);
+      return defaults.responseTimeoutMs !== undefined && defaults.responseTimeoutMs > CODEX_MCP_SYNC_WAIT_MS
+        ? this.#queuePublic(request)
+        : await this.#executePublic(request);
     } catch (error) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error, "config_corrupt"));
     }
@@ -1449,7 +1548,11 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       );
     }
     try {
-      return await this.#executePublic(parsed, undefined, undefined, true);
+      const defaults = await this.#publicDefaults();
+      const request = resolvePublicImageRequest(input, defaults);
+      return defaults.responseTimeoutMs !== undefined && defaults.responseTimeoutMs > CODEX_MCP_SYNC_WAIT_MS
+        ? this.#queuePublic(request, undefined, true)
+        : await this.#executePublic(request, undefined, undefined, true);
     } catch (error) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error, "config_corrupt"));
     }
@@ -1477,7 +1580,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
     }
     const tasks = parsed.tasks.map((task, index) => Object.freeze({
       id: task.id,
-      operation: freezeSnapshot(resolvePublicGenerationRequest(input.tasks[index]!.operation, defaults))
+      operation: freezeSnapshot(resolvePublicImageRequest(input.tasks[index]!.operation, defaults))
     }));
     let provider: ProviderSnapshot;
     try {

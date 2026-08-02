@@ -235,7 +235,6 @@ export const libraryAssetAllowedActionSchema = z.enum([
   "remove-folders",
   "export-zip",
   "download",
-  "mark",
   "copy-generation-info"
 ]);
 
@@ -266,7 +265,6 @@ export const libraryAssetDetailSchema = z
     model: z.string().trim().min(1).max(200),
     kind: z.enum(["generate", "edit"]),
     status: libraryAssetStatusSchema,
-    currentMark: z.boolean().default(false),
     primaryArtifactId: identifierSchema,
     mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]),
     width: z.number().int().min(1).max(65_535),
@@ -525,7 +523,6 @@ export const studioLibrarySearchItemSchema = z
     status: z.enum(["queued", "running", "succeeded", "partial", "failed"]),
     folderIds: z.array(identifierSchema).max(100),
     createdAt: timestampSchema,
-    currentMark: z.boolean().default(false),
     thumbnail: browserResourceDescriptorSchema.optional()
   })
   .strict()
@@ -570,8 +567,7 @@ export const libraryMutationActionSchema = z.enum([
   "assign-folders",
   "remove-folders",
   "export-zip",
-  "import-zip",
-  "mark"
+  "import-zip"
 ]);
 
 const assetFolderMutationSchema = (action: "assign-folders" | "remove-folders") =>
@@ -591,13 +587,6 @@ const assetMutationSchema = (action: "export-zip") =>
     })
     .strict();
 
-const markMutationSchema = z
-  .object({
-    action: z.literal("mark"),
-    assetIds: uniqueIdentifiersSchema(1, 1)
-  })
-  .strict();
-
 export const libraryMutationRequestSchema = z.discriminatedUnion("action", [
   assetFolderMutationSchema("assign-folders"),
   assetFolderMutationSchema("remove-folders"),
@@ -608,7 +597,6 @@ export const libraryMutationRequestSchema = z.discriminatedUnion("action", [
       uploadResourceId: identifierSchema
     })
     .strict(),
-  markMutationSchema
 ]);
 
 export const libraryMutationConfirmationSchema = z.enum([
@@ -839,57 +827,6 @@ export const executeLibraryMutationResultSchema = z
 const sha256FingerprintSchema = z
   .string()
   .regex(/^[a-f0-9]{64}$/u, "Migration fingerprint must be a lowercase SHA-256 hex digest");
-
-export const markLibraryAssetInputSchema = z
-  .object({
-    schemaVersion: routegoSchemaVersionSchema.default(1),
-    recordId: identifierSchema
-  })
-  .strict();
-
-export const markLibraryAssetResultSchema = z
-  .object({
-    schemaVersion: routegoSchemaVersionSchema,
-    status: z.enum(["succeeded", "failed"]),
-    recordId: identifierSchema,
-    currentMarkRecordId: identifierSchema.optional(),
-    markCleared: z.boolean(),
-    providerRequestCount: z.literal(0),
-    error: routegoServiceErrorSchema.optional()
-  })
-  .strict()
-  .superRefine((value, context) => {
-    if (value.status === "succeeded") {
-      if (value.error) {
-        context.addIssue({
-          code: "custom",
-          path: ["error"],
-          message: "Successful mark results cannot include an error"
-        });
-      }
-      if (value.markCleared && value.currentMarkRecordId !== undefined) {
-        context.addIssue({
-          code: "custom",
-          path: ["currentMarkRecordId"],
-          message: "Cleared mark results cannot keep a current mark identity"
-        });
-      }
-      if (!value.markCleared && value.currentMarkRecordId !== value.recordId) {
-        context.addIssue({
-          code: "custom",
-          path: ["currentMarkRecordId"],
-          message: "Successful mark must set the current mark to the requested record"
-        });
-      }
-    }
-    if (value.status === "failed" && !value.error) {
-      context.addIssue({
-        code: "custom",
-        path: ["error"],
-        message: "Failed mark results require a structured error"
-      });
-    }
-  });
 
 export const copyGenerationInfoInputSchema = z
   .object({
@@ -1155,8 +1092,6 @@ export type ReadLegacyLibraryMigrationInput = z.input<typeof readLegacyLibraryMi
 export type ConfirmLegacyLibraryMigrationInput = z.input<typeof confirmLegacyLibraryMigrationInputSchema>;
 export type ConfirmLegacyLibraryMigrationResult = z.output<typeof confirmLegacyLibraryMigrationResultSchema>;
 
-export type MarkLibraryAssetInput = z.input<typeof markLibraryAssetInputSchema>;
-export type MarkLibraryAssetResult = z.output<typeof markLibraryAssetResultSchema>;
 export type CopyGenerationInfoInput = z.input<typeof copyGenerationInfoInputSchema>;
 export type CopyGenerationInfoResult = z.output<typeof copyGenerationInfoResultSchema>;
 export type GenerationInfoProjection = z.infer<typeof generationInfoProjectionSchema>;

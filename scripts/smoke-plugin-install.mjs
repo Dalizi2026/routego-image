@@ -20,7 +20,7 @@ import { pathToFileURL } from "node:url";
 
 import { verifyPluginPackage } from "./verify-plugin-package.mjs";
 
-const ACCEPTED_PLUGIN_VERSION = /^1\.0\.0(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
+const ACCEPTED_PLUGIN_VERSION = /^1\.0\.5(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 
 const ROOT_PREFIX = "routego-plugin-install-smoke-";
 const OWNER_MARKER = ".routego-install-smoke-owner.json";
@@ -606,8 +606,8 @@ async function exerciseSyntheticInstalledRuntime(paths, folderId) {
     await runtime.start();
     const initialized = await mcp.request("initialize");
     if (initialized?.serverInfo?.name !== "routego-image" ||
-        initialized?.serverInfo?.version !== "1.0.0") {
-      fail("the isolated synthetic runtime did not initialize as Routego Image 1.0.0");
+        initialized?.serverInfo?.version !== "1.0.5") {
+      fail("the isolated synthetic runtime did not initialize as Routego Image 1.0.5");
     }
     const studioLaunch = parsedToolResult(await mcp.request("tools/call", {
       name: "routego_open_studio",
@@ -772,8 +772,8 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
       capabilities: {}
     });
     if (initialized?.serverInfo?.name !== "routego-image" ||
-        initialized?.serverInfo?.version !== "1.0.0") {
-      fail("the portable installed process did not initialize Routego Image 1.0.0");
+        initialized?.serverInfo?.version !== "1.0.5") {
+      fail("the portable installed process did not initialize Routego Image 1.0.5");
     }
     const listed = await client.request("tools/list");
     const listedTools = Array.isArray(listed?.tools) ? listed.tools : [];
@@ -803,7 +803,7 @@ async function runPortableInstalledProcess(options, paths, verification, copiedV
       arguments: { refreshCapabilities: false }
     }));
     if (status.configured !== false || status.hasApiKey !== false ||
-        status.service?.status !== "ready" || status.service?.version !== "1.0.0") {
+        status.service?.status !== "ready" || status.service?.version !== "1.0.5") {
       fail("portable offline MCP status is not ready, unconfigured, and credential-free");
     }
     const managed = parsedToolResult(await client.request("tools/call", {
@@ -930,8 +930,8 @@ async function runInsideOwnedRoot(options, root, verification) {
       detail: "full"
     });
     const server = mcpStatus?.data?.find((entry) => entry?.name === "routego-image");
-    if (server?.serverInfo?.name !== "routego-image" || server?.serverInfo?.version !== "1.0.0") {
-      fail("fresh Codex did not discover Routego Image 1.0.0");
+    if (server?.serverInfo?.name !== "routego-image" || server?.serverInfo?.version !== "1.0.5") {
+      fail("fresh Codex did not discover Routego Image 1.0.5");
     }
     const tools = Object.keys(server.tools ?? {}).sort((left, right) => left.localeCompare(right, "en"));
     if (JSON.stringify(tools) !== JSON.stringify(EXPECTED_TOOLS)) {
@@ -959,7 +959,7 @@ async function runInsideOwnedRoot(options, root, verification) {
       arguments: { refreshCapabilities: false }
     }));
     if (status.configured !== false || status.hasApiKey !== false ||
-        status.service?.status !== "ready" || status.service?.version !== "1.0.0") {
+        status.service?.status !== "ready" || status.service?.version !== "1.0.5") {
       fail("offline MCP status is not ready, unconfigured, and credential-free");
     }
     const managed = parsedToolResult(await client.request("mcpServer/tool/call", {

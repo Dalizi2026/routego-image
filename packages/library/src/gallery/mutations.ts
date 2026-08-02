@@ -24,7 +24,7 @@ export const DEFAULT_LIBRARY_PREFLIGHT_TTL_MS = 5 * 60_000;
 type AssetMutationAction = Exclude<LibraryMutationRequest["action"], "import-zip">;
 type SupportedAssetMutationAction = Extract<
   AssetMutationAction,
-  "assign-folders" | "remove-folders" | "mark"
+  "assign-folders" | "remove-folders"
 >;
 
 export interface LibraryMutationStoreOptions {
@@ -80,7 +80,7 @@ function allowedActions(asset: StoredLibraryAsset): LibraryAssetDetail["allowedA
   const actions: LibraryAssetDetail["allowedActions"][number][] = [];
   actions.push("assign-folders");
   if (asset.folderIds.length > 0) actions.push("remove-folders");
-  actions.push("export-zip", "download", "mark", "copy-generation-info");
+  actions.push("export-zip", "download", "copy-generation-info");
   return actions;
 }
 
@@ -255,11 +255,6 @@ export class LibraryMutationStore {
         error = !foldersValid
           ? libraryMutationError("not_found", "A selected active Library folder does not exist.")
           : undefined;
-      } else if (mutation.action === "mark" && asset.kind !== "generate") {
-        error = libraryMutationError(
-          "conflict",
-          "Only an active generation record can be marked."
-        );
       }
       if (error) errors.set(targetId, error);
       return {
@@ -378,16 +373,6 @@ export class LibraryMutationStore {
           );
           continue;
         }
-        if (action === "mark" && asset.kind !== "generate") {
-          items.set(
-            targetId,
-            failedItem(
-              targetId,
-              libraryMutationError("conflict", "The Library mutation target is no longer eligible.")
-            )
-          );
-          continue;
-        }
         candidates.push(targetId);
       }
 
@@ -416,20 +401,6 @@ export class LibraryMutationStore {
     items: Map<string, MutationItem>,
     now: Date
   ): Promise<void> {
-    if (action === "mark") {
-      const recordId = candidates[0];
-      if (recordId === undefined) return;
-      const currentMarkRecordId =
-        context.index.currentMarkRecordId === recordId ? undefined : recordId;
-      await context.commit({
-        blobs: context.index.blobs,
-        assets: context.index.assets,
-        folders: context.index.folders,
-        currentMarkRecordId
-      });
-      items.set(recordId, successItem(recordId));
-      return;
-    }
     const selected = new Set(candidates);
     const folderOrder = new Map(
       [...context.index.folders]

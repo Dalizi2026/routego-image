@@ -286,7 +286,7 @@ export class LibraryLocationStore {
       const referenced = new Set(remaining.flatMap((asset) => asset.renditions.map((rendition) => rendition.blobSha256)));
       const blobs = current.blobs.filter((blob) => referenced.has(blob.sha256));
       orphanPaths = current.blobs.filter((blob) => !referenced.has(blob.sha256)).map((blob) => blob.relativePath);
-      await commit({ blobs, assets: remaining, folders: current.folders, ...(current.currentMarkRecordId !== undefined && !deletable.includes(current.currentMarkRecordId) ? { currentMarkRecordId: current.currentMarkRecordId } : { currentMarkRecordId: undefined }) });
+      await commit({ blobs, assets: remaining, folders: current.folders });
     });
     for (const relativePath of orphanPaths) {
       const candidate = resolveApprovedPath({ root: this.#indexStore.paths.root, candidate: relativePath, operation: "delete" });

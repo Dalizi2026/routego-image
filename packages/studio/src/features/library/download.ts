@@ -8,6 +8,25 @@ export interface LibraryDownload {
   readonly resource: BrowserResourceDescriptor;
 }
 
+export async function resolveOriginalLibraryResource(
+  gateway: StudioGateway,
+  asset: LibraryAssetDetail
+): Promise<BrowserResourceDescriptor> {
+  const rendition = asset.renditions[0];
+  if (rendition === undefined) {
+    throw new Error("此图库项目没有可查看的原始图像。");
+  }
+  const result = await gateway.invoke("getBrowserResource", {
+    assetId: asset.id,
+    artifactId: rendition.artifactId,
+    rendition: "original"
+  });
+  if (result.status !== "succeeded" || result.resource === undefined) {
+    throw new Error(result.error?.safeMessage ?? "无法解析受保护原图资源。");
+  }
+  return result.resource;
+}
+
 export async function fetchProtectedResourceDownload(
   gateway: StudioGateway,
   resource: BrowserResourceDescriptor,
@@ -34,23 +53,12 @@ export async function fetchLibraryDownload(
   gateway: StudioGateway,
   asset: LibraryAssetDetail
 ): Promise<LibraryDownload> {
-  const rendition = asset.renditions[0];
-  if (rendition === undefined) {
-    throw new Error("此图库项目没有可下载的图像版本。");
-  }
-  const result = await gateway.invoke("getBrowserResource", {
-    assetId: asset.id,
-    artifactId: rendition.artifactId,
-    rendition: "original"
-  });
-  if (result.status !== "succeeded" || result.resource === undefined) {
-    throw new Error(result.error?.safeMessage ?? "无法解析受保护下载资源。");
-  }
-  const blob = await gateway.fetchProtectedBlob(result.resource);
+  const resource = await resolveOriginalLibraryResource(gateway, asset);
+  const blob = await gateway.fetchProtectedBlob(resource);
   return {
     blob,
-    resource: result.resource,
-    fileName: `routego-${asset.id}.${extension(result.resource.mimeType)}`
+    resource,
+    fileName: `routego-${asset.id}.${extension(resource.mimeType)}`
   };
 }
 

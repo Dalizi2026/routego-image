@@ -208,7 +208,12 @@ async function prepareSelectedRoute(
 ): Promise<PreparedProviderRequest | RoutegoServiceError> {
   const providerRequest = route.transparency === "local-fallback"
     ? imageOperationRequestSchema.parse({ ...request, transparentMode: "off" })
-    : request;
+    : request.transparentMode === "chromakey" || request.transparentMode === "auto"
+      ? imageOperationRequestSchema.parse({
+          ...request,
+          prompt: `${request.prompt}\n\nFor deterministic chromakey removal, render every non-subject pixel as one perfectly flat opaque RGB(0,255,0) background. Do not use gradients, texture, shadows, reflections, checkerboards, or any other green elements.`
+        })
+      : request;
   const prepared = await prepareProviderRequest(provider, providerRequest);
   return prepared.prepared ? prepared.value : prepared.error;
 }

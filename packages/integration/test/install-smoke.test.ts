@@ -123,7 +123,7 @@ describe.sequential("task 5.3 isolated plugin install smoke", () => {
         isolatedCodexHome: true,
         freshProcess: true,
         pluginDiscovered: true,
-        pluginVersion: "1.0.0"
+        pluginVersion: "1.0.5"
       },
       skill: { bilingual: true, exactPublicToolCount: 8 },
       mcp: {

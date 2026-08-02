@@ -343,7 +343,6 @@ describe("Library public and Studio query projections", () => {
     expect(detail.asset?.allowedActions).toEqual([
       "assign-folders",
       "remove-folders",
-      "mark",
       "copy-generation-info",
       "export-zip",
       "download"

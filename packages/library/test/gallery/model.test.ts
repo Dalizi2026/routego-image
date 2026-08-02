@@ -23,8 +23,8 @@ describe("Image Library index v2", () => {
     ).toThrowError("Image Library index uses an unsupported version.");
   });
 
-  it("rejects a mark that does not resolve to an active generation record", () => {
-    expect(() =>
+  it("accepts an old index with a mark and drops it from the in-memory model", () => {
+    expect(
       parseImageLibraryIndex({
         schemaVersion: IMAGE_LIBRARY_SCHEMA_VERSION,
         revision: 1,
@@ -33,6 +33,6 @@ describe("Image Library index v2", () => {
         folders: [],
         currentMarkRecordId: "asset-missing"
       })
-    ).toThrowError("The current mark must reference an active generation record.");
+    ).not.toHaveProperty("currentMarkRecordId");
   });
 });

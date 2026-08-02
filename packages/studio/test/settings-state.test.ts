@@ -234,6 +234,10 @@ describe("secret-safe Settings state and request construction", () => {
     expect(refreshed.profiles.find((item) => item.id === created.id)?.models).toEqual([
       "synthetic-image-model-v2"
     ]);
+    expect(refreshed.profiles.find((item) => item.id === created.id)?.defaultModel).toBe(
+      "synthetic-image-model-v2"
+    );
+    expect(refreshed.defaults.model).toBe("synthetic-image-model-v2");
 
     const removed = mergeRemovedProviderProfile(refreshed, {
       schemaVersion: 1,

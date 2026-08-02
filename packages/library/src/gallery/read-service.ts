@@ -144,7 +144,7 @@ function allowedActions(asset: StoredLibraryAsset): LibraryAssetDetail["allowedA
   const actions: LibraryAssetDetail["allowedActions"][number][] = [];
   actions.push("assign-folders");
   if (asset.folderIds.length > 0) actions.push("remove-folders");
-  actions.push("mark", "copy-generation-info");
+  actions.push("copy-generation-info");
   actions.push("export-zip", "download");
   return actions;
 }
@@ -178,7 +178,6 @@ function detailFromIndex(index: ImageLibraryIndex, asset: StoredLibraryAsset): L
     requestedParams: asset.requestedParams,
     effectiveParams: asset.effectiveParams,
     execution: asset.execution,
-    currentMark: index.currentMarkRecordId === asset.id,
     ...(asset.error === undefined ? {} : { error: pathFreeStoredError(asset.error) }),
     renditions: [...asset.renditions]
       .sort(
@@ -325,11 +324,7 @@ export class LibraryReadService {
   ): Promise<RoutegoPrepareRegenerationResult> {
     const parsed = routegoPrepareRegenerationInputSchema.parse(input);
     const index = await this.#indexStore.read();
-    const recordId = parsed.recordId ?? index.currentMarkRecordId;
-    if (recordId === undefined) {
-      throw new LibraryError("not_found", "No generation record is currently marked.");
-    }
-    const prepared = prepareSafeGeneration(index, recordId);
+    const prepared = prepareSafeGeneration(index, parsed.recordId);
     return routegoPrepareRegenerationResultSchema.parse({
       schemaVersion: 1,
       recipe: prepared.recipe,

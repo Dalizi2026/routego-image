@@ -26,6 +26,7 @@
     "@routego-image/foundation": "workspace:*",
     "@routego-image/library": "workspace:*",
     "jpeg-js": "0.4.4",
+    "onnxruntime-web": "1.20.1",
     "pngjs": "7.0.0"
   },
   "devDependencies": {

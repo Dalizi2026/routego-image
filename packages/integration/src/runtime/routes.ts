@@ -5,9 +5,6 @@ import { lstat, open, type FileHandle } from "node:fs/promises";
 import {
   copyGenerationInfoInputSchema,
   identifierSchema,
-  markLibraryAssetInputSchema,
-  markLibraryAssetResultSchema,
-  routegoServiceErrorSchema,
   type LocalRoutegoService,
   type StudioImageOperationRequest
 } from "@routego-image/contracts";
@@ -42,11 +39,11 @@ export const LIBRARY_RESOURCE_ROUTE_PATTERN =
 export const EPHEMERAL_RESOURCE_ROUTE_PATTERN =
   /^\/api\/v1\/resources\/([A-Za-z0-9][A-Za-z0-9._:-]*)$/u;
 
-const LIBRARY_MARK_ROUTE = "/api/v1/library/mark";
 const LIBRARY_COPY_INFORMATION_ROUTE = "/api/v1/library/copy-generation-info";
 const LIBRARY_SELECT_DIRECTORY_ROUTE = "/api/v1/library/select-directory";
 const REMOVED_LIBRARY_ROUTE_PATHS = new Set([
   "/api/v1/edit",
+  "/api/v1/library/mark",
   "/api/v1/library/trash",
   "/api/v1/library/delete",
   "/api/v1/library/restore",
@@ -344,41 +341,12 @@ async function boundedJsonBody(request: RoutegoHttpRequest): Promise<unknown> {
   }
 }
 
-function parseMarkInput(value: unknown) {
-  try {
-    return markLibraryAssetInputSchema.parse(value);
-  } catch {
-    throw new RuntimeRouteError(400, "invalid_request", "The Library mark request is invalid.");
-  }
-}
-
 function parseCopyInput(value: unknown) {
   try {
     return copyGenerationInfoInputSchema.parse(value);
   } catch {
     throw new RuntimeRouteError(400, "invalid_request", "The Library copy request is invalid.");
   }
-}
-
-function markFailure(recordId: string, value: unknown) {
-  const error = routegoServiceErrorSchema.safeParse(value);
-  return markLibraryAssetResultSchema.parse({
-    schemaVersion: 1,
-    status: "failed",
-    recordId,
-    markCleared: false,
-    providerRequestCount: 0,
-    error: error.success ? error.data : {
-      code: "internal_contract",
-      category: "internal",
-      stage: "persist",
-      safeMessage: "The Library mark could not be confirmed.",
-      retryDisposition: "never",
-      partialArtifacts: [],
-      receivedAnyOutput: false,
-      mayHaveBilled: false
-    }
-  });
 }
 
 function validIdentifier(value: string | undefined): string {
@@ -564,12 +532,11 @@ export function createIntegrationRuntimeRoutes(
     const libraryMatch = LIBRARY_RESOURCE_ROUTE_PATTERN.exec(request.url.pathname);
     const ephemeralMatch = EPHEMERAL_RESOURCE_ROUTE_PATTERN.exec(request.url.pathname);
     const isStream = request.url.pathname === STUDIO_CREATION_STREAM_PATH;
-    const isLibraryMark = request.url.pathname === LIBRARY_MARK_ROUTE;
     const isLibraryCopy = request.url.pathname === LIBRARY_COPY_INFORMATION_ROUTE;
     const isLibraryDirectorySelection = request.url.pathname === LIBRARY_SELECT_DIRECTORY_ROUTE;
     const isRemovedLibraryRoute = REMOVED_LIBRARY_ROUTE_PATHS.has(request.url.pathname);
     if (uploadMatch === null && libraryMatch === null && ephemeralMatch === null && !isStream &&
-      !isLibraryMark && !isLibraryCopy && !isLibraryDirectorySelection && !isRemovedLibraryRoute) {
+      !isLibraryCopy && !isLibraryDirectorySelection && !isRemovedLibraryRoute) {
       return undefined;
     }
 
@@ -580,7 +547,7 @@ export function createIntegrationRuntimeRoutes(
     if (extensionContext.preflight) {
       if (isStream) return await streamRoute(request, extensionContext);
       const expectedMethod = uploadMatch !== null ? "PUT" :
-        isLibraryMark || isLibraryCopy || isLibraryDirectorySelection ? "POST" : "GET";
+        isLibraryCopy || isLibraryDirectorySelection ? "POST" : "GET";
       if (header(request, "access-control-request-method")?.trim().toUpperCase() !== expectedMethod) {
         return errorResponse(new RuntimeRouteError(405, "invalid_request", "The protected route preflight method is invalid."));
       }
@@ -601,45 +568,6 @@ export function createIntegrationRuntimeRoutes(
     try {
       if (isRemovedLibraryRoute) {
         throw new RuntimeRouteError(404, "not_found", "The Library route was not found.");
-      }
-      if (isLibraryMark) {
-        if (request.method.toUpperCase() !== "POST") {
-          throw new RuntimeRouteError(405, "invalid_request", "The Library mark route accepts POST only.");
-        }
-        const input = parseMarkInput(await boundedJsonBody(request));
-        const preflight = await options.library.preflightLibraryMutation({
-          schemaVersion: 1,
-          mutation: { action: "mark", assetIds: [input.recordId] }
-        });
-        if (preflight.status !== "ready") {
-          return jsonResponse(409, markFailure(input.recordId, preflight.error ?? preflight.items[0]?.error));
-        }
-        const execution = await options.library.executeLibraryMutation({
-          schemaVersion: 1,
-          preflightId: preflight.preflightId,
-          action: "mark",
-          confirmations: []
-        });
-        if (execution.status !== "succeeded") {
-          return jsonResponse(409, markFailure(
-            input.recordId,
-            execution.error ?? execution.items[0]?.error
-          ));
-        }
-        const detail = await options.library.getAssetDetail({ schemaVersion: 1, assetId: input.recordId });
-        if (detail.asset === undefined) {
-          return jsonResponse(500, markFailure(input.recordId, undefined));
-        }
-        return jsonResponse(200, markLibraryAssetResultSchema.parse({
-          schemaVersion: 1,
-          status: "succeeded",
-          recordId: input.recordId,
-          ...(detail.asset.currentMark
-            ? { currentMarkRecordId: input.recordId }
-            : {}),
-          markCleared: !detail.asset.currentMark,
-          providerRequestCount: 0
-        }));
       }
       if (isLibraryCopy) {
         if (request.method.toUpperCase() !== "POST") {
@@ -742,7 +670,7 @@ export function createIntegrationRuntimeRoutes(
       };
     } catch (error) {
       return errorResponse(error instanceof RuntimeRouteError ? error :
-        (isLibraryMark || isLibraryCopy || isLibraryDirectorySelection
+        (isLibraryCopy || isLibraryDirectorySelection
           ? safeLibraryRouteError(error)
           : safeRouteError(error, true)));
     }

@@ -221,6 +221,23 @@ describe("resolved executor success, capability states, and false-success reject
     }
   });
 
+  it("submits one direct reference generation when the input capability is unknown", async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => imageResponse());
+    const provider = runtime(fetchMock, {
+      capabilities: imageCapabilities("unknown"),
+      allowUnverifiedDirectReferenceGeneration: true
+    });
+    const result = await createResolvedImageExecutor(dependencies(provider)).execute(
+      request({ references: [{ path: previousOutputPath, role: "reference" }] })
+    );
+
+    expect(result).toMatchObject({
+      status: "succeeded",
+      execution: { attemptCount: 1, providerRequestCount: 1, mayHaveBilled: true }
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("rejects a 2xx response with no usable image instead of reporting success", async () => {
     const result = await createResolvedImageExecutor(
       dependencies(runtime(async () => Response.json({ data: [] })))

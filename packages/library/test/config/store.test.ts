@@ -386,6 +386,38 @@ describe("Library settings persistence", () => {
     ).toMatchObject({ state: "supported", evidence: expect.arrayContaining(supportedKey.record.evidence) });
   });
 
+  it("replaces stale active defaults when a successful model refresh removes them", async () => {
+    const { store } = await createStore();
+    const created = await store.upsertProviderProfile({
+      profileId: "provider-renamed-model",
+      name: "Renamed model provider",
+      endpoints,
+      defaultModel: "gpt-image-2-x",
+      apiKey: { operation: "unchanged" },
+      setActive: true
+    });
+    const previous = await store.readSettings({});
+    await store.updateSettings({
+      defaults: { ...previous.defaults, model: "gpt-image-2-x" }
+    });
+
+    await store.persistModelRefresh({
+      schemaVersion: 1,
+      providerId: created.profile.id,
+      status: "succeeded",
+      billable: false,
+      models: ["gpt-image-2"],
+      refreshedAt: now.toISOString()
+    });
+
+    const settings = await store.readSettings({});
+    expect(settings.defaults.model).toBe("gpt-image-2");
+    expect(settings.profiles.find((profile) => profile.id === created.profile.id)).toMatchObject({
+      defaultModel: "gpt-image-2",
+      models: ["gpt-image-2"]
+    });
+  });
+
   it("persists defaults and all output-directory mutation modes without returning a full path", async () => {
     const { root, store } = await createStore();
     const custom = path.join(root, "selected", "outputs");

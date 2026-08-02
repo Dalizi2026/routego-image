@@ -150,6 +150,23 @@ export interface ProductionRoutegoMcpProcessOptions {
   readonly shutdownTimeoutMs?: number;
 }
 
+/**
+ * Every MCP runtime gets its own staging subtree by default. Studio and
+ * conversational MCP processes can coexist, and their startup recovery must
+ * never delete a live operation owned by another process.
+ */
+export function resolveProductionStagingRoot(
+  runtimeRoot: string,
+  configuredStagingRoot: string | undefined,
+  processId = process.pid
+): string {
+  if (configuredStagingRoot !== undefined) return path.resolve(configuredStagingRoot);
+  if (!Number.isSafeInteger(processId) || processId < 1) {
+    throw new TypeError("The Routego Image runtime process identifier is invalid.");
+  }
+  return path.resolve(runtimeRoot, "staging", `process-${processId}`);
+}
+
 export class RoutegoMcpProcessShutdownError extends Error {
   readonly code: "shutdown-failed" | "shutdown-timeout";
 
@@ -491,7 +508,7 @@ export async function createProductionRoutegoMcpProcess(
   const runtimeRoot = path.resolve(
     options.runtimeRoot ?? path.join(selectedHome, ".codex", "routego-image", "runtime")
   );
-  const stagingRoot = path.resolve(options.stagingRoot ?? path.join(runtimeRoot, "staging"));
+  const stagingRoot = resolveProductionStagingRoot(runtimeRoot, options.stagingRoot);
   const library = options.library ?? createRoutegoLibraryService({ homeDirectory: selectedHome });
   const ownsEphemeralResources = options.ephemeralResources === undefined;
   const ephemeralResources = options.ephemeralResources ??
@@ -539,7 +556,7 @@ export async function createProductionRoutegoMcpProcess(
       openStudio: async (request) => await lifecycle.openStudio(request),
       serviceHealth: () => ({
         status: "ready",
-        version: "1.0.0",
+        version: "1.0.5",
         nodeVersion: process.version,
         uptimeSeconds: 0,
         mcpAvailable: true,

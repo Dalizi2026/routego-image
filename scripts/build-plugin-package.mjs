@@ -153,6 +153,9 @@ async function auditRuntimeDependencies(repositoryRoot) {
   if (integrationPackage?.dependencies?.pngjs !== "7.0.0") {
     throw new Error("The Integration runtime must pin pngjs exactly to 7.0.0.");
   }
+  if (integrationPackage?.dependencies?.["onnxruntime-web"] !== "1.20.1") {
+    throw new Error("The Integration runtime must pin onnxruntime-web exactly to 1.20.1.");
+  }
   const packageFile = requireFromIntegration.resolve("pngjs/package.json");
   const dependencyRoot = path.dirname(packageFile);
   const dependencyPackage = JSON.parse(await readFile(packageFile, "utf8"));
@@ -176,6 +179,26 @@ async function auditRuntimeDependencies(repositoryRoot) {
   if (sha256(installedLicense) !== sha256(pinnedLicense)) {
     throw new Error("The pinned pngjs MIT license does not match the installed dependency.");
   }
+
+  const onnxruntimePackageFile = requireFromIntegration.resolve("onnxruntime-web");
+  const onnxruntimeRoot = path.resolve(path.dirname(onnxruntimePackageFile), "..");
+  const onnxruntimePackage = JSON.parse(await readFile(path.join(onnxruntimeRoot, "package.json"), "utf8"));
+  if (onnxruntimePackage.name !== "onnxruntime-web" || onnxruntimePackage.version !== "1.20.1" ||
+      onnxruntimePackage.license !== "MIT") {
+    throw new Error("The installed onnxruntime-web dependency does not match the pinned MIT provenance.");
+  }
+  for (const script of ["preinstall", "install", "postinstall"]) {
+    if (onnxruntimePackage.scripts?.[script] !== undefined) {
+      throw new Error(`The onnxruntime-web dependency declares a forbidden ${script} script.`);
+    }
+  }
+  const onnxruntimeFiles = await collectRegularFiles(onnxruntimeRoot);
+  if (onnxruntimeFiles.some((file) => file.endsWith(".node") || file.endsWith("binding.gyp"))) {
+    throw new Error("The onnxruntime-web dependency contains a native addon or binding definition.");
+  }
+  // onnxruntime-web's published npm archive omits a LICENSE file. The pinned
+  // MIT text is distributed with this plugin and its hash is checked again by
+  // the package verifier below.
 
   const contractsPackageFile = path.join(repositoryRoot, "packages/contracts/package.json");
   const requireFromContracts = createRequire(contractsPackageFile);

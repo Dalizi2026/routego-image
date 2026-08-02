@@ -67,7 +67,7 @@
 }
 
 .creation-workflow button[aria-pressed="true"] {
-  color: var(--ink-950);
+  color: var(--accent-foreground);
   background: var(--amber-400);
 }
 
@@ -81,7 +81,7 @@
 
 .creation-mode button[aria-pressed="true"] {
   border-color: var(--amber-400);
-  color: var(--ink-950);
+  color: var(--accent-foreground);
   background: var(--amber-400);
 }
 
@@ -462,7 +462,7 @@
   min-height: 54px;
   margin-top: 14px;
   border: 1px solid var(--amber-400);
-  color: var(--ink-950);
+  color: var(--accent-foreground);
   background: var(--amber-400);
   font-family: var(--font-mono);
   font-size: 0.72rem;

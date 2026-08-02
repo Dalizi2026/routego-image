@@ -52,6 +52,8 @@ export interface ProviderRoutingContext {
   readonly previousAttempt?: PreviousProviderAttempt;
   /** Direct public edits may establish support with their one user-authorized request. */
   readonly allowUnverifiedDirectEdit?: boolean;
+  /** Direct public reference generations may establish support with the user's requested submission. */
+  readonly allowUnverifiedDirectReferenceGeneration?: boolean;
 }
 
 export interface CapabilityLimitViolation {
@@ -197,7 +199,12 @@ function transparencyFor(
 ): NonNullable<SelectedProviderRoute["transparency"]> {
   if (request.transparentMode !== "native") return "none";
   const record = findCapabilityRecord(context, candidate, "native-transparency");
-  return record?.state === "supported" ? "native" : "local-fallback";
+  if (record?.state === "supported") return "native";
+  // `background: transparent` is not safe to trial on an unverified
+  // intermediary: some otherwise-compatible endpoints accept the connection
+  // but never complete the image operation. A native request is sent only
+  // after a success record proves this exact route supports it.
+  return "local-fallback";
 }
 
 function tierACapabilities(
@@ -472,6 +479,14 @@ function selectFromCandidates(
       if (
         request.kind === "edit" &&
         context.allowUnverifiedDirectEdit === true &&
+        (record === undefined || record.state === "unknown")
+      ) {
+        continue;
+      }
+      if (
+        request.kind === "generate" &&
+        candidate.imageInputCount > 0 &&
+        context.allowUnverifiedDirectReferenceGeneration === true &&
         (record === undefined || record.state === "unknown")
       ) {
         continue;

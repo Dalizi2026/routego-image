@@ -11,6 +11,7 @@ import { useI18n } from "../../i18n";
 
 type DefaultCapability =
   | "custom-size"
+  | "quality-control"
   | "native-variants"
   | "output-format"
   | "native-transparency";
@@ -25,6 +26,10 @@ const probeDetails: Record<DefaultCapability, { readonly zh: string; readonly en
   "custom-size": {
     zh: "自定义尺寸与比例",
     en: "Custom size and aspect ratio"
+  },
+  "quality-control": {
+    zh: "指定图片质量",
+    en: "Requested image quality"
   },
   "native-variants": {
     zh: "一次返回多张图片",
@@ -43,6 +48,7 @@ const probeDetails: Record<DefaultCapability, { readonly zh: string; readonly en
 function requiredCapabilities(defaults: ReadSettingsResult["defaults"]): readonly DefaultCapability[] {
   return [
     ...(defaults.size !== "auto" || defaults.aspectRatio !== "auto" ? ["custom-size" as const] : []),
+    ...(defaults.quality !== "auto" ? ["quality-control" as const] : []),
     ...(defaults.count > 1 ? ["native-variants" as const] : []),
     ...(defaults.format !== "png" ? ["output-format" as const] : []),
     ...(defaults.transparentMode === "native" ? ["native-transparency" as const] : [])
@@ -84,10 +90,12 @@ function probeErrorMessage(result: CapabilityProbeResult, language: "zh" | "en")
 
 export function CapabilityProbePanel({
   gateway,
-  settings
+  settings,
+  compact = false
 }: {
   readonly gateway: StudioGateway;
   readonly settings: ReadSettingsResult;
+  readonly compact?: boolean;
 }) {
   const { language } = useI18n();
   const active = settings.profiles.find((profile) => profile.id === settings.activeProviderId && profile.isActive);
@@ -107,10 +115,17 @@ export function CapabilityProbePanel({
           providerId: active.id,
           model,
           capability,
-          transport: "single-endpoint-json",
-          requestShape: "single-endpoint-json:text",
+          transport: capability === "quality-control" && active.endpoints.generation.mode === "legacy-api-base"
+            ? "openai-images"
+            : "single-endpoint-json",
+          requestShape: capability === "quality-control" && active.endpoints.generation.mode === "legacy-api-base"
+            ? "openai-images:generations-json"
+            : "single-endpoint-json:text",
           ...(capability === "custom-size" && settings.defaults.size !== "auto"
             ? { requestedSize: settings.defaults.size }
+            : {}),
+          ...(capability === "quality-control" && settings.defaults.quality !== "auto"
+            ? { requestedQuality: settings.defaults.quality }
             : {}),
           confirmBillableProbe: true
         });
@@ -131,8 +146,7 @@ export function CapabilityProbePanel({
     (result) => result.status === "completed" && result.record.state === "supported"
   );
 
-  return (
-    <section className="capability-probe" aria-labelledby="capability-probe-title">
+  const explanation = <>
       <div className="settings-section-heading">
         <p>VERIFY / OPTIONAL CONTROLS</p>
         <h2 id="capability-probe-title">{isChinese ? "验证当前默认参数" : "Verify current defaults"}</h2>
@@ -152,6 +166,11 @@ export function CapabilityProbePanel({
                   ? `：将生成并核对实际 ${settings.defaults.size} 像素尺寸`
                   : `: generates and checks the actual ${settings.defaults.size} pixel dimensions`)
                 : ""}
+              {capability === "quality-control" && settings.defaults.quality !== "auto"
+                ? (isChinese
+                  ? `：将发送并确认 ${settings.defaults.quality} 质量参数`
+                  : `: sends and confirms the ${settings.defaults.quality} quality parameter`)
+                : ""}
             </li>)}
           </ul>
           <p className="capability-probe__scope">
@@ -159,19 +178,17 @@ export function CapabilityProbePanel({
               ? `本次将顺序执行 ${requirements.length} 次探测；结果只适用于当前服务商、模型和调用端点。`
               : `${requirements.length} probe request(s) run sequentially. Results apply only to this provider, model, and endpoint.`}
           </p>
-          <button type="button" onClick={() => void runProbe()} disabled={state.status === "running" || active === undefined || model === undefined}>
-            {state.status === "running"
-              ? (isChinese ? "正在验证…" : "Verifying…")
-              : (isChinese ? "开始验证（可能计费）" : "Start verification (may be billable)")}
-          </button>
         </>
       ) : (
         <p className="capability-probe__scope">
           {isChinese
-            ? "当前默认值没有启用需要额外验证的参数。保存自定义尺寸、多张输出、JPEG/WebP 或原生透明后，可在这里验证。"
-            : "The current defaults do not use an optional control that needs verification. Save a custom size, multiple outputs, JPEG/WebP, or native transparency to verify it here."}
+            ? "当前默认值没有启用需要额外验证的参数。保存自定义尺寸、指定质量、多张输出、JPEG/WebP 或原生透明后，可在这里验证。"
+          : "The current defaults do not use an optional control that needs verification. Save a custom size, requested quality, multiple outputs, JPEG/WebP, or native transparency to verify it here."}
         </p>
       )}
+    </>;
+
+  const feedback = <>
       {active === undefined || model === undefined ? (
         <p className="capability-probe__message is-failure" role="alert">
           {isChinese ? "请先保存并启用含模型的服务商资料。" : "Save and activate a provider profile with a model first."}
@@ -199,6 +216,26 @@ export function CapabilityProbePanel({
           </p>
         </div>
       ) : null}
+    </>;
+
+  const probeButton = requirements.length > 0 ? (
+    <button type="button" onClick={() => void runProbe()} disabled={state.status === "running" || active === undefined || model === undefined}>
+      {state.status === "running"
+        ? (isChinese ? "正在验证…" : "Verifying…")
+        : (isChinese ? "开始验证（可能计费）" : "Start verification (may be billable)")}
+    </button>
+  ) : null;
+
+  return (
+    <section className={`capability-probe${compact ? " capability-probe--compact" : ""}`} aria-labelledby="capability-probe-title">
+      {compact ? (
+        <details className="capability-probe__disclosure">
+          <summary>{isChinese ? "验证说明" : "Verification details"}</summary>
+          <div className="capability-probe__disclosure-body">{explanation}</div>
+        </details>
+      ) : explanation}
+      {probeButton}
+      {feedback}
     </section>
   );
 }

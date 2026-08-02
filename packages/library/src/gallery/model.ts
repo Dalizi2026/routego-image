@@ -81,8 +81,6 @@ export interface ImageLibraryIndex {
   readonly blobs: readonly StoredImageBlob[];
   readonly assets: readonly StoredLibraryAsset[];
   readonly folders: readonly StoredLibraryFolder[];
-  /** The sole selected active generation record, when one has been marked. */
-  readonly currentMarkRecordId?: string;
 }
 
 /**
@@ -443,7 +441,6 @@ interface ParsedLibraryIndex {
   readonly blobs: readonly StoredImageBlob[];
   readonly assets: readonly StoredLibraryAsset[];
   readonly folders: readonly StoredLibraryFolder[];
-  readonly currentMarkRecordId?: string;
 }
 
 function parseVersionedImageLibraryIndex(
@@ -528,22 +525,11 @@ function parseVersionedImageLibraryIndex(
     }
   }
   if (schemaVersion === IMAGE_LIBRARY_SCHEMA_VERSION) {
-    const currentMarkRecordId =
-      record["currentMarkRecordId"] === undefined
-        ? undefined
-        : parseId(record["currentMarkRecordId"], "Current mark record identity");
-    if (currentMarkRecordId !== undefined) {
-      const marked = assets.find((asset) => asset.id === currentMarkRecordId);
-      if (!marked || marked.kind !== "generate") {
-        throw new LibraryError("config_corrupt", "The current mark must reference an active generation record.");
-      }
-    }
     return {
       revision: record["revision"] as number,
       blobs,
       assets,
-      folders,
-      ...(currentMarkRecordId === undefined ? {} : { currentMarkRecordId })
+      folders
     };
   }
 
@@ -562,10 +548,7 @@ export function parseImageLibraryIndex(value: unknown): ImageLibraryIndex {
     revision: parsed.revision,
     blobs: parsed.blobs,
     assets: parsed.assets,
-    folders: parsed.folders,
-    ...(parsed.currentMarkRecordId === undefined
-      ? {}
-      : { currentMarkRecordId: parsed.currentMarkRecordId })
+    folders: parsed.folders
   };
 }
 
