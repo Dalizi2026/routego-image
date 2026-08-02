@@ -350,6 +350,7 @@ function expectExactStreamRequest(
 }
 
 test("secure boot blocks missing and rejected sessions, then keeps a valid localized responsive shell usable", async ({ page, context }) => {
+  test.setTimeout(60_000);
   const audit = observeBrowserSecurity(page);
   await installSyntheticFaviconBoundary(page);
 
@@ -400,13 +401,9 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
     return { position: style.position, bottom: style.bottom };
   });
   expect(mobileNavigation).toEqual({ position: "fixed", bottom: "0px" });
-  await page.getByRole("navigation", { name: "Studio main navigation" }).getByRole("button", { name: "Settings" }).click();
-  await expect(page.getByRole("heading", { name: "Image API settings" })).toBeVisible();
-  await expect(page.getByLabel("Call endpoint")).toBeVisible();
-  await expect(page.getByLabel("API Key")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Connect and fetch models" })).toBeVisible();
-  await expect(page.locator("details.settings-advanced")).not.toHaveAttribute("open", "");
-  await expect(page.getByRole("heading", { name: "Relay configuration & capability calibration" })).not.toBeVisible();
+  await page.getByRole("navigation", { name: "Studio primary navigation" }).getByRole("button", { name: "Settings" }).click();
+  await expect(page.getByRole("heading", { name: "Provider management" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "New provider" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 
   await expectSecurityClean(page, audit);
@@ -428,7 +425,7 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
     allowedConsoleHttpStatuses: [401]
   });
   await rejectedPage.close();
-}, 60_000);
+});
 
 test("first run connects with endpoint and key, fetches models once, then returns work to Codex", async ({ page }) => {
   const audit = observeBrowserSecurity(page);

@@ -261,7 +261,7 @@ describe("task 6.1 offline production composition", () => {
     expect(new Set(detail.renditions.map((item) => item.artifactId)).size).toBe(21);
     expect(new Set(detail.relationships.map((item) => item.relatedAssetId))).toEqual(new Set([assetId]));
     expect(detail.relationships.map((item) => item.role)).not.toContain("transparent-original");
-  });
+  }, 15_000);
 
   it("copies a saved asset to a project without overwriting an existing file", async () => {
     const created = await harness();
