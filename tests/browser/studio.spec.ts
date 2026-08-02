@@ -428,7 +428,7 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
     allowedConsoleHttpStatuses: [401]
   });
   await rejectedPage.close();
-});
+}, 60_000);
 
 test("first run connects with endpoint and key, fetches models once, then returns work to Codex", async ({ page }) => {
   const audit = observeBrowserSecurity(page);

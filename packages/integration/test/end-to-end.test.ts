@@ -179,7 +179,11 @@ describe("task 6.1 offline production composition", () => {
     const canonicalRoot = await realpath(created.root);
     expect(executed.references.map((item) => item.path))
       .toSatisfy((paths: Array<string | undefined>) =>
-        paths.every((value) => value !== undefined && path.relative(canonicalRoot, value).startsWith("staging/")));
+        paths.every((value) => {
+          if (value === undefined) return false;
+          const relative = path.relative(canonicalRoot, value);
+          return !path.isAbsolute(relative) && relative.split(path.sep)[0] === "staging";
+        }));
   });
 
   it("keeps Studio generation text-only without upload source relationships", async () => {

@@ -1,4 +1,5 @@
 import { EventEmitter } from "node:events";
+import path from "node:path";
 
 import { describe, expect, it, vi } from "vitest";
 
@@ -37,17 +38,16 @@ const EXPECTED_TOOLS = [
 
 describe("production staging ownership", () => {
   it("isolates default staging folders by runtime process while preserving an explicit root", () => {
-    const runtimeRoot = "/tmp/routego-image-runtime";
+    const runtimeRoot = path.join(path.parse(process.cwd()).root, "tmp", "routego-image-runtime");
+    const explicitRoot = path.join(path.parse(process.cwd()).root, "tmp", "routego-image-explicit-staging");
 
     expect(resolveProductionStagingRoot(runtimeRoot, undefined, 4101)).toBe(
-      "/tmp/routego-image-runtime/staging/process-4101"
+      path.join(runtimeRoot, "staging", "process-4101")
     );
     expect(resolveProductionStagingRoot(runtimeRoot, undefined, 4102)).toBe(
-      "/tmp/routego-image-runtime/staging/process-4102"
+      path.join(runtimeRoot, "staging", "process-4102")
     );
-    expect(resolveProductionStagingRoot(runtimeRoot, "/tmp/routego-image-explicit-staging", 4101)).toBe(
-      "/tmp/routego-image-explicit-staging"
-    );
+    expect(resolveProductionStagingRoot(runtimeRoot, explicitRoot, 4101)).toBe(explicitRoot);
   });
 });
 
