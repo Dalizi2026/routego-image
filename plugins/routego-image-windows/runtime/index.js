@@ -1985,7 +1985,7 @@ var require_png = __commonJS({
     var Parser = require_parser_async();
     var Packer = require_packer_async();
     var PNGSync = require_png_sync();
-    var PNG7 = exports.PNG = function(options) {
+    var PNG5 = exports.PNG = function(options) {
       Stream.call(this);
       options = options || {};
       this.width = options.width | 0;
@@ -2014,9 +2014,9 @@ var require_png = __commonJS({
       this._parser.on("close", this._handleClose.bind(this));
       this._packer.on("error", this.emit.bind(this, "error"));
     };
-    util.inherits(PNG7, Stream);
-    PNG7.sync = PNGSync;
-    PNG7.prototype.pack = function() {
+    util.inherits(PNG5, Stream);
+    PNG5.sync = PNGSync;
+    PNG5.prototype.pack = function() {
       if (!this.data || !this.data.length) {
         this.emit("error", "No data provided");
         return this;
@@ -2028,7 +2028,7 @@ var require_png = __commonJS({
       );
       return this;
     };
-    PNG7.prototype.parse = function(data, callback) {
+    PNG5.prototype.parse = function(data, callback) {
       if (callback) {
         let onParsed, onError;
         onParsed = function(parsedData) {
@@ -2046,27 +2046,27 @@ var require_png = __commonJS({
       this.end(data);
       return this;
     };
-    PNG7.prototype.write = function(data) {
+    PNG5.prototype.write = function(data) {
       this._parser.write(data);
       return true;
     };
-    PNG7.prototype.end = function(data) {
+    PNG5.prototype.end = function(data) {
       this._parser.end(data);
     };
-    PNG7.prototype._metadata = function(metadata) {
+    PNG5.prototype._metadata = function(metadata) {
       this.width = metadata.width;
       this.height = metadata.height;
       this.emit("metadata", metadata);
     };
-    PNG7.prototype._gamma = function(gamma) {
+    PNG5.prototype._gamma = function(gamma) {
       this.gamma = gamma;
     };
-    PNG7.prototype._handleClose = function() {
+    PNG5.prototype._handleClose = function() {
       if (!this._parser.writable && !this._packer.readable) {
         this.emit("close");
       }
     };
-    PNG7.bitblt = function(src, dst, srcX, srcY, width, height, deltaX, deltaY) {
+    PNG5.bitblt = function(src, dst, srcX, srcY, width, height, deltaX, deltaY) {
       srcX |= 0;
       srcY |= 0;
       width |= 0;
@@ -2088,11 +2088,11 @@ var require_png = __commonJS({
         );
       }
     };
-    PNG7.prototype.bitblt = function(dst, srcX, srcY, width, height, deltaX, deltaY) {
-      PNG7.bitblt(this, dst, srcX, srcY, width, height, deltaX, deltaY);
+    PNG5.prototype.bitblt = function(dst, srcX, srcY, width, height, deltaX, deltaY) {
+      PNG5.bitblt(this, dst, srcX, srcY, width, height, deltaX, deltaY);
       return this;
     };
-    PNG7.adjustGamma = function(src) {
+    PNG5.adjustGamma = function(src) {
       if (src.gamma) {
         for (let y = 0; y < src.height; y++) {
           for (let x = 0; x < src.width; x++) {
@@ -2107,8 +2107,8 @@ var require_png = __commonJS({
         src.gamma = 0;
       }
     };
-    PNG7.prototype.adjustGamma = function() {
-      PNG7.adjustGamma(this);
+    PNG5.prototype.adjustGamma = function() {
+      PNG5.adjustGamma(this);
     };
   }
 });
@@ -20603,7 +20603,7 @@ var refreshModelsResultSchema = external_exports.object({
     });
   }
 });
-var capabilityProbeInputSchema = external_exports.object({
+external_exports.object({
   schemaVersion: routegoSchemaVersionSchema.default(1),
   providerId: identifierSchema,
   model: external_exports.string().trim().min(1).max(200),
@@ -21331,7 +21331,6 @@ var studioOperationNames = [
   "setActiveProviderProfile",
   "studioProviderSwitch",
   "refreshModels",
-  "probeCapabilities",
   "listFolders",
   "reorderFolders",
   "getAssetDetail",
@@ -21387,11 +21386,6 @@ var studioOperationDefinitions = {
     http: { method: "POST", path: "/api/v1/settings/providers/refresh-models" },
     inputSchema: refreshModelsInputSchema,
     outputSchema: refreshModelsResultSchema
-  },
-  probeCapabilities: {
-    http: { method: "POST", path: "/api/v1/settings/providers/capability-probe" },
-    inputSchema: capabilityProbeInputSchema,
-    outputSchema: capabilityProbeResultSchema
   },
   listFolders: {
     http: { method: "GET", path: "/api/v1/library/folders" },
@@ -21464,120 +21458,6 @@ var studioOperationDefinitions = {
     outputSchema: updateSettingsResultSchema
   }
 };
-
-// ../foundation/src/provider/capabilities.ts
-var SUPPORTED_SOURCES = /* @__PURE__ */ new Set([
-  "user-configuration",
-  "provider-documentation",
-  "successful-request"
-]);
-var UNSUPPORTED_SOURCES = /* @__PURE__ */ new Set([
-  "user-configuration",
-  "provider-documentation",
-  "protocol-rejection"
-]);
-function appendEvidence(current, evidence2) {
-  return [...current, evidence2].slice(-32);
-}
-function mergeLimits(current, observed) {
-  if (observed === void 0) return current;
-  const supportedSizes = [
-    ...current?.supportedSizes ?? [],
-    ...observed.supportedSizes ?? []
-  ];
-  const supportedQualities = [
-    ...current?.supportedQualities ?? [],
-    ...observed.supportedQualities ?? []
-  ];
-  const supportedFormats = [
-    ...current?.supportedFormats ?? [],
-    ...observed.supportedFormats ?? []
-  ];
-  return {
-    ...current,
-    ...observed,
-    ...supportedSizes.length === 0 ? {} : { supportedSizes: [...new Set(supportedSizes)] },
-    ...supportedQualities.length === 0 ? {} : { supportedQualities: [...new Set(supportedQualities)] },
-    ...supportedFormats.length === 0 ? {} : { supportedFormats: [...new Set(supportedFormats)] }
-  };
-}
-function createUnknownCapabilityRecord(capability, scope, evidence2 = []) {
-  return providerCapabilityRecordSchema.parse({
-    capability,
-    scope,
-    state: "unknown",
-    evidence: evidence2
-  });
-}
-function transitionCapability(record2, observation) {
-  const current = providerCapabilityRecordSchema.parse(record2);
-  const evidence2 = capabilityEvidenceSchema.parse(observation.evidence);
-  const nextEvidence = appendEvidence(current.evidence, evidence2);
-  if (observation.outcome === "transient") {
-    if (evidence2.source !== "transient-failure") {
-      throw new Error("Transient observations require transient-failure evidence");
-    }
-    return providerCapabilityRecordSchema.parse({
-      ...current,
-      evidence: nextEvidence
-    });
-  }
-  if (observation.outcome === "synthetic") {
-    if (evidence2.source !== "synthetic-fixture") {
-      throw new Error("Synthetic observations require synthetic-fixture evidence");
-    }
-    return providerCapabilityRecordSchema.parse({
-      ...current,
-      evidence: nextEvidence
-    });
-  }
-  if (observation.outcome === "supported") {
-    if (!SUPPORTED_SOURCES.has(evidence2.source)) {
-      throw new Error("Supported capabilities require explicit successful or authoritative evidence");
-    }
-    const { degradedReason: _degradedReason, ...withoutDegradedReason } = current;
-    return providerCapabilityRecordSchema.parse({
-      ...withoutDegradedReason,
-      state: "supported",
-      evidence: nextEvidence,
-      verifiedAt: evidence2.observedAt,
-      ...observation.limits === void 0 ? {} : { limits: mergeLimits(current.limits, observation.limits) }
-    });
-  }
-  if (observation.outcome === "unsupported") {
-    if (!UNSUPPORTED_SOURCES.has(evidence2.source)) {
-      throw new Error("Unsupported capabilities require stable protocol or authoritative evidence");
-    }
-    const {
-      degradedReason: _degradedReason,
-      limits: _limits,
-      ...withoutDegradedFields
-    } = current;
-    return providerCapabilityRecordSchema.parse({
-      ...withoutDegradedFields,
-      state: "unsupported",
-      evidence: nextEvidence,
-      verifiedAt: evidence2.observedAt
-    });
-  }
-  if (evidence2.source !== "degraded-fallback") {
-    throw new Error("Degraded capabilities require degraded-fallback evidence");
-  }
-  return providerCapabilityRecordSchema.parse({
-    ...current,
-    state: "degraded",
-    evidence: nextEvidence,
-    verifiedAt: evidence2.observedAt,
-    degradedReason: observation.degradedReason,
-    ...observation.limits === void 0 ? {} : { limits: mergeLimits(current.limits, observation.limits) }
-  });
-}
-function evaluateCapabilityProbe(request) {
-  if (request.confirmedByUser) {
-    return { allowed: true, requiresConfirmation: true, reason: "user-confirmed" };
-  }
-  return { allowed: false, requiresConfirmation: true, reason: "confirmation-required" };
-}
 function serializeProviderUrl(value) {
   return new URL(value).href;
 }
@@ -21702,7 +21582,13 @@ function requestedFeatureCapabilities(request) {
   return required2;
 }
 function isProviderDrivenControl(capability) {
-  return capability === "custom-size" || capability === "output-format";
+  return [
+    "custom-size",
+    "output-format",
+    "quality-control",
+    "compression",
+    "moderation"
+  ].includes(capability);
 }
 function transparencyFor(context, request, candidate) {
   if (request.transparentMode !== "native") return "none";
@@ -21887,21 +21773,15 @@ function selectFromCandidates(context, request, candidates) {
     for (const capability of candidate.requiredCapabilities) {
       if (isProviderDrivenControl(capability)) continue;
       const record2 = findCapabilityRecord(context, candidate, capability);
-      if (candidate.allowUnknownTextBaseline === true && capability === "text-generation" && (record2 === void 0 || record2.state === "unknown")) {
-        continue;
-      }
-      if (request.kind === "edit" && context.allowUnverifiedDirectEdit === true && (record2 === void 0 || record2.state === "unknown")) {
-        continue;
-      }
-      if (request.kind === "generate" && candidate.imageInputCount > 0 && context.allowUnverifiedDirectReferenceGeneration === true && (record2 === void 0 || record2.state === "unknown")) {
-        continue;
-      }
+      if (candidate.allowUnknownTextBaseline === true && capability === "text-generation" && (record2 === void 0 || record2.state === "unknown")) continue;
+      if (request.kind === "edit" && context.allowUnverifiedDirectEdit === true && (record2 === void 0 || record2.state === "unknown")) continue;
+      if (request.kind === "generate" && candidate.imageInputCount > 0 && context.allowUnverifiedDirectReferenceGeneration === true && (record2 === void 0 || record2.state === "unknown")) continue;
       if (record2 === void 0 || record2.state === "unknown" || record2.state === "unsupported") {
         missing.push(capability);
         candidateUnavailable = true;
         continue;
       }
-      if (record2.state === "degraded") {
+      if (record2?.state === "degraded") {
         degraded = true;
       }
       const violations = capabilityLimitViolations(record2, request, candidate.imageInputCount);
@@ -25157,7 +25037,7 @@ var OMIT_PROJECTED_FIELD = /* @__PURE__ */ Symbol("omit-projected-field");
 var IMAGE_DATA_URL_PATTERN = /data:image\/[a-z0-9][a-z0-9.+-]*(?:;[a-z0-9!#$&^_.+-]+=(?:"[^"\r\n]*"|[^;,\s]*))*(?:;base64)?,(?:(?:%[0-9a-f]{2})|[a-z0-9+/_~.!$&*=@?:-])*/giu;
 var LONG_BASE64_TOKEN_PATTERN = /(^|[^A-Za-z0-9+/_=-])([A-Za-z0-9+/_-]{64,}={0,2})(?=$|[^A-Za-z0-9+/_=-])/gu;
 function preservesOmittedPublicControls2(operation) {
-  return operation === "generate" || operation === "batch";
+  return operation === "generate" || operation === "edit" || operation === "batch";
 }
 function inputJsonSchema(operation) {
   const generated = routegoOperationDefinitions[operation].inputSchema.toJSONSchema({
@@ -27102,8 +26982,8 @@ var LibrarySettingsStore = class {
       const existing = profile.capabilities.find((item) => capabilityEvidenceKey(item) === key);
       let record2 = parsed.record;
       if (parsed.status === "failed" && existing) {
-        const evidence2 = [...existing.evidence, ...parsed.record.evidence].slice(-32);
-        record2 = providerCapabilityRecordSchema.parse({ ...existing, evidence: evidence2 });
+        const evidence = [...existing.evidence, ...parsed.record.evidence].slice(-32);
+        record2 = providerCapabilityRecordSchema.parse({ ...existing, evidence });
       }
       const capabilities = [
         ...profile.capabilities.filter((item) => capabilityEvidenceKey(item) !== key),
@@ -39946,903 +39826,6 @@ async function refreshProviderModels(owner, input, options = {}) {
   }
 }
 
-// src/provider/probes.ts
-var import_pngjs6 = __toESM(require_png());
-
-// src/image/png.ts
-var import_pngjs5 = __toESM(require_png());
-var SYNTHETIC_PROBE_SIZE = 4;
-function createDeterministicSyntheticPng(kind = "image") {
-  const png = new import_pngjs5.PNG({ width: SYNTHETIC_PROBE_SIZE, height: SYNTHETIC_PROBE_SIZE });
-  for (let y = 0; y < SYNTHETIC_PROBE_SIZE; y += 1) {
-    for (let x = 0; x < SYNTHETIC_PROBE_SIZE; x += 1) {
-      const offset = (y * SYNTHETIC_PROBE_SIZE + x) * 4;
-      const active = (x + y) % 2 === 0;
-      if (kind === "mask") {
-        png.data[offset] = 255;
-        png.data[offset + 1] = 255;
-        png.data[offset + 2] = 255;
-        png.data[offset + 3] = active ? 255 : 0;
-      } else {
-        png.data[offset] = active ? 32 : 224;
-        png.data[offset + 1] = active ? 96 : 192;
-        png.data[offset + 2] = active ? 224 : 48;
-        png.data[offset + 3] = 255;
-      }
-    }
-  }
-  const bytes = import_pngjs5.PNG.sync.write(png, {
-    colorType: 6,
-    inputColorType: 6,
-    inputHasAlpha: true,
-    bitDepth: 8,
-    deflateLevel: 9,
-    deflateStrategy: 3,
-    filterType: 4
-  });
-  const sha2562 = createHash("sha256").update(bytes).digest("hex");
-  return {
-    mimeType: "image/png",
-    width: SYNTHETIC_PROBE_SIZE,
-    height: SYNTHETIC_PROBE_SIZE,
-    byteLength: bytes.byteLength,
-    sha256: sha2562,
-    bytes: new Uint8Array(bytes),
-    dataUrl: `data:image/png;base64,${bytes.toString("base64")}`
-  };
-}
-function createDeterministicSyntheticPngInputs() {
-  return {
-    image: createDeterministicSyntheticPng("image"),
-    mask: createDeterministicSyntheticPng("mask")
-  };
-}
-
-// src/provider/probes.ts
-var DEFAULT_CAPABILITY_PROBE_TIMEOUT_MS = 12e4;
-var MAX_CAPABILITY_PROBE_ERROR_BYTES = 32 * 1024;
-var MAX_CAPABILITY_PROBE_SUCCESS_BYTES = 8 * 1024 * 1024;
-var MAX_CAPABILITY_PROBE_PNG_DIMENSION = 4096;
-var MAX_CAPABILITY_PROBE_PNG_PIXELS = 4 * 1024 * 1024;
-var MAX_CAPABILITY_PROBE_PNG_RGBA_BYTES = 16 * 1024 * 1024;
-var CAPABILITY_PROBE_DEFINITIONS = [
-  ...[
-    PROVIDER_REQUEST_SHAPES.singleEndpointText,
-    PROVIDER_REQUEST_SHAPES.imagesGenerationsJson
-  ].flatMap((requestShape) => {
-    const transport = requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointText ? "single-endpoint-json" : "openai-images";
-    return [
-      { transport, requestShape, capability: "text-generation", responseProof: "images-output" },
-      { transport, requestShape, capability: "quality-control", responseProof: "images-quality-control" },
-      { transport, requestShape, capability: "native-variants", responseProof: "images-two-outputs" },
-      { transport, requestShape, capability: "custom-size", responseProof: "images-custom-size" },
-      { transport, requestShape, capability: "output-format", responseProof: "images-jpeg-output" },
-      { transport, requestShape, capability: "native-transparency", responseProof: "images-alpha-output" }
-    ];
-  }),
-  {
-    transport: "single-endpoint-json",
-    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
-    capability: "single-image-input",
-    responseProof: "images-output"
-  },
-  {
-    transport: "single-endpoint-json",
-    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
-    capability: "native-transparency",
-    responseProof: "images-alpha-output"
-  },
-  {
-    transport: "single-endpoint-json",
-    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImage,
-    capability: "data-url-input",
-    responseProof: "images-output"
-  },
-  {
-    transport: "single-endpoint-json",
-    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImages,
-    capability: "multi-image-input",
-    responseProof: "images-output"
-  },
-  {
-    transport: "single-endpoint-json",
-    requestShape: PROVIDER_REQUEST_SHAPES.singleEndpointImages,
-    capability: "data-url-input",
-    responseProof: "images-output"
-  },
-  ...[
-    "text-generation",
-    "single-image-input",
-    "multi-image-input",
-    "data-url-input"
-  ].map((capability) => ({
-    transport: "openai-responses",
-    requestShape: PROVIDER_REQUEST_SHAPES.responsesImageGeneration,
-    capability,
-    responseProof: "responses-completed-output"
-  }))
-];
-CAPABILITY_PROBE_DEFINITIONS.map(({ responseProof: _responseProof, ...pair }) => pair);
-function safeTimeout2(value) {
-  const timeout = value ?? DEFAULT_CAPABILITY_PROBE_TIMEOUT_MS;
-  if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 6e5) {
-    throw new ProviderIntegrationError(
-      createProviderServiceError({
-        code: "invalid_input",
-        stage: "validate",
-        safeMessage: "The capability-probe timeout is invalid."
-      })
-    );
-  }
-  return timeout;
-}
-function exactEndpoint(profile, input) {
-  if (input.transport === "single-endpoint-json") {
-    return profile.normalizedEndpoints.generationEndpoint;
-  }
-  if (input.transport === "openai-responses") {
-    if (!profile.normalizedEndpoints.responsesEndpoint) {
-      throw new ProviderIntegrationError(
-        createProviderServiceError({
-          code: "config_missing",
-          stage: "configure",
-          safeMessage: "This provider profile has no explicitly configured Responses endpoint."
-        })
-      );
-    }
-    return profile.normalizedEndpoints.responsesEndpoint;
-  }
-  return profile.normalizedEndpoints.generationEndpoint;
-}
-function validateProbeShape(input) {
-  const definition = CAPABILITY_PROBE_DEFINITIONS.find(
-    (candidate) => candidate.transport === input.transport && candidate.requestShape === input.requestShape && candidate.capability === input.capability
-  );
-  if (definition === void 0) {
-    throw new ProviderIntegrationError(
-      createProviderServiceError({
-        code: "invalid_request",
-        stage: "validate",
-        safeMessage: "This capability cannot be conclusively proven by one exact confirmed request.",
-        capability: input.capability,
-        details: {
-          transport: input.transport,
-          requestShape: input.requestShape,
-          capability: input.capability
-        }
-      })
-    );
-  }
-  return definition;
-}
-function jsonProbeBody(input) {
-  const synthetic = createDeterministicSyntheticPngInputs();
-  const common = {
-    model: input.model,
-    prompt: "Routego capability probe: generate one synthetic checkerboard image."
-  };
-  const controls = {
-    ...input.capability === "native-variants" ? { n: 2 } : {},
-    ...input.capability === "custom-size" ? { size: customProbeSize(input).value } : {},
-    ...input.capability === "quality-control" ? { quality: input.requestedQuality } : {},
-    ...input.capability === "output-format" ? { output_format: "jpeg" } : {},
-    ...input.capability === "native-transparency" ? { background: "transparent" } : {}
-  };
-  if (input.requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointImage) {
-    return JSON.stringify({ ...common, ...controls, image: synthetic.image.dataUrl });
-  }
-  if (input.requestShape === PROVIDER_REQUEST_SHAPES.singleEndpointImages) {
-    return JSON.stringify({
-      ...common,
-      ...controls,
-      images: [synthetic.image.dataUrl, synthetic.mask.dataUrl]
-    });
-  }
-  if (input.requestShape === PROVIDER_REQUEST_SHAPES.responsesImageGeneration) {
-    const imageCount = input.capability === "multi-image-input" ? 2 : (/* @__PURE__ */ new Set([
-      "single-image-input",
-      "data-url-input"
-    ])).has(input.capability) ? 1 : 0;
-    const content = [
-      { type: "input_text", text: common.prompt },
-      ...imageCount >= 1 ? [{ type: "input_image", image_url: synthetic.image.dataUrl }] : [],
-      ...imageCount >= 2 ? [{ type: "input_image", image_url: synthetic.mask.dataUrl }] : []
-    ];
-    return JSON.stringify({
-      model: input.model,
-      input: [{ role: "user", content }],
-      tools: [{
-        type: "image_generation",
-        action: input.capability === "text-generation" ? "generate" : "auto"
-      }]
-    });
-  }
-  return JSON.stringify({ ...common, ...controls });
-}
-function requestDescriptor(profile, input) {
-  const endpoint = exactEndpoint(profile, input);
-  const authorization = `Bearer ${profile.credential}`;
-  return {
-    endpoint,
-    request: {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        authorization,
-        "content-type": "application/json"
-      },
-      body: jsonProbeBody(input)
-    }
-  };
-}
-function responseShape(response) {
-  const type = response.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
-  return `http:${response.status};content-type:${(type || "unknown").slice(0, 100)}`;
-}
-function errorCodeFromBody(value) {
-  if (value === null || typeof value !== "object" || Array.isArray(value)) return void 0;
-  const record2 = value;
-  const error51 = record2["error"];
-  const candidate = typeof record2["code"] === "string" ? record2["code"] : error51 !== null && typeof error51 === "object" && !Array.isArray(error51) ? error51["code"] : void 0;
-  return typeof candidate === "string" && candidate.length <= 200 ? candidate : void 0;
-}
-function unsupportedProviderCode(code) {
-  return code !== void 0 && /(?:not[_-]?supported|unsupported|unknown[_-]?(?:parameter|feature|endpoint))/iu.test(code);
-}
-function moderationProviderCode(code) {
-  return code !== void 0 && /moderation|content[_-]?policy|safety/iu.test(code);
-}
-function isRecord3(value) {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-var PNG_SIGNATURE4 = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-var PNG_IHDR_TOTAL_BYTES2 = 33;
-var PNG_8_BIT_COLOR_TYPES2 = /* @__PURE__ */ new Set([0, 2, 3, 4, 6]);
-function pngCrc322(bytes, start, end) {
-  let crc = 4294967295;
-  for (let position = start; position < end; position += 1) {
-    crc ^= bytes[position];
-    for (let bit = 0; bit < 8; bit += 1) {
-      crc = crc >>> 1 ^ (crc & 1 ? 3988292384 : 0);
-    }
-  }
-  return (crc ^ 4294967295) >>> 0;
-}
-function boundedPngHeader2(bytes) {
-  if (bytes.byteLength < PNG_IHDR_TOTAL_BYTES2 || !bytes.subarray(0, PNG_SIGNATURE4.byteLength).equals(PNG_SIGNATURE4) || bytes.readUInt32BE(8) !== 13 || bytes.toString("ascii", 12, 16) !== "IHDR" || bytes.readUInt32BE(29) !== pngCrc322(bytes, 12, 29)) {
-    return void 0;
-  }
-  const width = bytes.readUInt32BE(16);
-  const height = bytes.readUInt32BE(20);
-  const bitDepth = bytes[24];
-  const colorType = bytes[25];
-  const compressionMethod = bytes[26];
-  const filterMethod = bytes[27];
-  const interlaceMethod = bytes[28];
-  if (width < 1 || height < 1 || bitDepth !== 8 || colorType === void 0 || !PNG_8_BIT_COLOR_TYPES2.has(colorType) || compressionMethod !== 0 || filterMethod !== 0 || interlaceMethod !== 0) {
-    return void 0;
-  }
-  const pixels = width * height;
-  const decodedRgbaBytes = pixels * 4;
-  if (!Number.isSafeInteger(pixels) || !Number.isSafeInteger(decodedRgbaBytes) || width > MAX_CAPABILITY_PROBE_PNG_DIMENSION || height > MAX_CAPABILITY_PROBE_PNG_DIMENSION || pixels > MAX_CAPABILITY_PROBE_PNG_PIXELS || decodedRgbaBytes > MAX_CAPABILITY_PROBE_PNG_RGBA_BYTES) {
-    return void 0;
-  }
-  return { width, height, decodedRgbaBytes };
-}
-var JPEG_START_OF_FRAME_MARKERS3 = /* @__PURE__ */ new Set([
-  192,
-  193,
-  194,
-  195,
-  197,
-  198,
-  199,
-  201,
-  202,
-  203,
-  205,
-  206,
-  207
-]);
-function jpegDimensions(bytes) {
-  if (bytes.length < 4 || bytes[0] !== 255 || bytes[1] !== 216) return void 0;
-  let position = 2;
-  let width;
-  let height;
-  let sawScan = false;
-  while (position < bytes.length) {
-    if (bytes[position] !== 255) return void 0;
-    while (position < bytes.length && bytes[position] === 255) position += 1;
-    const marker = bytes[position];
-    if (marker === void 0) return void 0;
-    position += 1;
-    if (marker === 217) {
-      return sawScan && width !== void 0 && height !== void 0 && position === bytes.length ? { width, height } : void 0;
-    }
-    if (marker === 0 || marker === 216 || marker >= 208 && marker <= 215 || marker === 1) {
-      return void 0;
-    }
-    if (position + 2 > bytes.length) return void 0;
-    const segmentLength = bytes.readUInt16BE(position);
-    if (segmentLength < 2 || position + segmentLength > bytes.length) return void 0;
-    const dataStart = position + 2;
-    const segmentEnd = position + segmentLength;
-    if (JPEG_START_OF_FRAME_MARKERS3.has(marker)) {
-      if (segmentLength < 8) return void 0;
-      height = bytes.readUInt16BE(dataStart + 1);
-      width = bytes.readUInt16BE(dataStart + 3);
-      if (width < 1 || height < 1 || width > 65535 || height > 65535) return void 0;
-    }
-    position = segmentEnd;
-    if (marker !== 218) continue;
-    if (width === void 0 || height === void 0) return void 0;
-    sawScan = true;
-    while (position < bytes.length) {
-      if (bytes[position] !== 255) {
-        position += 1;
-        continue;
-      }
-      let next = position + 1;
-      while (next < bytes.length && bytes[next] === 255) next += 1;
-      const scanMarker = bytes[next];
-      if (scanMarker === void 0) return void 0;
-      if (scanMarker === 0 || scanMarker >= 208 && scanMarker <= 215) {
-        position = next + 1;
-        continue;
-      }
-      break;
-    }
-  }
-  return void 0;
-}
-function webpDimensions(bytes) {
-  if (bytes.length < 30 || !bytes.subarray(0, 4).equals(Buffer.from("RIFF")) || !bytes.subarray(8, 12).equals(Buffer.from("WEBP"))) {
-    return void 0;
-  }
-  const chunk = bytes.subarray(12, 16).toString("ascii");
-  if (chunk === "VP8X") {
-    const width = 1 + bytes.readUIntLE(24, 3);
-    const height = 1 + bytes.readUIntLE(27, 3);
-    return width > 0 && height > 0 ? { width, height } : void 0;
-  }
-  if (chunk === "VP8 " && bytes.subarray(23, 26).equals(Buffer.from([157, 1, 42]))) {
-    const width = bytes.readUInt16LE(26) & 16383;
-    const height = bytes.readUInt16LE(28) & 16383;
-    return width > 0 && height > 0 ? { width, height } : void 0;
-  }
-  if (chunk === "VP8L" && bytes[20] === 47) {
-    const width = 1 + (bytes[21] | (bytes[22] & 63) << 8);
-    const height = 1 + (bytes[22] >> 6 | bytes[23] << 2 | (bytes[24] & 15) << 10);
-    return width > 0 && height > 0 ? { width, height } : void 0;
-  }
-  return void 0;
-}
-function strictBase64Bytes(value) {
-  const encoded = value.startsWith("data:") ? /^data:image\/(?:png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})$/u.exec(value)?.[1] : value;
-  if (encoded === void 0 || encoded.length === 0 || encoded.length > Math.ceil(MAX_CAPABILITY_PROBE_SUCCESS_BYTES / 3) * 4 || encoded.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/u.test(encoded)) {
-    return void 0;
-  }
-  const bytes = Buffer.from(encoded, "base64");
-  if (bytes.byteLength === 0 || bytes.byteLength > MAX_CAPABILITY_PROBE_SUCCESS_BYTES) {
-    return void 0;
-  }
-  const normalizedInput = encoded.replace(/=+$/u, "");
-  const normalizedOutput = bytes.toString("base64").replace(/=+$/u, "");
-  return normalizedInput === normalizedOutput ? new Uint8Array(bytes) : void 0;
-}
-function inspectInlineImage(value) {
-  const bytes = strictBase64Bytes(value);
-  if (bytes === void 0) return void 0;
-  const pngBytes = Buffer.from(bytes);
-  if (pngBytes.subarray(0, PNG_SIGNATURE4.byteLength).equals(PNG_SIGNATURE4)) {
-    const header6 = boundedPngHeader2(pngBytes);
-    if (header6 === void 0) return void 0;
-    try {
-      const decoded = import_pngjs6.PNG.sync.read(pngBytes);
-      if (decoded.width !== header6.width || decoded.height !== header6.height || decoded.data.byteLength !== header6.decodedRgbaBytes) {
-        return void 0;
-      }
-      let hasTransparency = false;
-      for (let offset = 3; offset < decoded.data.length; offset += 4) {
-        if (decoded.data[offset] !== 255) {
-          hasTransparency = true;
-          break;
-        }
-      }
-      return {
-        kind: "inline",
-        mimeType: "image/png",
-        width: decoded.width,
-        height: decoded.height,
-        hasTransparency
-      };
-    } catch {
-      return void 0;
-    }
-  }
-  const jpeg = jpegDimensions(Buffer.from(bytes));
-  if (jpeg !== void 0) {
-    return { kind: "inline", mimeType: "image/jpeg", ...jpeg };
-  }
-  const webp = webpDimensions(Buffer.from(bytes));
-  if (webp !== void 0) {
-    return { kind: "inline", mimeType: "image/webp", ...webp };
-  }
-  return void 0;
-}
-function inspectOutputUrl(value) {
-  if (value.length === 0 || value.length > 4096) return void 0;
-  try {
-    const parsed = new URL(value);
-    if (parsed.protocol !== "https:" && parsed.protocol !== "http:" || parsed.username || parsed.password || parsed.hash) {
-      return void 0;
-    }
-    return { kind: "url", url: parsed.href };
-  } catch {
-    return void 0;
-  }
-}
-function imageOutputFromItem(item) {
-  if (!isRecord3(item)) return void 0;
-  const base643 = ["b64_json", "b64", "base64", "image_base64"].map((key) => typeof item[key] === "string" ? item[key] : void 0).find((value) => value !== void 0);
-  const url2 = ["url", "image_url", "imageUrl"].map((key) => typeof item[key] === "string" ? item[key] : void 0).find((value) => value !== void 0);
-  const image = typeof item["image"] === "string" ? item["image"] : void 0;
-  const encoded = base643 ?? (image !== void 0 && !image.startsWith("http") ? image : void 0);
-  const resource = url2 ?? (image !== void 0 && image.startsWith("http") ? image : void 0);
-  if (encoded === void 0 === (resource === void 0)) return void 0;
-  if (encoded !== void 0) return inspectInlineImage(encoded);
-  return inspectInlineImage(resource) ?? inspectOutputUrl(resource);
-}
-function imageOutputItems(body) {
-  const candidates = [body["data"], body["images"], body["result"]];
-  for (const candidate of candidates) {
-    if (Array.isArray(candidate) && candidate.length >= 1 && candidate.length <= 4) return candidate;
-    if (!isRecord3(candidate)) continue;
-    for (const nested of [candidate["data"], candidate["images"], candidate["result"]]) {
-      if (Array.isArray(nested) && nested.length >= 1 && nested.length <= 4) return nested;
-    }
-    return [candidate];
-  }
-  return void 0;
-}
-function imagesOutputs(body) {
-  if (!isRecord3(body)) return void 0;
-  const data = imageOutputItems(body);
-  if (data === void 0) return void 0;
-  const outputs = [];
-  for (const item of data) {
-    const output = imageOutputFromItem(item);
-    if (output === void 0) return void 0;
-    outputs.push(output);
-  }
-  return outputs;
-}
-function responsesOutputs(body) {
-  if (!isRecord3(body) || body["status"] !== "completed" || !Array.isArray(body["output"])) {
-    return void 0;
-  }
-  const outputs = [];
-  for (const item of body["output"]) {
-    if (!isRecord3(item) || item["type"] !== "image_generation_call" || item["status"] !== "completed" || typeof item["result"] !== "string") {
-      continue;
-    }
-    const output = inspectInlineImage(item["result"]);
-    if (output !== void 0) outputs.push(output);
-  }
-  return outputs.length > 0 && outputs.length <= 4 ? outputs : void 0;
-}
-function customProbeSize(input) {
-  const value = input.capability === "custom-size" && input.requestedSize !== void 0 && input.requestedSize !== "auto" ? input.requestedSize : "256x256";
-  const match = /^(?<width>[1-9]\d{1,4})x(?<height>[1-9]\d{1,4})$/u.exec(value);
-  const width = Number(match?.groups?.["width"]);
-  const height = Number(match?.groups?.["height"]);
-  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width > MAX_CAPABILITY_PROBE_PNG_DIMENSION || height > MAX_CAPABILITY_PROBE_PNG_DIMENSION || width * height > MAX_CAPABILITY_PROBE_PNG_PIXELS) {
-    throw new ProviderIntegrationError(
-      createProviderServiceError({
-        code: "invalid_request",
-        stage: "validate",
-        safeMessage: "The requested probe size exceeds Routego's bounded verification limit.",
-        capability: input.capability,
-        details: { requestedSize: value }
-      })
-    );
-  }
-  return { value, width, height };
-}
-async function resolveProbeUrls(outputs, endpoint, fetchImpl, timeoutMs) {
-  return Promise.all(outputs.map(async (output) => {
-    if (output.kind !== "url" || output.url === void 0) return output;
-    const downloaded = await downloadProviderImage(output.url, {
-      fetch: fetchImpl,
-      providerEndpoint: endpoint,
-      maximumBytes: MAX_CAPABILITY_PROBE_SUCCESS_BYTES,
-      timeoutMs
-    });
-    return {
-      kind: "inline",
-      mimeType: downloaded.mimeType,
-      width: downloaded.width,
-      height: downloaded.height,
-      hasTransparency: downloaded.hasAlpha
-    };
-  }));
-}
-function responseProvesCapability(outputs, proof, expectedSize) {
-  if (outputs === void 0) return false;
-  switch (proof) {
-    case "images-output":
-    case "images-quality-control":
-    case "responses-completed-output":
-      return outputs.length >= 1;
-    case "images-two-outputs":
-      return outputs.length >= 2;
-    case "images-custom-size":
-      return outputs.every(
-        (output) => output.width === expectedSize.width && output.height === expectedSize.height
-      );
-    case "images-jpeg-output":
-      return outputs.every((output) => output.mimeType === "image/jpeg");
-    case "images-alpha-output":
-      return outputs.every(
-        (output) => output.mimeType === "image/png" && output.hasTransparency === true
-      );
-  }
-}
-function responseBodyShape(body) {
-  if (!isRecord3(body)) return Array.isArray(body) ? "top-level-array" : typeof body;
-  const keys = Object.keys(body).filter((key) => /^[A-Za-z0-9_:-]{1,48}$/u.test(key)).sort().slice(0, 8);
-  const data = body["data"];
-  const dataShape = Array.isArray(data) ? "array" : data === null ? "null" : typeof data;
-  const firstItem = Array.isArray(data) ? data[0] : void 0;
-  const firstItemKeys = isRecord3(firstItem) ? Object.keys(firstItem).filter((key) => /^[A-Za-z0-9_:-]{1,48}$/u.test(key)).sort().slice(0, 8) : [];
-  return `object(${keys.join(",") || "no-safe-keys"});data=${dataShape}${firstItemKeys.length === 0 ? "" : `;data0=object(${firstItemKeys.join(",")})`}`;
-}
-function probeInconclusiveMessage(reason, body) {
-  switch (reason) {
-    case "returned-image-url-could-not-be-verified":
-      return "The provider accepted the request, but Routego could not safely read the returned test-image URL to verify pixels.";
-    case "returned-image-url-inspection-failed":
-      return "The provider returned a test-image URL that Routego could not inspect to verify pixels.";
-    case "capability-specific-proof-missing":
-      return `The provider accepted the request but did not return a recognizable image output for pixel verification (response ${responseBodyShape(body)}).`;
-    default:
-      return "The confirmed capability probe returned no conclusive capability evidence.";
-  }
-}
-function inconclusiveSuccess(response, reason, body) {
-  return {
-    outcome: "transient",
-    error: createProviderServiceError({
-      code: "invalid_response",
-      stage: "complete",
-      safeMessage: probeInconclusiveMessage(reason, body),
-      httpStatus: response.status,
-      mayHaveBilled: true,
-      details: {
-        responseShape: responseShape(response),
-        reason
-      }
-    })
-  };
-}
-async function defaultInterpretResponse(response, definition, options) {
-  const shape = responseShape(response);
-  if (response.ok) {
-    const contentType = response.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
-    if (contentType !== "application/json") {
-      await response.body?.cancel("inconclusive-probe-response").catch(() => void 0);
-      return inconclusiveSuccess(response, "success-content-type-not-json");
-    }
-    let body;
-    try {
-      const bytes = await readBoundedResponseBytes2(response, MAX_CAPABILITY_PROBE_SUCCESS_BYTES);
-      if (bytes.byteLength === 0) return inconclusiveSuccess(response, "empty-success-body");
-      body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
-    } catch {
-      return inconclusiveSuccess(response, "invalid-or-oversized-success-body");
-    }
-    const parsedOutputs = definition.responseProof === "responses-completed-output" ? responsesOutputs(body) : imagesOutputs(body);
-    let outputs = parsedOutputs;
-    if (outputs?.some((output) => output.kind === "url") === true) {
-      try {
-        outputs = await resolveProbeUrls(outputs, options.endpoint, options.fetch, options.timeoutMs);
-      } catch (error51) {
-        if (definition.responseProof === "images-custom-size" && error51 instanceof ProviderDownloadException) {
-          return {
-            outcome: "degraded",
-            degradedReason: "The provider accepted the requested size, but Routego could not safely read the returned test image to verify its pixels."
-          };
-        }
-        return inconclusiveSuccess(
-          response,
-          error51 instanceof ProviderDownloadException ? "returned-image-url-could-not-be-verified" : "returned-image-url-inspection-failed"
-        );
-      }
-    }
-    if (!responseProvesCapability(outputs, definition.responseProof, options.expectedSize)) {
-      return inconclusiveSuccess(response, "capability-specific-proof-missing", body);
-    }
-    const declaredState = response.headers.get("x-routego-capability-state")?.trim().toLowerCase();
-    if (declaredState === "degraded") {
-      const reason = response.headers.get("x-routego-degraded-reason")?.trim();
-      return {
-        outcome: "degraded",
-        degradedReason: reason && reason.length <= 500 ? redactProviderText(reason) : "The provider completed only a weaker confirmed fallback."
-      };
-    }
-    return { outcome: "supported" };
-  }
-  let providerCode;
-  try {
-    const bytes = await readBoundedResponseBytes2(response, MAX_CAPABILITY_PROBE_ERROR_BYTES);
-    if (bytes.byteLength > 0) {
-      const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-      providerCode = errorCodeFromBody(JSON.parse(text));
-    }
-  } catch {
-  }
-  if (response.status === 404 || response.status === 405 || response.status === 415 || response.status === 501 || (response.status === 400 || response.status === 422) && unsupportedProviderCode(providerCode)) {
-    return { outcome: "unsupported", ...providerCode ? { providerCode } : {} };
-  }
-  const code = response.status === 401 || response.status === 403 ? "auth_failed" : response.status === 429 ? "rate_limited" : response.status === 408 ? "timeout" : response.status >= 500 ? "provider_5xx" : moderationProviderCode(providerCode) ? "moderation_blocked" : "invalid_response";
-  return {
-    outcome: "transient",
-    ...providerCode ? { providerCode } : {},
-    error: createProviderServiceError({
-      code,
-      stage: "submit",
-      safeMessage: "The confirmed capability probe did not produce conclusive capability evidence.",
-      httpStatus: response.status,
-      ...providerCode === void 0 ? {} : { providerCode },
-      mayHaveBilled: true,
-      details: { responseShape: shape }
-    })
-  };
-}
-function matchingRecord(profile, input, endpointFingerprint) {
-  return profile.capabilities.find(
-    (record2) => record2.capability === input.capability && record2.scope.providerId === input.providerId && record2.scope.model === input.model && record2.scope.endpointFingerprint === endpointFingerprint && record2.scope.transport === input.transport && record2.scope.requestShape === input.requestShape
-  );
-}
-function evidence(input) {
-  return {
-    source: input.source,
-    observedAt: input.observedAt,
-    summary: input.summary,
-    requestShape: input.requestShape,
-    ...input.responseShape === void 0 ? {} : { responseShape: input.responseShape },
-    ...input.httpStatus === void 0 ? {} : { httpStatus: input.httpStatus },
-    ...input.providerCode === void 0 ? {} : { details: boundedRedactedDiagnostic({ providerCode: input.providerCode }) }
-  };
-}
-async function persistedTransientRecord(owner, profile, result, endpointFingerprint) {
-  await owner.persistCapabilityProbe(result);
-  const refreshed = await owner.getRuntimeProviderProfile(profile.id);
-  return matchingRecord(
-    refreshed,
-    {
-      providerId: result.providerId,
-      model: result.model,
-      capability: result.record.capability,
-      transport: result.record.scope.transport,
-      requestShape: result.record.scope.requestShape},
-    endpointFingerprint
-  ) ?? result.record;
-}
-async function probeProviderCapability(owner, input, options = {}) {
-  const parsedResult = capabilityProbeInputSchema.safeParse(input);
-  if (!parsedResult.success) {
-    throw new ProviderIntegrationError(
-      createProviderServiceError({
-        code: "invalid_request",
-        stage: "validate",
-        safeMessage: "A capability probe requires literal confirmation for one exact request shape."
-      })
-    );
-  }
-  const parsed = parsedResult.data;
-  const decision = evaluateCapabilityProbe({
-    confirmedByUser: parsed.confirmBillableProbe
-  });
-  if (!decision.allowed) {
-    throw new ProviderIntegrationError(
-      createProviderServiceError({
-        code: "invalid_request",
-        stage: "validate",
-        safeMessage: "The billable capability probe was not explicitly confirmed."
-      })
-    );
-  }
-  const definition = validateProbeShape(parsed);
-  const expectedSize = customProbeSize(parsed);
-  let profile;
-  try {
-    profile = await owner.getRuntimeProviderProfile(parsed.providerId);
-  } catch (error51) {
-    throw new ProviderIntegrationError(
-      toProviderServiceError(error51, {
-        code: "config_missing",
-        stage: "configure",
-        safeMessage: "The selected provider profile is unavailable."
-      }),
-      { cause: error51 }
-    );
-  }
-  if (!profile.credential) {
-    throw new ProviderIntegrationError(
-      createProviderServiceError({
-        code: "config_missing",
-        stage: "configure",
-        safeMessage: "The selected provider profile has no API key."
-      })
-    );
-  }
-  if (profile.models.length > 0 && !profile.models.includes(parsed.model) && profile.defaultModel !== parsed.model) {
-    throw new ProviderIntegrationError(
-      createProviderServiceError({
-        code: "invalid_input",
-        stage: "configure",
-        safeMessage: "The probe model is not available to the selected provider profile."
-      })
-    );
-  }
-  const descriptor2 = requestDescriptor(profile, parsed);
-  const endpointFingerprint = fingerprintProviderEndpoint(descriptor2.endpoint);
-  const scope = {
-    providerId: parsed.providerId,
-    model: parsed.model,
-    endpointFingerprint,
-    transport: parsed.transport,
-    requestShape: parsed.requestShape
-  };
-  const current = matchingRecord(profile, parsed, endpointFingerprint) ?? createUnknownCapabilityRecord(parsed.capability, scope);
-  const controller = new AbortController();
-  const timeout = setTimeout(
-    () => controller.abort("capability-probe-timeout"),
-    safeTimeout2(options.timeoutMs)
-  );
-  let response;
-  let outcome;
-  try {
-    try {
-      response = await (options.fetch ?? globalThis.fetch)(descriptor2.endpoint, {
-        ...descriptor2.request,
-        signal: controller.signal
-      });
-    } catch (error51) {
-      outcome = {
-        outcome: "transient",
-        error: createProviderServiceError({
-          code: controller.signal.aborted ? "timeout" : "invalid_response",
-          stage: "submit",
-          safeMessage: controller.signal.aborted ? "The confirmed capability probe timed out." : "The confirmed capability probe could not reach the provider.",
-          mayHaveBilled: true,
-          details: error51
-        })
-      };
-    }
-    if (response) {
-      outcome = await defaultInterpretResponse(response, definition, {
-        endpoint: descriptor2.endpoint,
-        fetch: options.fetch ?? globalThis.fetch,
-        timeoutMs: safeTimeout2(options.timeoutMs),
-        expectedSize
-      });
-    }
-  } finally {
-    clearTimeout(timeout);
-  }
-  if (outcome === void 0) {
-    throw new ProviderIntegrationError(
-      createProviderServiceError({
-        code: "internal_contract",
-        stage: "complete",
-        safeMessage: "The capability probe did not produce a bounded outcome.",
-        mayHaveBilled: response !== void 0
-      })
-    );
-  }
-  const finalOutcome = outcome;
-  const observedAt = (options.now ?? (() => /* @__PURE__ */ new Date()))().toISOString();
-  const shape = response === void 0 ? void 0 : responseShape(response);
-  const status = response?.status;
-  if (finalOutcome.outcome === "transient") {
-    const observation2 = evidence({
-      source: "transient-failure",
-      observedAt,
-      summary: "A transient provider failure preserved the prior scoped capability state.",
-      requestShape: parsed.requestShape,
-      ...shape === void 0 ? {} : { responseShape: shape },
-      ...status === void 0 ? {} : { httpStatus: status },
-      ...finalOutcome.providerCode === void 0 ? {} : { providerCode: finalOutcome.providerCode }
-    });
-    const transient = capabilityProbeResultSchema.parse({
-      schemaVersion: 1,
-      providerId: parsed.providerId,
-      model: parsed.model,
-      status: "failed",
-      record: createUnknownCapabilityRecord(parsed.capability, scope, [observation2]),
-      mayHaveBilled: true,
-      error: finalOutcome.error
-    });
-    let record3;
-    try {
-      record3 = await persistedTransientRecord(owner, profile, transient, endpointFingerprint);
-    } catch (error51) {
-      throw new ProviderIntegrationError(
-        toProviderServiceError(error51, {
-          code: "file_write_failed",
-          stage: "persist",
-          safeMessage: "The capability-probe evidence could not be saved.",
-          mayHaveBilled: true
-        }),
-        { cause: error51 }
-      );
-    }
-    return capabilityProbeResultSchema.parse({ ...transient, record: record3 });
-  }
-  const customSizeLimits = parsed.capability === "custom-size" ? { supportedSizes: [expectedSize.value] } : void 0;
-  const qualityLimits = parsed.capability === "quality-control" && parsed.requestedQuality !== void 0 ? { supportedQualities: [parsed.requestedQuality] } : void 0;
-  const observation = finalOutcome.outcome === "supported" ? {
-    outcome: "supported",
-    evidence: evidence({
-      source: "successful-request",
-      observedAt,
-      summary: "The confirmed provider request conclusively accepted this exact capability shape.",
-      requestShape: parsed.requestShape,
-      ...shape === void 0 ? {} : { responseShape: shape },
-      ...status === void 0 ? {} : { httpStatus: status }
-    }),
-    ...customSizeLimits === void 0 && qualityLimits === void 0 ? {} : { limits: { ...customSizeLimits, ...qualityLimits } }
-  } : finalOutcome.outcome === "unsupported" ? {
-    outcome: "unsupported",
-    evidence: evidence({
-      source: "protocol-rejection",
-      observedAt,
-      summary: "The provider returned a stable protocol-level rejection for this exact capability shape.",
-      requestShape: parsed.requestShape,
-      ...shape === void 0 ? {} : { responseShape: shape },
-      ...status === void 0 ? {} : { httpStatus: status },
-      ...finalOutcome.providerCode === void 0 ? {} : { providerCode: finalOutcome.providerCode }
-    })
-  } : {
-    outcome: "degraded",
-    degradedReason: redactProviderText(finalOutcome.degradedReason),
-    evidence: evidence({
-      source: "degraded-fallback",
-      observedAt,
-      summary: "The confirmed provider path completed only with weaker semantics.",
-      requestShape: parsed.requestShape,
-      ...shape === void 0 ? {} : { responseShape: shape },
-      ...status === void 0 ? {} : { httpStatus: status }
-    }),
-    ...customSizeLimits === void 0 && qualityLimits === void 0 ? {} : { limits: { ...customSizeLimits, ...qualityLimits } }
-  };
-  const record2 = transitionCapability(current, observation);
-  const result = capabilityProbeResultSchema.parse({
-    schemaVersion: 1,
-    providerId: parsed.providerId,
-    model: parsed.model,
-    status: "completed",
-    record: record2,
-    mayHaveBilled: true
-  });
-  try {
-    await owner.persistCapabilityProbe(result);
-  } catch (error51) {
-    throw new ProviderIntegrationError(
-      toProviderServiceError(error51, {
-        code: "file_write_failed",
-        stage: "persist",
-        safeMessage: "The capability-probe evidence could not be saved.",
-        mayHaveBilled: true
-      }),
-      { cause: error51 }
-    );
-  }
-  return result;
-}
-
 // src/composition/service.ts
 var DEFAULT_CHROMAKEY_POLICY = {
   contentClass: "simple",
@@ -40856,7 +39839,6 @@ function defaultChromakeyPolicy(request) {
   return request.transparentMode === "chromakey" ? DEFAULT_CHROMAKEY_POLICY : request.transparentMode === "auto" ? { ...DEFAULT_CHROMAKEY_POLICY, autoEligible: true } : void 0;
 }
 var FIXED_BATCH_CONCURRENCY = 2;
-var CODEX_MCP_SYNC_WAIT_MS = 3e5;
 function freezeSnapshot(value) {
   if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
     for (const child of Object.values(value)) freezeSnapshot(child);
@@ -41070,27 +40052,6 @@ function failureResult(request, requestId2, error51, status = error51.code === "
     failedSlots: [{ slot: 0, error: error51 }],
     relationships: [],
     error: error51
-  });
-}
-function queuedResult(request, requestId2) {
-  return imageOperationResultSchema.parse({
-    schemaVersion: 1,
-    requestId: requestId2,
-    status: "queued",
-    requestedParams: request,
-    effectiveParams: request,
-    execution: {
-      attemptCount: 0,
-      providerRequestCount: 0,
-      receivedAnyOutput: false,
-      mayHaveBilled: false,
-      degradedContinuation: false,
-      providerImageIds: []
-    },
-    finalArtifacts: [],
-    partialArtifacts: [],
-    failedSlots: [],
-    relationships: []
   });
 }
 function studioError2(error51, partialArtifacts2 = []) {
@@ -41345,16 +40306,6 @@ var ProductionLocalRoutegoService = class {
     };
     return refreshModelsResultSchema.parse(await refreshProviderModels(this.#options.library.settingsStore, parsed, options));
   }
-  async probeCapabilities(input) {
-    const parsed = capabilityProbeInputSchema.parse(input);
-    const settings = await this.#options.library.readSettings({});
-    const options = {
-      ...this.#options.capabilityProbeOptions ?? {},
-      ...this.#options.capabilityProbeOptions?.timeoutMs === void 0 ? { timeoutMs: settings.defaults.responseTimeoutMs ?? 3e5 } : {},
-      ...this.#options.fetch === void 0 ? {} : { fetch: this.#options.fetch }
-    };
-    return capabilityProbeResultSchema.parse(await probeProviderCapability(this.#options.library.settingsStore, parsed, options));
-  }
   async updateSettings(input) {
     return updateSettingsResultSchema.parse(await this.#options.library.updateSettings(updateSettingsInputSchema.parse(input)));
   }
@@ -41490,49 +40441,6 @@ var ProductionLocalRoutegoService = class {
       signal: context.signal,
       ...context.onEvent === void 0 ? {} : { onEvent: context.onEvent }
     });
-  }
-  async #persistSuccessfulDirectImageCapabilities(request, provider, creation) {
-    const isDirectReferenceGeneration = request.kind === "generate" && request.references.length > 0;
-    if (request.kind !== "edit" && !isDirectReferenceGeneration || creation.status !== "succeeded" || provider.context === void 0) {
-      return;
-    }
-    const context = isDirectReferenceGeneration ? { ...provider.context, allowUnverifiedDirectReferenceGeneration: true } : { ...provider.context, allowUnverifiedDirectEdit: true };
-    const decision = selectProviderRoute(context, request);
-    if (!decision.selected) return;
-    const capabilities = decision.requiredCapabilities.filter(
-      (capability) => request.kind === "edit" && capability === "target-edit" || capability === "single-image-input" || capability === "multi-image-input" || capability === "data-url-input" || capability === "multipart-input"
-    );
-    if (capabilities.length === 0) return;
-    const observedAt = this.#now().toISOString();
-    const evidence2 = {
-      source: "successful-request",
-      observedAt,
-      summary: isDirectReferenceGeneration ? "A user-requested direct reference-image generation completed on this exact provider route." : "A user-authorized direct image edit completed on this exact provider route.",
-      requestShape: decision.requestShape
-    };
-    await Promise.allSettled(capabilities.map(async (capability) => {
-      const result = capabilityProbeResultSchema.parse({
-        schemaVersion: 1,
-        providerId: provider.context.providerId,
-        model: provider.context.model,
-        status: "completed",
-        mayHaveBilled: creation.execution.mayHaveBilled,
-        record: {
-          capability,
-          scope: {
-            providerId: provider.context.providerId,
-            model: provider.context.model,
-            endpointFingerprint: fingerprintProviderEndpoint(decision.endpoint),
-            transport: decision.transport,
-            requestShape: decision.requestShape
-          },
-          state: "supported",
-          evidence: [evidence2],
-          verifiedAt: observedAt
-        }
-      });
-      await this.#options.library.settingsStore.persistCapabilityProbe(result);
-    }));
   }
   async #materialize(transaction, result, sourceCount) {
     const artifacts = [...result.partialArtifacts, ...result.finalArtifacts];
@@ -41727,35 +40635,6 @@ var ProductionLocalRoutegoService = class {
       signal?.removeEventListener("abort", forwardAbort);
     }
   }
-  /**
-   * Starts a long-running public operation without tying it to the lifecycle
-   * of the MCP request that submitted it. `close()` still owns cancellation
-   * and waits for this promise, so no work is orphaned during shutdown.
-   */
-  #queuePublic(input, providerSnapshot, allowUnverifiedDirectEdit = false) {
-    const requestId2 = this.#id("request");
-    const controller = new AbortController();
-    const promise2 = this.#executePublicInner(
-      requestId2,
-      input,
-      controller.signal,
-      providerSnapshot,
-      allowUnverifiedDirectEdit
-    );
-    this.#active.set(requestId2, { controller, promise: promise2 });
-    this.#activePromises.add(promise2);
-    void promise2.then(
-      () => {
-        this.#active.delete(requestId2);
-        this.#activePromises.delete(promise2);
-      },
-      () => {
-        this.#active.delete(requestId2);
-        this.#activePromises.delete(promise2);
-      }
-    );
-    return queuedResult(input, requestId2);
-  }
   async #executePublicInner(requestId2, input, signal, providerSnapshot, allowUnverifiedDirectEdit = false) {
     let transaction;
     let creationInvoked = false;
@@ -41798,7 +40677,6 @@ var ProductionLocalRoutegoService = class {
         }));
       }
       const creation = parsedCreation.data;
-      await this.#persistSuccessfulDirectImageCapabilities(staged.request, provider, creation);
       const materialized = await this.#materialize(transaction, creation, staged.graph.sourceRenditions.length);
       const normalized3 = await this.#normalizeOutputDimensions(
         staged.request,
@@ -41843,7 +40721,7 @@ var ProductionLocalRoutegoService = class {
     try {
       const defaults = await this.#publicDefaults();
       const request = resolvePublicImageRequest(input, defaults);
-      return defaults.responseTimeoutMs !== void 0 && defaults.responseTimeoutMs > CODEX_MCP_SYNC_WAIT_MS ? this.#queuePublic(request) : await this.#executePublic(request);
+      return await this.#executePublic(request);
     } catch (error51) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error51, "config_corrupt"));
     }
@@ -41860,7 +40738,7 @@ var ProductionLocalRoutegoService = class {
     try {
       const defaults = await this.#publicDefaults();
       const request = resolvePublicImageRequest(input, defaults);
-      return defaults.responseTimeoutMs !== void 0 && defaults.responseTimeoutMs > CODEX_MCP_SYNC_WAIT_MS ? this.#queuePublic(request, void 0, true) : await this.#executePublic(request, void 0, void 0, true);
+      return await this.#executePublic(request, void 0, void 0, true);
     } catch (error51) {
       return failureResult(parsed, this.#id("request"), errorFromUnknown(error51, "config_corrupt"));
     }

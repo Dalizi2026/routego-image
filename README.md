@@ -173,6 +173,8 @@ Windows 请安装独立插件 `routego-image-windows`（v1.0.5）。它与 macOS
 
 Windows 修订构建已修复宿主在打开 Studio 后关闭 MCP 通道时误停本机服务的问题；已认证的 Studio 页面会继续保持图库与生图 API 可用。
 
+Windows 当前修订构建移除了可能计费的能力验证入口和本地能力拦截；已保存的尺寸、比例、质量和格式会直接送往服务商。已保存的 4K 1:1 会保留其精确方形尺寸，不会回退为 1024×1536 等默认尺寸；超过五分钟也不会转入会在重启时丢失的内存队列。
+
 ```text
 请从 GitHub 仓库 Dalizi2026/routego-image 安装 Windows 专用 Routego Image 插件：先更新市场源，再安装 routego-image-windows；完成后告诉我版本号。
 ```
