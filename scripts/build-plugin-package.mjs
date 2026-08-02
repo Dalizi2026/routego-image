@@ -97,7 +97,9 @@ async function run(command, args, cwd, extraEnvironment = {}) {
     const child = spawn(command, args, {
       cwd,
       env: { ...childEnvironment(), ...extraEnvironment },
-      shell: false,
+      // Windows command shims such as pnpm.cmd cannot be spawned directly
+      // without cmd.exe; POSIX binaries must stay shell-free.
+      shell: process.platform === "win32",
       stdio: ["ignore", "pipe", "pipe"]
     });
     let stdout = "";
