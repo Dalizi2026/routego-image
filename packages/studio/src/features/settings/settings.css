@@ -173,55 +173,6 @@
 
 .generation-defaults__actions { display: flex; min-width: 0; align-items: center; justify-content: flex-end; gap: 10px; }
 
-.capability-probe {
-  display: grid;
-  gap: 12px;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-small);
-  background: rgba(7, 10, 8, 0.58);
-}
-.capability-probe > p,
-.capability-probe__disclosure-body > p { margin: 0; color: var(--paper-400); font-size: .78rem; line-height: 1.6; }
-.capability-probe__requirements, .capability-probe__result ul { display: grid; gap: 6px; margin: 0; padding-left: 20px; color: var(--paper-200); font-size: .78rem; }
-.capability-probe__scope { color: var(--paper-500) !important; }
-.capability-probe > button { width: fit-content; min-height: 42px; padding: 0 14px; border: 1px solid var(--amber-300); border-radius: var(--radius-small); color: var(--accent-foreground); background: var(--amber-300); font-weight: 800; cursor: pointer; }
-.capability-probe > button:disabled { cursor: wait; opacity: .65; }
-.capability-probe__message, .capability-probe__result { margin: 0; padding: 12px; border: 1px solid var(--line); font-size: .78rem; line-height: 1.55; }
-.capability-probe__message.is-failure { color: var(--red-400); }
-.capability-probe__result { display: grid; gap: 8px; }
-.capability-probe__result.is-success { border-color: var(--cyan-300); color: var(--cyan-300); }
-.capability-probe__result.is-warning { border-color: var(--amber-400); color: var(--paper-100); }
-.capability-probe__result p { margin: 0; color: var(--paper-300); }
-
-.capability-probe--compact {
-  display: flex;
-  min-width: 0;
-  gap: 8px;
-  padding: 0;
-  align-items: center;
-  border: 0;
-  background: transparent;
-}
-.capability-probe--compact .capability-probe__disclosure { order: 2; }
-.capability-probe--compact .capability-probe__disclosure > summary { color: var(--paper-400); cursor: pointer; font-size: 0.72rem; white-space: nowrap; }
-.capability-probe--compact .capability-probe__disclosure-body {
-  position: absolute;
-  right: 14px;
-  bottom: calc(100% + 8px);
-  display: grid;
-  width: min(520px, calc(100vw - 52px));
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-small);
-  background: var(--ink-900);
-  box-shadow: var(--shadow-panel);
-}
-.capability-probe--compact > button { order: 1; }
-.capability-probe--compact > .capability-probe__message,
-.capability-probe--compact > .capability-probe__result { position: absolute; right: 14px; bottom: calc(100% + 8px); width: min(520px, calc(100vw - 52px)); background: var(--ink-900); box-shadow: var(--shadow-panel); }
-
 @media (max-width: 1040px) {
   .generation-defaults__current-grid { grid-template-columns: minmax(140px, 0.8fr) minmax(220px, 1.2fr); }
   .generation-defaults__current-grid > :last-child { grid-column: 1 / -1; }
@@ -264,8 +215,6 @@
   .generation-defaults__grid--output > :first-child,
   .generation-defaults__grid--output > :last-child { grid-column: auto; }
   .generation-defaults__actions { display: grid; grid-template-columns: minmax(0, 1fr); }
-  .capability-probe--compact { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
-  .capability-probe--compact > button,
   .generation-defaults__save { width: 100%; }
   .studio-shell--sidebar .generation-defaults { padding-bottom: 190px; }
 }
@@ -1537,10 +1486,6 @@
 /* Light mode shares every measurement with the dark theme; only surfaces change. */
 .studio-shell[data-theme="light"] .generation-defaults__group,
 .studio-shell[data-theme="light"] .generation-defaults__action-bar,
-.studio-shell[data-theme="light"] .capability-probe,
-.studio-shell[data-theme="light"] .capability-probe__disclosure-body,
-.studio-shell[data-theme="light"] .capability-probe--compact > .capability-probe__message,
-.studio-shell[data-theme="light"] .capability-probe--compact > .capability-probe__result,
 .studio-shell[data-theme="light"] .provider-manager,
 .studio-shell[data-theme="light"] .provider-manager__picker,
 .studio-shell[data-theme="light"] .provider-manager__summary,
@@ -1563,11 +1508,6 @@
 .studio-shell[data-theme="light"] .provider-manager input,
 .studio-shell[data-theme="light"] .provider-manager select {
   background: rgba(255, 255, 255, 0.92);
-}
-
-.studio-shell[data-theme="light"] .capability-probe--compact {
-  background: transparent;
-  box-shadow: none;
 }
 
 /* Workbench reference composition.  The shell owns the header and bottom
@@ -1759,19 +1699,12 @@
   gap: 18px;
 }
 
-.studio-shell--sidebar .capability-probe--compact > button,
 .studio-shell--sidebar .generation-defaults__save {
   min-height: 60px;
   padding: 0 22px;
   border-radius: 7px;
   font-size: 1rem;
   font-weight: 650;
-}
-
-.studio-shell--sidebar .capability-probe--compact > button {
-  border-color: var(--paper-100);
-  color: var(--paper-100);
-  background: transparent;
 }
 
 .studio-shell--sidebar .generation-defaults__save {
@@ -1869,7 +1802,6 @@
     gap: 8px;
   }
 
-  .studio-shell--sidebar .capability-probe--compact > button,
   .studio-shell--sidebar .generation-defaults__save {
     width: 100%;
   }
@@ -2012,7 +1944,6 @@
 
 .studio-shell--sidebar .generation-defaults__summary,
 .studio-shell--sidebar .generation-defaults__save,
-.studio-shell--sidebar .capability-probe--compact > button,
 .studio-shell--sidebar .provider-manager button,
 .studio-shell--sidebar .provider-manager__summary span {
   font-size: 0.84rem;
@@ -2059,7 +1990,6 @@
 
   .studio-shell--sidebar .generation-defaults__summary,
   .studio-shell--sidebar .generation-defaults__save,
-  .studio-shell--sidebar .capability-probe--compact > button,
   .studio-shell--sidebar .provider-manager button,
   .studio-shell--sidebar .provider-manager__summary span {
     font-size: 0.78rem;

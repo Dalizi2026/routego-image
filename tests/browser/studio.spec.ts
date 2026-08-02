@@ -470,7 +470,6 @@ test("first run connects a provider and begins the current guided defaults flow"
     .filter((pathname) =>
       pathname.startsWith("/api/v1/") &&
       (pathname === "/api/v1/settings/providers/refresh-models" ||
-        pathname === "/api/v1/settings/providers/capability-probe" ||
         pathname.includes("/creation/stream"))
     );
   expect(requestedOperations).toEqual(["/api/v1/settings/providers/refresh-models"]);
