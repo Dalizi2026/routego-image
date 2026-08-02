@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "name": "routego-image-windows",
-  "version": "1.0.0+codex.20260802",
+  "version": "1.0.5+codex.20260802",
   "node": ">=20.19.0",
   "files": [
     {
       "path": ".codex-plugin/plugin.json",
       "bytes": 1448,
-      "sha256": "50cbbb6990f52ad4a0b025ef37417c20bcb80122df6de5f9ae23aaeefbe404ca"
+      "sha256": "1176a4e57330b901d5afe5b3d32f90680bcab7f447255388448ac77697c20234"
     },
     {
       "path": "assets/composer-icon.png",

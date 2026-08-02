@@ -169,7 +169,7 @@ Studio 支持深色和浅色模式，也会在窄屏下调整新手引导位置�
 
 ## Windows 专用版
 
-Windows 请安装独立插件 `routego-image-windows`（v1.0.0），它使用独立的本地配置与运行目录，不会覆盖 macOS 版的设置或图库。
+Windows 请安装独立插件 `routego-image-windows`（v1.0.5）。它与 macOS 版共享相同的公开功能版本号，但使用独立的本地配置与运行目录，不会覆盖 macOS 版的设置或图库。
 
 ```text
 请从 GitHub 仓库 Dalizi2026/routego-image 安装 Windows 专用 Routego Image 插件：先更新市场源，再安装 routego-image-windows；完成后告诉我版本号。
