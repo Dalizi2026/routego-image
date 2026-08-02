@@ -1,0 +1,36 @@
+{
+  "name": "routego-image-windows",
+  "version": "1.0.0+codex.20260802",
+  "description": "Create, edit, organize, and review images with the local Routego Image Windows runtime.",
+  "author": {
+    "name": "Routego Image"
+  },
+  "skills": "./skills/",
+  "mcpServers": {
+    "routego-image-windows": {
+      "command": "node",
+      "args": [
+        "./scripts/start-routego-image-windows.mjs"
+      ],
+      "cwd": "."
+    }
+  },
+  "interface": {
+    "displayName": "Routego Image for Windows v1.0.0",
+    "shortDescription": "Windows 专用的本地图片生成、编辑、图库与 Studio 工作流。\nWindows-local image creation, editing, Library, and Studio workflows.",
+    "longDescription": "面向 Windows 的独立 Routego Image 运行时，提供安全网络响应诊断、图片生成、编辑、图库与 Studio 工作流。\nA Windows-specific Routego Image runtime with safe network-response diagnostics, image creation, editing, Library, and Studio workflows.",
+    "developerName": "Routego Image",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "配置 Routego Image Windows\nConfigure Routego Image Windows",
+      "生成或编辑一张图片\nGenerate or edit an image",
+      "打开 Routego Image Windows Studio\nOpen Routego Image Windows Studio"
+    ],
+    "composerIcon": "./assets/composer-icon.png",
+    "logo": "./assets/logo.png"
+  }
+}

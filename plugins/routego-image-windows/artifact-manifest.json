@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "name": "routego-image-windows",
+  "version": "1.0.0+codex.20260802",
+  "node": ">=20.19.0",
+  "files": [
+    {
+      "path": ".codex-plugin/plugin.json",
+      "bytes": 1448,
+      "sha256": "50cbbb6990f52ad4a0b025ef37417c20bcb80122df6de5f9ae23aaeefbe404ca"
+    },
+    {
+      "path": "assets/composer-icon.png",
+      "bytes": 8201,
+      "sha256": "0924eb335c7b4e1c301d700b2e50d6d3dc5c575e31120946c566c0fdf13775ff"
+    },
+    {
+      "path": "assets/logo.png",
+      "bytes": 92793,
+      "sha256": "4f3a3a9b53f04258d0dcb784c7a005d6023bd8f30f2392ce471887ff6ffc4cec"
+    },
+    {
+      "path": "licenses/gpt_image_playground-MIT.txt",
+      "bytes": 1066,
+      "sha256": "e5d6bb44052f9a560528bef0e49d4bbf246837c3286f879996ee42ab17bb341d"
+    },
+    {
+      "path": "licenses/onnxruntime-web-MIT.txt",
+      "bytes": 1074,
+      "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+    },
+    {
+      "path": "licenses/pngjs-MIT.txt",
+      "bytes": 1150,
+      "sha256": "be75ef59c5cf59715588a17a82dff7dd3e83c4dba3c458676bb9311e05fbedc5"
+    },
+    {
+      "path": "licenses/u2netp-Apache-2.0.txt",
+      "bytes": 9944,
+      "sha256": "44ad51c5f588276b85d65f599087034c3a3c957f67cb8f7de92bb9b58cad9bb3"
+    },
+    {
+      "path": "resources/background-removal/ort-wasm-simd-threaded.jsep.wasm",
+      "bytes": 21663894,
+      "sha256": "185b0861a6cd6cbdfb057289338090436483cc59e10a7bc83bd167b15531a51b"
+    },
+    {
+      "path": "resources/background-removal/ort-wasm-simd-threaded.mjs",
+      "bytes": 24618,
+      "sha256": "745eb7c0ce6f18a6aa521971b2877babc7ffb27eecb58ab3bc6e5ef4692672e8"
+    },
+    {
+      "path": "resources/background-removal/ort-wasm-simd-threaded.wasm",
+      "bytes": 11246032,
+      "sha256": "207d02be4591c156b0a98f024f3d58005b5b04c92274d759fb390338c63559ea"
+    },
+    {
+      "path": "resources/background-removal/u2netp.onnx",
+      "bytes": 4574861,
+      "sha256": "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8"
+    },
+    {
+      "path": "runtime/index.js",
+      "bytes": 1699479,
+      "sha256": "aa14e8cd04a67830fc0b57443fe03b39be645e3b0c05c3bf74af97c08910ba1a"
+    },
+    {
+      "path": "runtime/resource-manifest.json",
+      "bytes": 1770,
+      "sha256": "ec157b108fd4b5227738d0d5a65562cca2dfb4e7b92723b35ea0a17b04dde68a"
+    },
+    {
+      "path": "runtime/studio-assets.json",
+      "bytes": 312,
+      "sha256": "fbfa6e9a1d2c1e81294154d71383149c3d27ac2a3ada602e9386cfb480a4cbe2"
+    },
+    {
+      "path": "runtime/studio/assets/index-C1msOYkR.css",
+      "bytes": 120006,
+      "sha256": "f75144297b7e77d1c444ae9db1595fcc6bb6a8870c49917470551289f8bb019a"
+    },
+    {
+      "path": "runtime/studio/assets/index-Ch_LRS0o.js",
+      "bytes": 437931,
+      "sha256": "836d05bd2f9977d7d68f60668fa2d05c398f34376e934d996ae9a13c8315fa07"
+    },
+    {
+      "path": "scripts/start-routego-image-windows.mjs",
+      "bytes": 3020,
+      "sha256": "c6f460e0f57e1eafdbd68eeed916a48d7a16e0add171a73e7faaf5750b3ed64a"
+    },
+    {
+      "path": "skills/routego-image-windows/SKILL.md",
+      "bytes": 1477,
+      "sha256": "f05c52fa002bb74e3f3ab9a9c2f7223eba099eb73448666a9ab06445c485397e"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 3465,
+      "sha256": "7d1941273a9b72d725b37b2ee1f14764a79252d7e6450b3a4183353b0f480aa5"
+    }
+  ]
+}
