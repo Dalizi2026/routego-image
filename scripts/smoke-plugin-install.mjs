@@ -736,6 +736,7 @@ function childEnvironment(paths) {
   return {
     PATH: process.env.PATH ?? "",
     HOME: paths.home,
+    USERPROFILE: paths.home,
     CODEX_HOME: paths.codexHome,
     TMPDIR: paths.temp,
     TMP: paths.temp,
