@@ -323,9 +323,11 @@ export async function openStudio(
   await installSyntheticFaviconBoundary(page);
   await installSyntheticStudioBootstrap(page);
   await page.goto("/");
-  await page.getByRole("heading", {
-    name: options.firstRun ? "完成首次连接" : "把想法放进显影盘"
-  }).waitFor();
+  if (options.firstRun) {
+    await page.getByRole("heading", { name: "供应商管理" }).waitFor();
+    return;
+  }
+  await page.locator("main h1").first().waitFor();
 }
 
 export const syntheticPng = {
