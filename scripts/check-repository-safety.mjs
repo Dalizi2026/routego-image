@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,6 +36,16 @@ const rasterExtensions = new Set([
   ".webp"
 ]);
 const allowedRasterRoots = [".codex-plugin/", "assets/", "packages/studio/public/"];
+const pinnedLargeRuntimeResources = new Map([
+  [
+    "packages/integration/resources/background-removal/ort-wasm-simd-threaded.jsep.wasm",
+    "185b0861a6cd6cbdfb057289338090436483cc59e10a7bc83bd167b15531a51b"
+  ],
+  [
+    "packages/integration/resources/background-removal/ort-wasm-simd-threaded.wasm",
+    "207d02be4591c156b0a98f024f3d58005b5b04c92274d759fb390338c63559ea"
+  ]
+]);
 const syntheticMarkers = [
   "redacted",
   "dummy",
@@ -131,11 +142,15 @@ for (const file of trackedFiles) {
   }
 
   const absolutePath = path.join(repositoryRoot, ...segments);
+  const buffer = readFileSync(absolutePath);
   if (statSync(absolutePath).size > 5 * 1024 * 1024) {
-    report(file, "tracked file exceeds the repository safety size limit");
+    const expectedHash = pinnedLargeRuntimeResources.get(file);
+    const actualHash = createHash("sha256").update(buffer).digest("hex");
+    if (expectedHash !== actualHash) {
+      report(file, "tracked file exceeds the repository safety size limit or does not match its pinned runtime hash");
+    }
     continue;
   }
-  const buffer = readFileSync(absolutePath);
   if (buffer.includes(0)) {
     continue;
   }
