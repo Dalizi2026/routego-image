@@ -22,7 +22,7 @@ const BACKGROUND_REMOVAL_RESOURCES = new Map([
 ]);
 const MINIMUM_RAW_BASE64_PAYLOAD_CHARS = 96;
 const ACCEPTED_PLUGIN_VERSION = /^1\.0\.7(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
-const ACCEPTED_PLUGIN_MANIFEST = {
+const MAC_PLUGIN_MANIFEST = {
   name: "routego-image",
   description: "Create, edit, organize, and review images with the local Routego Image runtime.",
   author: {
@@ -52,8 +52,7 @@ const ACCEPTED_PLUGIN_MANIFEST = {
     logo: "./assets/logo.png"
   }
 };
-const ACCEPTED_PLUGIN_DISPLAY_NAMES = new Set(["Routego Image v1.0.7"]);
-const EXACT_FILES = new Set([
+const MAC_EXACT_FILES = new Set([
   ".codex-plugin/plugin.json",
   "assets/composer-icon.png",
   "assets/logo.png",
@@ -68,6 +67,56 @@ const EXACT_FILES = new Set([
   "licenses/u2netp-Apache-2.0.txt",
   "licenses/onnxruntime-web-MIT.txt",
   ARTIFACT_MANIFEST
+]);
+const WINDOWS_PLUGIN_MANIFEST = {
+  name: "routego-image-windows",
+  description: "Create, edit, organize, and review images with the local Routego Image Windows runtime.",
+  author: {
+    name: "Routego Image"
+  },
+  skills: "./skills/",
+  mcpServers: {
+    "routego-image-windows": {
+      command: "node",
+      args: ["./scripts/start-routego-image-windows.mjs"],
+      cwd: "."
+    }
+  },
+  interface: {
+    displayName: "Routego Image for Windows v1.0.7",
+    shortDescription: "Windows 专用的本地图片生成、编辑、图库与 Studio 工作流。\nWindows-local image creation, editing, Library, and Studio workflows.",
+    longDescription: "面向 Windows 的独立 Routego Image 运行时，提供图片生成、编辑、图库与持续可用的 Studio 工作流。\nA Windows-specific Routego Image runtime with image creation, editing, Library, and persistent Studio workflows.",
+    developerName: "Routego Image",
+    category: "Productivity",
+    capabilities: ["Interactive", "Write"],
+    defaultPrompt: [
+      "配置 Routego Image Windows\nConfigure Routego Image Windows",
+      "生成或编辑一张图片\nGenerate or edit an image",
+      "打开 Routego Image Windows Studio\nOpen Routego Image Windows Studio"
+    ],
+    composerIcon: "./assets/composer-icon.png",
+    logo: "./assets/logo.png"
+  }
+};
+const WINDOWS_EXACT_FILES = new Set([
+  ".codex-plugin/plugin.json",
+  "assets/composer-icon.png",
+  "assets/logo.png",
+  "skills/routego-image-windows/SKILL.md",
+  "scripts/start-routego-image-windows.mjs",
+  "runtime/index.js",
+  "runtime/resource-manifest.json",
+  "runtime/studio-assets.json",
+  "THIRD_PARTY_NOTICES.md",
+  "licenses/gpt_image_playground-MIT.txt",
+  "licenses/pngjs-MIT.txt",
+  "licenses/u2netp-Apache-2.0.txt",
+  "licenses/onnxruntime-web-MIT.txt",
+  ARTIFACT_MANIFEST
+]);
+const PACKAGE_VARIANTS = new Map([
+  ["routego-image", { name: "routego-image", manifest: MAC_PLUGIN_MANIFEST, exactFiles: MAC_EXACT_FILES }],
+  ["routego-image-windows", { name: "routego-image-windows", manifest: WINDOWS_PLUGIN_MANIFEST, exactFiles: WINDOWS_EXACT_FILES }]
 ]);
 const FORBIDDEN_SEGMENTS = new Set([
   "node_modules",
@@ -157,8 +206,8 @@ async function readJson(root, relativePath) {
   return value;
 }
 
-function validateContentManifest(value, expectedVersion) {
-  if (!plainObject(value) || value.schemaVersion !== 1 || value.name !== "routego-image" ||
+function validateContentManifest(value, expectedVersion, variant) {
+  if (!plainObject(value) || value.schemaVersion !== 1 || value.name !== variant.name ||
       value.version !== expectedVersion || value.node !== ">=20.19.0" || !Array.isArray(value.files)) {
     fail("artifact-manifest.json has an invalid shape");
   }
@@ -181,18 +230,13 @@ function validateContentManifest(value, expectedVersion) {
   return { schemaVersion: 1, name: value.name, version: value.version, node: value.node, files: entries };
 }
 
-function validatePluginManifest(value) {
+function validatePluginManifest(value, variant) {
   const version = plainObject(value) ? value.version : undefined;
-  const displayName = plainObject(value) && plainObject(value.interface)
-    ? value.interface.displayName
-    : undefined;
-  const acceptedManifest = typeof displayName === "string" && ACCEPTED_PLUGIN_DISPLAY_NAMES.has(displayName)
-    ? {
-        ...ACCEPTED_PLUGIN_MANIFEST,
-        version,
-        interface: { ...ACCEPTED_PLUGIN_MANIFEST.interface, displayName }
-      }
-    : undefined;
+  const acceptedManifest = {
+    ...variant.manifest,
+    version,
+    interface: { ...variant.manifest.interface }
+  };
   if (typeof version !== "string" || !ACCEPTED_PLUGIN_VERSION.test(version) ||
       !isDeepStrictEqual(value, acceptedManifest)) {
     fail("the Codex plugin manifest does not exactly match the accepted canonical manifest");
@@ -240,7 +284,7 @@ function validateStudioManifest(value, fileSet) {
   }
 }
 
-function validateAllowlist(files) {
+function validateAllowlist(files, variant) {
   for (const file of files) {
     const segments = file.toLowerCase().split("/");
     if (segments.some((segment) => FORBIDDEN_SEGMENTS.has(segment)) ||
@@ -248,7 +292,7 @@ function validateAllowlist(files) {
         file.endsWith(".tsx") || file.endsWith(".env") || file.includes("binding.gyp")) {
       fail(`a forbidden path is present: ${file}`);
     }
-    if (!EXACT_FILES.has(file) && !file.startsWith("runtime/studio/assets/") &&
+    if (!variant.exactFiles.has(file) && !file.startsWith("runtime/studio/assets/") &&
         !file.startsWith("resources/background-removal/")) {
       fail(`a file is not allowlisted: ${file}`);
     }
@@ -336,22 +380,26 @@ function validateTextSecurity(relativePath, text, packageRoot) {
 
 export async function verifyPluginPackage(packageDirectory) {
   const requestedRoot = path.resolve(packageDirectory);
+  const variant = PACKAGE_VARIANTS.get(path.basename(requestedRoot));
+  if (variant === undefined) {
+    fail("the package root must be named routego-image or routego-image-windows");
+  }
   const requestedRootStats = await lstat(requestedRoot);
   if (requestedRootStats.isSymbolicLink()) {
     fail("the package root must not be a symbolic link");
   }
-  if (!requestedRootStats.isDirectory() || path.basename(requestedRoot) !== "routego-image") {
-    fail("the package root must be a real directory named routego-image");
+  if (!requestedRootStats.isDirectory()) {
+    fail("the package root must be a real plugin directory");
   }
   const root = await realpath(requestedRoot);
   const files = await collectFiles(root);
-  validateAllowlist(files);
+  validateAllowlist(files, variant);
   const fileSet = new Set(files);
-  for (const required of EXACT_FILES) {
+  for (const required of variant.exactFiles) {
     if (!fileSet.has(required)) fail(`a required file is missing: ${required}`);
   }
 
-  const pluginVersion = validatePluginManifest(await readJson(root, ".codex-plugin/plugin.json"));
+  const pluginVersion = validatePluginManifest(await readJson(root, ".codex-plugin/plugin.json"), variant);
   const artifactManifestBytes = await boundedRead(path.join(root, ARTIFACT_MANIFEST));
   let artifactManifestValue;
   try {
@@ -359,7 +407,7 @@ export async function verifyPluginPackage(packageDirectory) {
   } catch {
     fail("artifact-manifest.json is not valid UTF-8 JSON");
   }
-  const contentManifest = validateContentManifest(artifactManifestValue, pluginVersion);
+  const contentManifest = validateContentManifest(artifactManifestValue, pluginVersion, variant);
   const expected = [...files]
     .filter((file) => file !== ARTIFACT_MANIFEST)
     .sort((left, right) => left.localeCompare(right, "en"));

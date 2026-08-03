@@ -270,6 +270,37 @@ describe("task 4.3 MCP process protocol", () => {
     expect(service.close).toHaveBeenCalledTimes(1);
   });
 
+  it("keeps the Windows Studio HTTP host alive after Codex closes MCP STDIO", async () => {
+    const input = new ControlledInput();
+    const output = new MemoryOutput();
+    const service = managedService();
+    const http = httpLifecycle();
+    const signalEmitter = new EventEmitter();
+    const signals = signalEmitter as RuntimeSignalSource;
+    const runtime = createRoutegoMcpProcess({
+      service,
+      httpLifecycle: http,
+      input,
+      output,
+      error: new MemoryOutput(),
+      signalSource: signals,
+      retainHttpOnMcpDisconnect: true
+    });
+
+    await runtime.start();
+    input.end();
+    await vi.waitFor(() => {
+      expect(runtime.closed).toBe(false);
+    });
+    expect(http.shutdown).not.toHaveBeenCalled();
+    expect(service.close).not.toHaveBeenCalled();
+
+    signalEmitter.emit("SIGTERM");
+    await runtime.waitUntilClosed();
+    expect(http.shutdown).toHaveBeenCalledTimes(1);
+    expect(service.close).toHaveBeenCalledTimes(1);
+  });
+
   it("preserves Studio launch content, coexists with HTTP, and keeps serving after a call failure", async () => {
     const studioResult = routegoOpenStudioResultSchema.parse({
       schemaVersion: 1,

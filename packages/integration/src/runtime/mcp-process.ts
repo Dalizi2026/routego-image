@@ -90,6 +90,12 @@ interface RoutegoMcpProcessConstructionOptions {
   readonly diagnose: RoutegoProcessDiagnosticSink;
   readonly maximumLineBytes?: number;
   readonly shutdownTimeoutMs?: number;
+  /**
+   * Windows Codex hosts can close STDIO after handing a Studio URL to the
+   * browser. Keep the loopback Studio host alive until an explicit signal
+   * instead of treating that disconnect as a process-wide shutdown.
+   */
+  readonly retainHttpOnMcpDisconnect?: boolean;
 }
 
 export interface CreateRoutegoMcpProcessOptions {
@@ -102,6 +108,7 @@ export interface CreateRoutegoMcpProcessOptions {
   readonly logger?: RoutegoProcessDiagnosticSink;
   readonly maximumLineBytes?: number;
   readonly shutdownTimeoutMs?: number;
+  readonly retainHttpOnMcpDisconnect?: boolean;
 }
 
 type ServiceOverrides = Omit<
@@ -133,6 +140,8 @@ export interface ProductionRoutegoMcpProcessOptions {
   readonly entryModuleRoute: string;
   readonly styleRoutes?: readonly string[];
   readonly homeDirectory?: string;
+  /** Root for the Windows edition's configuration, credentials, and Library. */
+  readonly dataRoot?: string;
   readonly runtimeRoot?: string;
   readonly stagingRoot?: string;
   readonly library?: RoutegoLibraryService;
@@ -148,6 +157,7 @@ export interface ProductionRoutegoMcpProcessOptions {
   readonly logger?: RoutegoProcessDiagnosticSink;
   readonly maximumLineBytes?: number;
   readonly shutdownTimeoutMs?: number;
+  readonly retainHttpOnMcpDisconnect?: boolean;
 }
 
 /**
@@ -392,12 +402,17 @@ export class RoutegoMcpProcess {
         if (this.#closing) return;
         await this.#server.handleChunk(chunk);
         if (this.#server.closed) {
+          if (this.#options.retainHttpOnMcpDisconnect === true) return;
           await this.shutdown("mcp-shutdown");
           return;
         }
       }
       if (this.#closing) return;
       await this.#server.finish();
+      if (this.#options.retainHttpOnMcpDisconnect === true) {
+        this.#server.shutdown();
+        return;
+      }
       await this.shutdown(this.#server.closed ? "mcp-shutdown" : "stdin-eof");
     } catch (error) {
       if (!this.#closing) {
@@ -492,7 +507,10 @@ export function createRoutegoMcpProcess(options: CreateRoutegoMcpProcessOptions)
       : { maximumLineBytes: options.maximumLineBytes }),
     ...(options.shutdownTimeoutMs === undefined
       ? {}
-      : { shutdownTimeoutMs: options.shutdownTimeoutMs })
+      : { shutdownTimeoutMs: options.shutdownTimeoutMs }),
+    ...(options.retainHttpOnMcpDisconnect === undefined
+      ? {}
+      : { retainHttpOnMcpDisconnect: options.retainHttpOnMcpDisconnect })
   });
 }
 
@@ -509,7 +527,15 @@ export async function createProductionRoutegoMcpProcess(
     options.runtimeRoot ?? path.join(selectedHome, ".codex", "routego-image", "runtime")
   );
   const stagingRoot = resolveProductionStagingRoot(runtimeRoot, options.stagingRoot);
-  const library = options.library ?? createRoutegoLibraryService({ homeDirectory: selectedHome });
+  const dataRoot = options.dataRoot === undefined ? undefined : path.resolve(options.dataRoot);
+  const library = options.library ?? createRoutegoLibraryService({
+    homeDirectory: selectedHome,
+    ...(dataRoot === undefined ? {} : {
+      settings: { dataRoot },
+      uploads: { dataRoot },
+      index: { root: path.join(dataRoot, "library") }
+    })
+  });
   const ownsEphemeralResources = options.ephemeralResources === undefined;
   const ephemeralResources = options.ephemeralResources ??
     await createEphemeralImageResourceRegistry({ root: path.join(runtimeRoot, "ephemeral") });
@@ -577,7 +603,10 @@ export async function createProductionRoutegoMcpProcess(
         : { maximumLineBytes: options.maximumLineBytes }),
       ...(options.shutdownTimeoutMs === undefined
         ? {}
-        : { shutdownTimeoutMs: options.shutdownTimeoutMs })
+        : { shutdownTimeoutMs: options.shutdownTimeoutMs }),
+      ...(options.retainHttpOnMcpDisconnect === undefined
+        ? {}
+        : { retainHttpOnMcpDisconnect: options.retainHttpOnMcpDisconnect })
     });
   } catch (error) {
     if (ownsEphemeralResources) await ephemeralResources.shutdown().catch(() => 0);
