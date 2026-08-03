@@ -3,8 +3,6 @@ import { createHash } from "node:crypto";
 import {
   confirmLegacyLibraryMigrationInputSchema,
   confirmLegacyLibraryMigrationResultSchema,
-  capabilityProbeInputSchema,
-  capabilityProbeResultSchema,
   discardUploadResourceInputSchema,
   discardUploadResourceResultSchema,
   executeLibraryMutationInputSchema,
@@ -68,8 +66,6 @@ import {
   upsertProviderProfileInputSchema,
   upsertProviderProfileResultSchema,
   type BrowserResourceDescriptor,
-  type CapabilityProbeInput,
-  type CapabilityProbeResult,
   type ConfirmLegacyLibraryMigrationInput,
   type ConfirmLegacyLibraryMigrationResult,
   type DiscardUploadResourceInput,
@@ -1142,59 +1138,6 @@ export class MockRoutegoService implements LocalRoutegoService {
       billable: false,
       models,
       refreshedAt: this.#timestamp()
-    });
-  }
-
-  async probeCapabilities(input: CapabilityProbeInput): Promise<CapabilityProbeResult> {
-    const parsed = capabilityProbeInputSchema.parse(input);
-    const fixture = this.#fixture("probeCapabilities");
-    if (fixture === "invalid-output") {
-      return invalidOutput<CapabilityProbeResult>();
-    }
-    const failed = fixture === "failure" || fixture === "partial";
-    const state = failed ? "unknown" : fixture === "degraded" ? "degraded" : "supported";
-    const source = failed
-      ? "transient-failure"
-      : fixture === "degraded"
-        ? "degraded-fallback"
-        : "successful-request";
-    const record = {
-      capability: parsed.capability,
-      scope: {
-        providerId: parsed.providerId,
-        model: parsed.model,
-        endpointFingerprint: "a".repeat(64),
-        transport: parsed.transport,
-        requestShape: parsed.requestShape
-      },
-      state,
-      evidence: [
-        {
-          source,
-          observedAt: this.#timestamp(),
-          summary: failed
-            ? "A synthetic transient failure preserved the prior capability state."
-            : fixture === "degraded"
-              ? "A synthetic fallback completed with weaker semantics."
-              : "A synthetic provider-shaped request completed successfully.",
-          requestShape: parsed.requestShape
-        }
-      ],
-      ...(!failed ? { verifiedAt: this.#timestamp() } : {}),
-      ...(fixture === "degraded"
-        ? { degradedReason: "The previous output must be uploaded as a new target." }
-        : {})
-    } as const;
-    return capabilityProbeResultSchema.parse({
-      schemaVersion: 1,
-      providerId: parsed.providerId,
-      model: parsed.model,
-      status: failed ? "failed" : "completed",
-      record,
-      mayHaveBilled: !failed,
-      ...(failed
-        ? { error: this.#error("timeout", "The synthetic capability probe timed out.") }
-        : {})
     });
   }
 

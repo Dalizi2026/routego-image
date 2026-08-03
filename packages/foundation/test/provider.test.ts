@@ -387,7 +387,7 @@ describe("provider route selection", () => {
     }
   });
 
-  it("requires evidence for every non-default requested feature", () => {
+  it("forwards explicit provider parameters without separate capability evidence", () => {
     const featureCapabilities: ProviderCapability[] = [
       "native-variants",
       "custom-size",
@@ -432,15 +432,14 @@ describe("provider route selection", () => {
       selectProviderRoute(context(records, { preferredTransports: ["single-endpoint-json"] }), request)
     ).toMatchObject({ selected: true });
 
-    const withoutModeration = records.filter((record) => record.capability !== "moderation");
-    const unavailable = selectProviderRoute(
-      context(withoutModeration, { preferredTransports: ["single-endpoint-json"] }),
+    const withoutProviderControls = records.filter((record) =>
+      !["custom-size", "quality-control", "output-format", "compression", "moderation"].includes(record.capability)
+    );
+    const selectedWithoutProbe = selectProviderRoute(
+      context(withoutProviderControls, { preferredTransports: ["single-endpoint-json"] }),
       request
     );
-    expect(unavailable.selected).toBe(false);
-    if (!unavailable.selected) {
-      expect(unavailable.missingCapabilities).toContain("moderation");
-    }
+    expect(selectedWithoutProbe).toMatchObject({ selected: true });
 
     const nativeTransparency = selectProviderRoute(
       context(

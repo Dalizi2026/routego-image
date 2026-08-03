@@ -44,7 +44,9 @@ export function normalizeVisibleControls(
   const format = controls.transparentMode === "off" ? controls.format : "png";
   const transparentMode = format === "png" ? controls.transparentMode : "off";
   return {
-    size: controls.aspectRatio === "auto" ? controls.size : "auto",
+    // Settings keep an exact size together with its descriptive ratio. The
+    // provider accepts one sizing control, so exact saved dimensions win.
+    size: controls.size,
     aspectRatio: controls.size === "auto" ? controls.aspectRatio : "auto",
     format,
     count: controls.count,

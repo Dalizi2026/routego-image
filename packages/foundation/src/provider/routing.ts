@@ -186,10 +186,14 @@ function requestedFeatureCapabilities(request: ImageOperationRequest): ProviderC
 }
 
 function isProviderDrivenControl(capability: ProviderCapability): boolean {
-  // Size and format are explicit provider controls whose results can be verified
-  // from the returned artifact. Forward them once and fail closed on a mismatch
-  // instead of requiring a separate, potentially billable probe first.
-  return capability === "custom-size" || capability === "output-format";
+  // These are explicit request controls. Do not reject a user-selected value
+  // merely because no separate capability probe has run; the provider is the
+  // authority for compatibility and can return a concrete parameter error.
+  return capability === "custom-size" ||
+    capability === "output-format" ||
+    capability === "quality-control" ||
+    capability === "compression" ||
+    capability === "moderation";
 }
 
 function transparencyFor(

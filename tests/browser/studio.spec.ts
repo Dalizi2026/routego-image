@@ -400,13 +400,10 @@ test("secure boot blocks missing and rejected sessions, then keeps a valid local
     return { position: style.position, bottom: style.bottom };
   });
   expect(mobileNavigation).toEqual({ position: "fixed", bottom: "0px" });
-  await page.getByRole("navigation", { name: "Studio main navigation" }).getByRole("button", { name: "Settings" }).click();
-  await expect(page.getByRole("heading", { name: "Image API settings" })).toBeVisible();
-  await expect(page.getByLabel("Call endpoint")).toBeVisible();
-  await expect(page.getByLabel("API Key")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Connect and fetch models" })).toBeVisible();
-  await expect(page.locator("details.settings-advanced")).not.toHaveAttribute("open", "");
-  await expect(page.getByRole("heading", { name: "Relay configuration & capability calibration" })).not.toBeVisible();
+  await page.getByRole("navigation", { name: "Studio primary navigation" }).getByRole("button", { name: "Settings" }).click();
+  await expect(page.getByRole("heading", { name: "Provider management" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Edit" })).toBeVisible();
+  await expect(page.getByText("Relay configuration & capability calibration")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 
   await expectSecurityClean(page, audit);
@@ -436,19 +433,17 @@ test("first run connects with endpoint and key, fetches models once, then return
   await installDeterministicMock(page, {}, { initiallyConfigured: false });
   await openStudio(page, { firstRun: true });
 
-  await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "完成首次连接" })).toBeVisible();
-  await expect(page.getByText("这个页面只负责连接你的图片 API")).toBeVisible();
-  await expect(page.getByRole("button", { name: "进入工作台" })).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "供应商管理" })).toBeVisible();
   await expect(page.getByLabel("调用端点")).toBeVisible();
   await expect(page.getByLabel("API Key")).toBeVisible();
-  await expect(page.getByRole("button", { name: "连接并获取模型" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "获取模型" })).toBeVisible();
   await expect(page.getByText("能力探测")).toHaveCount(0);
   await expect(page.getByText("生成默认值")).toHaveCount(0);
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await expect(page.getByRole("heading", { name: "完成首次连接" })).toBeVisible();
-  const desktopSetupBox = await page.locator(".settings-setup").boundingBox();
+  await expect(page.getByRole("heading", { name: "供应商管理" })).toBeVisible();
+  const desktopSetupBox = await page.locator(".provider-manager").boundingBox();
   expect(desktopSetupBox?.width).toBeGreaterThan(600);
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
@@ -461,19 +456,17 @@ test("first run connects with endpoint and key, fetches models once, then return
   expect(automaticOperations).toEqual([]);
 
   await page.getByRole("button", { name: "界面语言" }).click();
-  await expect(page.getByRole("heading", { name: "Complete the first connection" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Connect and fetch models" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Provider management" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Get models" })).toBeVisible();
   await page.getByRole("button", { name: "Interface language" }).click();
 
   await page.getByLabel("调用端点").fill("https://first-run.invalid/");
   await page.getByLabel("API Key").fill(replacementMarker);
-  await page.getByRole("button", { name: "连接并获取模型" }).click();
-  await expect(page.getByLabel("选择生图模型")).toHaveValue("mock-image-model");
-  await page.getByRole("button", { name: "完成配置" }).click();
+  await page.getByRole("button", { name: "获取模型" }).click();
+  await expect(page.getByLabel("默认模型")).toHaveValue("mock-image-model");
+  await page.getByRole("button", { name: "保存" }).click();
 
-  await expect(page.getByRole("heading", { name: "首次配置已完成" })).toBeVisible();
-  await expect(page.locator(".settings-setup__complete p")).toContainText("现在回到 Codex");
-  await expect(page.getByRole("button", { name: "进入工作台" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "为 Codex 设定默认出图参数" })).toBeVisible();
   await expect(page.locator("body")).not.toContainText(replacementMarker);
 
   const requestedOperations = audit.requests
@@ -481,12 +474,10 @@ test("first run connects with endpoint and key, fetches models once, then return
     .filter((pathname) =>
       pathname.startsWith("/api/v1/") &&
       (pathname === "/api/v1/settings/providers/refresh-models" ||
-        pathname === "/api/v1/settings/providers/capability-probe" ||
         pathname.includes("/creation/stream"))
     );
   expect(requestedOperations).toEqual(["/api/v1/settings/providers/refresh-models"]);
 
-  await page.getByRole("button", { name: "进入工作台" }).click();
   await expect(page.getByRole("navigation", { name: "Studio 主导航" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "为 Codex 设定默认出图参数" })).toBeVisible();
 
@@ -755,7 +746,7 @@ test("Studio saves compact Codex defaults without exposing a prompt or dispatchi
   await expect(page.getByLabel("提示词")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "开始生成" })).toHaveCount(0);
   await page.getByLabel("图片比例").selectOption("16:9");
-  await page.getByLabel("输出分辨率").selectOption("2048x2048");
+  await page.getByLabel("清晰度").selectOption("4K");
   await page.getByLabel("背景透明").selectOption("chromakey");
   await page.getByRole("button", { name: "保存并作为 Codex 默认值" }).click();
   await expect(page.getByRole("status")).toContainText("之后在 Codex 对话生图将默认使用这些参数");
@@ -770,7 +761,7 @@ test("Library search, detail, folders, mark, and copy stay identifier based", as
   await openStudio(page);
 
   await page.getByRole("button", { name: "图库" }).click();
-  await expect(page.getByRole("heading", { name: "底片档案与成片图库" })).toBeVisible();
+  await expect(page.locator('[data-studio-route="library"] h1')).toHaveText("图库");
   await expect(page.locator(".library-card")).toHaveCount(2);
 
   await page.getByLabel("提示词检索").fill("no-synthetic-match");
@@ -781,12 +772,10 @@ test("Library search, detail, folders, mark, and copy stay identifier based", as
   const prompt = "Synthetic astronaut cat in a quiet darkroom.";
   await expect(page.getByRole("button", { name: `查看详情: ${prompt}` })).toBeVisible();
   await page.getByRole("button", { name: `查看详情: ${prompt}` }).click();
-  const detail = page.getByRole("dialog", { name: prompt });
+  const detail = page.getByRole("dialog");
   await expect(detail).toBeVisible();
   await expect(detail.getByRole("slider", { name: "调整源图与结果图的对比分隔线" })).toHaveCount(0);
-  await expect(detail.getByRole("heading", { name: "关系底片" })).toBeVisible();
   await expect(detail.getByRole("button", { name: "复制生成信息" })).toBeVisible();
-  await expect(detail.getByRole("button", { name: "标记图片" })).toBeVisible();
   await detail.getByRole("button", { name: "关闭详情" }).click();
 
   await page.getByRole("button", { name: "重置" }).click();

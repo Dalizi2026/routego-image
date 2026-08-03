@@ -4,7 +4,6 @@ import path from "node:path";
 import { access, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 
 import {
-  capabilityProbeInputSchema,
   imageArtifactPhaseSchema,
   imageOperationRequestSchema,
   imageOperationResultSchema,
@@ -117,7 +116,6 @@ const LOCAL_METHODS = [
   "setActiveProviderProfile",
   "studioProviderSwitch",
   "refreshModels",
-  "probeCapabilities",
   "updateSettings",
   "searchStudioLibrary",
   "listFolders",
@@ -416,7 +414,7 @@ async function collectEvents(source: AsyncIterable<StudioImageOperationEvent>) {
 describe("task 3.5 contract surface and recovery", () => {
   it("implements the exact local method matrix while preserving eight public tools and phases", async () => {
     const { service } = await createHarness();
-    expect(LOCAL_METHODS).toHaveLength(29);
+    expect(LOCAL_METHODS).toHaveLength(28);
     for (const method of LOCAL_METHODS) expect(typeof service[method]).toBe("function");
     expect(routegoOperationNames).toEqual([
       "status", "generate", "edit", "prepareRegeneration", "batch", "searchLibrary", "manageLibrary", "openStudio"
@@ -431,7 +429,7 @@ describe("task 3.5 contract surface and recovery", () => {
       "routego_manage_library",
       "routego_open_studio"
     ]);
-    expect(studioOperationNames).toHaveLength(23);
+    expect(studioOperationNames).toHaveLength(22);
     expect(imageArtifactPhaseSchema.options).toEqual(["partial", "final"]);
     expect(imageArtifactPhaseSchema.safeParse("source").success).toBe(false);
   });
@@ -460,14 +458,6 @@ describe("task 3.5 contract surface and recovery", () => {
     const refresh = await service.refreshModels({ providerId: "missing-provider" });
     expect(refresh).toMatchObject({ status: "failed", billable: false, models: [] });
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(() => capabilityProbeInputSchema.parse({
-      providerId: "missing-provider",
-      model: "synthetic-model",
-      capability: "single-image-input",
-      transport: "single-endpoint-json",
-      requestShape: "single-endpoint:image",
-      confirmBillableProbe: false
-    })).toThrow();
   });
 
   it("stays degraded after recovery failure and never invokes Creation", async () => {
@@ -482,7 +472,7 @@ describe("task 3.5 contract surface and recovery", () => {
     expect(execute).not.toHaveBeenCalled();
   });
 
-  it("continues a long Studio-configured generation after the MCP call returns queued", async () => {
+  it("waits for a long Studio-configured generation instead of returning an ephemeral queued result", async () => {
     let markStarted: (() => void) | undefined;
     let release: (() => void) | undefined;
     const started = new Promise<void>((resolve) => { markStarted = resolve; });
@@ -498,17 +488,15 @@ describe("task 3.5 contract surface and recovery", () => {
       defaults: { ...settings.defaults, responseTimeoutMs: 600_000 }
     });
 
-    const queued = await service.generate(publicRequest());
-
-    expect(queued).toMatchObject({
-      status: "queued",
-      execution: { providerRequestCount: 0, receivedAnyOutput: false },
-      finalArtifacts: []
-    });
+    const pending = service.generate(publicRequest());
     await started;
     expect(execute).toHaveBeenCalledTimes(1);
 
     release?.();
+    await expect(pending).resolves.toMatchObject({
+      status: "succeeded",
+      execution: { providerRequestCount: 1 }
+    });
     await service.close();
     const saved = await service.searchLibrary({ query: "synthetic production service result" });
     expect(saved).toMatchObject({ total: 1, items: [{ status: "succeeded" }] });

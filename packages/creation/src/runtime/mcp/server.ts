@@ -73,7 +73,7 @@ const LONG_BASE64_TOKEN_PATTERN =
   /(^|[^A-Za-z0-9+/_=-])([A-Za-z0-9+/_-]{64,}={0,2})(?=$|[^A-Za-z0-9+/_=-])/gu;
 
 function preservesOmittedPublicControls(operation: RoutegoOperation): boolean {
-  return operation === "generate" || operation === "batch";
+  return operation === "generate" || operation === "edit" || operation === "batch";
 }
 
 function inputJsonSchema(operation: RoutegoOperation): Record<string, unknown> {
@@ -409,7 +409,7 @@ export class RoutegoMcpServer {
       return jsonRpcSuccess(requestId(request), {
         protocolVersion: ROUTEGO_MCP_PROTOCOL_VERSION,
         capabilities: { tools: {} },
-        serverInfo: { name: "routego-image", version: "1.0.5" }
+        serverInfo: { name: "routego-image", version: "1.0.6" }
       });
     }
     if (request.method === "notifications/initialized") return undefined;

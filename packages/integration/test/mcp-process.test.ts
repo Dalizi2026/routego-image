@@ -247,7 +247,7 @@ describe("task 4.3 MCP process protocol", () => {
     expect(resultOf(responses[0]!)).toMatchObject({
       protocolVersion: "2025-06-18",
       capabilities: { tools: {} },
-      serverInfo: { name: "routego-image", version: "1.0.5" }
+      serverInfo: { name: "routego-image", version: "1.0.6" }
     });
     const tools = resultOf(responses[1]!)["tools"] as Array<{
       name: string;

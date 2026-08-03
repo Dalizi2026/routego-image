@@ -216,7 +216,7 @@ describe("Routego Image plugin package", () => {
       manifest["mcpServers"]["routego-image"]["unexpected"] = true;
     }],
     ["an invalid cachebuster version", (manifest: Record<string, any>) => {
-      manifest["version"] = "1.0.5+codex.INVALID_token";
+      manifest["version"] = "1.0.6+codex.INVALID_token";
     }]
   ])("rejects a rehashed canonical manifest with %s", async (_label, mutate) => {
     const candidate = path.join(temporaryRoot, `manifest-${String(_label).replaceAll(" ", "-")}`, "routego-image");
@@ -236,7 +236,7 @@ describe("Routego Image plugin package", () => {
   it("accepts an official cachebuster when both manifests use the same version", async () => {
     const candidate = path.join(temporaryRoot, "cachebuster", "routego-image");
     await cp(firstPackage, candidate, { recursive: true });
-    const version = "1.0.5+codex.local-20260720-g11";
+    const version = "1.0.6+codex.local-20260720-g11";
     const pluginManifestPath = path.join(candidate, ".codex-plugin/plugin.json");
     const pluginManifest = JSON.parse(await readFile(pluginManifestPath, "utf8")) as Record<string, any>;
     pluginManifest["version"] = version;
@@ -260,7 +260,7 @@ describe("Routego Image plugin package", () => {
     await cp(firstPackage, candidate, { recursive: true });
     const pluginManifestPath = path.join(candidate, ".codex-plugin/plugin.json");
     const pluginManifest = JSON.parse(await readFile(pluginManifestPath, "utf8")) as Record<string, any>;
-    pluginManifest["version"] = "1.0.5+codex.local-20260720-g11";
+    pluginManifest["version"] = "1.0.6+codex.local-20260720-g11";
     await rewriteFileAndManifest(
       candidate,
       ".codex-plugin/plugin.json",

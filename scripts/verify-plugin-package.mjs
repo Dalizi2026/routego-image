@@ -18,10 +18,10 @@ const BACKGROUND_REMOVAL_RESOURCES = new Map([
   ["u2netp-model", { path: "u2netp.onnx", bytes: 4574861, sha256: "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8", version: "u2netp", license: "Apache-2.0", source: "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx" }],
   ["onnxruntime-web-simd-threaded-jsep", { path: "ort-wasm-simd-threaded.jsep.wasm", bytes: 21663894, sha256: "185b0861a6cd6cbdfb057289338090436483cc59e10a7bc83bd167b15531a51b", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }],
   ["onnxruntime-web-simd-threaded", { path: "ort-wasm-simd-threaded.wasm", bytes: 11246032, sha256: "207d02be4591c156b0a98f024f3d58005b5b04c92274d759fb390338c63559ea", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }],
-  ["onnxruntime-web-simd-threaded-loader", { path: "ort-wasm-simd-threaded.mjs", bytes: 24618, sha256: "745eb7c0ce6f18a6aa521971b2877babc7ffb27eecb58ab3bc6e5ef4692672e8", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }]
+  ["onnxruntime-web-simd-threaded-loader", { path: "ort-wasm-simd-threaded.mjs", bytes: 24616, sha256: "21430d8b7296e1985cef8a2e2b31cc8b7dcf3bbf1aa6434cb1bba331c0f3e1d6", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }]
 ]);
 const MINIMUM_RAW_BASE64_PAYLOAD_CHARS = 96;
-const ACCEPTED_PLUGIN_VERSION = /^1\.0\.5(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
+const ACCEPTED_PLUGIN_VERSION = /^1\.0\.6(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 const ACCEPTED_PLUGIN_MANIFEST = {
   name: "routego-image",
   description: "Create, edit, organize, and review images with the local Routego Image runtime.",
@@ -37,7 +37,7 @@ const ACCEPTED_PLUGIN_MANIFEST = {
     }
   },
   interface: {
-    displayName: "Routego Image v1.0.5",
+    displayName: "Routego Image v1.0.6",
     shortDescription: "本地图片生成、编辑、图库与 Studio 工作流。\nLocal image creation, editing, Library, and Studio workflows.",
     longDescription: "生成和编辑图片、运行独立批次、管理图库并继续在本地 Studio 工作。\nGenerate and edit images, run independent batches, manage the Library, and continue in the local Studio.",
     developerName: "Routego Image",
@@ -52,7 +52,7 @@ const ACCEPTED_PLUGIN_MANIFEST = {
     logo: "./assets/logo.png"
   }
 };
-const ACCEPTED_PLUGIN_DISPLAY_NAMES = new Set(["Routego Image v1.0.5"]);
+const ACCEPTED_PLUGIN_DISPLAY_NAMES = new Set(["Routego Image v1.0.6"]);
 const EXACT_FILES = new Set([
   ".codex-plugin/plugin.json",
   "assets/composer-icon.png",

@@ -49,7 +49,7 @@ describe("path-free Studio generation request construction", () => {
     );
   });
 
-  it("enforces size and aspect ratio as mutually exclusive browser controls", () => {
+  it("keeps an exact saved size when its descriptive aspect ratio is also present", () => {
     const draft: CreationDraft = {
       ...createInitialCreationDraft(defaults),
       prompt: "A clean Studio submission",
@@ -62,9 +62,21 @@ describe("path-free Studio generation request construction", () => {
       }
     };
 
-    expect(() => buildStudioCreationRequest(draft)).toThrow(CreationDraftError);
-    expect(normalizeVisibleControls(draft.controls)).toMatchObject({
-      size: "auto",
+    const normalized = normalizeVisibleControls(draft.controls);
+    expect(normalized).toMatchObject({
+      size: "1024x1024",
+      aspectRatio: "auto"
+    });
+    expect(buildStudioCreationRequest({ ...draft, controls: normalized })).toMatchObject({
+      size: "1024x1024",
+      aspectRatio: "auto"
+    });
+  });
+
+  it("preserves a saved 4K square default rather than silently falling back to auto", () => {
+    const draft = createInitialCreationDraft({ ...defaults, size: "4096x4096", aspectRatio: "1:1" });
+    expect(buildStudioCreationRequest({ ...draft, prompt: "A square 4K product render" })).toMatchObject({
+      size: "4096x4096",
       aspectRatio: "auto"
     });
   });

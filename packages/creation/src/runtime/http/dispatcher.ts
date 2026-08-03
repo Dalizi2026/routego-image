@@ -298,7 +298,8 @@ async function callService(
 }
 
 function preservesOmittedPublicControls(route: RuntimeRoute): boolean {
-  return route.scope === "public" && (route.operation === "generate" || route.operation === "batch");
+  return route.scope === "public" &&
+    (route.operation === "generate" || route.operation === "edit" || route.operation === "batch");
 }
 
 export function createRoutegoHttpDispatcher(options: RoutegoHttpRuntimeOptions): RoutegoHttpDispatcher {

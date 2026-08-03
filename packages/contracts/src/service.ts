@@ -39,8 +39,6 @@ import {
   type StudioLibrarySearchResult
 } from "./library";
 import {
-  capabilityProbeInputSchema,
-  capabilityProbeResultSchema,
   readSettingsInputSchema,
   readSettingsResultSchema,
   refreshModelsInputSchema,
@@ -55,8 +53,6 @@ import {
   upsertProviderProfileResultSchema,
   updateSettingsInputSchema,
   updateSettingsResultSchema,
-  type CapabilityProbeInput,
-  type CapabilityProbeResult,
   type ReadSettingsInput,
   type ReadSettingsResult,
   type RefreshModelsInput,
@@ -155,7 +151,6 @@ export const studioOperationNames = [
   "setActiveProviderProfile",
   "studioProviderSwitch",
   "refreshModels",
-  "probeCapabilities",
   "listFolders",
   "reorderFolders",
   "getAssetDetail",
@@ -274,11 +269,6 @@ export const studioOperationDefinitions = {
     inputSchema: refreshModelsInputSchema,
     outputSchema: refreshModelsResultSchema
   },
-  probeCapabilities: {
-    http: { method: "POST", path: "/api/v1/settings/providers/capability-probe" },
-    inputSchema: capabilityProbeInputSchema,
-    outputSchema: capabilityProbeResultSchema
-  },
   listFolders: {
     http: { method: "GET", path: "/api/v1/library/folders" },
     inputSchema: listFoldersInputSchema,
@@ -380,7 +370,6 @@ export interface StudioSettingsService {
   ): Promise<SetActiveProviderProfileResult>;
   studioProviderSwitch(input: StudioProviderSwitchInput): Promise<StudioProviderSwitchResult>;
   refreshModels(input: RefreshModelsInput): Promise<RefreshModelsResult>;
-  probeCapabilities(input: CapabilityProbeInput): Promise<CapabilityProbeResult>;
   updateSettings(input: UpdateSettingsInput): Promise<UpdateSettingsResult>;
 }
 

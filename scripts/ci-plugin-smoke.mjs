@@ -112,10 +112,10 @@ function assertSmokeResult(result, acceptedArtifactManifestSha256) {
   if (result.artifact?.manifestSha256 !== acceptedArtifactManifestSha256 ||
       result.artifact?.name !== "routego-image" ||
       typeof result.artifact?.version !== "string" ||
-      !/^1\.0\.2\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u.test(result.artifact.version) ||
+      !/^1\.0\.6\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u.test(result.artifact.version) ||
       result.artifact?.strictVerificationPassed !== true ||
       result.codex?.freshProcess !== true || result.codex?.pluginDiscovered !== true ||
-      result.codex?.pluginVersion !== "1.0.5" ||
+      result.codex?.pluginVersion !== "1.0.6" ||
       result.skill?.bilingual !== true || result.skill?.exactPublicToolCount !== 8 ||
       JSON.stringify(result.mcp?.tools) !== JSON.stringify(EXPECTED_TOOLS) ||
       JSON.stringify(result.mcp?.publicArtifactPhases) !== JSON.stringify(["partial", "final"]) ||

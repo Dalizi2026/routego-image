@@ -556,7 +556,7 @@ export async function createProductionRoutegoMcpProcess(
       openStudio: async (request) => await lifecycle.openStudio(request),
       serviceHealth: () => ({
         status: "ready",
-        version: "1.0.5",
+        version: "1.0.6",
         nodeVersion: process.version,
         uptimeSeconds: 0,
         mcpAvailable: true,

@@ -1,8 +1,8 @@
 const SIZE_MULTIPLE = 16;
-const MAX_EDGE = 3840;
+const MAX_EDGE = 4096;
 const MAX_ASPECT_RATIO = 3;
 const MIN_PIXELS = 655_360;
-const MAX_PIXELS = 8_294_400;
+const MAX_PIXELS = 16_777_216;
 
 export const resolutionTiers = ["auto", "1K", "2K", "4K"] as const;
 export const configurableRatios = ["1:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16", "21:9"] as const;
@@ -20,8 +20,8 @@ const sizePresets: Record<Exclude<ResolutionTier, "auto">, Record<ConfigurableRa
     "3:4": "1536x2048", "16:9": "2560x1440", "9:16": "1440x2560", "21:9": "2560x1088"
   },
   "4K": {
-    "1:1": "2880x2880", "3:2": "3456x2304", "2:3": "2304x3456", "4:3": "3200x2400",
-    "3:4": "2400x3200", "16:9": "3840x2160", "9:16": "2160x3840", "21:9": "3840x1600"
+    "1:1": "4096x4096", "3:2": "4096x2736", "2:3": "2736x4096", "4:3": "4096x3072",
+    "3:4": "3072x4096", "16:9": "4096x2304", "9:16": "2304x4096", "21:9": "4096x1760"
   }
 };
 
@@ -138,7 +138,7 @@ function sizeForCustomRatio(tier: Exclude<ResolutionTier, "auto">, ratio: string
   if (normalized === undefined) return sizePresets[tier]["1:1"];
 
   const [widthRatio, heightRatio] = normalized.split(":").map(Number) as [number, number];
-  const largestEdge = tier === "1K" ? 1_024 : tier === "2K" ? 2_048 : 3_840;
+  const largestEdge = tier === "1K" ? 1_024 : tier === "2K" ? 2_048 : 4_096;
   const width = widthRatio >= heightRatio ? largestEdge : largestEdge * (widthRatio / heightRatio);
   const height = widthRatio >= heightRatio ? largestEdge * (heightRatio / widthRatio) : largestEdge;
   return normalizeCustomImageSize(String(Math.round(width)), String(Math.round(height))) ?? sizePresets[tier]["1:1"];
