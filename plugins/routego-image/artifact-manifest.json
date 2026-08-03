@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "name": "routego-image",
-  "version": "1.0.5+codex.20260802",
+  "version": "1.0.6+codex.20260803",
   "node": ">=20.19.0",
   "files": [
     {
       "path": ".codex-plugin/plugin.json",
       "bytes": 1444,
-      "sha256": "d2837d82dc111933b6a9ae5bc78176e8864e16ee4f9088888743f0fb39e24724"
+      "sha256": "35f7cf5d7eaefdebc018e44f93942a152c41dce406290ac7a128ca3304c2b33b"
     },
     {
       "path": "assets/composer-icon.png",
@@ -46,8 +46,8 @@
     },
     {
       "path": "resources/background-removal/ort-wasm-simd-threaded.mjs",
-      "bytes": 24618,
-      "sha256": "745eb7c0ce6f18a6aa521971b2877babc7ffb27eecb58ab3bc6e5ef4692672e8"
+      "bytes": 24616,
+      "sha256": "21430d8b7296e1985cef8a2e2b31cc8b7dcf3bbf1aa6434cb1bba331c0f3e1d6"
     },
     {
       "path": "resources/background-removal/ort-wasm-simd-threaded.wasm",
@@ -61,28 +61,28 @@
     },
     {
       "path": "runtime/index.js",
-      "bytes": 1698317,
-      "sha256": "d6dc26ce34594c3ca79e1afa7475e076a54fbca10ebb879be5a7496e50be6133"
+      "bytes": 1653397,
+      "sha256": "67a207a15cc14d1811fa7a0447f9e76b6887fc0eba42405c37e8ce41fd4991fb"
     },
     {
       "path": "runtime/resource-manifest.json",
       "bytes": 1770,
-      "sha256": "ec157b108fd4b5227738d0d5a65562cca2dfb4e7b92723b35ea0a17b04dde68a"
+      "sha256": "16d529538dcdc4ff6adca0284cdbb00151a1eed5d157d560c10f160cf7bc6178"
     },
     {
       "path": "runtime/studio-assets.json",
       "bytes": 312,
-      "sha256": "fbfa6e9a1d2c1e81294154d71383149c3d27ac2a3ada602e9386cfb480a4cbe2"
+      "sha256": "1f1f9d24e4eab81198b6680df779b59b7be2b1998e7aa96c6aeb7e3c8106187b"
     },
     {
-      "path": "runtime/studio/assets/index-C1msOYkR.css",
-      "bytes": 120006,
-      "sha256": "f75144297b7e77d1c444ae9db1595fcc6bb6a8870c49917470551289f8bb019a"
+      "path": "runtime/studio/assets/index-BnQLSrNV.css",
+      "bytes": 116959,
+      "sha256": "8407bcb4eb683eaec44a94ed5bdc26adc78928b169785b899327290be5d85b7d"
     },
     {
-      "path": "runtime/studio/assets/index-Ch_LRS0o.js",
-      "bytes": 437931,
-      "sha256": "836d05bd2f9977d7d68f60668fa2d05c398f34376e934d996ae9a13c8315fa07"
+      "path": "runtime/studio/assets/index-Gntj-duf.js",
+      "bytes": 430389,
+      "sha256": "4bb1dcf9a0a4c3b4fc2c1d8655bcb4e427849221c3563a6aae573d9f53aa1f5c"
     },
     {
       "path": "scripts/start-routego-image.mjs",

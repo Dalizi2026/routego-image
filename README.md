@@ -1,12 +1,12 @@
-# Routego Image v1.0.5
+# Routego Image v1.0.6
 
 <p>
-  <img src="plugins/routego-image/assets/logo.png" width="112" alt="Routego Image v1.0.5 标志">
+  <img src="plugins/routego-image/assets/logo.png" width="112" alt="Routego Image v1.0.6 标志">
 </p>
 
 Routego Image 是运行在 Codex 桌面端中的本地图片工作流插件。它把图片生成、图片编辑、批量任务、图库管理与 Studio 工作台放进同一个对话与本机环境中。
 
-> 本仓库是可直接安装的 Codex 插件市场源。插件显示名为 `Routego Image v1.0.5`。
+> 本仓库是可直接安装的 Codex 插件市场源。插件显示名为 `Routego Image v1.0.6`。
 
 ## 你可以做什么
 
@@ -21,7 +21,7 @@ Routego Image 是运行在 Codex 桌面端中的本地图片工作流插件。�
 在 Codex 桌面端新开一个对话，直接发送下面这段话即可：
 
 ```text
-请从 GitHub 仓库 Dalizi2026/routego-image 安装 Routego Image v1.0.5 插件。先添加该仓库为插件市场源，再安装 routego-image；完成后告诉我安装结果和版本号。
+请从 GitHub 仓库 Dalizi2026/routego-image 安装 Routego Image v1.0.6 插件。先添加该仓库为插件市场源，再安装 routego-image；完成后告诉我安装结果和版本号。
 ```
 
 安装完成后，重新开启一个 Codex 对话即可使用插件。
@@ -130,7 +130,7 @@ Studio 支持深色和浅色模式，也会在窄屏下调整新手引导位置�
 把下面这段话直接发送给 Codex 桌面端：
 
 ```text
-请更新 GitHub 市场源 Dalizi2026/routego-image，并升级 Routego Image v1.0.5 到最新版本；完成后告诉我版本号和更新结果。
+请更新 GitHub 市场源 Dalizi2026/routego-image，并升级 Routego Image v1.0.6 到最新版本；完成后告诉我版本号和更新结果。
 ```
 
 ## 反馈
@@ -140,6 +140,16 @@ Studio 支持深色和浅色模式，也会在窄屏下调整新手引导位置�
 ## 第三方说明
 
 插件内使用的第三方组件与资源说明位于 [`THIRD_PARTY_NOTICES.md`](plugins/routego-image/THIRD_PARTY_NOTICES.md)。
+
+## v1.0.6 更新说明
+
+### v1.0.6
+
+- 修复 Studio 已保存默认参数在提交时被覆盖：生成、编辑和批处理保留尺寸、比例、质量与格式。
+- 将 4K 调整为真实精确尺寸：4K 1:1 提交 4096 × 4096，其他比例保持 4096 最长边。
+- 移除可能计费的能力验证入口、探测接口和本地参数拦截；由服务商返回实际兼容性结果。
+- 移除超过五分钟后会随重启丢失的内存排队结果；任务保持在当前调用中直到完成。
+- 修复本地透明去背运行时的资源完整性元数据。
 
 ## v1.0.5 更新说明
 
