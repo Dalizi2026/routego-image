@@ -115,7 +115,7 @@ function assertSmokeResult(result, acceptedArtifactManifestSha256) {
       !/^1\.0\.6\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?$/u.test(result.artifact.version) ||
       result.artifact?.strictVerificationPassed !== true ||
       result.codex?.freshProcess !== true || result.codex?.pluginDiscovered !== true ||
-      result.codex?.pluginVersion !== "1.0.6" ||
+      result.codex?.pluginVersion !== "1.0.7" ||
       result.skill?.bilingual !== true || result.skill?.exactPublicToolCount !== 8 ||
       JSON.stringify(result.mcp?.tools) !== JSON.stringify(EXPECTED_TOOLS) ||
       JSON.stringify(result.mcp?.publicArtifactPhases) !== JSON.stringify(["partial", "final"]) ||

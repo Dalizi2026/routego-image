@@ -332,6 +332,7 @@ async function createHarness(options: {
   readonly executeCreation?: CreationExecution;
   readonly fetch?: typeof fetch;
   readonly recoverFailure?: boolean;
+  readonly defaultModel?: string;
 } = {}): Promise<Harness> {
   const root = await createRoot("harness");
   const output = path.join(root, "output");
@@ -379,7 +380,7 @@ async function createHarness(options: {
     now: () => new Date(BASE_NOW),
     createId: (scope) => `${scope}-${++identity}`,
     executeCreation: options.executeCreation ?? defaultExecution,
-    defaultModel: "synthetic-model",
+    defaultModel: options.defaultModel ?? "synthetic-model",
     ...(options.fetch === undefined ? {} : { fetch: options.fetch })
   };
   const service = await createLocalRoutegoService(serviceOptions);
@@ -541,6 +542,51 @@ describe("Task 4.4 provider activation projection", () => {
 });
 
 describe("task 3.5 public composition", () => {
+  it("rejects non-official GPT Image 2 dimensions before invoking the provider", async () => {
+    const execute = vi.fn<CreationExecution>(async (request, context) =>
+      succeededResult(request, context.requestId)
+    );
+    const { service } = await createHarness({
+      executeCreation: execute,
+      defaultModel: "gpt-image-2"
+    });
+
+    const result = await service.generate(publicRequest({ size: "4096x4096" }));
+
+    expect(result).toMatchObject({
+      status: "failed",
+      error: {
+        code: "invalid_input",
+        stage: "validate",
+        mayHaveBilled: false
+      },
+      execution: { providerRequestCount: 0, mayHaveBilled: false }
+    });
+    expect(execute).not.toHaveBeenCalled();
+  });
+
+  it("sends a valid official GPT Image 2 4K landscape size unchanged", async () => {
+    const observed: ImageOperationRequest[] = [];
+    const execute: CreationExecution = async (request, context) => {
+      observed.push(request);
+      return succeededResult(request, context.requestId);
+    };
+    const { service } = await createHarness({
+      executeCreation: execute,
+      defaultModel: "gpt-image-2"
+    });
+
+    const result = await service.generate(publicRequest({ size: "3840x2160" }));
+
+    expect(result).toMatchObject({
+      status: "succeeded",
+      requestedParams: { size: "3840x2160" },
+      effectiveParams: { size: "3840x2160" }
+    });
+    expect(observed).toHaveLength(1);
+    expect(observed[0]).toMatchObject({ size: "3840x2160" });
+  });
+
   it("resolves omitted public controls from one active default snapshot while preserving explicit overrides", async () => {
     const observed: ImageOperationRequest[] = [];
     const execute: CreationExecution = async (request, context) => {

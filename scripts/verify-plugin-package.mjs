@@ -21,7 +21,7 @@ const BACKGROUND_REMOVAL_RESOURCES = new Map([
   ["onnxruntime-web-simd-threaded-loader", { path: "ort-wasm-simd-threaded.mjs", bytes: 24616, sha256: "21430d8b7296e1985cef8a2e2b31cc8b7dcf3bbf1aa6434cb1bba331c0f3e1d6", version: "1.20.1", license: "MIT", source: "https://registry.npmjs.org/onnxruntime-web/-/onnxruntime-web-1.20.1.tgz" }]
 ]);
 const MINIMUM_RAW_BASE64_PAYLOAD_CHARS = 96;
-const ACCEPTED_PLUGIN_VERSION = /^1\.0\.6(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
+const ACCEPTED_PLUGIN_VERSION = /^1\.0\.7(?:\+codex\.[a-z0-9](?:[a-z0-9-]{0,79})?)?$/u;
 const ACCEPTED_PLUGIN_MANIFEST = {
   name: "routego-image",
   description: "Create, edit, organize, and review images with the local Routego Image runtime.",
@@ -37,7 +37,7 @@ const ACCEPTED_PLUGIN_MANIFEST = {
     }
   },
   interface: {
-    displayName: "Routego Image v1.0.6",
+    displayName: "Routego Image v1.0.7",
     shortDescription: "本地图片生成、编辑、图库与 Studio 工作流。\nLocal image creation, editing, Library, and Studio workflows.",
     longDescription: "生成和编辑图片、运行独立批次、管理图库并继续在本地 Studio 工作。\nGenerate and edit images, run independent batches, manage the Library, and continue in the local Studio.",
     developerName: "Routego Image",
@@ -52,7 +52,7 @@ const ACCEPTED_PLUGIN_MANIFEST = {
     logo: "./assets/logo.png"
   }
 };
-const ACCEPTED_PLUGIN_DISPLAY_NAMES = new Set(["Routego Image v1.0.6"]);
+const ACCEPTED_PLUGIN_DISPLAY_NAMES = new Set(["Routego Image v1.0.7"]);
 const EXACT_FILES = new Set([
   ".codex-plugin/plugin.json",
   "assets/composer-icon.png",

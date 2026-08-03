@@ -84,7 +84,7 @@ const copy = {
     saved: "已保存。之后在 Codex 对话生图将默认使用这些参数。",
     failed: "设置未保存，请检查选项后重试。",
     nativeHint: "原生透明需要服务商明确支持；当前配置使用安全默认值。",
-    resolutionHint: "选择 1K、2K 或 4K 后，插件会直接把所选的精确像素尺寸发送给上游；4K 方形为 4096 × 4096。"
+    resolutionHint: "按 GPT Image 2 官方限制发送精确像素尺寸；4K 横版为 3840 × 2160，方形最高为 2880 × 2880。"
   },
   en: {
     eyebrow: "CODEX DEFAULTS / 01",
@@ -124,7 +124,7 @@ const copy = {
     saved: "Saved. Future Codex image requests will use these defaults unless overridden.",
     failed: "Settings were not saved. Check the options and try again.",
     nativeHint: "Native transparency requires explicit provider support; the current setup keeps a safe default.",
-    resolutionHint: "Routego sends the exact selected pixel dimensions upstream; square 4K is 4096 × 4096."
+    resolutionHint: "Routego sends exact dimensions within the official GPT Image 2 limit: 3840 × 2160 for 4K landscape and up to 2880 × 2880 for square."
   }
 } as const;
 

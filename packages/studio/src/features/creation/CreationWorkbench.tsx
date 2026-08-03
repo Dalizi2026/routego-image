@@ -297,7 +297,7 @@ export function CreationWorkbench({
   const mountedRef = useRef(true);
 
   const sizeOptions = useMemo(
-    () => ["auto", "1024x1024", "1536x1024", "1024x1536", "2048x2048", "4096x4096"] as const,
+    () => ["auto", "1024x1024", "1536x1024", "1024x1536", "2048x2048", "2880x2880", "3840x2160", "2160x3840"] as const,
     []
   );
   const aspectOptions = useMemo(

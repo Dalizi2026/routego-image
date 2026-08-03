@@ -409,7 +409,7 @@ export class RoutegoMcpServer {
       return jsonRpcSuccess(requestId(request), {
         protocolVersion: ROUTEGO_MCP_PROTOCOL_VERSION,
         capabilities: { tools: {} },
-        serverInfo: { name: "routego-image", version: "1.0.6" }
+        serverInfo: { name: "routego-image", version: "1.0.7" }
       });
     }
     if (request.method === "notifications/initialized") return undefined;

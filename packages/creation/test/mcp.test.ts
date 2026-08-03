@@ -202,7 +202,7 @@ async function initialize(server: ReturnType<typeof createRoutegoMcpServer>): Pr
     result: {
       protocolVersion: ROUTEGO_MCP_PROTOCOL_VERSION,
       capabilities: { tools: {} },
-      serverInfo: { name: "routego-image", version: "1.0.6" }
+      serverInfo: { name: "routego-image", version: "1.0.7" }
     }
   });
 }

@@ -38,6 +38,8 @@ import {
   routegoBatchInputSchema,
   routegoBatchResultSchema,
   routegoEditInputSchema,
+  gptImage2SizeViolation,
+  isGptImage2Model,
   routegoGenerateInputSchema,
   routegoManageLibraryInputSchema,
   routegoManageLibraryResultSchema,
@@ -419,6 +421,19 @@ function resolvePublicImageRequest(
   return imageOperationRequestSchema.parse(resolved);
 }
 
+function assertGptImage2Size(request: ImageOperationRequest, model: string): void {
+  if (!isGptImage2Model(model)) return;
+  const violation = gptImage2SizeViolation(request.size);
+  if (violation === undefined) return;
+  throw new ProviderIntegrationError(createProviderServiceError({
+    code: "invalid_input",
+    stage: "validate",
+    safeMessage: violation,
+    mayHaveBilled: false,
+    details: { model, size: request.size }
+  }));
+}
+
 function outputContractError(
   request: ImageOperationRequest,
   result: ImageOperationResult
@@ -462,7 +477,7 @@ function outputContractError(
 function defaultHealth(status: RoutegoStatusResult["service"]["status"]): RoutegoStatusResult["service"] {
   return routegoServiceHealthSchema.parse({
     status,
-    version: "1.0.6",
+    version: "1.0.7",
     nodeVersion: process.version,
     uptimeSeconds: 0,
     mcpAvailable: false,
@@ -1302,6 +1317,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
       });
       const staged = await stagePreparedPublicOperationSources(prepared, { transaction });
       const selectedProvider = providerSnapshot ?? await this.#provider(requestId, signal);
+      assertGptImage2Size(staged.request, selectedProvider.model);
       const isDirectReferenceGeneration = input.kind === "generate" && input.references.length > 0;
       const allowUnverifiedImageInput = allowUnverifiedDirectEdit || isDirectReferenceGeneration;
       const provider = allowUnverifiedImageInput && selectedProvider.context !== undefined
@@ -1563,6 +1579,7 @@ export class ProductionLocalRoutegoService implements LocalRoutegoService {
         now: () => this.#now()
       });
       const provider = providerSnapshot ?? await this.#provider(requestId, signal);
+      assertGptImage2Size(staged.creationRequest, provider.model);
       creationInvoked = true;
       const raw = await this.#executeCreation(staged.creationRequest, {
         requestId,

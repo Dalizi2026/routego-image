@@ -73,10 +73,10 @@ describe("path-free Studio generation request construction", () => {
     });
   });
 
-  it("preserves a saved 4K square default rather than silently falling back to auto", () => {
-    const draft = createInitialCreationDraft({ ...defaults, size: "4096x4096", aspectRatio: "1:1" });
+  it("preserves an official-limit 4K square default rather than silently falling back to auto", () => {
+    const draft = createInitialCreationDraft({ ...defaults, size: "2880x2880", aspectRatio: "1:1" });
     expect(buildStudioCreationRequest({ ...draft, prompt: "A square 4K product render" })).toMatchObject({
-      size: "4096x4096",
+      size: "2880x2880",
       aspectRatio: "auto"
     });
   });
