@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "rootDirectory": "runtime/studio",
-  "entryModuleRoute": "/assets/index-Dj4OHXhK.js",
+  "entryModuleRoute": "/assets/index-DnbNCAuY.js",
   "styleRoutes": [
     "/assets/index-BnQLSrNV.css"
   ],
   "assets": {
     "/assets/index-BnQLSrNV.css": "assets/index-BnQLSrNV.css",
-    "/assets/index-Dj4OHXhK.js": "assets/index-Dj4OHXhK.js"
+    "/assets/index-DnbNCAuY.js": "assets/index-DnbNCAuY.js"
   }
 }

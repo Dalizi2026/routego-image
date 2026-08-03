@@ -1,6 +1,6 @@
 {
   "name": "routego-image-windows",
-  "version": "1.0.5+codex.20260802-windows3",
+  "version": "1.0.7+codex.20260803-windows1",
   "description": "Create, edit, organize, and review images with the local Routego Image Windows runtime.",
   "author": {
     "name": "Routego Image"
@@ -16,9 +16,9 @@
     }
   },
   "interface": {
-    "displayName": "Routego Image for Windows v1.0.5",
+    "displayName": "Routego Image for Windows v1.0.7",
     "shortDescription": "Windows 专用的本地图片生成、编辑、图库与 Studio 工作流。\nWindows-local image creation, editing, Library, and Studio workflows.",
-    "longDescription": "面向 Windows 的独立 Routego Image 运行时，提供安全网络响应诊断、图片生成、编辑、图库与 Studio 工作流。\nA Windows-specific Routego Image runtime with safe network-response diagnostics, image creation, editing, Library, and Studio workflows.",
+    "longDescription": "面向 Windows 的独立 Routego Image 运行时，提供图片生成、编辑、图库与持续可用的 Studio 工作流。\nA Windows-specific Routego Image runtime with image creation, editing, Library, and persistent Studio workflows.",
     "developerName": "Routego Image",
     "category": "Productivity",
     "capabilities": [

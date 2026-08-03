@@ -19218,6 +19218,30 @@ var failedOutputSlotSchema = external_exports.object({
   error: routegoServiceErrorSchema
 }).strict();
 
+// ../contracts/src/gpt-image-2.ts
+var GPT_IMAGE_2_SIZE_LIMITS = Object.freeze({
+  multiple: 16,
+  maxEdge: 3840,
+  maxPixels: 8294400,
+  minPixels: 655360,
+  maxAspectRatio: 3
+});
+function isGptImage2Model(model) {
+  return model?.trim().toLowerCase() === "gpt-image-2";
+}
+function gptImage2SizeViolation(size) {
+  if (size === "auto") return void 0;
+  const match = /^(\d+)x(\d+)$/u.exec(size);
+  if (match === null) return "GPT Image 2 requires an exact WIDTHxHEIGHT size or auto.";
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  const { multiple, maxEdge, maxPixels, minPixels, maxAspectRatio } = GPT_IMAGE_2_SIZE_LIMITS;
+  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width < multiple || height < multiple || width % multiple !== 0 || height % multiple !== 0 || Math.max(width, height) > maxEdge || width * height > maxPixels || width * height < minPixels || width / height > maxAspectRatio || height / width > maxAspectRatio) {
+    return "GPT Image 2 requires dimensions aligned to 16 px, with each edge at most 3840 px, at most 8,294,400 total pixels, and an aspect ratio no wider than 3:1.";
+  }
+  return void 0;
+}
+
 // ../contracts/src/tools.ts
 var operationStatusSchema = external_exports.enum([
   "queued",
@@ -21582,13 +21606,7 @@ function requestedFeatureCapabilities(request) {
   return required2;
 }
 function isProviderDrivenControl(capability) {
-  return [
-    "custom-size",
-    "output-format",
-    "quality-control",
-    "compression",
-    "moderation"
-  ].includes(capability);
+  return capability === "custom-size" || capability === "output-format" || capability === "quality-control" || capability === "compression" || capability === "moderation";
 }
 function transparencyFor(context, request, candidate) {
   if (request.transparentMode !== "native") return "none";
@@ -21773,15 +21791,21 @@ function selectFromCandidates(context, request, candidates) {
     for (const capability of candidate.requiredCapabilities) {
       if (isProviderDrivenControl(capability)) continue;
       const record2 = findCapabilityRecord(context, candidate, capability);
-      if (candidate.allowUnknownTextBaseline === true && capability === "text-generation" && (record2 === void 0 || record2.state === "unknown")) continue;
-      if (request.kind === "edit" && context.allowUnverifiedDirectEdit === true && (record2 === void 0 || record2.state === "unknown")) continue;
-      if (request.kind === "generate" && candidate.imageInputCount > 0 && context.allowUnverifiedDirectReferenceGeneration === true && (record2 === void 0 || record2.state === "unknown")) continue;
+      if (candidate.allowUnknownTextBaseline === true && capability === "text-generation" && (record2 === void 0 || record2.state === "unknown")) {
+        continue;
+      }
+      if (request.kind === "edit" && context.allowUnverifiedDirectEdit === true && (record2 === void 0 || record2.state === "unknown")) {
+        continue;
+      }
+      if (request.kind === "generate" && candidate.imageInputCount > 0 && context.allowUnverifiedDirectReferenceGeneration === true && (record2 === void 0 || record2.state === "unknown")) {
+        continue;
+      }
       if (record2 === void 0 || record2.state === "unknown" || record2.state === "unsupported") {
         missing.push(capability);
         candidateUnavailable = true;
         continue;
       }
-      if (record2?.state === "degraded") {
+      if (record2.state === "degraded") {
         degraded = true;
       }
       const violations = capabilityLimitViolations(record2, request, candidate.imageInputCount);
@@ -22701,7 +22725,7 @@ function mapProviderHttpError(status, body, context) {
     context
   );
 }
-function invalidProviderResponseError(safeMessage3, reason, context = { stage: "parse", mayHaveBilled: true }, diagnosticDetails = {}) {
+function invalidProviderResponseError(safeMessage3, reason, context = { stage: "parse", mayHaveBilled: true }) {
   return createProviderError(
     {
       code: "invalid_response",
@@ -22709,7 +22733,7 @@ function invalidProviderResponseError(safeMessage3, reason, context = { stage: "
       stage: context.stage,
       safeMessage: safeMessage3,
       retryDisposition: "never",
-      details: { reason, ...diagnosticDetails }
+      details: { reason }
     },
     { ...context, mayHaveBilled: context.mayHaveBilled ?? true }
   );
@@ -23534,20 +23558,15 @@ function normalized(context, input) {
     ...error51 === void 0 ? {} : { error: error51 }
   };
 }
-function invalidResult(context, safeMessage3, reason, outputs = {}, diagnosticDetails = {}) {
+function invalidResult(context, safeMessage3, reason, outputs = {}) {
   return normalized(context, {
     ...outputs,
-    error: invalidProviderResponseError(
-      safeMessage3,
-      reason,
-      {
-        stage: "parse",
-        receivedAnyOutput: (outputs.finalArtifacts?.length ?? 0) > 0 || (outputs.partialArtifacts?.length ?? 0) > 0,
-        mayHaveBilled: true,
-        partialArtifacts: outputs.partialArtifacts
-      },
-      diagnosticDetails
-    )
+    error: invalidProviderResponseError(safeMessage3, reason, {
+      stage: "parse",
+      receivedAnyOutput: (outputs.finalArtifacts?.length ?? 0) > 0 || (outputs.partialArtifacts?.length ?? 0) > 0,
+      mayHaveBilled: true,
+      partialArtifacts: outputs.partialArtifacts
+    })
   });
 }
 function downloadOptions(context) {
@@ -23893,18 +23912,6 @@ function parseJsonBytes(bytes) {
   const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   return JSON.parse(text);
 }
-function windowsResponseParseDiagnostics(response, reason) {
-  if (process.env["ROUTEGO_PACKAGE_TARGET"] !== "windows") return {};
-  const contentLength = response.headers.get("content-length");
-  const parsedLength = contentLength === null ? void 0 : Number(contentLength);
-  return {
-    responseContentType: response.headers.get("content-type") ?? "missing",
-    responseContentEncoding: response.headers.get("content-encoding") ?? "missing",
-    responseContentLength: typeof parsedLength === "number" && Number.isSafeInteger(parsedLength) && parsedLength >= 0 ? parsedLength : "missing-or-invalid",
-    responseParser: "strict-utf8-json",
-    responseParseReason: reason
-  };
-}
 async function parseProviderResponse(response, context) {
   if (!response.ok) {
     let body2;
@@ -23937,13 +23944,10 @@ async function parseProviderResponse(response, context) {
   try {
     body = parseJsonBytes(await readBoundedBody(response, maximumBodyBytes));
   } catch (error51) {
-    const reason = error51 instanceof Error ? error51.message : "invalid-json-body";
     return invalidResult(
       context,
       "The provider returned invalid, non-UTF-8, or oversized JSON.",
-      reason,
-      {},
-      windowsResponseParseDiagnostics(response, reason)
+      error51 instanceof Error ? error51.message : "invalid-json-body"
     );
   }
   return context.route.transport === "openai-responses" ? normalizeResponsesJsonResponse(body, context) : normalizeImagesJsonResponse(body, context);
@@ -24775,7 +24779,7 @@ async function callService(route, service, localService, input) {
   return method.call(target, input);
 }
 function preservesOmittedPublicControls(route) {
-  return route.scope === "public" && (route.operation === "generate" || route.operation === "batch");
+  return route.scope === "public" && (route.operation === "generate" || route.operation === "edit" || route.operation === "batch");
 }
 function createRoutegoHttpDispatcher(options) {
   const maximumJsonBodyBytes = options.maximumJsonBodyBytes ?? DEFAULT_MAXIMUM_JSON_BODY_BYTES;
@@ -25306,7 +25310,7 @@ var RoutegoMcpServer = class {
       return jsonRpcSuccess(requestId(request), {
         protocolVersion: ROUTEGO_MCP_PROTOCOL_VERSION,
         capabilities: { tools: {} },
-        serverInfo: { name: "routego-image", version: "1.0.5" }
+        serverInfo: { name: "routego-image", version: "1.0.7" }
       });
     }
     if (request.method === "notifications/initialized") return void 0;
@@ -39934,6 +39938,18 @@ function resolvePublicImageRequest(input, defaults) {
   }
   return imageOperationRequestSchema.parse(resolved);
 }
+function assertGptImage2Size(request, model) {
+  if (!isGptImage2Model(model)) return;
+  const violation = gptImage2SizeViolation(request.size);
+  if (violation === void 0) return;
+  throw new ProviderIntegrationError(createProviderServiceError({
+    code: "invalid_input",
+    stage: "validate",
+    safeMessage: violation,
+    mayHaveBilled: false,
+    details: { model, size: request.size }
+  }));
+}
 function outputContractError(request, result) {
   if (result.status !== "succeeded") return void 0;
   const expectedMimeType = request.format === "png" ? "image/png" : request.format === "jpeg" ? "image/jpeg" : "image/webp";
@@ -39969,7 +39985,7 @@ function outputContractError(request, result) {
 function defaultHealth(status) {
   return routegoServiceHealthSchema.parse({
     status,
-    version: "1.0.5",
+    version: "1.0.7",
     nodeVersion: process.version,
     uptimeSeconds: 0,
     mcpAvailable: false,
@@ -40651,6 +40667,7 @@ var ProductionLocalRoutegoService = class {
       });
       const staged = await stagePreparedPublicOperationSources(prepared, { transaction });
       const selectedProvider = providerSnapshot ?? await this.#provider(requestId2, signal);
+      assertGptImage2Size(staged.request, selectedProvider.model);
       const isDirectReferenceGeneration = input.kind === "generate" && input.references.length > 0;
       const allowUnverifiedImageInput = allowUnverifiedDirectEdit || isDirectReferenceGeneration;
       const provider = allowUnverifiedImageInput && selectedProvider.context !== void 0 ? freezeProviderSnapshot({
@@ -40888,6 +40905,7 @@ var ProductionLocalRoutegoService = class {
         now: () => this.#now()
       });
       const provider = providerSnapshot ?? await this.#provider(requestId2, signal);
+      assertGptImage2Size(staged.creationRequest, provider.model);
       creationInvoked = true;
       const raw = await this.#executeCreation(staged.creationRequest, {
         requestId: requestId2,
@@ -43117,7 +43135,7 @@ async function createProductionRoutegoMcpProcess(options) {
       openStudio: async (request) => await lifecycle.openStudio(request),
       serviceHealth: () => ({
         status: "ready",
-        version: "1.0.5",
+        version: "1.0.7",
         nodeVersion: process.version,
         uptimeSeconds: 0,
         mcpAvailable: true,

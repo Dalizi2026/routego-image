@@ -1,12 +1,12 @@
-# Routego Image v1.0.6
+# Routego Image v1.0.7
 
 <p>
-  <img src="plugins/routego-image/assets/logo.png" width="112" alt="Routego Image v1.0.6 标志">
+  <img src="plugins/routego-image/assets/logo.png" width="112" alt="Routego Image v1.0.7 标志">
 </p>
 
 Routego Image 是运行在 Codex 桌面端中的本地图片工作流插件。它把图片生成、图片编辑、批量任务、图库管理与 Studio 工作台放进同一个对话与本机环境中。
 
-> 本仓库是可直接安装的 Codex 插件市场源。插件显示名为 `Routego Image v1.0.6`。
+> 本仓库是可直接安装的 Codex 插件市场源。插件显示名为 `Routego Image v1.0.7`。
 
 ## 你可以做什么
 
@@ -21,7 +21,7 @@ Routego Image 是运行在 Codex 桌面端中的本地图片工作流插件。�
 在 Codex 桌面端新开一个对话，直接发送下面这段话即可：
 
 ```text
-请从 GitHub 仓库 Dalizi2026/routego-image 安装 Routego Image v1.0.6 插件。先添加该仓库为插件市场源，再安装 routego-image；完成后告诉我安装结果和版本号。
+请从 GitHub 仓库 Dalizi2026/routego-image 安装 Routego Image v1.0.7 插件。先添加该仓库为插件市场源，再安装 routego-image；完成后告诉我安装结果和版本号。
 ```
 
 安装完成后，重新开启一个 Codex 对话即可使用插件。
@@ -130,7 +130,7 @@ Studio 支持深色和浅色模式，也会在窄屏下调整新手引导位置�
 把下面这段话直接发送给 Codex 桌面端：
 
 ```text
-请更新 GitHub 市场源 Dalizi2026/routego-image，并升级 Routego Image v1.0.6 到最新版本；完成后告诉我版本号和更新结果。
+请更新 GitHub 市场源 Dalizi2026/routego-image，并升级 Routego Image v1.0.7 到最新版本；完成后告诉我版本号和更新结果。
 ```
 
 ## 反馈
@@ -140,6 +140,15 @@ Studio 支持深色和浅色模式，也会在窄屏下调整新手引导位置�
 ## 第三方说明
 
 插件内使用的第三方组件与资源说明位于 [`THIRD_PARTY_NOTICES.md`](plugins/routego-image/THIRD_PARTY_NOTICES.md)。
+
+## v1.0.7 更新说明
+
+### v1.0.7
+
+- macOS 与 Windows 分别发布 v1.0.7 安装包：macOS 插件名为 routego-image，Windows 插件名为 routego-image-windows，两者使用同一公开版本号。
+- Windows 专用包使用独立的配置、运行时与图库目录；Studio 在 Codex 关闭最初 MCP 通道后继续提供本地 API，避免旧页面出现“无法连接本地 Routego 服务”。
+- GPT Image 2 的尺寸限制改为官方边界：最长边 3840、最大 8,294,400 像素、16 像素对齐，最高方形尺寸为 2880 × 2880；不符合规则的请求会在本地明确拒绝，不产生服务商调用。
+- 两个包均通过独立清单、内容哈希、运行时依赖和敏感内容检查后发布。
 
 ## v1.0.6 更新说明
 
@@ -179,11 +188,11 @@ Studio 支持深色和浅色模式，也会在窄屏下调整新手引导位置�
 
 ## Windows 专用版
 
-Windows 请安装独立插件 `routego-image-windows`（v1.0.5）。它与 macOS 版共享相同的公开功能版本号，但使用独立的本地配置与运行目录，不会覆盖 macOS 版的设置或图库。
+Windows 请安装独立插件 `routego-image-windows`（v1.0.7）。它与 macOS 版共享相同的公开功能版本号，但使用独立的本地配置与运行目录，不会覆盖 macOS 版的设置或图库。
 
 Windows 修订构建已修复宿主在打开 Studio 后关闭 MCP 通道时误停本机服务的问题；已认证的 Studio 页面会继续保持图库与生图 API 可用。
 
-Windows 当前修订构建移除了可能计费的能力验证入口和本地能力拦截；已保存的尺寸、比例、质量和格式会直接送往服务商。已保存的 4K 1:1 会保留其精确方形尺寸，不会回退为 1024×1536 等默认尺寸；超过五分钟也不会转入会在重启时丢失的内存队列。
+Windows v1.0.7 使用独立的本地配置、临时运行时与图库目录；Studio 在 Codex 结束最初 MCP 通道后仍保持本地服务。它同步 macOS v1.0.7 的默认参数传递与 GPT Image 2 官方尺寸限制：最长边 3840、最大 8,294,400 像素、16 像素对齐，最高方形尺寸为 2880×2880。
 
 ```text
 请从 GitHub 仓库 Dalizi2026/routego-image 安装 Windows 专用 Routego Image 插件：先更新市场源，再安装 routego-image-windows；完成后告诉我版本号。

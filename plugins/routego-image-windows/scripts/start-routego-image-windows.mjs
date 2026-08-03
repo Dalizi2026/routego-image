@@ -58,16 +58,12 @@ async function main() {
   if (process.platform !== "win32") {
     throw new Error("Routego Image for Windows can run only on Windows.");
   }
-  process.env.ROUTEGO_PACKAGE_TARGET = "windows";
   const manifestText = await readFile(path.join(runtimeRoot, "studio-assets.json"), "utf8");
   const studio = parseStaticManifest(JSON.parse(manifestText));
   const runtime = await import(pathToFileURL(path.join(runtimeRoot, "index.js")).href);
   if (typeof runtime.runRoutegoImageCli !== "function") {
     throw new Error("Routego Image runtime entry is invalid.");
   }
-  // Keep every Windows-specific persisted path rooted at the same user profile.
-  // USERPROFILE is the Windows-native source; HOME is retained for portable
-  // Codex hosts and test runners that provide an isolated profile that way.
   const homeDirectory = process.env.USERPROFILE?.trim() || process.env.HOME?.trim() || homedir();
   const dataRoot = path.join(homeDirectory, ".codex", "routego-image-windows");
   await runtime.runRoutegoImageCli({
@@ -75,9 +71,6 @@ async function main() {
     homeDirectory,
     dataRoot,
     runtimeRoot: path.join(dataRoot, "runtime"),
-    // Codex hosts on Windows can close the MCP STDIO channel after returning
-    // the Studio URL. Keep the same authenticated loopback service alive so
-    // the opened page can keep using its local API.
     retainHttpOnMcpDisconnect: true
   });
 }

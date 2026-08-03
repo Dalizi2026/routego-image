@@ -19218,6 +19218,30 @@ var failedOutputSlotSchema = external_exports.object({
   error: routegoServiceErrorSchema
 }).strict();
 
+// ../contracts/src/gpt-image-2.ts
+var GPT_IMAGE_2_SIZE_LIMITS = Object.freeze({
+  multiple: 16,
+  maxEdge: 3840,
+  maxPixels: 8294400,
+  minPixels: 655360,
+  maxAspectRatio: 3
+});
+function isGptImage2Model(model) {
+  return model?.trim().toLowerCase() === "gpt-image-2";
+}
+function gptImage2SizeViolation(size) {
+  if (size === "auto") return void 0;
+  const match = /^(\d+)x(\d+)$/u.exec(size);
+  if (match === null) return "GPT Image 2 requires an exact WIDTHxHEIGHT size or auto.";
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  const { multiple, maxEdge, maxPixels, minPixels, maxAspectRatio } = GPT_IMAGE_2_SIZE_LIMITS;
+  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width < multiple || height < multiple || width % multiple !== 0 || height % multiple !== 0 || Math.max(width, height) > maxEdge || width * height > maxPixels || width * height < minPixels || width / height > maxAspectRatio || height / width > maxAspectRatio) {
+    return "GPT Image 2 requires dimensions aligned to 16 px, with each edge at most 3840 px, at most 8,294,400 total pixels, and an aspect ratio no wider than 3:1.";
+  }
+  return void 0;
+}
+
 // ../contracts/src/tools.ts
 var operationStatusSchema = external_exports.enum([
   "queued",
@@ -25286,7 +25310,7 @@ var RoutegoMcpServer = class {
       return jsonRpcSuccess(requestId(request), {
         protocolVersion: ROUTEGO_MCP_PROTOCOL_VERSION,
         capabilities: { tools: {} },
-        serverInfo: { name: "routego-image", version: "1.0.6" }
+        serverInfo: { name: "routego-image", version: "1.0.7" }
       });
     }
     if (request.method === "notifications/initialized") return void 0;
@@ -39914,6 +39938,18 @@ function resolvePublicImageRequest(input, defaults) {
   }
   return imageOperationRequestSchema.parse(resolved);
 }
+function assertGptImage2Size(request, model) {
+  if (!isGptImage2Model(model)) return;
+  const violation = gptImage2SizeViolation(request.size);
+  if (violation === void 0) return;
+  throw new ProviderIntegrationError(createProviderServiceError({
+    code: "invalid_input",
+    stage: "validate",
+    safeMessage: violation,
+    mayHaveBilled: false,
+    details: { model, size: request.size }
+  }));
+}
 function outputContractError(request, result) {
   if (result.status !== "succeeded") return void 0;
   const expectedMimeType = request.format === "png" ? "image/png" : request.format === "jpeg" ? "image/jpeg" : "image/webp";
@@ -39949,7 +39985,7 @@ function outputContractError(request, result) {
 function defaultHealth(status) {
   return routegoServiceHealthSchema.parse({
     status,
-    version: "1.0.6",
+    version: "1.0.7",
     nodeVersion: process.version,
     uptimeSeconds: 0,
     mcpAvailable: false,
@@ -40631,6 +40667,7 @@ var ProductionLocalRoutegoService = class {
       });
       const staged = await stagePreparedPublicOperationSources(prepared, { transaction });
       const selectedProvider = providerSnapshot ?? await this.#provider(requestId2, signal);
+      assertGptImage2Size(staged.request, selectedProvider.model);
       const isDirectReferenceGeneration = input.kind === "generate" && input.references.length > 0;
       const allowUnverifiedImageInput = allowUnverifiedDirectEdit || isDirectReferenceGeneration;
       const provider = allowUnverifiedImageInput && selectedProvider.context !== void 0 ? freezeProviderSnapshot({
@@ -40868,6 +40905,7 @@ var ProductionLocalRoutegoService = class {
         now: () => this.#now()
       });
       const provider = providerSnapshot ?? await this.#provider(requestId2, signal);
+      assertGptImage2Size(staged.creationRequest, provider.model);
       creationInvoked = true;
       const raw = await this.#executeCreation(staged.creationRequest, {
         requestId: requestId2,
@@ -42938,12 +42976,17 @@ var RoutegoMcpProcess = class {
         if (this.#closing) return;
         await this.#server.handleChunk(chunk);
         if (this.#server.closed) {
+          if (this.#options.retainHttpOnMcpDisconnect === true) return;
           await this.shutdown("mcp-shutdown");
           return;
         }
       }
       if (this.#closing) return;
       await this.#server.finish();
+      if (this.#options.retainHttpOnMcpDisconnect === true) {
+        this.#server.shutdown();
+        return;
+      }
       await this.shutdown(this.#server.closed ? "mcp-shutdown" : "stdin-eof");
     } catch (error51) {
       if (!this.#closing) {
@@ -43024,7 +43067,8 @@ function createRoutegoMcpProcess(options) {
     signalSource: processSignals(options.signalSource),
     diagnose: createDiagnosticReporter(error51, options.logger),
     ...options.maximumLineBytes === void 0 ? {} : { maximumLineBytes: options.maximumLineBytes },
-    ...options.shutdownTimeoutMs === void 0 ? {} : { shutdownTimeoutMs: options.shutdownTimeoutMs }
+    ...options.shutdownTimeoutMs === void 0 ? {} : { shutdownTimeoutMs: options.shutdownTimeoutMs },
+    ...options.retainHttpOnMcpDisconnect === void 0 ? {} : { retainHttpOnMcpDisconnect: options.retainHttpOnMcpDisconnect }
   });
 }
 async function createProductionRoutegoMcpProcess(options) {
@@ -43038,7 +43082,15 @@ async function createProductionRoutegoMcpProcess(options) {
     options.runtimeRoot ?? path18.join(selectedHome, ".codex", "routego-image", "runtime")
   );
   const stagingRoot = resolveProductionStagingRoot(runtimeRoot, options.stagingRoot);
-  const library = options.library ?? createRoutegoLibraryService({ homeDirectory: selectedHome });
+  const dataRoot = options.dataRoot === void 0 ? void 0 : path18.resolve(options.dataRoot);
+  const library = options.library ?? createRoutegoLibraryService({
+    homeDirectory: selectedHome,
+    ...dataRoot === void 0 ? {} : {
+      settings: { dataRoot },
+      uploads: { dataRoot },
+      index: { root: path18.join(dataRoot, "library") }
+    }
+  });
   const ownsEphemeralResources = options.ephemeralResources === void 0;
   const ephemeralResources = options.ephemeralResources ?? await createEphemeralImageResourceRegistry({ root: path18.join(runtimeRoot, "ephemeral") });
   try {
@@ -43083,7 +43135,7 @@ async function createProductionRoutegoMcpProcess(options) {
       openStudio: async (request) => await lifecycle.openStudio(request),
       serviceHealth: () => ({
         status: "ready",
-        version: "1.0.6",
+        version: "1.0.7",
         nodeVersion: process.version,
         uptimeSeconds: 0,
         mcpAvailable: true,
@@ -43100,7 +43152,8 @@ async function createProductionRoutegoMcpProcess(options) {
       signalSource,
       diagnose,
       ...options.maximumLineBytes === void 0 ? {} : { maximumLineBytes: options.maximumLineBytes },
-      ...options.shutdownTimeoutMs === void 0 ? {} : { shutdownTimeoutMs: options.shutdownTimeoutMs }
+      ...options.shutdownTimeoutMs === void 0 ? {} : { shutdownTimeoutMs: options.shutdownTimeoutMs },
+      ...options.retainHttpOnMcpDisconnect === void 0 ? {} : { retainHttpOnMcpDisconnect: options.retainHttpOnMcpDisconnect }
     });
   } catch (error52) {
     if (ownsEphemeralResources) await ephemeralResources.shutdown().catch(() => 0);
